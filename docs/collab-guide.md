@@ -1,4 +1,6 @@
-# 🚀 CSE-310 Team Project – Collaboration Guide
+
+# CSE-360 Team Project – Collaboration Guide
+
 
 This guide explains how our team will use **GitHub** to collaborate on the project.  
 Follow these steps to keep our repository clean, organized, and easy to grade.
@@ -7,10 +9,10 @@ Follow these steps to keep our repository clean, organized, and easy to grade.
 
 ## 🔑 Setup (First Time Only)
 
-```bash
-# Clone the repository
-git clone https://github.com/YourTeamName/CSE-310-TeamProject.git
-cd CSE-310-TeamProject
+1. Clone the repository (first time only):
+   git clone https://github.com/YourTeamName/CSE-360-TeamProject.git
+   cd CSE-360-TeamProject
+
 
 # Configure your Git identity (must match your GitHub email)
 git config --global user.name "Your Name"

@@ -1,2 +1,2 @@
-# CSE-310-TeamProject
-Team Project for CSE310 - ASU 
+# CSE-360-TeamProject
+Team Project for CSE360 - ASU 
