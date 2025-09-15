@@ -1,4 +1,4 @@
-# 🚀 CSE-310 Team Project – Collaboration Guide
+# 🚀 CSE-360 Team Project – Collaboration Guide
 
 This guide explains how our team will use **GitHub** to collaborate on the project.  
 Follow these steps to keep our repository clean, organized, and easy to grade.
