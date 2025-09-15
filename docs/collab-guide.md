@@ -3,24 +3,24 @@
 This guide explains how our team will use **GitHub** to collaborate on the project. Follow these steps to keep our repository clean, organized, and easy to grade.
 
 
-## 🔑 Setup (First Time Only)
+# 🔑 Setup (First Time Only)
 
 You can use GitHub’s **no-reply** email for privacy (see GitHub account settings).
 
 # Commands:
-# Clone the repository
+### Clone the repository
 git clone https://github.com/YourTeamName/CSE-310-TeamProject.git
 cd CSE-310-TeamProject
 
-# Configure your Git identity (must match your GitHub email)
+### Configure your Git identity (must match your GitHub email)
 git config --global user.name "Your Name"
 git config --global user.email "YourGitHubEmail@example.com"
 
-# (Optional) Verify your config
+### (Optional) Verify your config
 git config --get user.name
 git config --get user.email
 
-## 🌲 Branching Workflow
+# 🌲 Branching Workflow
 
 We never commit directly to `main`. All work is done in feature branches and merged via Pull Requests (PRs).
 - `main` → always clean, submission-ready
@@ -31,12 +31,12 @@ git checkout main
 git pull origin main        # ensure latest
 git checkout -b feature-your-task
 
-# Examples:
-# feature-input-validation
-# feature-user-stories
-# docs-team-norms
+## Examples:
+### feature-input-validation
+### feature-user-stories
+### docs-team-norms
 
-## 📝 Making Changes
+# 📝 Making Changes
 
 1. Edit your assigned files in VS Code.
 2. Stage and commit your changes.
@@ -47,7 +47,7 @@ git add .
 git commit -m "Short, clear summary of changes"
 git push -u origin feature-your-task   # first push sets upstream
 
-## 📄 Add a New File and Push It
+# 📄 Add a New File and Push It
 
 # Example:
 mkdir -p docs
@@ -58,7 +58,7 @@ git add docs/team-norms.md
 git commit -m "Add team norms draft"
 git push
 
-## 🔄 Open a Pull Request (PR)
+# 🔄 Open a Pull Request (PR)
 
 1. Go to your repo on GitHub.
 2. Click "Compare & pull request".
@@ -68,7 +68,7 @@ git push
    - Reviewers: assign at least one teammate
 4. Wait for review and approval before merging.
 
-## ✅ Merging & Staying Up to Date
+# ✅ Merging & Staying Up to Date
 
 After approval, the PR is merged into `main`. Before starting new work, update your local copy and branch off again:
 
@@ -76,7 +76,7 @@ git checkout main
 git pull origin main
 git checkout -b feature-next-task
 
-## 📋 Team Rules for GitHub
+# 📋 Team Rules for GitHub
 
 - Work on feature branches only.
 - Write clear, descriptive commit messages.
@@ -84,23 +84,23 @@ git checkout -b feature-next-task
 - Keep `main` clean (no broken code).
 - (Optional) Delete branches after merge to stay tidy.
 
-## ⚡ Quick VS Code Tips
+# ⚡ Quick VS Code Tips
 
 - Source Control tab → view changes, stage, commit.
 - Commit requires a message.
 - Branch menu (bottom-left) → switch/create branches.
 - Publish Branch → pushes your branch to GitHub.
 
-## 🛠️ Troubleshooting (Quick Fixes)
+# 🛠️ Troubleshooting (Quick Fixes)
 
-# "Author identity unknown" when committing
+## "Author identity unknown" when committing
 git config --global user.name "Your Name"
 git config --global user.email "YourGitHubEmail@example.com"
 
-# "No upstream branch" when pushing
+## "No upstream branch" when pushing
 git push -u origin feature-your-task
 
-# Need latest main before branching
+## Need latest main before branching
 git checkout main && git pull origin main
 
 
