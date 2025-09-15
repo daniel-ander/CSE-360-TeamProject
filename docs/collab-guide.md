@@ -1,97 +1,146 @@
+
 # CSE-360 Team Project – Collaboration Guide
 
-This guide explains how our team will use GitHub to collaborate on the project.  
-Please follow these steps to keep our repository clean, organized, and easy to grade.
+
+This guide explains how our team will use **GitHub** to collaborate on the project.  
+Follow these steps to keep our repository clean, organized, and easy to grade.
 
 ---
 
-## 🔑 Setup
+## 🔑 Setup (First Time Only)
 
 1. Clone the repository (first time only):
    git clone https://github.com/YourTeamName/CSE-360-TeamProject.git
    cd CSE-360-TeamProject
 
-2. Configure Git identity (first time only):
-   git config --global user.name "Your Name"
-   git config --global user.email "YourGitHubEmail@example.com"
 
-   > Use the same email linked to your GitHub account.  
-   > You can find a no-reply GitHub email in your account settings if you prefer privacy.
+# Configure your Git identity (must match your GitHub email)
+git config --global user.name "Your Name"
+git config --global user.email "YourGitHubEmail@example.com"
+
+# (Optional) Verify your config
+git config --get user.name
+git config --get user.email
+```
+
+> You can use GitHub’s **no-reply** email for privacy (see GitHub account settings).
 
 ---
 
 ## 🌲 Branching Workflow
 
-We will never commit directly to `main`.  
-Instead, each task is completed in its own branch and merged through a Pull Request (PR).
+We **never commit directly to `main`**.  
+All work is done in **feature branches** and merged via **Pull Requests (PRs)**.
 
-- Main branch (`main`) → always clean, submission-ready.  
-- Feature branches → where individual work is done.  
+- **`main`** → always clean, submission-ready  
+- **feature branches** → where individual work happens
 
 ### Create a new branch
-   git checkout main
-   git pull origin main        # get the latest code
-   git checkout -b feature-your-task
 
-Examples:
-- feature-input-validation  
-- feature-user-stories  
-- docs-team-norms  
+```bash
+git checkout main
+git pull origin main        # ensure latest
+git checkout -b feature-your-task
+```
+
+✅ Examples:
+- `feature-input-validation`  
+- `feature-user-stories`  
+- `docs-team-norms`
 
 ---
 
 ## 📝 Making Changes
 
-1. Edit your assigned files in VS Code.  
-2. Stage and commit:
-   git add .
-   git commit -m "Short description of what you changed"
-3. Push your branch to GitHub:
-   git push origin feature-your-task
+1. Edit your assigned files in VS Code.
+2. Stage and commit your changes.
+3. Push your branch to GitHub.
+
+```bash
+# Stage and commit
+git add .
+git commit -m "Short, clear summary of changes"
+
+# Push (first push sets upstream)
+git push -u origin feature-your-task
+```
 
 ---
 
-## 🔄 Pull Requests (PRs)
+## 📄 Add a New File and Push It
 
-1. After pushing, go to GitHub.  
-2. Click "Compare & pull request".  
+```bash
+# Create a file (example)
+mkdir -p docs
+echo "# Team Norms" > docs/team-norms.md
+
+# Stage, commit, and push
+git add docs/team-norms.md
+git commit -m "Add team norms draft"
+git push
+```
+
+---
+
+## 🔄 Open a Pull Request (PR)
+
+1. Go to your repo on **GitHub**.  
+2. Click **“Compare & pull request.”**  
 3. Fill out:
-   - Title: Brief summary of the change  
-   - Description: What was changed, notes for reviewers  
-   - Assign at least one teammate as reviewer  
-4. Wait for review before merging.  
+   - **Title**: brief summary  
+   - **Description**: what changed, why, any notes for reviewers  
+   - **Reviewers**: assign at least one teammate  
+4. ✅ Wait for review and approval before merging.
 
 ---
 
-## ✅ Merging & Staying Up To Date
+## ✅ Merging & Staying Up to Date
 
-- After approval, the PR is merged into `main`.  
-- Before starting new work:
-   git checkout main
-   git pull origin main
-   git checkout -b feature-next-task
+After approval, the PR is merged into **`main`**.
 
-This ensures you are always working from the latest version.  
+Before starting new work, update your local copy and branch off again:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature-next-task
+```
 
 ---
 
 ## 📋 Team Rules for GitHub
 
-- Always work on a feature branch.  
-- Use clear, descriptive commit messages.  
-- Review teammate PRs promptly.  
-- Keep `main` clean — no broken code.  
-- Delete branches after merge (optional but keeps things tidy).  
+- Work on **feature branches** only  
+- Write **clear, descriptive commit messages**  
+- **Review PRs promptly** and leave constructive feedback  
+- Keep `main` **clean** (no broken code)  
+- (Optional) **Delete branches** after merge to stay tidy
 
 ---
 
 ## ⚡ Quick VS Code Tips
 
-- Source Control tab (left sidebar) shows changed files.  
-- Use ✓ to commit after writing a message.  
-- Use bottom-left branch menu to switch or create branches.  
-- After committing, click "Publish Branch" to push it to GitHub.  
+- **Source Control** tab → view changes, stage, commit  
+- **✓ Commit** → requires a commit message  
+- **Branch menu (bottom-left)** → switch/create branches  
+- **Publish Branch** → pushes your branch to GitHub
 
 ---
 
-Following this workflow will help us avoid conflicts, track changes clearly, and make integration much smoother.
+## 🛠️ Troubleshooting (Quick Fixes)
+
+```bash
+# "Author identity unknown" when committing
+git config --global user.name "Your Name"
+git config --global user.email "YourGitHubEmail@example.com"
+
+# "No upstream branch" when pushing
+git push -u origin feature-your-task
+
+# Need latest main before branching
+git checkout main && git pull origin main
+```
+
+---
+
+✅ Following this workflow helps us avoid conflicts, track changes clearly, and keep `main` submission-ready.
