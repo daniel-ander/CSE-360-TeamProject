@@ -1,0 +1,16 @@
+- **New Users**
+  - As the first user of the system to log in, I can establish my username, password, and account informa:on using a special screen for the first user.  
+  - As the first user, I am assigned the role of an admin.  
+  - Once I have finished providing the required account informa:on, I’m required to log in again.  
+  - The possible roles include admin, student, instructor, staff, and reviewer.  
+  - As a user of the system, I can be assigned one or more user roles so the various func:ons of the system can be performed, some of which require special knowledge, skills, and authoriza:ons.  
+  - As a user of the system with only one role assigned, I can start playing my role immediately aDer logging in (i.e., I’m taken to that role’s home screen), so I do not have to spend :me telling the system which role I want to play.  
+  - As a user of the system with more than one role assigned, I can select which role I want to play aDer logging in (i.e., I’m then taken to that role’s home screen) so I can focus on the tasks of the role with a focused and easy-to-use user interface.  
+  - As a user of the system, I can log out when I’m finished using the system, or I wish to change roles.  
+
+- **Admin**
+  - As an admin, I can invite users to join the system and play one or more roles so they can use and support the opera:on of the system. This invita:on uses a one-:me code and includes a deadline for joining the system.  
+  - As an admin, I can set a one-:me password for a user who has forgoIen their password so they can establish a new password. Once a user has logged in with the one-:me password, it is cleared so it can’t be used again. ADer establishing a new password, the user is required to log in again.  
+  - As an admin, I can “delete” a user account so individuals who are no longer associated with the class are not able to use the system. An admin is not allowed to remove that admin’s access. When dele:ng an account, an "Are you sure?" message must be answered with "Yes" to remove access.  
+  - As an admin, I can list all the user accounts so I can perform my administra:ve func:ons. The list shows each account’s username, the user’s name, the user’s email address, and the roles the user plays.  
+  - As an admin, I can add or remove roles for each user. An admin may not remove the admin role from that admin’s account. There must always be at least one user able to perform the admin role.  
