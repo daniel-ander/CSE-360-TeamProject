@@ -2,6 +2,7 @@
 Team Project for CSE360 - ASU 
 
 # Contents: 
+## User Stories - Stories that we are required to implement
 ## /docs
 ### collab-guide.md
 
