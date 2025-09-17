@@ -129,25 +129,17 @@ public class DatabaseHelper {
 	// Adds roles to the user by appending the role delimited by 
 	
 	public void updateUserRoles(String userName, List<String> newRoles) {
-	    // Get the existing roles
-	    String existingRolesStr = getUserRole(userName);
-	    List<String> allRoles = new ArrayList<>();
-
-	    if (existingRolesStr != null && !existingRolesStr.isEmpty()) {
-	        allRoles.addAll(Arrays.asList(existingRolesStr.split(",")));
-	    }
-
-	    // Add only roles that aren’t already present
-	    for (String role : newRoles) {
-	        if (!allRoles.contains(role)) {
-	            allRoles.add(role);
+	    // Normalize, de-dup, and join
+	    LinkedHashSet<String> norm = new LinkedHashSet<>();
+	    for (String r : newRoles) {
+	        if (r != null) {
+	            String v = r.trim().toLowerCase(Locale.ROOT);
+	            if (!v.isEmpty()) norm.add(v);
 	        }
 	    }
+	    String roleString = String.join(",", norm); // empty string means “no roles”
 
-	    // Join back into a string
-	    String roleString = String.join(",", allRoles);
-
-	    String query = "UPDATE cse360users SET role=? WHERE userName =?";
+	    String query = "UPDATE cse360users SET role = ? WHERE userName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, roleString);
 	        pstmt.setString(2, userName);
@@ -171,6 +163,15 @@ public class DatabaseHelper {
 	        e.printStackTrace();
 	    }
 		return usernames;
+	}
+	// Deletes a user from the database based on their userName.
+	public void deleteUser(String userName) throws SQLException {
+	    String sql = "DELETE FROM cse360users WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, userName);
+	        pstmt.executeUpdate();
+	        System.out.println("Deleted user: " + userName);
+	    }
 	}
 	
 	// Generates a new invitation code and inserts it into the database.
