@@ -1,1 +1,4 @@
 /bin/
+/database/*.mv.db
+/database/*.trace.db
+/database/*.lock.db
