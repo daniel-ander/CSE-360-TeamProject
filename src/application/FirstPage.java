@@ -28,7 +28,7 @@ public class FirstPage {
     	
     	// Label to display the welcome message for the first user
 	    layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-	    Label userLabel = new Label("Hello..You are the first person here. \nPlease select continue to setup administrator access");
+	    Label userLabel = new Label("Welcome!\n This is the special Admin page\n Only the first user sees this!");
 	    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 	    
 	    Button continueButton = new Button("Continue");

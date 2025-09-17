@@ -13,6 +13,9 @@ import databasePart1.*;
  * The SetupAdmin class handles the setup process for creating an administrator account.
  * This is intended to be used by the first user to initialize the system with admin credentials.
  */
+
+// This is the page that the first User to login will be sent to. 
+// 
 public class AdminSetupPage {
 	
     private final DatabaseHelper databaseHelper;
@@ -26,7 +29,8 @@ public class AdminSetupPage {
         // Label to display error messages
         Label errorLabel = new Label(""); //creation of label, "blank" so its rendered early and nothing shifts around
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-    	
+    	Label pageExplain = new Label("This page is where the first user will login\n they are automatically an admin\n Use Admin/Password1");
+    	pageExplain.setStyle("-fx-text-fill: black; -fx-font-size: 12px;");
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter Admin userName");
         userNameField.setMaxWidth(250);
@@ -59,14 +63,14 @@ public class AdminSetupPage {
                 System.out.println("Administrator setup completed.");
                 
                 // Navigate to the Welcome Login Page
-                new WelcomeLoginPage(databaseHelper).show(primaryStage,user);
+                new UserLoginPage(databaseHelper).show(primaryStage);
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();
             }
         });
 
-        VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel);
+        VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
         primaryStage.setScene(new Scene(layout, 800, 400));
