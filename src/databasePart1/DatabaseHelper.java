@@ -1,4 +1,5 @@
 package databasePart1;
+import java.util.*;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -123,6 +124,21 @@ public class DatabaseHelper {
 	        e.printStackTrace();
 	    }
 	    return null; // If no user exists or an error occurs
+	}
+	// Retrieves all user names from the database
+	
+	public List<String> getAllUsernames() {
+		List<String> usernames = new ArrayList<>();
+		String query = "SELECT username FROM cse360users";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        ResultSet rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	        	usernames.add((rs.getString("username")));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+		return usernames;
 	}
 	
 	// Generates a new invitation code and inserts it into the database.
