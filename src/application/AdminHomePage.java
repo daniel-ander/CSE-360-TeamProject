@@ -41,6 +41,9 @@ public class AdminHomePage {
 	    CheckBox staffCheck = new CheckBox("Staff");
 	    CheckBox reviewerCheck = new CheckBox("Reviewer");
 	    
+	    // admins cant unadmin so disable the checkbox functionality, still shows role
+	    adminCheck.setDisable(true);
+	    	
 	    // label to display the welcome message for the admin
 	    Label adminLabel = new Label("Hello, Admin!\n Select a User, Select their roles, then save.");
 	    
@@ -50,6 +53,31 @@ public class AdminHomePage {
 	    List<String> users = databaseHelper.getAllUsernames();
 	    userDropDown.setPromptText("Select user");
 	    userDropDown.getItems().addAll(users);
+	    
+	    // Dropdown onAction
+	    userDropDown.setOnAction(a ->{
+	    	String selectedUser = userDropDown.getValue();
+	    	if (selectedUser == null) return;
+	    	
+	    	String roleStr = databaseHelper.getUserRole(selectedUser);
+	    	List <String> roles = new ArrayList<>();
+	    	if (roleStr != null && !roleStr.isEmpty()) {
+	    		roles = Arrays.asList(roleStr.split(","));
+	    	}
+	    	// Reset them first, 
+	        adminCheck.setSelected(false);
+	        studentCheck.setSelected(false);
+	        instructorCheck.setSelected(false);
+	        staffCheck.setSelected(false);
+	        reviewerCheck.setSelected(false);
+
+	        // then enable the ones the user has
+	        if (roles.contains("admin")) adminCheck.setSelected(true);
+	        if (roles.contains("student")) studentCheck.setSelected(true);
+	        if (roles.contains("instructor")) instructorCheck.setSelected(true);
+	        if (roles.contains("staff")) staffCheck.setSelected(true);
+	        if (roles.contains("reviewer")) reviewerCheck.setSelected(true);
+	    });
 	    
 	    // Save button
 	    Button saveRoles = new Button("Save");
