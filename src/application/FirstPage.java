@@ -34,6 +34,7 @@ public class FirstPage {
 	    Button continueButton = new Button("Continue");
 	    // Button to navigate to the SetupAdmin page
 	    
+	    
 	    continueButton.setOnAction(a -> {
 	        new AdminSetupPage(databaseHelper).show(primaryStage);
 	        

@@ -41,6 +41,13 @@ public class AdminSetupPage {
 
         Button setupButton = new Button("Setup");
         
+	    Button adminInfoAutoFill = new Button("Admin Login (TESTING)");
+	    adminInfoAutoFill.setOnAction(a -> {
+	    	userNameField.setText("admin");
+	    	passwordField.setText("Password1!");
+	    });
+
+        
         setupButton.setOnAction(a -> {
         	// Retrieve user input
             String userName = userNameField.getText();
@@ -70,7 +77,7 @@ public class AdminSetupPage {
             }
         });
 
-        VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain);
+        VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain, adminInfoAutoFill);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
 
         primaryStage.setScene(new Scene(layout, 800, 400));
