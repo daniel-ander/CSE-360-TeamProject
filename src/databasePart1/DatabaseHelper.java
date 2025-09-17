@@ -165,12 +165,25 @@ public class DatabaseHelper {
 		return usernames;
 	}
 	// Deletes a user from the database based on their userName.
-	public void deleteUser(String userName) throws SQLException {
-	    String sql = "DELETE FROM cse360users WHERE userName = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-	        pstmt.setString(1, userName);
+	public boolean deleteUser(String currentUser, String targetUser) {
+	    // Prevent an admin from deleting their own account
+	    if (currentUser.equals(targetUser)) {
+	        String currentRoles = getUserRole(currentUser);
+	        // stop admins deleting their own account
+	        if (currentRoles != null && currentRoles.contains("admin")) {
+	            System.out.println("Admins cannot delete their own account.");
+	            return false;
+	        }
+	    }
+
+	    String query = "DELETE FROM cse360users WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, targetUser);
 	        pstmt.executeUpdate();
-	        System.out.println("Deleted user: " + userName);
+	        return true;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
 	    }
 	}
 	
