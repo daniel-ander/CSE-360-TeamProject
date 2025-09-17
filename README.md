@@ -1,6 +1,12 @@
 # CSE-360-TeamProject
 Team Project for CSE360 - ASU 
 
+# Documentation
+### Github doesn't play well with .docx, everyone should request access to this project and edit it in there. 
+- [Team Project Report (Google Doc)](https://docs.google.com/document/d/1uQYse7CRU5mB1yXKWRj2MBDQrIfw3NvYD8Fvsl5CsXs/edit?usp=sharing)
+- 
+
+
 # How to make eclipse work!
 
 I included the .jars and lib files for both h2 and JavaFX, but the .dlls are too large. You'll have to download javafx SDK 24.0.2, you probably already have it from HW1
