@@ -128,13 +128,29 @@ public class DatabaseHelper {
 	
 	// Adds roles to the user by appending the role delimited by 
 	
-	public void updateUserRoles(String userName, List<String> roles) {
-		String roleString = String.join("," , roles);
-		
-		String query = "UPDATE cse360users SET role=? WHERE userName =?";
-		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, userName);
-	        pstmt.setString(2, roleString);
+	public void updateUserRoles(String userName, List<String> newRoles) {
+	    // Get the existing roles
+	    String existingRolesStr = getUserRole(userName);
+	    List<String> allRoles = new ArrayList<>();
+
+	    if (existingRolesStr != null && !existingRolesStr.isEmpty()) {
+	        allRoles.addAll(Arrays.asList(existingRolesStr.split(",")));
+	    }
+
+	    // Add only roles that aren’t already present
+	    for (String role : newRoles) {
+	        if (!allRoles.contains(role)) {
+	            allRoles.add(role);
+	        }
+	    }
+
+	    // Join back into a string
+	    String roleString = String.join(",", allRoles);
+
+	    String query = "UPDATE cse360users SET role=? WHERE userName =?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, roleString);
+	        pstmt.setString(2, userName);
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -199,6 +215,28 @@ public class DatabaseHelper {
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
 	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+	// Print the cse360 table to console for debugging
+	public void printUsersTable() {
+	    String query = "SELECT id, userName, password, role FROM cse360users";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+
+	        System.out.printf("%-5s %-20s %-20s %-30s%n", "ID", "Username", "Password", "Roles");
+	        System.out.println("--------------------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            int id = rs.getInt("id");
+	            String userName = rs.getString("userName");
+	            String password = rs.getString("password");
+	            String role = rs.getString("role");
+
+	            System.out.printf("%-5d %-20s %-20s %-30s%n", id, userName, password, role);
+	        }
+
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }

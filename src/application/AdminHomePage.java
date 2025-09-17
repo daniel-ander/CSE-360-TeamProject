@@ -59,18 +59,60 @@ public class AdminHomePage {
 	    		return;
 	    	}
 	    	List<String> roles = new ArrayList<>();
-	    	if (adminCheck.isSelected()) roles.add("admin");
-	        if (studentCheck.isSelected()) roles.add("student");
-	        if (instructorCheck.isSelected()) roles.add("instructor");
-	        if (staffCheck.isSelected()) roles.add("staff");
-	        if (reviewerCheck.isSelected()) roles.add("reviewer");
+	    	String currentRolesStr = databaseHelper.getUserRole(selectedUser);
+	    	List<String> currentRoles = Arrays.asList(currentRolesStr.split(","));
+	    	if (adminCheck.isSelected()) {
+	    	    if (currentRoles.contains("admin")) {
+	    	        System.out.printf("Admin role already assigned to %s%n", selectedUser);
+	    	        System.out.printf("Role string: %s%n", currentRoles);
+	    	    } else {
+	    	        roles.add("admin");
+	    	    }
+	    	}
+
+	    	if (studentCheck.isSelected()) {
+	    	    if (currentRoles.contains("student")) {
+	    	        System.out.printf("Student role already assigned to %s%n", selectedUser);
+	    	        System.out.printf("Role string: %s%n", currentRoles);
+	    	    } else {
+	    	        roles.add("student");
+	    	    }
+	    	}
+
+	    	if (instructorCheck.isSelected()) {
+	    	    if (currentRoles.contains("instructor")) {
+	    	        System.out.printf("Instructor role already assigned to %s%n", selectedUser);
+	    	        System.out.printf("Role string: %s%n", currentRoles);
+	    	    } else {
+	    	        roles.add("instructor");
+	    	    }
+	    	}
+
+	    	if (staffCheck.isSelected()) {
+	    	    if (currentRoles.contains("staff")) {
+	    	        System.out.printf("Staff role already assigned to %s%n", selectedUser);
+	    	        System.out.printf("Role string: %s%n", currentRoles);
+	    	    } else {
+	    	        roles.add("staff");
+	    	    }
+	    	}
+
+	    	if (reviewerCheck.isSelected()) {
+	    	    if (currentRoles.contains("reviewer")) {
+	    	        System.out.printf("Reviewer role already assigned to %s%n", selectedUser);
+	    	        System.out.printf("Role string: %s%n", currentRoles);
+	    	    } else {
+	    	        roles.add("reviewer");
+	    	    }
+	    	}
+
 	        
-	        databaseHelper.updateUserRoles(selectedUser, roles);
+	        databaseHelper.updateUserRoles(selectedUser, roles);	
 	        System.out.println("Updates Roles for " + selectedUser + ": " + roles);
+	        databaseHelper.printUsersTable();
 	        
 	    });
-	    
-	    
+	   
 	    
 	    roleBox.getChildren().addAll(userDropDown, new Label("Choose Role to add"), adminCheck, studentCheck, instructorCheck, staffCheck, reviewerCheck, saveRoles);
 	    
