@@ -1,5 +1,6 @@
 package application;
 
+import java.sql.SQLException;
 import java.util.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -51,6 +52,23 @@ public class AdminHomePage {
         // User details section
         Label userDetails = new Label("Select a user to view details.");
         userDetails.setStyle("-fx-border-color: gray; -fx-padding: 10; -fx-font-size: 14px;");
+        
+        Label tempPasswordInfo = new Label();
+        tempPasswordInfo.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
+
+        Button setTempPassword = new Button("Set Temp Password");
+        setTempPassword.setOnAction(a -> {
+            String selectedUser = userDropDown.getValue();
+            if (selectedUser == null) return;
+
+            String tempPass = databaseHelper.issueResetPassword(selectedUser);
+            
+            if (tempPass == null) {
+                tempPasswordInfo.setText("Error setting temp password");
+            } else {
+                tempPasswordInfo.setText("Temp password for " + selectedUser + " is: " + tempPass);
+            }
+        });
 
         // Populate checkboxes and details when user is selected
         userDropDown.setOnAction(a -> {
@@ -166,7 +184,7 @@ public class AdminHomePage {
             saveRoles
         );
 
-        layout.getChildren().addAll(adminLabel, roleBox, userDetails, deleteUser);
+        layout.getChildren().addAll(adminLabel, roleBox, userDetails, deleteUser, setTempPassword, tempPasswordInfo);
         Scene adminScene = new Scene(layout, 800, 400);
 
         primaryStage.setScene(adminScene);

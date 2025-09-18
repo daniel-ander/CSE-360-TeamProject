@@ -255,6 +255,41 @@ public class DatabaseHelper {
 	        e.printStackTrace();
 	    }
 	}
+	// method to generate a random password w/ a reset flag 
+	public String issueResetPassword(String userName) {
+	    Random rand = new Random();
+
+	    String lowers   = "abcdefghijklmnopqrstuvwxyz";
+	    String uppers   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	    String digits   = "0123456789";
+	    String specials = "~`!@#$%^&*()_-+{}[]|:,.?/";
+	    String pool     = uppers + lowers + digits + specials;
+
+	    // Build the 6-char tail: guarantee 1 lowercase and 1 digit, fill the rest
+	    List<Character> tail = new ArrayList<>();
+	    tail.add(lowers.charAt(rand.nextInt(lowers.length()))); // guarantee lowercase
+	    tail.add(digits.charAt(rand.nextInt(digits.length()))); // guarantee digit
+	    while (tail.size() < 8) {
+	        tail.add(pool.charAt(rand.nextInt(pool.length())));
+	    }
+	    Collections.shuffle(tail, rand);
+
+	    StringBuilder sb = new StringBuilder("R_"); // marker = reset
+	    for (char c : tail) sb.append(c);
+	    String tempPass = sb.toString();            // total length = 8
+
+	    String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, tempPass);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	    return tempPass;
+	}
+
 
 	// Closes the database connection and statement.
 	public void closeConnection() {

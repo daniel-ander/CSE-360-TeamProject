@@ -43,42 +43,62 @@ public class UserLoginPage {
 	    	passwordField.setText("Password1!");
 	    });
         
-        loginButton.setOnAction(a -> {																	// this is where we're going to check credentials against our FSM classes
-        	// Retrieve user inputs
-        	String userName = userNameField.getText();
-        	String password = passwordField.getText();
+	    loginButton.setOnAction(a -> {  
+	        // Retrieve user inputs
+	        String userName = userNameField.getText();
+	        String password = passwordField.getText();
+	        boolean resetPasswordFlag = false; // default to false
 
-        	// validate against our FSM classes
-        	if (!UserNameRecognizer.checkForValidUserName(userName)) {
-        	    errorLabel.setText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
-        	    return;
-        	}
-        	if (!PasswordEvaluator.evaluatePassword(password)) {
-        	    errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
-        	    return;
-        	}
+	        // --- Username validation ---
+	        if (!UserNameRecognizer.checkForValidUserName(userName)) {
+	            errorLabel.setText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
+	            return;
+	        }
 
-        	// if FSM validates then compare against the database
-        	try {
-        	    User user = new User(userName, password, "");
-        	    WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage(databaseHelper);
+	        // --- Password validation ---
+	        if (password.length() >= 2 && password.startsWith("R_")) {
+	            resetPasswordFlag = true;
+	            String tempPass = password.substring(2); // strip R_
+	            if (!PasswordEvaluator.evaluatePassword(tempPass)) {
+	                errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+	                return;
+	            }
+	        } else if (!PasswordEvaluator.evaluatePassword(password)) {
+	            errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+	            return;
+	        }
 
-        	    String role = databaseHelper.getUserRole(userName);
-        	    if (role != null) {
-        	        user.setRole(role);
-        	        if (databaseHelper.login(user)) {
-        	            welcomeLoginPage.show(primaryStage, user);
-        	        } else {
-        	            errorLabel.setText("Error logging in");
-        	        }
-        	    } else {
-        	        errorLabel.setText("User account doesn't exist");
-        	    }
-        	} catch (SQLException e) {
-        	    System.err.println("Database error: " + e.getMessage());
-        	    e.printStackTrace();
-        	}
-        });
+	        // --- Database check ---
+	        try {
+	            User user = new User(userName, password, "");
+	            WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage(databaseHelper);
+
+	            String role = databaseHelper.getUserRole(userName);
+	            if (role != null) {
+	                user.setRole(role);
+	                if (databaseHelper.login(user)) {
+	                	if (resetPasswordFlag) {
+	                	    // Instead of redirecting, just show an alert
+	                	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	                	    alert.setTitle("Password Reset Required");
+	                	    alert.setHeaderText(null);
+	                	    alert.setContentText("Redirecting to reset-password flow (placeholder).");
+	                	    alert.showAndWait();
+	                	} else {
+	                	    welcomeLoginPage.show(primaryStage, user);
+	                	}
+	                } else {
+	                    errorLabel.setText("Error logging in");
+	                }
+	            } else {
+	                errorLabel.setText("User account doesn't exist");
+	            }
+	        } catch (SQLException e) {
+	            System.err.println("Database error: " + e.getMessage());
+	            e.printStackTrace();
+	        }
+	    });
+
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
