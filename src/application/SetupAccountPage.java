@@ -6,6 +6,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 import databasePart1.*;
 
@@ -26,6 +29,11 @@ public class SetupAccountPage {
      * @param primaryStage The primary stage where the scene will be displayed.
      */
     public void show(Stage primaryStage) {
+    	final boolean debug = true;
+	    if (debug) {
+	    	databaseHelper.printInvitationCodesTable();
+	    }
+
     	// Input fields for userName, password, and invitation code
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter userName");
@@ -51,6 +59,15 @@ public class SetupAccountPage {
             String userName = userNameField.getText();
             String password = passwordField.getText();
             String code = inviteCodeField.getText();
+            // Validate userName and password using FSM classes
+            if (!UserNameRecognizer.checkForValidUserName(userName)) {
+			    errorLabel.setText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
+			    return;
+			    }
+            if (!PasswordEvaluator.evaluatePassword(password)) {
+				errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+				return;
+			}
             
             try {
             	// Check if the user already exists
@@ -58,9 +75,9 @@ public class SetupAccountPage {
             		
             		// Validate the invitation code
             		if(databaseHelper.validateInvitationCode(code)) {
-            			
+            			String role = databaseHelper.getRoleFromInviteCode(code);
             			// Create a new user and register them in the database
-		            	User user=new User(userName, password, "user");
+		            	User user=new User(userName, password, role);
 		                databaseHelper.register(user);
 		                
 		             // Navigate to the Welcome Login Page

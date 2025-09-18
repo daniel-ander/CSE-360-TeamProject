@@ -90,8 +90,7 @@ public class UserLoginPage {
 	        }
 	    });
 
-
-
+	    
 
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");

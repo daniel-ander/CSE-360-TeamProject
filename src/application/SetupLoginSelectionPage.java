@@ -22,7 +22,7 @@ public class SetupLoginSelectionPage {
     public void show(Stage primaryStage) {
         
     	// Buttons to select Login / Setup options that redirect to respective pages
-        Button setupButton = new Button("SetUp");
+        Button setupButton = new Button("Don't have an account? Setup here");
         Button loginButton = new Button("Login");
         
         setupButton.setOnAction(a -> {
