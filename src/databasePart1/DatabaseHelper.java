@@ -289,6 +289,16 @@ public class DatabaseHelper {
 	    }
 	    return tempPass;
 	}
+	
+	public void updatePassword(String userName, String newPassword) throws SQLException {
+	    String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, newPassword);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
+
 
 
 	// Closes the database connection and statement.

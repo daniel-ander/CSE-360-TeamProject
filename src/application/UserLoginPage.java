@@ -43,11 +43,13 @@ public class UserLoginPage {
 	    	passwordField.setText("Password1!");
 	    });
         
-	    loginButton.setOnAction(a -> {  
-	        // Retrieve user inputs
+	    loginButton.setOnAction(a -> {
+	        // --- Retrieve user inputs ---
 	        String userName = userNameField.getText();
 	        String password = passwordField.getText();
-	        boolean resetPasswordFlag = false; // default to false
+
+	        // --- Flags ---
+	        boolean resetPasswordFlag = password.startsWith("R_") && password.length() > 2;
 
 	        // --- Username validation ---
 	        if (!UserNameRecognizer.checkForValidUserName(userName)) {
@@ -56,15 +58,8 @@ public class UserLoginPage {
 	        }
 
 	        // --- Password validation ---
-	        if (password.length() >= 2 && password.startsWith("R_")) {
-	            resetPasswordFlag = true;
-	            String tempPass = password.substring(2); // strip R_
-	            if (!PasswordEvaluator.evaluatePassword(tempPass)) {
-	                errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
-	                return;
-	            }
-	        } else if (!PasswordEvaluator.evaluatePassword(password)) {
-	            errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+	        if (!PasswordEvaluator.evaluatePassword(password)) {
+	            errorLabel.setText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
 	            return;
 	        }
 
@@ -78,12 +73,8 @@ public class UserLoginPage {
 	                user.setRole(role);
 	                if (databaseHelper.login(user)) {
 	                	if (resetPasswordFlag) {
-	                	    // Instead of redirecting, just show an alert
-	                	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	                	    alert.setTitle("Password Reset Required");
-	                	    alert.setHeaderText(null);
-	                	    alert.setContentText("Redirecting to reset-password flow (placeholder).");
-	                	    alert.showAndWait();
+	                	    ResetPasswordPopup resetPasswordPopup = new ResetPasswordPopup(databaseHelper);
+	                	    resetPasswordPopup.show(userName);
 	                	} else {
 	                	    welcomeLoginPage.show(primaryStage, user);
 	                	}
@@ -98,6 +89,8 @@ public class UserLoginPage {
 	            e.printStackTrace();
 	        }
 	    });
+
+
 
 
         VBox layout = new VBox(10);
