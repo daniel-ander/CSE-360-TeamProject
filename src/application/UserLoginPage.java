@@ -22,6 +22,9 @@ public class UserLoginPage {
     }
 
     public void show(Stage primaryStage) {
+    	
+    	final boolean DEBUG = true; //toggle for debugging
+    	
     	// Input field for the user's userName, password
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter userName");
@@ -37,11 +40,9 @@ public class UserLoginPage {
 
 
         Button loginButton = new Button("Login");
-	    Button adminInfoAutoFill = new Button("Admin Login (TESTING)");
-	    adminInfoAutoFill.setOnAction(a -> {
-	    	userNameField.setText("admin");
-	    	passwordField.setText("Password1!");
-	    });
+	    Button adminInfoAutoFill = new Button();
+	    adminInfoAutoFill.setVisible(DEBUG); //hide button unless debugging
+	    
         
 	    loginButton.setOnAction(a -> {
 	        // --- Retrieve user inputs ---
@@ -89,7 +90,15 @@ public class UserLoginPage {
 	            e.printStackTrace();
 	        }
 	    });
+	 // Debugging section 
 
+        if (DEBUG) {
+        		adminInfoAutoFill.setText("AutoFill Admin Info (Debug)");
+        		adminInfoAutoFill.setOnAction(a -> {
+    	    	userNameField.setText("admin");
+    	    	passwordField.setText("Password1!");
+    	    });
+        }
 	    
 
         VBox layout = new VBox(10);

@@ -218,7 +218,7 @@ public class DatabaseHelper {
 		return rolesStr;
 	}
 	
-	// Validates an invitation code to check if it is unused.
+	// Validates an invitation code to check if it is unused and valid.
 	public boolean validateInvitationCode(String code) {
 	    String query = "SELECT * FROM InvitationCodes WHERE code = ? AND isUsed = FALSE";
 	    
