@@ -115,7 +115,7 @@ public class WelcomeLoginPage {
             case "admin":
                 new AdminHomePage(databaseHelper, username).show(stage);
                 break;
-                /* functionality for later roles?
+
             case "student":
                 new StudentHomePage(databaseHelper, username).show(stage);
                 break;
@@ -129,13 +129,17 @@ public class WelcomeLoginPage {
                 new ReviewerHomePage(databaseHelper, username).show(stage);
                 break;
             case "user":
-                new UserHomePage(databaseHelper, username).show(stage);
+                new StudentHomePage(databaseHelper, username).show(stage);
                 break;
+            // Add more roles here as needed, following the same pattern.
+                
+            
+            // since this isnt dynamic youll have to update other places too
             default:
                 // 👀 Fallback if role has no page mapped yet
                 System.out.println("No page mapped for role: " + role);
                 break;
-                 */
+
                 
         }
     }

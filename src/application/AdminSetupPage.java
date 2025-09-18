@@ -43,6 +43,8 @@ public class AdminSetupPage {
         passwordField.setMaxWidth(250);
 
         Button setupButton = new Button("Setup");
+        
+        // autofill button for easy admin login during debugging, declared here for scope
         Button adminInfoAutoFill = new Button(); //placeholder for debugging section
         adminInfoAutoFill.setVisible(DEBUG); //hide button unless debugging
   
