@@ -58,7 +58,7 @@ public class StudentHomePage {
 	        debugLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
 	        layout.getChildren().add(debugLabel);
 	    }
-
+	    // Add all elements to layout
 
 	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
 	    Scene userScene = new Scene(layout, 800, 400);
