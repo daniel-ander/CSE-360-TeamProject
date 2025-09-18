@@ -87,7 +87,7 @@ public class WelcomeLoginPage {
         if (roles.contains("admin")) {
             Button inviteButton = new Button("Invite");
             inviteButton.setOnAction(a -> {
-                new InvitationPage().show(databaseHelper, primaryStage);
+                new InvitationPage(databaseHelper, roleStr).show(databaseHelper, primaryStage);
             });
             layout.getChildren().add(inviteButton);
         }

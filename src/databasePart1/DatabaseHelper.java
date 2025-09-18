@@ -188,8 +188,8 @@ public class DatabaseHelper {
 	}
 	
 	// Generates a new invitation code and inserts it into the database.
-	public String generateInvitationCode() {
-	    String code = UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
+	public String generateInvitationCode(String roles) {
+	    String code = roles + "_" + UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
 	    String query = "INSERT INTO InvitationCodes (code) VALUES (?)";
 
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
