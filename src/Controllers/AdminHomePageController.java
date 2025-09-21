@@ -9,6 +9,7 @@ import databasePart1.*;
 public class AdminHomePageController {
 	private final DatabaseHelper databaseHelper;
 	private final AdminHomePage view = new AdminHomePage();
+	private final Stage primaryStage;
 	
 	List<String> users;
 
@@ -19,9 +20,10 @@ public class AdminHomePageController {
 	 */
 	public AdminHomePageController(DatabaseHelper databaseHelper, Stage primaryStage) {
 		this.databaseHelper = databaseHelper;
+		this.primaryStage = primaryStage;
 		this.users = databaseHelper.getAllUsernames();
 		
-		setInitialLayout(primaryStage);
+		setInitialLayout();
 		
 		setUpdateRolesButtonAction();
 	}
@@ -30,7 +32,7 @@ public class AdminHomePageController {
 	// Setters
 	// ===================
 	
-	private void setInitialLayout(Stage primaryStage) {
+	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
 		view.setUserDropDownLayout(users);
 	}

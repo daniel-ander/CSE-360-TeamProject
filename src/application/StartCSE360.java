@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 
 import Controllers.FirstPageController;
+import Controllers.SetupLoginSelectionPageController;
 import UI.Pages.FirstPage;
 import UI.Pages.SetupLoginSelectionPage;
 import databasePart1.DatabaseHelper;
@@ -27,8 +28,7 @@ public class StartCSE360 extends Application {
             	
             	new FirstPageController(databaseHelper, primaryStage);
             } else {
-            	new SetupLoginSelectionPage(databaseHelper).show(primaryStage);
-                
+            	new SetupLoginSelectionPageController(databaseHelper, primaryStage);
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());

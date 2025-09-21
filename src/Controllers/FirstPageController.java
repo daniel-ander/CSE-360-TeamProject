@@ -19,7 +19,7 @@ public class FirstPageController {
         this.databaseHelper = databaseHelper;
         this.primaryStage = primaryStage;
         
-        setInitialLayout(primaryStage);
+        setInitialLayout();
         
         setContinueButtonAction();
     }
@@ -34,7 +34,7 @@ public class FirstPageController {
 		});
 	}
     
-    private void setInitialLayout(Stage primaryStage) {
+    private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
 }

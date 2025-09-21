@@ -30,7 +30,7 @@ public class AdminSetupPageController {
         
         view = new AdminSetupPage();
         
-        setInitialLayout(primaryStage);
+        setInitialLayout();
         
         setSetupButtonAction();
     }
@@ -39,7 +39,7 @@ public class AdminSetupPageController {
     // Setters
  	// ===================
     
-    private void setInitialLayout(Stage primaryStage) {
+    private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
     
