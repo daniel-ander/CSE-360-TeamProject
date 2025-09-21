@@ -6,6 +6,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 import Controllers.AdminHomePageController;
+import Controllers.InvitationPageController;
 import Models.User;
 import databasePart1.*;
 
@@ -54,7 +55,7 @@ public class WelcomeLoginPage {
 	    if ("admin".equals(user.getRole())) {
             Button inviteButton = new Button("Invite");
             inviteButton.setOnAction(a -> {
-                new InvitationPage().show(databaseHelper, primaryStage);
+                new InvitationPageController(databaseHelper, primaryStage);
             });
             layout.getChildren().add(inviteButton);
         }

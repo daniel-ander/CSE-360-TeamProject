@@ -1,15 +1,7 @@
 package Controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import Controllers.AdminSetupPageController;
 import UI.Pages.FirstPage;
 import databasePart1.*;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -31,6 +23,10 @@ public class FirstPageController {
         
         setContinueButtonAction();
     }
+	
+	// ===================
+	// Setters
+	// ===================
     
     private void setContinueButtonAction() {
 		view.getContinueButton().setOnAction(a -> {
