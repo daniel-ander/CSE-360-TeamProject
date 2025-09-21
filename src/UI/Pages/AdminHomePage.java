@@ -6,10 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
-
-import databasePart1.*;
-
 /**
  * AdminPage class represents the user interface for the admin user. This page
  * displays a simple welcome message for the admin.

@@ -11,6 +11,7 @@ import databasePart1.*;
 
 public class AdminHomePageController {
 	private final DatabaseHelper databaseHelper;
+	private final AdminHomePage view = new AdminHomePage();
 	
 	List<String> users;
 
@@ -27,11 +28,6 @@ public class AdminHomePageController {
 		
 		setUpdateRolesButtonAction();
 	}
-	
-	private AdminHomePage view = new AdminHomePage();
-	
-	
-	
 	
 	// ===================
 	// Setters

@@ -5,13 +5,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
-
-import Models.User;
-import Utils.PasswordEvaluator;
-import Utils.UserNameRecognizer;
-import databasePart1.*;
-
 /**
  * The SetupAdmin class handles the setup process for creating an administrator account.
  * This is intended to be used by the first user to initialize the system with admin credentials.
@@ -20,71 +13,63 @@ import databasePart1.*;
 // This is the page that the first User to login will be sent to. 
 // 
 public class AdminSetupPage {
+    
+	// Input fields for userName and password
+    // Label to display error messages
+    private final Label errorLabel = new Label(""); //creation of label, "blank" so its rendered early and nothing shifts around
+	private final Label pageExplain = new Label("This page is where the first user will login\n they are automatically an admin\n Use Admin/Password1");
 	
-    private final DatabaseHelper databaseHelper;
+    private final TextField userNameField = new TextField();
+    
+    private final PasswordField passwordField = new PasswordField();
+    
+    private final Button setupButton = new Button("Setup");
+    private final Button adminInfoAutoFillButton = new Button("Admin Login (TESTING)");
 
-    public AdminSetupPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    
+    // ===================
+ 	// Getters
+ 	// ===================
+    
+    public Button getSetupButton() {
+    	return setupButton;
     }
-
-    public void show(Stage primaryStage) {
-    	// Input fields for userName and password
-        // Label to display error messages
-        Label errorLabel = new Label(""); //creation of label, "blank" so its rendered early and nothing shifts around
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-    	Label pageExplain = new Label("This page is where the first user will login\n they are automatically an admin\n Use Admin/Password1");
+    
+    public Button getAdminAutoFillButton() {
+    	return adminInfoAutoFillButton;
+    }
+    
+    public TextField getUserNameField() {
+    	return userNameField;
+    }
+    
+    public PasswordField getPasswordField() {
+    	return passwordField;
+    }
+    
+    // ===================
+    // Setters
+ 	// ===================
+    
+    public void setInitialLayout(Stage primaryStage) {
+		// Set the scene to primary stage
+    	errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
     	pageExplain.setStyle("-fx-text-fill: black; -fx-font-size: 12px;");
-        TextField userNameField = new TextField();
-        userNameField.setPromptText("Enter Admin userName");
-        userNameField.setMaxWidth(250);
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter Password");
+    	userNameField.setPromptText("Enter Admin userName");
+    	userNameField.setMaxWidth(250);
+    	passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
-
-        Button setupButton = new Button("Setup");
-        
-	    Button adminInfoAutoFill = new Button("Admin Login (TESTING)");
-	    adminInfoAutoFill.setOnAction(a -> {
-	    	userNameField.setText("admin");
-	    	passwordField.setText("Password1!");
-	    });
-
-        
-        setupButton.setOnAction(a -> {
-        	// Retrieve user input
-            String userName = userNameField.getText();
-            String password = passwordField.getText();
-         // validate against our FSM classes
-         // validate against our FSM classes
-        	if (!UserNameRecognizer.checkForValidUserName(userName)) {
-        	    errorLabel.setText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
-        	    return;
-        	}
-        	if (!PasswordEvaluator.evaluatePassword(password)) {
-        	    errorLabel.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
-        	    return;
-        	}
-            
-            try {
-            	// Create a new User object with admin role and register in the database
-            	User user=new User(userName, password, "admin");
-                databaseHelper.register(user);
-                System.out.println("Administrator setup completed.");
-                
-                // Navigate to the Welcome Login Page
-                new UserLoginPage(databaseHelper).show(primaryStage);
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
-                e.printStackTrace();
-            }
-        });
-
-        VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain, adminInfoAutoFill);
+    	
+    	VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain, adminInfoAutoFillButton);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
+        
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Administrator Setup");
         primaryStage.show();
+        
+	}
+    
+    public void setErrorLabel(String text) {
+    	errorLabel.setText(text);
     }
 }

@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import Controllers.AdminSetupPageController;
 import databasePart1.*;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -36,8 +37,7 @@ public class FirstPage {
 	    
 	    
 	    continueButton.setOnAction(a -> {
-	        new AdminSetupPage(databaseHelper).show(primaryStage);
-	        
+	        new AdminSetupPageController(databaseHelper, primaryStage);
 	    });
 
 	    layout.getChildren().addAll(userLabel, continueButton);
