@@ -25,11 +25,14 @@ public class AdminSetupPage {
     }
 
     public void show(Stage primaryStage) {
+
+    	final boolean DEBUG = true; //toggle for debugging
+    	
     	// Input fields for userName and password
         // Label to display error messages
         Label errorLabel = new Label(""); //creation of label, "blank" so its rendered early and nothing shifts around
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-    	Label pageExplain = new Label("This page is where the first user will login\n they are automatically an admin\n Use Admin/Password1");
+    	Label pageExplain = new Label("This Account Will Be The Administrator Account");
     	pageExplain.setStyle("-fx-text-fill: black; -fx-font-size: 12px;");
         TextField userNameField = new TextField();
         userNameField.setPromptText("Enter Admin userName");
@@ -41,11 +44,10 @@ public class AdminSetupPage {
 
         Button setupButton = new Button("Setup");
         
-	    Button adminInfoAutoFill = new Button("Admin Login (TESTING)");
-	    adminInfoAutoFill.setOnAction(a -> {
-	    	userNameField.setText("admin");
-	    	passwordField.setText("Password1!");
-	    });
+        // autofill button for easy admin login during debugging, declared here for scope
+        Button adminInfoAutoFill = new Button(); //placeholder for debugging section
+        adminInfoAutoFill.setVisible(DEBUG); //hide button unless debugging
+  
 
         
         setupButton.setOnAction(a -> {
@@ -76,6 +78,14 @@ public class AdminSetupPage {
                 e.printStackTrace();
             }
         });
+        // DEBUGging section 
+        if (DEBUG) {
+    		adminInfoAutoFill.setText("AutoFill Admin Info (Debug)");
+    		adminInfoAutoFill.setOnAction(a -> {
+	    	userNameField.setText("admin");
+	    	passwordField.setText("Password1!");
+	    });
+    }
 
         VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain, adminInfoAutoFill);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");

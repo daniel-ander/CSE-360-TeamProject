@@ -53,7 +53,7 @@ public class DatabaseHelper {
 		
 		// Create the invitation codes table
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
-	            + "code VARCHAR(10) PRIMARY KEY, "
+	            + "code VARCHAR(10 ) PRIMARY KEY, "
 	            + "isUsed BOOLEAN DEFAULT FALSE)";
 	    statement.execute(invitationCodesTable);
 	}
@@ -128,13 +128,21 @@ public class DatabaseHelper {
 	
 	// Adds roles to the user by appending the role delimited by 
 	
-	public void updateUserRoles(String userName, List<String> roles) {
-		String roleString = String.join("," , roles);
-		
-		String query = "UPDATE cse360users SET role=? WHERE userName =?";
-		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, userName);
-	        pstmt.setString(2, roleString);
+	public void updateUserRoles(String userName, List<String> newRoles) {
+	    // Normalize, de-dup, and join
+	    LinkedHashSet<String> norm = new LinkedHashSet<>();
+	    for (String r : newRoles) {
+	        if (r != null) {
+	            String v = r.trim().toLowerCase(Locale.ROOT);
+	            if (!v.isEmpty()) norm.add(v);
+	        }
+	    }
+	    String roleString = String.join(",", norm); // empty string means “no roles”
+
+	    String query = "UPDATE cse360users SET role = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, roleString);
+	        pstmt.setString(2, userName);
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -156,23 +164,61 @@ public class DatabaseHelper {
 	    }
 		return usernames;
 	}
+	// Deletes a user from the database based on their userName.
+	public boolean deleteUser(String currentUser, String targetUser) {
+	    // Prevent an admin from deleting their own account
+	    if (currentUser.equals(targetUser)) {
+	        String currentRoles = getUserRole(currentUser);
+	        // stop admins deleting their own account
+	        if (currentRoles != null && currentRoles.contains("admin")) {
+	            System.out.println("Admins cannot delete their own account.");
+	            return false;
+	        }
+	    }
+
+	    String query = "DELETE FROM cse360users WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, targetUser);
+	        pstmt.executeUpdate();
+	        return true;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
 	
 	// Generates a new invitation code and inserts it into the database.
-	public String generateInvitationCode() {
-	    String code = UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
+	public String generateInvitationCode(String roles) {
+		boolean generateInvitationCodeDebug = true;
+	    String code = roles + "_" + UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
 	    String query = "INSERT INTO InvitationCodes (code) VALUES (?)";
-
+	    
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
+	    if (generateInvitationCodeDebug) System.out.println("Generated invitation code: " + code);
+	    
 	    return code;
 	}
 	
-	// Validates an invitation code to check if it is unused.
+	public String getRoleFromInviteCode(String code) {
+		String roleBits = code.substring(0, code.indexOf('_'));
+		List<String> roles = new ArrayList<>();
+		String[] roleNames = {"admin","student","instructor","staff","reviewer"};
+
+		for (int i = 0; i < roleBits.length(); i++) {
+		    if (roleBits.charAt(i) == '1') {
+		        roles.add(roleNames[i]);
+		    }
+		}
+		String rolesStr = String.join(",", roles);
+		return rolesStr;
+	}
+	
+	// Validates an invitation code to check if it is unused and valid.
 	public boolean validateInvitationCode(String code) {
 	    String query = "SELECT * FROM InvitationCodes WHERE code = ? AND isUsed = FALSE";
 	    
@@ -203,6 +249,93 @@ public class DatabaseHelper {
 	        e.printStackTrace();
 	    }
 	}
+	// Print the cse360 table to console for debugging
+	public void printUsersTable() {
+	    String query = "SELECT id, userName, password, role FROM cse360users";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+
+	        System.out.printf("%-5s %-20s %-20s %-30s%n", "ID", "Username", "Password", "Roles");
+	        System.out.println("--------------------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            int id = rs.getInt("id");
+	            String userName = rs.getString("userName");
+	            String password = rs.getString("password");
+	            String role = rs.getString("role");
+
+	            System.out.printf("%-5d %-20s %-20s %-30s%n", id, userName, password, role);
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+	public void printInvitationCodesTable() {
+	    String query = "SELECT code, isUsed FROM InvitationCodes";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+
+	        System.out.printf("%-15s %-10s%n", "Code", "Is Used");
+	        System.out.println("-------------------------");
+
+	        while (rs.next()) {
+	            String code = rs.getString("code");
+	            boolean isUsed = rs.getBoolean("isUsed");
+
+	            System.out.printf("%-15s %-10s%n", code, isUsed);
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	// method to generate a random password w/ a reset flag 
+	public String issueResetPassword(String userName) {
+	    Random rand = new Random();
+
+	    String lowers   = "abcdefghijklmnopqrstuvwxyz";
+	    String uppers   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	    String digits   = "0123456789";
+	    String specials = "~`!@#$%^&*()_-+{}[]|:,.?/";
+	    String pool     = uppers + lowers + digits + specials;
+
+	    // Build the 6-char tail: guarantee 1 lowercase and 1 digit, fill the rest
+	    List<Character> tail = new ArrayList<>();
+	    tail.add(lowers.charAt(rand.nextInt(lowers.length()))); // guarantee lowercase
+	    tail.add(digits.charAt(rand.nextInt(digits.length()))); // guarantee digit
+	    while (tail.size() < 8) {
+	        tail.add(pool.charAt(rand.nextInt(pool.length())));
+	    }
+	    Collections.shuffle(tail, rand);
+
+	    StringBuilder sb = new StringBuilder("R_"); // marker = reset
+	    for (char c : tail) sb.append(c);
+	    String tempPass = sb.toString();            // total length = 8
+
+	    String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, tempPass);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	    return tempPass;
+	}
+	
+	public void updatePassword(String userName, String newPassword) throws SQLException {
+	    String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, newPassword);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
+
+
 
 	// Closes the database connection and statement.
 	public void closeConnection() {

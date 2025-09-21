@@ -47,7 +47,10 @@ public class PasswordEvaluator {
 	 * @param currentCharNdx	The location where an error was found
 	 * @return					Two lines, the entire input line followed by a line with an up arrow
 	 */
+	
+	private static final boolean DEBUG = false;	// Set to true to get detailed processing information
 	private static void displayInputState() {
+		if (!DEBUG) return;  // If not debugging, do not display anything because youre extremely annoying
 		// Display the entire input line
 		System.out.println(inputLine);
 		System.out.println(inputLine.substring(0,currentCharNdx) + "?");
@@ -71,6 +74,13 @@ public class PasswordEvaluator {
 		passwordIndexofError = 0;			// Initialize the IndexofError
 		inputLine = input;					// Save the reference to the input line as a global
 		currentCharNdx = 0;					// The index of the current character
+		
+		// R_ validation
+		if (input.startsWith("R_") && input.length() > 2) {
+            inputLine = input.substring(2);
+        } else {
+            inputLine = input;
+        }
 		
 		if(input.length() <= 0) {
 			passwordErrorMessage = "*** ERROR *** Empty Password!";
