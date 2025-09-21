@@ -1,0 +1,5 @@
+.text-element {
+    -fx-font-size: 20px;
+    -fx-fill: blue;
+    -fx-font-weight: bold;
+}

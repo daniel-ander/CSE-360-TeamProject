@@ -5,6 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.application.Platform;
+import Controllers.AdminHomePageController;
 import Models.User;
 import databasePart1.*;
 
@@ -34,7 +35,8 @@ public class WelcomeLoginPage {
 	    	System.out.println(role);
 	    	
 	    	if(role.equals("admin")) {
-	    		new AdminHomePage(databaseHelper).show(primaryStage);
+	    		new AdminHomePageController(databaseHelper, primaryStage);
+	    		// AdminHomePage(databaseHelper).show(primaryStage)
 	    	}
 	    	else if(role.equals("user")) {
 	    		new UserHomePage().show(primaryStage);
