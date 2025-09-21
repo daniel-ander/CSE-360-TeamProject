@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
+import UI.Pages.FirstPage;
+import UI.Pages.SetupLoginSelectionPage;
 import databasePart1.DatabaseHelper;
 
 

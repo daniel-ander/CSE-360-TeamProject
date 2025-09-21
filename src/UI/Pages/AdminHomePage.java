@@ -1,4 +1,4 @@
-package application;
+package UI.Pages;
 
 import java.util.*;
 import javafx.scene.Scene;

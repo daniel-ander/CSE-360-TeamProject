@@ -1,4 +1,4 @@
-package application;
+package UI.Pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+import Models.User;
 import databasePart1.*;
 
 /**

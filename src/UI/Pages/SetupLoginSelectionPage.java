@@ -1,10 +1,9 @@
-package application;
+package UI.Pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import databasePart1.*;
 
 /**

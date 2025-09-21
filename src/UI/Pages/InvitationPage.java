@@ -1,4 +1,4 @@
-package application;
+package UI.Pages;
 
 
 import databasePart1.*;

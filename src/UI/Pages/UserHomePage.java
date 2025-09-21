@@ -1,4 +1,4 @@
-package application;
+package UI.Pages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
