@@ -38,7 +38,7 @@ public class SetupLoginSelectionPageController {
     
     private void setLoginButtonAction() {
 		view.getLoginButton().setOnAction(a -> {
-			new UserLoginPage(databaseHelper).show(primaryStage);
+			new UserLoginPageController(databaseHelper, primaryStage);
 		});
 	}
     

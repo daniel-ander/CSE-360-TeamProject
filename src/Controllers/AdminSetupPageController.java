@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import Models.User;
 import UI.Pages.AdminSetupPage;
-import UI.Pages.UserLoginPage;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 import databasePart1.*;
@@ -66,7 +65,7 @@ public class AdminSetupPageController {
                 System.out.println("Administrator setup completed.");
                 
                 // Navigate to the Welcome Login Page
-                new UserLoginPage(databaseHelper).show(primaryStage);
+                new UserLoginPageController(databaseHelper, primaryStage);
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();
