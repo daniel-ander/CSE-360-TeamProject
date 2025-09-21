@@ -5,82 +5,58 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
-
-import Models.User;
-import databasePart1.*;
-
 /**
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
  */
 public class SetupAccountPage {
 	
-    private final DatabaseHelper databaseHelper;
-    // DatabaseHelper to handle database operations.
-    public SetupAccountPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+	private final TextField userNameField = new TextField();
+	private final PasswordField passwordField = new PasswordField();
+	private final TextField inviteCodeField = new TextField();
+	private final Label errorLabel = new Label();
+	private final Button setupButton = new Button("Setup");
+	    
+    // ===================
+   	// Getters
+   	// ===================
+    
+    public Button getSetupButton() {
+    	return setupButton;
     }
-
-    /**
-     * Displays the Setup Account page in the provided stage.
-     * @param primaryStage The primary stage where the scene will be displayed.
-     */
-    public void show(Stage primaryStage) {
-    	// Input fields for userName, password, and invitation code
-        TextField userNameField = new TextField();
-        userNameField.setPromptText("Enter userName");
+    
+    public TextField getUserNameField() {
+    	return userNameField;
+    }
+    
+    public TextField getPasswordField() {
+    	return passwordField;
+    }
+    
+    public TextField getInvitationCodeField() {
+    	return inviteCodeField;
+    }
+    
+    public Label getErrorLabel() {
+    	return errorLabel;
+    }
+    
+    // ===================
+   	// Setters
+   	// ===================
+    
+    public void setInitialLayout(Stage primaryStage) {
+    	userNameField.setPromptText("Enter userName");
         userNameField.setMaxWidth(250);
 
-        PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
         
-        TextField inviteCodeField = new TextField();
         inviteCodeField.setPromptText("Enter InvitationCode");
         inviteCodeField.setMaxWidth(250);
         
-        // Label to display error messages for invalid input or registration issues
-        Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-        
-
-        Button setupButton = new Button("Setup");
-        
-        setupButton.setOnAction(a -> {
-        	// Retrieve user input
-            String userName = userNameField.getText();
-            String password = passwordField.getText();
-            String code = inviteCodeField.getText();
-            
-            try {
-            	// Check if the user already exists
-            	if(!databaseHelper.doesUserExist(userName)) {
-            		
-            		// Validate the invitation code
-            		if(databaseHelper.validateInvitationCode(code)) {
-            			
-            			// Create a new user and register them in the database
-		            	User user=new User(userName, password, "user");
-		                databaseHelper.register(user);
-		                
-		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPage(databaseHelper).show(primaryStage,user);
-            		}
-            		else {
-            			errorLabel.setText("Please enter a valid invitation code");
-            		}
-            	}
-            	else {
-            		errorLabel.setText("This useruserName is taken!!.. Please use another to setup an account");
-            	}
-            	
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
-                e.printStackTrace();
-            }
-        });
-
+    	
         VBox layout = new VBox(10);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         layout.getChildren().addAll(userNameField, passwordField,inviteCodeField, setupButton, errorLabel);

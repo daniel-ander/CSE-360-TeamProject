@@ -1,9 +1,6 @@
 package Controllers;
 
 import java.util.*;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import UI.Pages.AdminHomePage;

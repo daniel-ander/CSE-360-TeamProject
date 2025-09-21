@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import Controllers.SetupAccountPageController;
 import databasePart1.*;
 
 /**
@@ -25,7 +26,7 @@ public class SetupLoginSelectionPage {
         Button loginButton = new Button("Login");
         
         setupButton.setOnAction(a -> {
-            new SetupAccountPage(databaseHelper).show(primaryStage);
+            new SetupAccountPageController(databaseHelper, primaryStage);
         });
         loginButton.setOnAction(a -> {
         	new UserLoginPage(databaseHelper).show(primaryStage);
