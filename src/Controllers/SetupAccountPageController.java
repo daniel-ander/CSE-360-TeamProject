@@ -60,7 +60,7 @@ public class SetupAccountPageController {
 		                databaseHelper.register(user);
 		                
 		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPage(databaseHelper).show(primaryStage,user);
+		                new WelcomeLoginPageController(databaseHelper, primaryStage, user);
             		}
             		else {
             			view.getErrorLabel().setText("Please enter a valid invitation code");

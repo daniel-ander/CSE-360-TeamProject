@@ -17,50 +17,41 @@ import databasePart1.*;
  */
 public class WelcomeLoginPage {
 	
-	private final DatabaseHelper databaseHelper;
-
-    public WelcomeLoginPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
-    }
-    public void show( Stage primaryStage, User user) {
-    	
-    	VBox layout = new VBox(5);
-	    layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+	private final VBox layout = new VBox(5);
+	private final Label welcomeLabel = new Label("Welcome!!");
+	private final Button continueButton = new Button("Continue to your Page");
+	private final Button quitButton = new Button("Quit");
+	private final Button inviteButton = new Button("Invite");
+    
+    // ===================
+   	// Getters
+   	// ===================
+	
+	public VBox getLayout() {
+		return layout;
+	}
+    
+    public Button getContinueButton() {
+		return continueButton;
+	}
+	
+	public Button getQuitButton() {
+		return quitButton;
+	}
+	
+	public Button getInviteButton() {
+		return inviteButton;
+	}
+    
+    // ===================
+   	// Setters
+   	// ===================
+    
+    public void setInitialLayout(Stage primaryStage) {
+    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
 	    
-	    Label welcomeLabel = new Label("Welcome!!");
 	    welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 	    
-	    // Button to navigate to the user's respective page based on their role
-	    Button continueButton = new Button("Continue to your Page");
-	    continueButton.setOnAction(a -> {
-	    	String role =user.getRole();
-	    	System.out.println(role);
-	    	
-	    	if(role.equals("admin")) {
-	    		new AdminHomePageController(databaseHelper, primaryStage);
-	    		// AdminHomePage(databaseHelper).show(primaryStage)
-	    	}
-	    	else if(role.equals("user")) {
-	    		new UserHomePageController(primaryStage);
-	    	}
-	    });
-	    
-	    // Button to quit the application
-	    Button quitButton = new Button("Quit");
-	    quitButton.setOnAction(a -> {
-	    	databaseHelper.closeConnection();
-	    	Platform.exit(); // Exit the JavaFX application
-	    });
-	    
-	    // "Invite" button for admin to generate invitation codes
-	    if ("admin".equals(user.getRole())) {
-            Button inviteButton = new Button("Invite");
-            inviteButton.setOnAction(a -> {
-                new InvitationPageController(databaseHelper, primaryStage);
-            });
-            layout.getChildren().add(inviteButton);
-        }
-
 	    layout.getChildren().addAll(welcomeLabel,continueButton,quitButton);
 	    Scene welcomeScene = new Scene(layout, 800, 400);
 

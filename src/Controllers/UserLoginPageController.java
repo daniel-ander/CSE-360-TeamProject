@@ -57,13 +57,13 @@ public class UserLoginPageController {
         	// if FSM validates then compare against the database
         	try {
         	    User user = new User(userName, password, "");
-        	    WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage(databaseHelper);
+        	   // WelcomeLoginPageController welcomeLoginPage = new WelcomeLoginPageController(databaseHelper, primaryStage, user);
 
         	    String role = databaseHelper.getUserRole(userName);
         	    if (role != null) {
         	        user.setRole(role);
         	        if (databaseHelper.login(user)) {
-        	            welcomeLoginPage.show(primaryStage, user);
+        	        	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
         	        } else {
         	            view.getErrorLabel().setText("Error logging in");
         	        }
