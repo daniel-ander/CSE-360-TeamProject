@@ -1,4 +1,4 @@
-package application;
+package Models;
 
 /**
  * The User class represents a user entity in the system.
