@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import javafx.application.Platform;
 import Controllers.AdminHomePageController;
 import Controllers.InvitationPageController;
+import Controllers.UserHomePageController;
 import Models.User;
 import databasePart1.*;
 
@@ -40,7 +41,7 @@ public class WelcomeLoginPage {
 	    		// AdminHomePage(databaseHelper).show(primaryStage)
 	    	}
 	    	else if(role.equals("user")) {
-	    		new UserHomePage().show(primaryStage);
+	    		new UserHomePageController(primaryStage);
 	    	}
 	    });
 	    
