@@ -13,39 +13,32 @@ import javafx.stage.Stage;
  * It prompts the user to set up administrator access and navigate to the setup screen.
  */
 public class FirstPage {
-	
-	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
-	public FirstPage(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+	VBox layout = new VBox(5);
+	Label userLabel = new Label("Welcome!\n This is the special Admin page\n Only the first user sees this!");
+	Button continueButton = new Button("Continue");
+	Scene firstPageScene = new Scene(layout, 800, 400);
+    
+	// ===================
+  	// Getters
+  	// ===================
+    
+    public Button getContinueButton() {
+    	return continueButton;
     }
-
-	/**
-     * Displays the first page in the provided primary stage. 
-     * @param primaryStage The primary stage where the scene will be displayed.
-     */
-    public void show(Stage primaryStage) {
-    	VBox layout = new VBox(5);
+    
+    // ===================
+    // Setters
+ 	// ===================
+    
+    public void setInitialLayout(Stage primaryStage) {
+    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+    	userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
     	
-    	// Label to display the welcome message for the first user
-	    layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-	    Label userLabel = new Label("Welcome!\n This is the special Admin page\n Only the first user sees this!");
-	    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-	    
-	    Button continueButton = new Button("Continue");
-	    // Button to navigate to the SetupAdmin page
-	    
-	    
-	    continueButton.setOnAction(a -> {
-	        new AdminSetupPageController(databaseHelper, primaryStage);
-	    });
-
-	    layout.getChildren().addAll(userLabel, continueButton);
-	    Scene firstPageScene = new Scene(layout, 800, 400);
+    	layout.getChildren().addAll(userLabel, continueButton);
 
 	    // Set the scene to primary stage
 	    primaryStage.setScene(firstPageScene);
 	    primaryStage.setTitle("First Page");
     	primaryStage.show();
-    }
+	}
 }

@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
+import Controllers.FirstPageController;
 import UI.Pages.FirstPage;
 import UI.Pages.SetupLoginSelectionPage;
 import databasePart1.DatabaseHelper;
@@ -24,7 +25,7 @@ public class StartCSE360 extends Application {
             databaseHelper.connectToDatabase(); // Connect to the database
             if (databaseHelper.isDatabaseEmpty()) {
             	
-            	new FirstPage(databaseHelper).show(primaryStage);
+            	new FirstPageController(databaseHelper, primaryStage);
             } else {
             	new SetupLoginSelectionPage(databaseHelper).show(primaryStage);
                 
