@@ -50,6 +50,10 @@ public class AdminHomePage {
 	// Getters
 	// ===================
 	
+	public ComboBox<String> getUserDropdown() {
+		return userDropDown;
+	}
+	
 	public Alert getErrorAlert() {
 		return errorAlert;
 	}
@@ -66,6 +70,10 @@ public class AdminHomePage {
 		return confirmAlert;
 	}
 	
+	public Label getTempPasswordInfoLabel() {
+		return tempPasswordInfoLabel;
+	}
+	
 	public Label getUserDetailsLabel() {
 		return userDetailsLabel;
 	}
@@ -78,16 +86,8 @@ public class AdminHomePage {
 		return setTempPasswordButton;
 	}
 	
-	public Label getTempPasswordInfoLabel() {
-		return tempPasswordInfoLabel;
-	}
-	
 	public Button getSaveRolesButton() {
 		return saveRolesButton;
-	}
-	
-	public ComboBox<String> getUserDropdown() {
-		return userDropDown;
 	}
 	
 	public CheckBox getAdminCheckBox() {

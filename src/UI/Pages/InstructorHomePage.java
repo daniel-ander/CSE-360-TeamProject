@@ -3,14 +3,10 @@ package UI.Pages;
 
 import javafx.scene.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import Controllers.UserLoginPageController;
-import Controllers.WelcomeLoginPageController;
-import Models.User;
-import databasePart1.*;
 
 /**
  * This page displays a simple welcome message for the user.

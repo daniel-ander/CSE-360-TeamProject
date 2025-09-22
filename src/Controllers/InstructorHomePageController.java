@@ -1,12 +1,8 @@
 package Controllers;
 
 import Models.User;
-import UI.Pages.FirstPage;
 import UI.Pages.InstructorHomePage;
-import UI.Pages.UserLoginPage;
-import UI.Pages.WelcomeLoginPage;
 import databasePart1.*;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 /**
@@ -24,7 +20,7 @@ public class InstructorHomePageController {
         this.databaseHelper = databaseHelper;
         this.primaryStage = primaryStage;
         
-        setInitialLayout()
+        setInitialLayout();
         
         setLogoutButtonAction();
         
@@ -35,7 +31,7 @@ public class InstructorHomePageController {
 	// Setters
 	// ===================
 	
-//	if (DEBUG) {
+//	  if (DEBUG) {
 //        Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
 //        debugLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
 //        layout.getChildren().add(debugLabel);

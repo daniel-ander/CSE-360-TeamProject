@@ -6,8 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import Models.User;
-import databasePart1.*;
 
 /**
  * This page displays a simple welcome message for the user.

@@ -1,8 +1,7 @@
 package Controllers;
 import Models.User;
 import UI.Pages.StudentHomePage;
-import UI.Pages.UserLoginPage;
-import UI.Pages.WelcomeLoginPage;
+
 import databasePart1.*;
 import javafx.stage.Stage;
 
@@ -37,7 +36,7 @@ public class StudentHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	        UserLoginPageController loginPage = new UserLoginPageController(databaseHelper, primaryStage);
+	        new UserLoginPageController(databaseHelper, primaryStage);
 	    });
     }
     

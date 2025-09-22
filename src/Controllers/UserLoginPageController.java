@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import Models.User;
 import UI.Elements.ResetPasswordPopup;
 import UI.Pages.UserLoginPage;
-import UI.Pages.WelcomeLoginPage;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 import databasePart1.*;
@@ -60,7 +59,7 @@ public class UserLoginPageController {
 	        // --- Database check ---
 	        try {
 	            User user = new User(userName, password, "");
-	            WelcomeLoginPageController welcomeLoginPage = new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+	            new WelcomeLoginPageController(databaseHelper, primaryStage, user);
 
 	            String role = databaseHelper.getUserRole(userName);
 	            if (role != null) {

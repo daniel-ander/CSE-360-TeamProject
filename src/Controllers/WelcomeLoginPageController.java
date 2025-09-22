@@ -6,8 +6,10 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javafx.application.Platform;
+
 import Models.User;
-import UI.Pages.InstructorHomePage;
+
 import UI.Pages.WelcomeLoginPage;
 import databasePart1.*;
 
@@ -23,7 +25,7 @@ public class WelcomeLoginPageController {
     private final User user;
     
     String roleStr;
-    ArrayList<String> roles;
+    ArrayList<String> roles = new ArrayList<String>();
 
     public WelcomeLoginPageController(DatabaseHelper databaseHelper, Stage primaryStage, User user) {
         this.databaseHelper = databaseHelper;
@@ -65,11 +67,10 @@ public class WelcomeLoginPageController {
 	}
     
     private void setQuitButtonAction() {
-    	view.getInviteButton().setOnAction(a -> {
-            new InvitationPageController(databaseHelper, primaryStage, roleStr);
+    	view.getQuitButton().setOnAction(a -> {
+    		databaseHelper.closeConnection();
+            Platform.exit(); // Exit the JavaFX application
         });
-    	
-    	view.getLayout().getChildren().add(view.getInviteButton());
     }
     
     private void setInviteButtonAction() {
