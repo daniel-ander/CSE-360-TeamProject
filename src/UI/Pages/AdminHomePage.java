@@ -141,11 +141,6 @@ public class AdminHomePage {
 	}
 	
 	private void addUserRoleDropdown() {
-		roleBox.getChildren().addAll(userDropDown, new Label("Choose Role to add"), adminCheckBox, studentCheckBox,
-				instructorCheckBox, staffCheckBox, reviewerCheckBox, saveRolesButton);
-
-		layout.getChildren().addAll(adminLabel, roleBox);
-		
 		roleBox.getChildren().addAll(
 	            userDropDown,
 	            new Label("Choose Role to add"),

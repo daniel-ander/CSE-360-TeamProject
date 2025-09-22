@@ -48,7 +48,7 @@ public class WelcomeLoginPageController {
                 System.out.println("No roles found for user: " + user.getUserName());
                 return;
             }
-
+            System.out.println("No page mapped for role: " + roles.size());
             if (roles.size() == 1) {
                 // ✅ CASE 1: Only one role → jump straight in
                 navigateToPage(primaryStage, roles.get(0), user.getUserName());
@@ -87,13 +87,13 @@ public class WelcomeLoginPageController {
     
     private void assignRoles(User user) {
     	this.roleStr = databaseHelper.getUserRole(user.getUserName());
-        ArrayList<String> roles = new ArrayList<>();
+        
         if (roleStr != null && !roleStr.isEmpty()) {
             for (String r : roleStr.split(",")) {
                 roles.add(r.trim().toLowerCase(Locale.ROOT));
             }
         }
-       
+ 
        if(roles.contains("admin")) {
     	   setInviteButtonAction();
        }
