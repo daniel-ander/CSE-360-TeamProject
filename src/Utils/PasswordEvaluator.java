@@ -1,4 +1,4 @@
-package application;
+package Utils;
 
 
 public class PasswordEvaluator {

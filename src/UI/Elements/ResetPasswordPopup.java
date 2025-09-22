@@ -1,4 +1,4 @@
-package application;  // or your package name
+package UI.Elements;  // or your package name
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -6,6 +6,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
+import Utils.PasswordEvaluator;
 import databasePart1.*;
 
 public class ResetPasswordPopup {
