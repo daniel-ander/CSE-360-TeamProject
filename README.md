@@ -1,10 +1,14 @@
 # CSE-360-TeamProject
 Team Project for CSE360 - ASU 
 
-# Documentation
-### Github doesn't play well with .docx, everyone should request access to this project and edit it in there. 
+# Deliverables
+### Project Deliverables - Links to relevant deliverables  
 - [Team Project Report (Google Doc)](https://docs.google.com/document/d/1uQYse7CRU5mB1yXKWRj2MBDQrIfw3NvYD8Fvsl5CsXs/edit?usp=sharing)
-- 
+- Standup 1 Link: https://drive.google.com/file/d/1z9gdqxR9_6wXilsDHyN-EHbCyQWYLQht/view?usp=sharing
+- Standup 2 Link: https://drive.google.com/file/d/1vGqnoTy7fKNoPD9SVSekAnb1D0HYfBO9/view?usp=sharing
+- User-Facing Screencast 1 Link: 
+- Technical Screencast 2: https://youtu.be/JabwQ2pI4WQ
+  
 
 
 # How to make eclipse work!
