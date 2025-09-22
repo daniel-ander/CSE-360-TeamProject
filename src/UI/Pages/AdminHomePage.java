@@ -2,9 +2,9 @@ package UI.Pages;
 
 import java.util.*;
 
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**

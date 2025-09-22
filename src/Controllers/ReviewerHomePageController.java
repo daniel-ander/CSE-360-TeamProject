@@ -3,8 +3,6 @@ package Controllers;
 
 import Models.User;
 import UI.Pages.ReviewerHomePage;
-import UI.Pages.UserLoginPage;
-import UI.Pages.WelcomeLoginPage;
 import databasePart1.*;
 import javafx.stage.Stage;
 

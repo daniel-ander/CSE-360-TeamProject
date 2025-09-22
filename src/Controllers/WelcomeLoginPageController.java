@@ -118,7 +118,7 @@ public class WelcomeLoginPageController {
                 new StudentHomePageController(databaseHelper, stage, username);
                 break;
             case "instructor":
-                new InstructorHomePageController(databaseHelper, stage);
+                new InstructorHomePageController(databaseHelper, stage, username);
                 break;
             case "staff":
                 new StaffHomePageController(databaseHelper, stage, username);

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import Models.User;
 import UI.Pages.AdminSetupPage;
+import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 import databasePart1.*;
@@ -32,6 +33,10 @@ public class AdminSetupPageController {
         setInitialLayout();
         
         setSetupButtonAction();
+        
+        if(Debug.isEnabled) {
+        	setupDebugEnvironment();
+        }
     }
     
     // ===================
@@ -72,4 +77,12 @@ public class AdminSetupPageController {
             }
 		});
 	}
+    
+    private void setupDebugEnvironment() {
+		view.getAdminAutoFillButton().setText("AutoFill Admin Info (Debug)");
+		view.getAdminAutoFillButton().setOnAction(a -> {
+	    	view.getUserNameField().setText("admin");
+	    	view.getPasswordField().setText("Password1!");
+		});
+    }
 }

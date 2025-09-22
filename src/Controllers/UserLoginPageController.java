@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import Models.User;
 import UI.Elements.ResetPasswordPopup;
 import UI.Pages.UserLoginPage;
+import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 import databasePart1.*;
@@ -20,7 +21,6 @@ public class UserLoginPageController {
     private final DatabaseHelper databaseHelper;
     private final Stage primaryStage;
     private final UserLoginPage view = new UserLoginPage();
-    private boolean DEBUG = true;
 
     public UserLoginPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
         this.databaseHelper = databaseHelper;
@@ -29,7 +29,7 @@ public class UserLoginPageController {
         setInitialLayout();
         
         setLoginButtonAction();
-        if(DEBUG) {
+        if(Debug.isEnabled) {
         	setDebugEnvironment();
         }
     }

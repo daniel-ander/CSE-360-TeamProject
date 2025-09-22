@@ -1,8 +1,8 @@
 package UI.Pages;
 
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
@@ -14,12 +14,10 @@ import javafx.stage.Stage;
 // 
 public class AdminSetupPage {
 	
-
-	private boolean DEBUG = true; //toggle for debugging
 	// Input fields for userName and password
     // Label to display error messages
-    private final Label errorLabel = new Label(""); //creation of label, "blank" so its rendered early and nothing shifts around
-	private final Label pageExplain = new Label("This page is where the first user will login\n they are automatically an admin\n Use Admin/Password1");
+    private final Label errorLabel = new Label(); //creation of label, "blank" so its rendered early and nothing shifts around
+	private final Label pageExplain = new Label("This Account Will Be The Administrator Account");
 	
     private final TextField userNameField = new TextField();
     
@@ -68,15 +66,6 @@ public class AdminSetupPage {
         primaryStage.setScene(new Scene(layout, 800, 400));
         primaryStage.setTitle("Administrator Setup");
         primaryStage.show();
-        
-        if (DEBUG) {
-    		adminInfoAutoFillButton.setText("AutoFill Admin Info (Debug)");
-    		adminInfoAutoFillButton.setOnAction(a -> {
-		    	userNameField.setText("admin");
-		    	passwordField.setText("Password1!");
-    		});
-        
-        };
     }
     
     public void setErrorLabel(String text) {

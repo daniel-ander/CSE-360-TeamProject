@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import Models.User;
 import UI.Pages.SetupAccountPage;
+import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 import databasePart1.*;
@@ -18,7 +19,6 @@ public class SetupAccountPageController {
     private final DatabaseHelper databaseHelper;
     private final Stage primaryStage;
     private final SetupAccountPage view = new SetupAccountPage();
-    private boolean DEBUG = true;
     
     // DatabaseHelper to handle database operations.
     public SetupAccountPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
@@ -42,7 +42,7 @@ public class SetupAccountPageController {
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	
-    	if(DEBUG) {
+    	if(Debug.isEnabled) {
     		databaseHelper.printInvitationCodesTable();
     	}
     }

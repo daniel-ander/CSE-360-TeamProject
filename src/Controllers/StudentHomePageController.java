@@ -1,7 +1,7 @@
 package Controllers;
 import Models.User;
 import UI.Pages.StudentHomePage;
-
+import Utils.Debug;
 import databasePart1.*;
 import javafx.stage.Stage;
 
@@ -16,7 +16,6 @@ public class StudentHomePageController {
 	private final Stage primaryStage;
 	private final StudentHomePage view = new StudentHomePage();
 	private final String currentUser;
-	private boolean DEBUG = true;
 	
 	public StudentHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
         this.databaseHelper = databaseHelper;
@@ -53,7 +52,7 @@ public class StudentHomePageController {
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	
-    	if(DEBUG) {
+    	if(Debug.isEnabled) {
     		view.getLayout().getChildren().add(view.getDebugLabel());
     	}
     }
