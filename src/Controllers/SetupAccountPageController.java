@@ -50,17 +50,17 @@ public class SetupAccountPageController {
     private void setSetupButtonAction() {
     	view.getSetupButton().setOnAction(a -> {
         	// Retrieve user input
-            String userName = view.getUserNameField().getText();
-            String password = view.getPasswordField().getText();
+            String userName = view.getUserName();
+            String password = view.getPassword();
             String code = view.getInvitationCodeField().getText();
             
          // Validate userName and password using FSM classes
             if (!UserNameRecognizer.checkForValidUserName(userName)) {
-			    view.getErrorLabel().setText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
+			    view.setErrorMessage("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 			    return;
 			    }
             if (!PasswordEvaluator.evaluatePassword(password)) {
-				view.getErrorLabel().setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+            	view.setErrorMessage("Password issues: " + PasswordEvaluator.passwordErrorMessage);
 				return;
 			}
             
@@ -79,11 +79,11 @@ public class SetupAccountPageController {
 		                new WelcomeLoginPageController(databaseHelper, primaryStage, user);
             		}
             		else {
-            			view.getErrorLabel().setText("Please enter a valid invitation code");
+            			view.setErrorMessage("Please enter a valid invitation code");
             		}
             	}
             	else {
-            		view.getErrorLabel().setText("This useruserName is taken!!.. Please use another to setup an account");
+            		view.setErrorMessage("This useruserName is taken!!.. Please use another to setup an account");
             	}
             	
             } catch (SQLException e) {

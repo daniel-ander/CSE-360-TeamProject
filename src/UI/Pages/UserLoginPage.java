@@ -37,13 +37,13 @@ public class UserLoginPage {
     	return passwordField;
     }
     
-    public Label getErrorLabel() {
-    	return errorLabel;
-    }
-    
     // ===================
    	// Setters
    	// ===================
+    
+    public void setErrorLabelText(String text) {
+    	errorLabel.setText(text);
+    }
     
     public void setInitialLayout(Stage primaryStage) {
     	// Input field for the user's userName, password
@@ -64,6 +64,5 @@ public class UserLoginPage {
         primaryStage.show();
     }
 }
-
 
 
