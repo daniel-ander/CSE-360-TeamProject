@@ -3,6 +3,7 @@ package Controllers;
 
 import Models.User;
 import UI.Pages.ReviewerHomePage;
+import Utils.Debug;
 import databasePart1.*;
 import javafx.stage.Stage;
 
@@ -35,6 +36,10 @@ public class ReviewerHomePageController {
 	    
 	    setLogoutButtonAction();
 	    setChangeRolesButtonAction();
+	    
+	    if(Debug.isEnabled) {
+        	setUpDebugEnvironment();
+        }
 	}
 	
     // ===================
@@ -61,4 +66,7 @@ public class ReviewerHomePageController {
     	view.setInitialLayout(primaryStage);
     }
     
+    private final void setUpDebugEnvironment() {
+    	view.getLayout().getChildren().add(view.getDebugLabel());
+    }
 }

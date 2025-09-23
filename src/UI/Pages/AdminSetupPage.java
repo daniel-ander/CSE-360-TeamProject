@@ -39,17 +39,25 @@ public class AdminSetupPage {
     	return adminInfoAutoFillButton;
     }
     
-    public TextField getUserNameField() {
-    	return userNameField;
-    }
+    public String getUserName() {
+    	return userNameField.getText();
+    }  
     
-    public PasswordField getPasswordField() {
-    	return passwordField;
+    public String getPassword() {
+    	return passwordField.getText();
     }
     
     // ===================
     // Setters
  	// ===================
+    
+    public void setUsername(String text) {
+    	userNameField.setText(text);
+    }
+    
+    public void setPassword(String text) {
+    	passwordField.setText(text);
+    }
     
     public void setInitialLayout(Stage primaryStage) {
 		// Set the scene to primary stage
