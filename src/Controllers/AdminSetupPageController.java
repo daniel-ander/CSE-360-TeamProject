@@ -50,8 +50,8 @@ public class AdminSetupPageController {
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(a -> {
 			// Retrieve user input
-            String userName = view.getUserNameField().getText();
-            String password = view.getPasswordField().getText();
+            String userName = view.getUserName();
+            String password = view.getPassword();
             // validate against our FSM classes
             // validate against our FSM classes
         	if (!UserNameRecognizer.checkForValidUserName(userName)) {
@@ -81,8 +81,8 @@ public class AdminSetupPageController {
     private void setupDebugEnvironment() {
 		view.getAdminAutoFillButton().setText("AutoFill Admin Info (Debug)");
 		view.getAdminAutoFillButton().setOnAction(a -> {
-	    	view.getUserNameField().setText("admin");
-	    	view.getPasswordField().setText("Password1!");
+	    	view.setUsername("admin");
+	    	view.setPassword("Password1!");
 		});
     }
 }

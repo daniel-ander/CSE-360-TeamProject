@@ -70,14 +70,6 @@ public class AdminHomePage {
 		return confirmAlert;
 	}
 	
-	public Label getTempPasswordInfoLabel() {
-		return tempPasswordInfoLabel;
-	}
-	
-	public Label getUserDetailsLabel() {
-		return userDetailsLabel;
-	}
-	
 	public Button getDeleteUserButton() {
 		return deleteUserButton;
 	}
@@ -90,29 +82,57 @@ public class AdminHomePage {
 		return saveRolesButton;
 	}
 	
-	public CheckBox getAdminCheckBox() {
-		return adminCheckBox;
+	public boolean isAdminCheckBoxSelected() {
+		return adminCheckBox.isSelected();
 	}
 	
-	public CheckBox getStudentCheckBox() {
-		return studentCheckBox;
+	public boolean isStudentCheckBoxSelected() {
+		return studentCheckBox.isSelected();
 	}
 	
-	public CheckBox getInstructorCheckBox() {
-		return instructorCheckBox;
+	public boolean isInstructorCheckBoxSelected() {
+		return instructorCheckBox.isSelected();
 	}
 	
-	public CheckBox getStaffCheckBox() {
-		return staffCheckBox;
+	public boolean isStaffCheckBoxSelected() {
+		return staffCheckBox.isSelected();
 	}
 	
-	public CheckBox getReviewerCheckBox() {
-		return reviewerCheckBox;
+	public boolean isReviewerCheckBoxSelected() {
+		return reviewerCheckBox.isSelected();
 	}
 	
 	// ===================
 	// Setters
 	// ===================
+	
+	public void setTempPasswordInfoLabel(String text) {
+		tempPasswordInfoLabel.setText(text);;
+	}
+	
+	public void setAdminCheckBox(boolean flag) {
+		adminCheckBox.setSelected(flag);
+	}
+	
+	public void setStudentCheckBox(boolean flag) {
+		studentCheckBox.setSelected(flag);
+	}
+	
+	public void setInstructorCheckBox(boolean flag) {
+		instructorCheckBox.setSelected(flag);
+	}
+	
+	public void setStaffCheckBox(boolean flag) {
+		staffCheckBox.setSelected(flag);
+	}
+	
+	public void setReviewerCheckBox(boolean flag) {
+		reviewerCheckBox.setSelected(flag);
+	}
+	
+	public void setUserDetailsLabel(String text) {
+		userDetailsLabel.setText(text);
+	}
 	
 	public void setInitialLayout(Stage primaryStage) {				
 		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");

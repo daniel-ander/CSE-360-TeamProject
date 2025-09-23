@@ -46,13 +46,13 @@ public class UserLoginPageController {
 
 	        // --- Username validation ---
 	        if (!UserNameRecognizer.checkForValidUserName(userName)) {
-	            view.getErrorLabel().setText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
+	        	view.setErrorLabelText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 	            return;
 	        }
 
 	        // --- Password validation ---
 	        if (!PasswordEvaluator.evaluatePassword(password)) {
-	            view.getErrorLabel().setText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
+	            view.setErrorLabelText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
 	            return;
 	        }
 
@@ -73,10 +73,10 @@ public class UserLoginPageController {
 	                	    //welcomeLoginPage.show(primaryStage, user);
 	                	}
 	                } else {
-	                    view.getErrorLabel().setText("Error logging in");
+	                    view.setErrorLabelText("Error logging in");
 	                }
 	            } else {
-	                view.getErrorLabel().setText("User account doesn't exist");
+	            	view.setErrorLabelText("User account doesn't exist");
 	            }
 	        } catch (SQLException e) {
 	            System.err.println("Database error: " + e.getMessage());

@@ -54,15 +54,15 @@ public class AdminHomePageController {
 				return;
 			}
 			List<String> roles = new ArrayList<>();
-			if (view.getAdminCheckBox().isSelected())
+			if (view.isAdminCheckBoxSelected())
 				roles.add("admin");
-			if (view.getStudentCheckBox().isSelected())
+			if (view.isStudentCheckBoxSelected())
 				roles.add("student");
-			if (view.getInstructorCheckBox().isSelected())
+			if (view.isInstructorCheckBoxSelected())
 				roles.add("instructor");
-			if (view.getStaffCheckBox().isSelected())
+			if (view.isStaffCheckBoxSelected())
 				roles.add("staff");
-			if (view.getReviewerCheckBox().isSelected())
+			if (view.isReviewerCheckBoxSelected())
 				roles.add("reviewer");
 
 			databaseHelper.updateUserRoles(selectedUser, roles);
@@ -78,9 +78,9 @@ public class AdminHomePageController {
             String tempPass = databaseHelper.issueResetPassword(selectedUser);
 
             if (tempPass == null) {
-                view.getTempPasswordInfoLabel().setText("Error setting temp password");
+                view.setTempPasswordInfoLabel("Error setting temp password");
             } else {
-                view.getTempPasswordInfoLabel().setText("Temp password for " + selectedUser + " is: " + tempPass);
+                view.setTempPasswordInfoLabel("Temp password for " + selectedUser + " is: " + tempPass);
             }
         });
 	}
@@ -93,26 +93,26 @@ public class AdminHomePageController {
             String roleStr = databaseHelper.getUserRole(selectedUser);
 
             // Reset all checkboxes
-            view.getAdminCheckBox().setSelected(false);
-            view.getStudentCheckBox().setSelected(false);
-            view.getInstructorCheckBox().setSelected(false);
-            view.getStaffCheckBox().setSelected(false);
-            view.getReviewerCheckBox().setSelected(false);
+            view.setAdminCheckBox(false);
+            view.setStudentCheckBox(false);
+            view.setInstructorCheckBox(false);
+            view.setStaffCheckBox(false);
+            view.setReviewerCheckBox(false);
 
             if (roleStr != null && !roleStr.isEmpty()) {
                 Set<String> roles = new HashSet<>();
                 for (String r : roleStr.split(",")) {
                     roles.add(r.trim().toLowerCase(Locale.ROOT));
                 }
-                if (roles.contains("admin")) view.getAdminCheckBox().setSelected(true);
-                if (roles.contains("student")) view.getStudentCheckBox().setSelected(true);
-                if (roles.contains("instructor")) view.getInstructorCheckBox().setSelected(true);
-                if (roles.contains("staff")) view.getStaffCheckBox().setSelected(true);
-                if (roles.contains("reviewer")) view.getReviewerCheckBox().setSelected(true);
+                if (roles.contains("admin")) view.setAdminCheckBox(true);
+                if (roles.contains("student")) view.setStudentCheckBox(true);
+                if (roles.contains("instructor")) view.setInstructorCheckBox(true);
+                if (roles.contains("staff")) view.setStaffCheckBox(true);
+                if (roles.contains("reviewer")) view.setReviewerCheckBox(true);
             }
 
             // Update details section
-            view.getUserDetailsLabel().setText(
+            view.setUserDetailsLabel(
                 "User: " + selectedUser + "\n" +
                 "Roles: " + (roleStr == null || roleStr.isEmpty() ? "None" : roleStr) + "\n" +
                 "Other info: (e.g., last login, email, etc.)"
@@ -169,15 +169,15 @@ public class AdminHomePageController {
 
         // Build new role list from checkboxes
         List<String> roles = new ArrayList<>();
-        if (view.getAdminCheckBox().isSelected()) roles.add("admin");
-        if (view.getStudentCheckBox().isSelected()) roles.add("student");
-        if (view.getInstructorCheckBox().isSelected()) roles.add("instructor");
-        if (view.getStaffCheckBox().isSelected()) roles.add("staff");
-        if (view.getReviewerCheckBox().isSelected()) roles.add("reviewer");
+        if (view.isAdminCheckBoxSelected()) roles.add("admin");
+        if (view.isStudentCheckBoxSelected()) roles.add("student");
+        if (view.isInstructorCheckBoxSelected()) roles.add("instructor");
+        if (view.isStaffCheckBoxSelected()) roles.add("staff");
+        if (view.isReviewerCheckBoxSelected()) roles.add("reviewer");
 
         // Update details view
         String roleStr = String.join(",", roles);
-        view.getUserDetailsLabel().setText(
+        view.setUserDetailsLabel(
             "User: " + selectedUser + "\n" +
             "Roles: " + (roleStr.isEmpty() ? "None" : roleStr) + "\n" +
             "Other info: (e.g., last login, email, etc.)"

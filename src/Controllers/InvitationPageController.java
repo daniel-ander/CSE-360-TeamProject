@@ -44,11 +44,11 @@ public class InvitationPageController {
     private void setShowCodeButtonAction() {
 		view.getShowCodeButton().setOnAction(a -> {
 			StringBuilder selectedRoles = new StringBuilder();
-        	if (view.getAdminCheckBox().isSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
-        	if (view.getStudentCheckBox().isSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
-        	if (view.getInstructorCheckBox().isSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
-        	if (view.getStaffCheckBox().isSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
-        	if (view.getReviewerCheckBox().isSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
+        	if (view.isAdminCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
+        	if (view.isStudentCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
+        	if (view.isInstructorCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
+        	if (view.isStaffCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
+        	if (view.isReviewerCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
         	
         	
 			String invitationCode = databaseHelper.generateInvitationCode("");

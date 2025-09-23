@@ -29,7 +29,7 @@ public class InvitationPage {
 	private final Scene inviteScene = new Scene(layout, 800, 400);
 	
 	private final HBox roleBox = new HBox(20);
-    private final CheckBox adminCheckBpx = new CheckBox("Admin");
+    private final CheckBox adminCheckBox = new CheckBox("Admin");
     private final CheckBox studentCheckBox = new CheckBox("Student");
     private final CheckBox instructorCheckBox = new CheckBox("Instructor");
     private final CheckBox staffCheckBox = new CheckBox("Staff");
@@ -39,26 +39,6 @@ public class InvitationPage {
    	// Getters
    	// ===================
     
-    public CheckBox getAdminCheckBox() {
-    	return adminCheckBpx;
-    }
-    
-    public CheckBox getStudentCheckBox() {
-    	return studentCheckBox;
-    }
-    
-    public CheckBox getInstructorCheckBox() {
-    	return instructorCheckBox;
-    }
-    
-    public CheckBox getStaffCheckBox() {
-    	return staffCheckBox;
-    }
-    
-    public CheckBox getReviewerCheckBox() {
-    	return reviewerCheckBox;
-    }
-     
     public Button getShowCodeButton() {
     	return showCodeButton;
     }
@@ -67,9 +47,30 @@ public class InvitationPage {
     	return inviteCodeLabel;
     }
     
+    public boolean isAdminCheckBoxSelected() {
+    	return adminCheckBox.isSelected();
+    }
+    
+    public boolean isStudentCheckBoxSelected() {
+    	return studentCheckBox.isSelected();
+    }
+    
+    public boolean isInstructorCheckBoxSelected() {
+    	return instructorCheckBox.isSelected();
+    }
+    
+    public boolean isStaffCheckBoxSelected() {
+    	return staffCheckBox.isSelected();
+    }
+    
+    public boolean isReviewerCheckBoxSelected() {
+    	return reviewerCheckBox.isSelected();
+    }
+    
     // ===================
    	// Setters
    	// ===================
+    
     
     public void setInitialLayout(Stage primaryStage) {
     	
@@ -77,7 +78,7 @@ public class InvitationPage {
     	userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
     	inviteCodeLabel.setStyle("-fx-font-size: 14px; -fx-font-style: italic;");
     	
-    	roleBox.getChildren().addAll(adminCheckBpx, studentCheckBox, instructorCheckBox, staffCheckBox, reviewerCheckBox);
+    	roleBox.getChildren().addAll(adminCheckBox, studentCheckBox, instructorCheckBox, staffCheckBox, reviewerCheckBox);
     	roleBox.setStyle("-fx-alignment: center;");
     	
     	layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel, roleBox);

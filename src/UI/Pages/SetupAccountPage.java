@@ -24,25 +24,25 @@ public class SetupAccountPage {
     	return setupButton;
     }
     
-    public TextField getUserNameField() {
-    	return userNameField;
+    public String getUserName() {
+    	return userNameField.getText();
     }
     
-    public TextField getPasswordField() {
-    	return passwordField;
+    public String getPassword() {
+    	return passwordField.getText();
     }
     
     public TextField getInvitationCodeField() {
     	return inviteCodeField;
     }
     
-    public Label getErrorLabel() {
-    	return errorLabel;
-    }
-    
     // ===================
    	// Setters
    	// ===================
+    
+    public void setErrorMessage(String text) {
+    	errorLabel.setText(text);
+    }
     
     public void setInitialLayout(Stage primaryStage) {
     	userNameField.setPromptText("Enter userName");
