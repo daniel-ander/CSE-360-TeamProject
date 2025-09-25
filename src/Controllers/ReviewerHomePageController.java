@@ -49,7 +49,7 @@ public class ReviewerHomePageController {
 	private void setLogoutButtonAction() {
 		view.getLogoutButton().setOnAction(a -> {
 			// Return to login page
-	        UserLoginPageController loginPage = new UserLoginPageController(databaseHelper, primaryStage);
+	        new UserLoginPageController(databaseHelper, primaryStage);
 		});
 	}
 	

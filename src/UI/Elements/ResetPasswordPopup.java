@@ -1,50 +1,55 @@
 package UI.Elements;  // or your package name
 
+import Utils.PasswordEvaluator;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.sql.SQLException;
-
-import Utils.PasswordEvaluator;
-import databasePart1.*;
 
 public class ResetPasswordPopup {
-    private final DatabaseHelper databaseHelper;
-
-    public ResetPasswordPopup(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+	Stage resetStage = new Stage();
+	
+	VBox layout = new VBox();
+	Scene scene = new Scene(layout, 250, 120);
+	
+    Label passwordPromptLabel = new Label("Enter your new password:");
+    Label feedbackLabel = new Label();
+    
+    PasswordField newPasswordField = new PasswordField();
+    
+    Button submitButton = new Button("Submit");
+    
+    // ===================
+  	// Getters
+  	// ===================
+     
+    public Button getSubmitButton() {
+    	return submitButton;
+    }	
+     
+    public String getPasswordPromptLabelText() {
+    	return passwordPromptLabel.getText();
     }
+     
+    // ===================
+    // Setters
+  	// ===================
+     
+    public void setFeedbackLabelText(String text) {
+    	feedbackLabel.setText(text);
+    }
+     
+    public void setInitialLayout() {
+    	resetStage.setTitle("Reset Password");
+    	
+    	layout.getChildren().addAll(passwordPromptLabel, newPasswordField, submitButton, feedbackLabel);
 
-    public void show(String userName) {
-        Stage resetStage = new Stage();
-        resetStage.setTitle("Reset Password");
-
-        VBox layout = new VBox();
-        Label label = new Label("Enter your new password:");
-        PasswordField newPasswordField = new PasswordField();
-        Label feedback = new Label();
-        Button submitButton = new Button("Submit");
-
-        submitButton.setOnAction(ev -> {
-            String newPass = newPasswordField.getText();
-            if (!PasswordEvaluator.evaluatePassword(newPass)) {
-                feedback.setText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
-                return;
-            }
-            try {
-                databaseHelper.updatePassword(userName, newPass);
-                feedback.setText("Password updated. Please log in again.");
-                resetStage.close();
-            } catch (SQLException ex) {
-                feedback.setText("Database error: " + ex.getMessage());
-            }
-        });
-
-        layout.getChildren().addAll(label, newPasswordField, submitButton, feedback);
-
-        Scene scene = new Scene(layout, 250, 120);
         resetStage.setScene(scene);
         resetStage.show();
     }
+    
+    public void closeStage() {
+    	resetStage.close();
+    }
+		
 }

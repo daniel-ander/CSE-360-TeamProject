@@ -21,6 +21,11 @@ public class UserLoginPageController {
     private final DatabaseHelper databaseHelper;
     private final Stage primaryStage;
     private final UserLoginPage view = new UserLoginPage();
+    private final ResetPasswordPopup resetPasswordPopupView = new ResetPasswordPopup();
+    
+ // --- Retrieve user inputs ---
+    String userName = view.getUsernameField().getText();
+    String password = view.getPasswordField().getText();
 
     public UserLoginPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
         this.databaseHelper = databaseHelper;
@@ -29,6 +34,8 @@ public class UserLoginPageController {
         setInitialLayout();
         
         setLoginButtonAction();
+        setSubmitButtonResetPasswordPopupAction();
+        
         if(Debug.isEnabled) {
         	setDebugEnvironment();
         }
@@ -37,10 +44,6 @@ public class UserLoginPageController {
     
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(a -> {
-	        // --- Retrieve user inputs ---
-	        String userName = view.getUsernameField().getText();
-	        String password = view.getPasswordField().getText();
-
 	        // --- Flags ---
 	        boolean resetPasswordFlag = password.startsWith("R_") && password.length() > 2;
 
@@ -66,8 +69,7 @@ public class UserLoginPageController {
 	                user.setRole(role);
 	                if (databaseHelper.login(user)) {
 	                	if (resetPasswordFlag) {
-	                	    ResetPasswordPopup resetPasswordPopup = new ResetPasswordPopup(databaseHelper);
-	                	    resetPasswordPopup.show(userName);
+	                	    new ResetPasswordPopup();
 	                	} else {
 	                		// TOCHANGE
 	                	    //welcomeLoginPage.show(primaryStage, user);
@@ -85,6 +87,23 @@ public class UserLoginPageController {
 	    });
 	}
     
+    private void setSubmitButtonResetPasswordPopupAction() {
+    	resetPasswordPopupView.getSubmitButton().setOnAction(ev -> {
+            String newPass = resetPasswordPopupView.getPasswordPromptLabelText();
+            if (!PasswordEvaluator.evaluatePassword(newPass)) {
+            	resetPasswordPopupView.setFeedbackLabelText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+                return;
+            }
+            try {
+                databaseHelper.updatePassword(userName, newPass);
+                resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
+                resetPasswordPopupView.closeStage();
+            } catch (SQLException ex) {
+            	resetPasswordPopupView.setFeedbackLabelText("Database error: " + ex.getMessage());
+            }
+        });
+    }
+    
     private void setDebugEnvironment() {
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
  		view.getAdminInfoAutoFillButton().setOnAction(a -> {
@@ -95,6 +114,7 @@ public class UserLoginPageController {
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
+    	resetPasswordPopupView.setInitialLayout();
     }
 
 }
