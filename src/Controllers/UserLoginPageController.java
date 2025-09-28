@@ -41,11 +41,16 @@ public class UserLoginPageController {
         }
     }
     
+    // TODO: set it up so each stroke updates field variables
+    
     
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(a -> {
 	        // --- Flags ---
 	        boolean resetPasswordFlag = password.startsWith("R_") && password.length() > 2;
+	        
+	        userName = view.getUsernameField().getText();
+	        password = view.getPasswordField().getText();
 
 	        // --- Username validation ---
 	        if (!UserNameRecognizer.checkForValidUserName(userName)) {
@@ -72,7 +77,8 @@ public class UserLoginPageController {
 	                	    new ResetPasswordPopup();
 	                	} else {
 	                		// TOCHANGE
-	                	    //welcomeLoginPage.show(primaryStage, user);
+	                		new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+//	                	    welcomeLoginPage.show(primaryStage, user);
 	                	}
 	                } else {
 	                    view.setErrorLabelText("Error logging in");
@@ -89,6 +95,9 @@ public class UserLoginPageController {
     
     private void setSubmitButtonResetPasswordPopupAction() {
     	resetPasswordPopupView.getSubmitButton().setOnAction(ev -> {
+    		userName = view.getUsernameField().getText();
+	        password = view.getPasswordField().getText();
+	        
             String newPass = resetPasswordPopupView.getPasswordPromptLabelText();
             if (!PasswordEvaluator.evaluatePassword(newPass)) {
             	resetPasswordPopupView.setFeedbackLabelText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
@@ -107,7 +116,7 @@ public class UserLoginPageController {
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	resetPasswordPopupView.setInitialLayout();
+//    	resetPasswordPopupView.setInitialLayout();
     }
     
     private void setDebugEnvironment() {
