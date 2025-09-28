@@ -71,4 +71,8 @@ public class StudentHomePage {
 	    primaryStage.setTitle("Student Home Page");
 
     }
+    
+    public void addDebugLabel() {
+    	layout.getChildren().add(debugLabel);
+    }
 }

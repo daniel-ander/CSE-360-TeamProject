@@ -55,12 +55,12 @@ public class InstructorHomePageController {
 	    });
 	}
     
-    private void setUpDebugEnvironment() {
-    	view.getLayout().getChildren().add(view.getDebugLabel());
-    }
-    
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	view.setUserLabel(currentUserName);
+    }
+    
+    private void setUpDebugEnvironment() {
+    	view.addDebugLabel();
     }
 }

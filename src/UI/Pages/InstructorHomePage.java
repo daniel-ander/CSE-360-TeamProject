@@ -68,4 +68,8 @@ public class InstructorHomePage {
 	    primaryStage.setTitle("Instructor Home Page");
     	
     }
+    
+    public void addDebugLabel() {
+    	layout.getChildren().add(debugLabel);
+    }
 }

@@ -67,6 +67,6 @@ public class ReviewerHomePageController {
     }
     
     private final void setUpDebugEnvironment() {
-    	view.getLayout().getChildren().add(view.getDebugLabel());
+    	view.addDebugLabel();
     }
 }

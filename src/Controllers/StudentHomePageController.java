@@ -26,6 +26,10 @@ public class StudentHomePageController {
         
         setLogoutButtonAction();
         setChangeRolesButtonAction();
+        
+        if(Debug.isEnabled) {
+        	setUpDebugEnvironment();
+    	}
     }
 	
 	// ===================
@@ -51,9 +55,9 @@ public class StudentHomePageController {
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	
-    	if(Debug.isEnabled) {
-    		view.getLayout().getChildren().add(view.getDebugLabel());
-    	}
+    }
+    
+    private final void setUpDebugEnvironment() {
+    	view.addDebugLabel();
     }
 }

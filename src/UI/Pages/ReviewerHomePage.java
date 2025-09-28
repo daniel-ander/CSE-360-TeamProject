@@ -65,6 +65,9 @@ public class ReviewerHomePage {
 	    // Set the scene to primary stage
 	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("Reviewer Home Page");
-
+    }
+    
+    public void addDebugLabel() {
+    	layout.getChildren().add(debugLabel);
     }
 }
