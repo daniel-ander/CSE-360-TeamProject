@@ -20,6 +20,13 @@ public class StaffHomePage {
 	
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
 	
+	public StaffHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
+	
     
     // ===================
    	// Getters

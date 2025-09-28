@@ -28,6 +28,13 @@ public class AdminSetupPage {
     
     private final VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplainLabel, adminInfoAutoFillButton);
     private final Scene scene = new Scene(layout, 800, 400);
+    
+    public AdminSetupPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 
     
     // ===================
@@ -62,7 +69,7 @@ public class AdminSetupPage {
     	passwordField.setText(text);
     }
     
-    public void setInitialLayout(Stage primaryStage) {		
+    public void setInitialLayout(Stage primaryStage) {	
     	layout.getStyleClass().add("layout");
     	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
     	pageExplainLabel.getStyleClass().addAll("auxilary-label", "info-label-secondary");

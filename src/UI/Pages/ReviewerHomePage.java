@@ -19,6 +19,13 @@ public class ReviewerHomePage {
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
 	
+	public ReviewerHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
+	
 	// ===================
    	// Getters
    	// ===================

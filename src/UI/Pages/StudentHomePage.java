@@ -19,6 +19,13 @@ public class StudentHomePage {
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
+	
+	public StudentHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 		
     // ===================
    	// Getters

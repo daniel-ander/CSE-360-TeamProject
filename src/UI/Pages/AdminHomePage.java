@@ -46,6 +46,13 @@ public class AdminHomePage {
 	
 	private final ComboBox<String> userDropDown = new ComboBox<>();
 	
+	public AdminHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
+	
 	// ===================
 	// Getters
 	// ===================

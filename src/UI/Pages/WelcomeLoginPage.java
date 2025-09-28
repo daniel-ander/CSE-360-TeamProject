@@ -18,6 +18,7 @@ import javafx.stage.Stage;
  */
 public class WelcomeLoginPage {
 	private final VBox layout = new VBox(5);
+	private final Scene scene = new Scene(layout, 800, 400);
 	// Page title / greeting
     private final Label welcomeLabel = new Label("Welcome!!");
     private final Button continueButton = new Button("Continue to your Page");
@@ -28,6 +29,13 @@ public class WelcomeLoginPage {
      * @param primaryStage The main JavaFX stage.
      * @param user The logged-in user object.
      */
+    
+    public WelcomeLoginPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 
     // ===================
    	// Getters
@@ -53,17 +61,14 @@ public class WelcomeLoginPage {
    	// Setters
    	// ===================
     
-    public void setInitialLayout(Stage primaryStage) {
+    public void setInitialLayout(Stage primaryStage) {    	
     	// Base layout container
         layout.getStyleClass().add("layout");
         welcomeLabel.getStyleClass().add("main-label");
         
-        // Assemble UI
-        layout.getChildren().addAll(welcomeLabel, continueButton, quitButton);
-        Scene welcomeScene = new Scene(layout, 800, 400);
 
         // Show the scene
-        primaryStage.setScene(welcomeScene);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Welcome Page");
     }
 }

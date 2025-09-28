@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import databasePart1.DatabaseHelper;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -17,6 +18,13 @@ public class UserLoginPage {
     private final Button adminInfoAutoFillButton = new Button("Admin Login (TESTING)");
     private final VBox layout = new VBox(10);
     private final Scene scene = new Scene(layout, 800, 400);
+    
+    public UserLoginPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
     
     // ===================
    	// Getters
@@ -51,9 +59,6 @@ public class UserLoginPage {
     }
     
     public void setInitialLayout(Stage primaryStage) {
-    	scene.getStylesheets().add(
-    		    getClass().getResource("/Styles/styles.css").toExternalForm()
-    	);
     	layout.getStyleClass().add("layout");
     	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
     	// Input field for the user's userName, password

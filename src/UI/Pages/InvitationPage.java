@@ -35,6 +35,13 @@ public class InvitationPage {
     private final CheckBox staffCheckBox = new CheckBox("Staff");
     private final CheckBox reviewerCheckBox = new CheckBox("Reviewer");
     
+    public InvitationPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
+    
     // ===================
    	// Getters
    	// ===================

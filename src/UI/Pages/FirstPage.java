@@ -15,6 +15,13 @@ public class FirstPage {
 	Label userLabel = new Label("Welcome!\n This is the special Admin page\n Only the first user sees this!");
 	Button continueButton = new Button("Continue");
 	Scene scene = new Scene(layout, 800, 400);
+	
+	public FirstPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
     
 	// ===================
   	// Getters
