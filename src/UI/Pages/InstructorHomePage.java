@@ -59,7 +59,6 @@ public class InstructorHomePage {
     public void setInitialLayout(Stage primaryStage) {
     	layout.getStyleClass().add("layout");
     	userLabel.getStyleClass().add("main-label");
-    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
     	
     	layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
 	    
@@ -70,6 +69,7 @@ public class InstructorHomePage {
     }
     
     public void addDebugLabel() {
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
     	layout.getChildren().add(debugLabel);
     }
 }

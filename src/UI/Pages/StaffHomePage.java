@@ -52,8 +52,6 @@ public class StaffHomePage {
     	layout.getStyleClass().add("layout");
     	// Label to display Hello user
 	    userLabel.getStyleClass().add("main-label");
-	    debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
-
 	    
 	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
 	    // Set the scene to primary stage
@@ -62,6 +60,7 @@ public class StaffHomePage {
     }
     
     public void addDebugLabel() {
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
     	layout.getChildren().add(debugLabel);
     }
 }

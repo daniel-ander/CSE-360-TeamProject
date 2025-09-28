@@ -104,17 +104,18 @@ public class UserLoginPageController {
         });
     }
     
+    
+    private void setInitialLayout() {
+    	view.setInitialLayout(primaryStage);
+    	resetPasswordPopupView.setInitialLayout();
+    }
+    
     private void setDebugEnvironment() {
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
  		view.getAdminInfoAutoFillButton().setOnAction(a -> {
  			view.getUsernameField().setText("admin");
  			view.getPasswordField().setText("Password1!");
  		});
-    }
-    
-    private void setInitialLayout() {
-    	view.setInitialLayout(primaryStage);
-    	resetPasswordPopupView.setInitialLayout();
     }
 
 }

@@ -59,9 +59,7 @@ public class StudentHomePage {
     	layout.getStyleClass().add("layout");
     	// Label to display Hello user
 	    userLabel.getStyleClass().add("main-label");
-	    debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
-	    
-	    
+	   
 	    // Add all elements to layout
 
 	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
@@ -73,6 +71,7 @@ public class StudentHomePage {
     }
     
     public void addDebugLabel() {
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
     	layout.getChildren().add(debugLabel);
     }
 }
