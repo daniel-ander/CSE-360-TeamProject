@@ -66,6 +66,7 @@ public class WelcomeLoginPage {
         layout.getStyleClass().add("layout");
         welcomeLabel.getStyleClass().add("main-label");
         
+        layout.getChildren().addAll(welcomeLabel, continueButton, quitButton);
 
         // Show the scene
         primaryStage.setScene(scene);
