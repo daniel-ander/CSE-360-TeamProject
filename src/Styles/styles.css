@@ -3,3 +3,57 @@
 	padding: 20;
 	-fx-padding: 20;
 }
+
+.main-label {
+	-fx-font-size: 16px; 
+	font-size: 16px;
+	-fx-font-weight: bold;
+	font-weight: bold;
+}
+
+.auxilary-label {
+	-fx-font-size: 12px; 
+	font-size: 12px;
+}
+
+.centered {
+	-fx-alignment: center;
+}
+
+.debug-label, .info-label {
+	-fx-text-fill: blue;
+}
+
+.error-label {
+	-fx-text-fill: red;
+}
+
+.info-label-secondary {
+	-fx-text-fill: black;
+}
+
+/* Name subject to change based on future elements */
+.minor-label {
+	-fx-fond-size: 14px;
+	-fx-border-color: gray;
+	border-color: gray;
+	-fx-padding: 10;
+	padding: 10;
+}
+
+/* Name is arbitrary */
+.invite-code-label {
+	-fx-font-size: 14px;
+	font-size: 14px;
+	-fx-font-style: italic;
+	font-style: italic;
+}
+
+
+
+
+
+
+
+
+

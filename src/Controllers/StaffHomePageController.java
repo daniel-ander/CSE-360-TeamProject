@@ -2,6 +2,7 @@ package Controllers;
 
 import Models.User;
 import UI.Pages.StaffHomePage;
+import Utils.Debug;
 import databasePart1.*;
 import javafx.stage.Stage;
 
@@ -26,6 +27,10 @@ public class StaffHomePageController {
         
         setLogoutButtonAction();
         setChangeToRolesButtonAction();
+        
+        if(Debug.isEnabled) {
+        	setUpDebugEnvironment();
+        }
     }
 	
 	// ===================
@@ -52,5 +57,9 @@ public class StaffHomePageController {
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	view.setUserLabel(currentUser);
+    }
+    
+    private final void setUpDebugEnvironment() {
+    	view.addDebugLabel();
     }
 }

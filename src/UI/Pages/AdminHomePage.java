@@ -27,7 +27,7 @@ public class AdminHomePage {
 	private final CheckBox reviewerCheckBox = new CheckBox("Reviewer");
 
 	private final VBox layout = new VBox();
-	private final Scene adminScene = new Scene(layout, 800, 400);
+	private final Scene scene = new Scene(layout, 800, 400);
 	private final HBox roleBox = new HBox(20);
 	
 	// label to display the welcome message for the admin
@@ -134,23 +134,21 @@ public class AdminHomePage {
 		userDetailsLabel.setText(text);
 	}
 	
-	public void setInitialLayout(Stage primaryStage) {				
-		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-		roleBox.setStyle(null);
-		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-		
-		// Admins can't be un-admined by UI, so disable interaction
-        adminCheckBox.setDisable(true);
+	public void setInitialLayout(Stage primaryStage) {	
+		layout.getStyleClass().add("layout");
+		adminLabel.getStyleClass().add("main-label");
+		userDetailsLabel.getStyleClass().add("minor-label");
+        tempPasswordInfoLabel.getStyleClass().addAll("auxilary-label", "info-label");
         
-        userDetailsLabel.setStyle("-fx-border-color: gray; -fx-padding: 10; -fx-font-size: 14px;");
-        tempPasswordInfoLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
+		roleBox.setStyle(null);
+        adminCheckBox.setDisable(true); // Admins can't be un-admined by UI, so disable interaction
 		
-		addUserRoleDropdown();
+		setUserRoleDropdownLayout();
 		
 		layout.getChildren().addAll(adminLabel, roleBox, userDetailsLabel, deleteUserButton, setTempPasswordButton, tempPasswordInfoLabel);
 		
 		// Set the scene to primary stage
-		primaryStage.setScene(adminScene);
+		primaryStage.setScene(scene);
 		primaryStage.setTitle("Admin Page");
 	}
 	
@@ -160,7 +158,7 @@ public class AdminHomePage {
 		userDropDown.getItems().addAll(users);
 	}
 	
-	private void addUserRoleDropdown() {
+	private void setUserRoleDropdownLayout() {
 		roleBox.getChildren().addAll(
 	            userDropDown,
 	            new Label("Choose Role to add"),

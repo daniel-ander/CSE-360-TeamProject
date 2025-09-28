@@ -13,6 +13,8 @@ public class SetupLoginSelectionPage {
 	// Buttons to select Login / Setup options that redirect to respective pages
     private final Button setupButton = new Button("Don't have an account? Setup here");
     private final Button loginButton = new Button("Login");
+    private final VBox layout = new VBox(10);
+    private final Scene scene = new Scene(layout, 800, 400);
     
     // ===================
    	// Getters
@@ -31,11 +33,13 @@ public class SetupLoginSelectionPage {
    	// ===================
     
     public void setInitialLayout(Stage primaryStage) {
-    	VBox layout = new VBox(10);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
+    	scene.getStylesheets().add(
+    		    getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+        layout.getStyleClass().add("layout");
         layout.getChildren().addAll(setupButton, loginButton);
 
-        primaryStage.setScene(new Scene(layout, 800, 400));
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Account Setup");
         primaryStage.show();
     }

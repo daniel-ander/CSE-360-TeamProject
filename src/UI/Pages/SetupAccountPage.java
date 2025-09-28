@@ -10,6 +10,7 @@ import javafx.stage.Stage;
  * Users provide their userName, password, and a valid invitation code to register.
  */
 public class SetupAccountPage {
+	private final VBox layout = new VBox(10);
 	private final TextField userNameField = new TextField();
 	private final PasswordField passwordField = new PasswordField();
 	private final TextField inviteCodeField = new TextField();
@@ -45,6 +46,8 @@ public class SetupAccountPage {
     }
     
     public void setInitialLayout(Stage primaryStage) {
+    	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
+    	
     	userNameField.setPromptText("Enter userName");
         userNameField.setMaxWidth(250);
 
@@ -54,10 +57,8 @@ public class SetupAccountPage {
         inviteCodeField.setPromptText("Enter InvitationCode");
         inviteCodeField.setMaxWidth(250);
         
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
     	
-        VBox layout = new VBox(10);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
+        layout.getStyleClass().add("layout");
         layout.getChildren().addAll(userNameField, passwordField,inviteCodeField, setupButton, errorLabel);
         
 

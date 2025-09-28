@@ -12,8 +12,9 @@ import javafx.stage.Stage;
  */
 
 public class InstructorHomePage {
-
+	
 	private final VBox layout = new VBox();
+	private final Scene scene = new Scene(layout, 800, 400);
 
 	private final Label userLabel = new Label(); // "Hello, " + currentUser + "!"
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
@@ -49,14 +50,14 @@ public class InstructorHomePage {
     }
     
     public void setInitialLayout(Stage primaryStage) {
-    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-    	userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-    	debugLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
+    	layout.getStyleClass().add("layout");
+    	userLabel.getStyleClass().add("main-label");
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
     	
     	layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
-	    Scene userScene = new Scene(layout, 800, 400);
+	    
 	    // Set the scene to primary stage
-	    primaryStage.setScene(userScene);
+	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("Instructor Home Page");
     	
     }

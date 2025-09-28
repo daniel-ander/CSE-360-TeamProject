@@ -55,8 +55,8 @@ public class WelcomeLoginPage {
     
     public void setInitialLayout(Stage primaryStage) {
     	// Base layout container
-        layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-        welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        layout.getStyleClass().add("layout");
+        welcomeLabel.getStyleClass().add("main-label");
         
         // Assemble UI
         layout.getChildren().addAll(welcomeLabel, continueButton, quitButton);
