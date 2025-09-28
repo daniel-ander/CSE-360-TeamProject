@@ -48,8 +48,8 @@ public class InstructorHomePageController {
     	// TOCHANGE currentUser
     	view.getChangeRolesButton().setOnAction(a -> {
 	    	// Return to welcome page
-//	    	String role = databaseHelper.getUserRole(currentUser);
-	    	User user = new User(currentUserName, "", ""); // Password can be blank if not needed
+	    	String role = databaseHelper.getUserRole(currentUserName);
+	    	User user = new User(currentUserName, "", role); // Password can be blank if not needed
 	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
 
 	    });

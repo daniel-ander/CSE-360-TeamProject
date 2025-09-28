@@ -1,6 +1,5 @@
 package UI.Pages;
 
-import databasePart1.DatabaseHelper;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
