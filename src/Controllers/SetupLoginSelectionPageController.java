@@ -10,13 +10,13 @@ import javafx.stage.Stage;
 public class SetupLoginSelectionPageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final RepositoryProvider repositoryProvider;
+	private final DBConnectionStore dBConnectionStore;
 	
 	private final Stage primaryStage;
 	private final SetupLoginSelectionPage view = new SetupLoginSelectionPage();
 	
-	public SetupLoginSelectionPageController(RepositoryProvider repositoryProvider, Stage primaryStage) {
-		this.repositoryProvider = repositoryProvider;
+	public SetupLoginSelectionPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+		this.dBConnectionStore = dBConnectionStore;
 
         this.primaryStage = primaryStage;
         
@@ -33,13 +33,13 @@ public class SetupLoginSelectionPageController {
     
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(a -> {
-			new SetupAccountPageController(repositoryProvider, primaryStage);
+			new SetupAccountPageController(dBConnectionStore, primaryStage);
 		});
 	}
     
     private void setLoginButtonAction() {
 		view.getLoginButton().setOnAction(a -> {
-			new UserLoginPageController(repositoryProvider, primaryStage);
+			new UserLoginPageController(dBConnectionStore, primaryStage);
 		});
 	}
     

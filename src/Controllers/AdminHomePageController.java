@@ -10,7 +10,7 @@ import UI.Pages.AdminHomePage;
 import databasePart1.*;
 
 public class AdminHomePageController {
-	private final IUserRepository userRepository;
+	private final IUserDBManager userDBManager;
 	private final AdminHomePage view = new AdminHomePage();
 	private final Stage primaryStage;
 	private final String currentAdmin;
@@ -22,10 +22,10 @@ public class AdminHomePageController {
 	 * 
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
-	public AdminHomePageController(RepositoryProvider repositoryProvider, Stage primaryStage, String username) {
-		this.userRepository = repositoryProvider.getUserRepository();
+	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String username) {
+		this.userDBManager = dBConnectionStore.getUserRepository();
 		this.primaryStage = primaryStage;
-		this.users = userRepository.getAllUsernames();
+		this.users = userDBManager.getAllUsernames();
 		this.currentAdmin = username;
 		
 		setInitialLayout();
@@ -65,7 +65,7 @@ public class AdminHomePageController {
 			if (view.isReviewerCheckBoxSelected())
 				roles.add("reviewer");
 
-			userRepository.updateUserRoles(selectedUser, roles);
+			userDBManager.updateUserRoles(selectedUser, roles);
 			System.out.println("Updates Roles for " + selectedUser + ": " + roles);
 		});
 	}
@@ -75,7 +75,7 @@ public class AdminHomePageController {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
 
-            String tempPass = userRepository.issueResetPassword(selectedUser);
+            String tempPass = userDBManager.issueResetPassword(selectedUser);
 
             if (tempPass == null) {
                 view.setTempPasswordInfoLabel("Error setting temp password");
@@ -90,7 +90,7 @@ public class AdminHomePageController {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
 
-            String roleStr = userRepository.getUserRole(selectedUser);
+            String roleStr = userDBManager.getUserRole(selectedUser);
 
             // Reset all checkboxes
             view.setAdminCheckBox(false);
@@ -143,7 +143,7 @@ public class AdminHomePageController {
 
             Optional<ButtonType> result = view.getConfirmationAlert().showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean success = userRepository.deleteUser(currentAdmin, selectedUser);
+                boolean success = userDBManager.deleteUser(currentAdmin, selectedUser);
                 if (success) {
                     view.getUserDropdown().getItems().remove(selectedUser);
                     view.getUserDropdown().setValue(null);
@@ -184,9 +184,9 @@ public class AdminHomePageController {
         );
 
         // Save roles in database
-        userRepository.updateUserRoles(selectedUser, roles);
+        userDBManager.updateUserRoles(selectedUser, roles);
         System.out.println("Updated Roles for " + selectedUser + ": " + roles);
-        userRepository.printUsersTable();
+        userDBManager.printUsersTable();
     
 	}
 }

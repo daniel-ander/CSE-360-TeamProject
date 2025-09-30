@@ -16,17 +16,17 @@ import databasePart1.*;
  */
 public class SetupAccountPageController {
 
-	private final RepositoryProvider repositoryProvider;
+	private final DBConnectionStore dBConnectionStore;
     private final DatabaseHelper databaseHelper;
-    private final IUserRepository userRepository;
+    private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final SetupAccountPage view = new SetupAccountPage();
     
     // DatabaseHelper to handle database operations.
-    public SetupAccountPageController(RepositoryProvider repositoryProvider, Stage primaryStage) {
-    	this.repositoryProvider = repositoryProvider;
-        this.databaseHelper = repositoryProvider.getDatabaseHelper();
-        this.userRepository = repositoryProvider.getUserRepository();
+    public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+        this.userDBManager = dBConnectionStore.getUserRepository();
         this.primaryStage = primaryStage;
         
         setInitialLayout();
@@ -70,17 +70,17 @@ public class SetupAccountPageController {
             
             try {
             	// Check if the user already exists
-            	if(!userRepository.doesUserExist(userName)) {
+            	if(!userDBManager.doesUserExist(userName)) {
             		
             		// Validate the invitation code
             		if(databaseHelper.validateInvitationCode(code)) {
             			
             			// Create a new user and register them in the database
 		            	User user=new User(userName, password, "user");
-		            	userRepository.register(user);
+		            	userDBManager.register(user);
 		                
 		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPageController(repositoryProvider, primaryStage, user);
+		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
             		}
             		else {
             			view.setErrorMessage("Please enter a valid invitation code");

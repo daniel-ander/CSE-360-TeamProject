@@ -19,9 +19,9 @@ import databasePart1.*;
  */
 public class WelcomeLoginPageController {
 	
-	private final RepositoryProvider repositoryProvider;
+	private final DBConnectionStore dBConnectionStore;
     private final DatabaseHelper databaseHelper;
-    private final IUserRepository userRepository;
+    private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
@@ -29,10 +29,10 @@ public class WelcomeLoginPageController {
     String roleStr;
     ArrayList<String> roles = new ArrayList<String>();
 
-    public WelcomeLoginPageController(RepositoryProvider repositoryProvider, Stage primaryStage, User user) {
-    	this.repositoryProvider = repositoryProvider;
-        this.databaseHelper = repositoryProvider.getDatabaseHelper();
-        this.userRepository = repositoryProvider.getUserRepository();
+    public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, User user) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+        this.userDBManager = dBConnectionStore.getUserRepository();
         
         this.primaryStage = primaryStage;
         this.user = user;
@@ -80,7 +80,7 @@ public class WelcomeLoginPageController {
     
     private void setInviteButtonAction() {
     	view.getInviteButton().setOnAction(a -> {
-            new InvitationPageController(repositoryProvider, primaryStage, roleStr);
+            new InvitationPageController(dBConnectionStore, primaryStage, roleStr);
         });
     	
     	view.getLayout().getChildren().add(view.getInviteButton());
@@ -91,7 +91,7 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	this.roleStr = userRepository.getUserRole(user.getUserName());
+    	this.roleStr = userDBManager.getUserRole(user.getUserName());
         
         if (roleStr != null && !roleStr.isEmpty()) {
             for (String r : roleStr.split(",")) {
@@ -117,22 +117,22 @@ public class WelcomeLoginPageController {
         switch (role) {
             case "admin":
                 //new AdminHomePageController(databaseHelper, username).show(stage);
-            	new AdminHomePageController(repositoryProvider, stage, username);
+            	new AdminHomePageController(dBConnectionStore, stage, username);
                 break;
             case "student":
-                new StudentHomePageController(repositoryProvider, stage, username);
+                new StudentHomePageController(dBConnectionStore, stage, username);
                 break;
             case "instructor":
-                new InstructorHomePageController(repositoryProvider, stage, username);
+                new InstructorHomePageController(dBConnectionStore, stage, username);
                 break;
             case "staff":
-                new StaffHomePageController(repositoryProvider, stage, username);
+                new StaffHomePageController(dBConnectionStore, stage, username);
                 break;
             case "reviewer":
-                new ReviewerHomePageController(repositoryProvider, stage, username);
+                new ReviewerHomePageController(dBConnectionStore, stage, username);
                 break;
             case "user":
-                new StudentHomePageController(repositoryProvider, stage, username);
+                new StudentHomePageController(dBConnectionStore, stage, username);
                 break;
             // Add more roles here as needed, following the same pattern.
                 

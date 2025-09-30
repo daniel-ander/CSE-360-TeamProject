@@ -18,8 +18,8 @@ import databasePart1.*;
  */
 public class UserLoginPageController {
 	
-	private final RepositoryProvider repositoryProvider;
-    private final IUserRepository userRepository;
+	private final DBConnectionStore dBConnectionStore;
+    private final IUserDBManager userDBManager;
     
     private final Stage primaryStage;
     private final UserLoginPage view = new UserLoginPage();
@@ -29,9 +29,9 @@ public class UserLoginPageController {
     String userName = view.getUsernameField().getText();
     String password = view.getPasswordField().getText();
 
-    public UserLoginPageController(RepositoryProvider repositoryProvider, Stage primaryStage) {
-    	this.repositoryProvider = repositoryProvider;
-        this.userRepository = repositoryProvider.getUserRepository();
+    public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.userDBManager = dBConnectionStore.getUserRepository();
         
         this.primaryStage = primaryStage;
         
@@ -71,17 +71,17 @@ public class UserLoginPageController {
 	        // --- Database check ---
 	        try {
 	            User user = new User(userName, password, "");
-	            new WelcomeLoginPageController(repositoryProvider, primaryStage, user);
+	            new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
 
-	            String role = userRepository.getUserRole(userName);
+	            String role = userDBManager.getUserRole(userName);
 	            if (role != null) {
 	                user.setRole(role);
-	                if (userRepository.login(user)) {
+	                if (userDBManager.login(user)) {
 	                	if (resetPasswordFlag) {
 	                	    new ResetPasswordPopup();
 	                	} else {
 	                		// TOCHANGE
-	                		new WelcomeLoginPageController(repositoryProvider, primaryStage, user);
+	                		new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
 //	                	    welcomeLoginPage.show(primaryStage, user);
 	                	}
 	                } else {
@@ -108,7 +108,7 @@ public class UserLoginPageController {
                 return;
             }
             try {
-            	userRepository.updatePassword(userName, newPass);
+            	userDBManager.updatePassword(userName, newPass);
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
             } catch (SQLException ex) {

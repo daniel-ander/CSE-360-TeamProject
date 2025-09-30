@@ -11,12 +11,12 @@ import javafx.stage.Stage;
 public class FirstPageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final RepositoryProvider repositoryProvider;
+	private final DBConnectionStore dBConnectionStore;
 	private final Stage primaryStage;
 	private final FirstPage view = new FirstPage();
 	
-	public FirstPageController(RepositoryProvider repositoryProvider, Stage primaryStage) {
-        this.repositoryProvider = repositoryProvider;
+	public FirstPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+        this.dBConnectionStore = dBConnectionStore;
         this.primaryStage = primaryStage;
         
         setInitialLayout();
@@ -30,7 +30,7 @@ public class FirstPageController {
     
     private void setContinueButtonAction() {
 		view.getContinueButton().setOnAction(a -> {
-			new AdminSetupPageController(repositoryProvider, primaryStage);
+			new AdminSetupPageController(dBConnectionStore, primaryStage);
 		});
 	}
     

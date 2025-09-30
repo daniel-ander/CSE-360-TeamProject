@@ -22,16 +22,16 @@ public class ReviewerHomePageController {
      */
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final RepositoryProvider repositoryProvider;
-	private final IUserRepository userRepository;
+	private final DBConnectionStore dBConnectionStore;
+	private final IUserDBManager userDBManager;
 	
 	private final Stage primaryStage;
 	private final ReviewerHomePage view = new ReviewerHomePage();
 	private final String currentUser;
 		
-	public ReviewerHomePageController(RepositoryProvider repositoryProvider, Stage primaryStage, String currentUser) {
-		this.repositoryProvider = repositoryProvider;
-		this.userRepository = repositoryProvider.getUserRepository();
+	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser) {
+		this.dBConnectionStore = dBConnectionStore;
+		this.userDBManager = dBConnectionStore.getUserRepository();
 		
 	    this.primaryStage = primaryStage;
 	    this.currentUser = currentUser;
@@ -53,16 +53,16 @@ public class ReviewerHomePageController {
 	private void setLogoutButtonAction() {
 		view.getLogoutButton().setOnAction(a -> {
 			// Return to login page
-	        new UserLoginPageController(repositoryProvider, primaryStage);
+	        new UserLoginPageController(dBConnectionStore, primaryStage);
 		});
 	}
 	
 	private void setChangeRolesButtonAction() {
 		view.getLogoutButton().setOnAction(a -> {
 			// Return to welcome page
-	    	String role = userRepository.getUserRole(currentUser);
+	    	String role = userDBManager.getUserRole(currentUser);
 	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(repositoryProvider, primaryStage, user);
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
 		});
 	}
     

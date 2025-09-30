@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
 
-import databasePart1.RepositoryProvider;
+import databasePart1.DBConnectionStore;
 
 
 public class StartCSE360 extends Application {
@@ -21,7 +21,7 @@ public class StartCSE360 extends Application {
 	@Override
     public void start(Stage primaryStage) {
         try {
-        	RepositoryProvider sharedRepositoryProvider = RepositoryProvider.createInstance();
+        	DBConnectionStore sharedRepositoryProvider = DBConnectionStore.createInstance();
         	sharedRepositoryProvider.getDatabaseHelper().connectToDatabase(); // Connect to the database
         	
             if (sharedRepositoryProvider.getDatabaseHelper().isDatabaseEmpty()) {

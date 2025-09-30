@@ -166,6 +166,7 @@ public class DatabaseHelper {
 	}
 	
 	public Connection getConnection() throws SQLException {
+		System.out.println("Connecting to database...");
 		return DriverManager.getConnection(DB_URL, USER, PASS);
 	}
 

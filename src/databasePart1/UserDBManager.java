@@ -13,12 +13,12 @@ import java.sql.Connection;
 
 import Models.User;
 
-public class UserRepository implements IUserRepository {
+public class UserDBManager implements IUserDBManager {
 	
 	private final DatabaseHelper dbHelper;
 	//private final Connection connection;
 	
-	public UserRepository(DatabaseHelper dbHelper) throws SQLException {
+	public UserDBManager(DatabaseHelper dbHelper) throws SQLException {
 		this.dbHelper = dbHelper;
 	}
 
