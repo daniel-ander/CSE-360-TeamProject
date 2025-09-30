@@ -1,5 +1,7 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 
@@ -7,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import javafx.application.Platform;
-
-import Models.User;
 
 import UI.Pages.WelcomeLoginPage;
 import databasePart1.*;
@@ -19,7 +19,9 @@ import databasePart1.*;
  */
 public class WelcomeLoginPageController {
 	
+	private final RepositoryProvider repositoryProvider;
     private final DatabaseHelper databaseHelper;
+    private final IUserRepository userRepository;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
@@ -27,8 +29,11 @@ public class WelcomeLoginPageController {
     String roleStr;
     ArrayList<String> roles = new ArrayList<String>();
 
-    public WelcomeLoginPageController(DatabaseHelper databaseHelper, Stage primaryStage, User user) {
-        this.databaseHelper = databaseHelper;
+    public WelcomeLoginPageController(RepositoryProvider repositoryProvider, Stage primaryStage, User user) {
+    	this.repositoryProvider = repositoryProvider;
+        this.databaseHelper = repositoryProvider.getDatabaseHelper();
+        this.userRepository = repositoryProvider.getUserRepository();
+        
         this.primaryStage = primaryStage;
         this.user = user;
         this.view = new WelcomeLoginPage();
@@ -75,7 +80,7 @@ public class WelcomeLoginPageController {
     
     private void setInviteButtonAction() {
     	view.getInviteButton().setOnAction(a -> {
-            new InvitationPageController(databaseHelper, primaryStage, roleStr);
+            new InvitationPageController(repositoryProvider, primaryStage, roleStr);
         });
     	
     	view.getLayout().getChildren().add(view.getInviteButton());
@@ -86,7 +91,7 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	this.roleStr = databaseHelper.getUserRole(user.getUserName());
+    	this.roleStr = userRepository.getUserRole(user.getUserName());
         
         if (roleStr != null && !roleStr.isEmpty()) {
             for (String r : roleStr.split(",")) {
@@ -112,22 +117,22 @@ public class WelcomeLoginPageController {
         switch (role) {
             case "admin":
                 //new AdminHomePageController(databaseHelper, username).show(stage);
-            	new AdminHomePageController(databaseHelper, stage, username);
+            	new AdminHomePageController(repositoryProvider, stage, username);
                 break;
             case "student":
-                new StudentHomePageController(databaseHelper, stage, username);
+                new StudentHomePageController(repositoryProvider, stage, username);
                 break;
             case "instructor":
-                new InstructorHomePageController(databaseHelper, stage, username);
+                new InstructorHomePageController(repositoryProvider, stage, username);
                 break;
             case "staff":
-                new StaffHomePageController(databaseHelper, stage, username);
+                new StaffHomePageController(repositoryProvider, stage, username);
                 break;
             case "reviewer":
-                new ReviewerHomePageController(databaseHelper, stage, username);
+                new ReviewerHomePageController(repositoryProvider, stage, username);
                 break;
             case "user":
-                new StudentHomePageController(databaseHelper, stage, username);
+                new StudentHomePageController(repositoryProvider, stage, username);
                 break;
             // Add more roles here as needed, following the same pattern.
                 

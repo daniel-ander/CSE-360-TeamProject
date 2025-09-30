@@ -24,8 +24,8 @@ public class InvitationPageController {
 	private final Stage primaryStage;
 	private final InvitationPage view = new InvitationPage();
 		
-	public InvitationPageController(DatabaseHelper databaseHelper, Stage primaryStage, String userRole) {
-		this.databaseHelper = databaseHelper;
+	public InvitationPageController(RepositoryProvider repositoryProvider, Stage primaryStage, String userRole) {
+		this.databaseHelper = repositoryProvider.getDatabaseHelper();
 	    this.primaryStage = primaryStage;
 	        
 	    setInitialLayout();

@@ -10,12 +10,14 @@ import javafx.stage.Stage;
 public class SetupLoginSelectionPageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final RepositoryProvider repositoryProvider;
+	
 	private final Stage primaryStage;
 	private final SetupLoginSelectionPage view = new SetupLoginSelectionPage();
 	
-	public SetupLoginSelectionPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+	public SetupLoginSelectionPageController(RepositoryProvider repositoryProvider, Stage primaryStage) {
+		this.repositoryProvider = repositoryProvider;
+
         this.primaryStage = primaryStage;
         
         setInitialLayout();
@@ -31,13 +33,13 @@ public class SetupLoginSelectionPageController {
     
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(a -> {
-			new SetupAccountPageController(databaseHelper, primaryStage);
+			new SetupAccountPageController(repositoryProvider, primaryStage);
 		});
 	}
     
     private void setLoginButtonAction() {
 		view.getLoginButton().setOnAction(a -> {
-			new UserLoginPageController(databaseHelper, primaryStage);
+			new UserLoginPageController(repositoryProvider, primaryStage);
 		});
 	}
     

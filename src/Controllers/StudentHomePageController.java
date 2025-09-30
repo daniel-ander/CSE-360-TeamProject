@@ -12,13 +12,17 @@ import javafx.stage.Stage;
 public class StudentHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final RepositoryProvider repositoryProvider;
+	private final IUserRepository userRepository;
+	
 	private final Stage primaryStage;
 	private final StudentHomePage view = new StudentHomePage();
 	private final String currentUser;
 	
-	public StudentHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
-        this.databaseHelper = databaseHelper;
+	public StudentHomePageController(RepositoryProvider repositoryProvider, Stage primaryStage, String currentUser) {
+		this.repositoryProvider = repositoryProvider;
+        this.userRepository = repositoryProvider.getUserRepository();
+        
         this.primaryStage = primaryStage;
         this.currentUser = currentUser;
         
@@ -39,16 +43,16 @@ public class StudentHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	        new UserLoginPageController(databaseHelper, primaryStage);
+	        new UserLoginPageController(repositoryProvider, primaryStage);
 	    });
     }
     
     private void setChangeRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
 	    	// Return to welcome page
-	    	String role = databaseHelper.getUserRole(currentUser);
+	    	String role = userRepository.getUserRole(currentUser);
 	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+	    	new WelcomeLoginPageController(repositoryProvider, primaryStage, user);
 
 	    });
     }

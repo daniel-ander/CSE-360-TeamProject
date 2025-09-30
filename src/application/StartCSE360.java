@@ -7,28 +7,27 @@ import java.sql.SQLException;
 import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
 
-import databasePart1.DatabaseHelper;
+import databasePart1.RepositoryProvider;
 
 
 public class StartCSE360 extends Application {
 
-	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	
 	public static void main( String[] args )
 	{
-		 launch(args);
+		launch(args);
 	}
 	
 	@Override
     public void start(Stage primaryStage) {
         try {
-            databaseHelper.connectToDatabase(); // Connect to the database
-            if (databaseHelper.isDatabaseEmpty()) {
-            	
-            	new FirstPageController(databaseHelper, primaryStage);
+        	RepositoryProvider sharedRepositoryProvider = RepositoryProvider.createInstance();
+        	sharedRepositoryProvider.getDatabaseHelper().connectToDatabase(); // Connect to the database
+        	
+            if (sharedRepositoryProvider.getDatabaseHelper().isDatabaseEmpty()) {
+            	new FirstPageController(sharedRepositoryProvider, primaryStage);
             } else {
-            	new SetupLoginSelectionPageController(databaseHelper, primaryStage);
-                
+            	new SetupLoginSelectionPageController(sharedRepositoryProvider, primaryStage);
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());

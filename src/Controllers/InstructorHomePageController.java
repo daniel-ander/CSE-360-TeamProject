@@ -13,13 +13,16 @@ import databasePart1.*;
 public class InstructorHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final RepositoryProvider repositoryProvider;
+	private final IUserRepository userRepository;
 	private final Stage primaryStage;
 	private final InstructorHomePage view = new InstructorHomePage();
 	private final String currentUserName;
 	
-	public InstructorHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUserName) {
-        this.databaseHelper = databaseHelper;
+	public InstructorHomePageController(RepositoryProvider repositoryProvider, Stage primaryStage, String currentUserName) {
+		this.repositoryProvider = repositoryProvider;
+        this.userRepository = repositoryProvider.getUserRepository();
+        
         this.primaryStage = primaryStage;
         this.currentUserName = currentUserName;
         
@@ -40,7 +43,7 @@ public class InstructorHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	         new UserLoginPageController(databaseHelper, primaryStage);
+	         new UserLoginPageController(repositoryProvider, primaryStage);
 	    });
 	}
     
@@ -48,9 +51,9 @@ public class InstructorHomePageController {
     	// TOCHANGE currentUser
     	view.getChangeRolesButton().setOnAction(a -> {
 	    	// Return to welcome page
-	    	String role = databaseHelper.getUserRole(currentUserName);
+	    	String role = userRepository.getUserRole(currentUserName);
 	    	User user = new User(currentUserName, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+	    	new WelcomeLoginPageController(repositoryProvider, primaryStage, user);
 
 	    });
 	}
