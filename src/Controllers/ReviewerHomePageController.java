@@ -31,7 +31,7 @@ public class ReviewerHomePageController {
 		
 	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser) {
 		this.dBConnectionStore = dBConnectionStore;
-		this.userDBManager = dBConnectionStore.getUserRepository();
+		this.userDBManager = dBConnectionStore.getUserDatabaseManager();
 		
 	    this.primaryStage = primaryStage;
 	    this.currentUser = currentUser;

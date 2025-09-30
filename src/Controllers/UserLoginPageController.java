@@ -31,7 +31,7 @@ public class UserLoginPageController {
 
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserRepository();
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         
         this.primaryStage = primaryStage;
         

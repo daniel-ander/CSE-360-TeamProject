@@ -17,7 +17,7 @@ public class DBConnectionStore {
 	// Getters
 	// ===================
 	
-	public IUserDBManager getUserRepository() {
+	public IUserDBManager getUserDatabaseManager() {
 		return userDBManager;
 	}
 	

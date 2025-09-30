@@ -32,7 +32,7 @@ public class WelcomeLoginPageController {
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, User user) {
     	this.dBConnectionStore = dBConnectionStore;
         this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.userDBManager = dBConnectionStore.getUserRepository();
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         
         this.primaryStage = primaryStage;
         this.user = user;

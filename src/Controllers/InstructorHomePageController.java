@@ -21,7 +21,7 @@ public class InstructorHomePageController {
 	
 	public InstructorHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUserName) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserRepository();
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         
         this.primaryStage = primaryStage;
         this.currentUserName = currentUserName;

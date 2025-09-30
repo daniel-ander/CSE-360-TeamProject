@@ -23,7 +23,7 @@ public class AdminHomePageController {
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
 	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String username) {
-		this.userDBManager = dBConnectionStore.getUserRepository();
+		this.userDBManager = dBConnectionStore.getUserDatabaseManager();
 		this.primaryStage = primaryStage;
 		this.users = userDBManager.getAllUsernames();
 		this.currentAdmin = username;

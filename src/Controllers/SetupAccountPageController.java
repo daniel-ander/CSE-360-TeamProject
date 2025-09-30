@@ -26,7 +26,7 @@ public class SetupAccountPageController {
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
     	this.dBConnectionStore = dBConnectionStore;
         this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.userDBManager = dBConnectionStore.getUserRepository();
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
         
         setInitialLayout();
