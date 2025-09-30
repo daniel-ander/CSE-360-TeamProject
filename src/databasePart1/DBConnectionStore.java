@@ -8,9 +8,9 @@ public class DBConnectionStore {
 	private final IUserDBManager userDBManager;
 	
 	public DBConnectionStore(DatabaseHelper dbHelper, IUserDBManager userDBManager) throws SQLException {
-		this.dbHelper = new DatabaseHelper();
+		this.dbHelper = dbHelper;
 		dbHelper.connectToDatabase();
-		this.userDBManager = new UserDBManager(dbHelper);
+		this.userDBManager = userDBManager;
 	}
 	
 	// ===================
