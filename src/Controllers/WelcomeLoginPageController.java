@@ -138,7 +138,7 @@ public class WelcomeLoginPageController {
                 new ReviewerHomePageController(dBConnectionStore, stage, username, new ReviewerHomePage());
                 break;
             case "user":
-                new UserLoginPageController(dBConnectionStore, stage, username, new UserLoginPage());
+                new StudentHomePageController(dBConnectionStore, stage, username, new StudentHomePage());
                 break;
             // Add more roles here as needed, following the same pattern.
                 
