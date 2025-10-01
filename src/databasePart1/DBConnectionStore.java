@@ -4,10 +4,10 @@ import java.sql.SQLException;
 
 // An object that holds every connection
 public class DBConnectionStore {
-	private final DatabaseHelper dbHelper;
+	private final IDatabaseHelper dbHelper;
 	private final IUserDBManager userDBManager;
 	
-	public DBConnectionStore(DatabaseHelper dbHelper, IUserDBManager userDBManager) throws SQLException {
+	public DBConnectionStore(IDatabaseHelper dbHelper, IUserDBManager userDBManager) throws SQLException {
 		this.dbHelper = dbHelper;
 		dbHelper.connectToDatabase();
 		this.userDBManager = userDBManager;
@@ -21,7 +21,7 @@ public class DBConnectionStore {
 		return userDBManager;
 	}
 	
-	public DatabaseHelper getDatabaseHelper() {
+	public IDatabaseHelper getDatabaseHelper() {
 		return dbHelper;
 	}
 	
