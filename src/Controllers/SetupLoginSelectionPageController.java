@@ -1,6 +1,11 @@
 package Controllers;
+
+import UI.Pages.SetupAccountPage;
 import UI.Pages.SetupLoginSelectionPage;
+import UI.Pages.UserLoginPage;
+
 import databasePart1.*;
+
 import javafx.stage.Stage;
 
 /**
@@ -13,12 +18,12 @@ public class SetupLoginSelectionPageController {
 	private final DBConnectionStore dBConnectionStore;
 	
 	private final Stage primaryStage;
-	private final SetupLoginSelectionPage view = new SetupLoginSelectionPage();
+	private final SetupLoginSelectionPage view;
 	
-	public SetupLoginSelectionPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+	public SetupLoginSelectionPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupLoginSelectionPage view) {
 		this.dBConnectionStore = dBConnectionStore;
-
         this.primaryStage = primaryStage;
+        this.view = view;
         
         setInitialLayout();
         
@@ -33,13 +38,14 @@ public class SetupLoginSelectionPageController {
     
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(a -> {
-			new SetupAccountPageController(dBConnectionStore, primaryStage);
+			new SetupAccountPageController(dBConnectionStore, primaryStage, new SetupAccountPage());
 		});
 	}
     
+    // TODO: -- Fix how user works
     private void setLoginButtonAction() {
 		view.getLoginButton().setOnAction(a -> {
-			new UserLoginPageController(dBConnectionStore, primaryStage);
+			new UserLoginPageController(dBConnectionStore, primaryStage, "", new UserLoginPage());
 		});
 	}
     

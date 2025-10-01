@@ -34,7 +34,7 @@
 
 /* Name subject to change based on future elements */
 .minor-label {
-	-fx-fond-size: 14px;
+	-fx-font-size: 14px;
 	-fx-border-color: gray;
 	border-color: gray;
 	-fx-padding: 10;

@@ -22,18 +22,20 @@ public class UserLoginPageController {
     private final IUserDBManager userDBManager;
     
     private final Stage primaryStage;
-    private final UserLoginPage view = new UserLoginPage();
+    private final UserLoginPage view;
     private final ResetPasswordPopup resetPasswordPopupView = new ResetPasswordPopup();
     
  // --- Retrieve user inputs ---
-    String userName = view.getUsernameField().getText();
-    String password = view.getPasswordField().getText();
+    private String userName;
+    private String password;
 
-    public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+    public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String userName, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
-        
+        this.view = view;
         this.primaryStage = primaryStage;
+        this.userName = view.getUsernameField().getText();
+        this.password = view.getPasswordField().getText();
         
         setInitialLayout();
         

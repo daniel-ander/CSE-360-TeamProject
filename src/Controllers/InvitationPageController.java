@@ -20,14 +20,15 @@ public class InvitationPageController {
      */
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final IDatabaseHelper databaseHelper;
 	private final Stage primaryStage;
-	private final InvitationPage view = new InvitationPage();
+	private final InvitationPage view;
 		
-	public InvitationPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String userRole) {
+	public InvitationPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String userRole, InvitationPage view) {
 		this.databaseHelper = dBConnectionStore.getDatabaseHelper();
 	    this.primaryStage = primaryStage;
-	        
+	    this.view = view;    
+	    
 	    setInitialLayout();
 	        
 	    setShowCodeButtonAction();

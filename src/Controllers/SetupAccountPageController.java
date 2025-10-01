@@ -17,17 +17,18 @@ import databasePart1.*;
 public class SetupAccountPageController {
 
 	private final DBConnectionStore dBConnectionStore;
-    private final DatabaseHelper databaseHelper;
+    private final IDatabaseHelper databaseHelper;
     private final IUserDBManager userDBManager;
     private final Stage primaryStage;
-    private final SetupAccountPage view = new SetupAccountPage();
+    private final SetupAccountPage view;
     
     // DatabaseHelper to handle database operations.
-    public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+    public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.databaseHelper = dBConnectionStore.getDatabaseHelper();
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
+        this.view = view;
         
         setInitialLayout();
         

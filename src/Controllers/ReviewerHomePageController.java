@@ -3,6 +3,8 @@ package Controllers;
 
 import Models.User;
 import UI.Pages.ReviewerHomePage;
+
+import UI.Pages.UserLoginPage;
 import Utils.Debug;
 import databasePart1.*;
 import javafx.stage.Stage;
@@ -26,13 +28,13 @@ public class ReviewerHomePageController {
 	private final IUserDBManager userDBManager;
 	
 	private final Stage primaryStage;
-	private final ReviewerHomePage view = new ReviewerHomePage();
+	private final ReviewerHomePage view;
 	private final String currentUser;
 		
-	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser) {
+	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser, ReviewerHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
 		this.userDBManager = dBConnectionStore.getUserDatabaseManager();
-		
+		this.view = view;
 	    this.primaryStage = primaryStage;
 	    this.currentUser = currentUser;
 	        
@@ -53,7 +55,7 @@ public class ReviewerHomePageController {
 	private void setLogoutButtonAction() {
 		view.getLogoutButton().setOnAction(a -> {
 			// Return to login page
-	        new UserLoginPageController(dBConnectionStore, primaryStage);
+	        new UserLoginPageController(dBConnectionStore, primaryStage, currentUser, new UserLoginPage());
 		});
 	}
 	

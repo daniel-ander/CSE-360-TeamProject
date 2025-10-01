@@ -11,7 +11,7 @@ import databasePart1.*;
 
 public class AdminHomePageController {
 	private final IUserDBManager userDBManager;
-	private final AdminHomePage view = new AdminHomePage();
+	private final AdminHomePage view;
 	private final Stage primaryStage;
 	private final String currentAdmin;
 	
@@ -22,7 +22,8 @@ public class AdminHomePageController {
 	 * 
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
-	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String username) {
+	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String username, AdminHomePage view) {
+		this.view = view;
 		this.userDBManager = dBConnectionStore.getUserDatabaseManager();
 		this.primaryStage = primaryStage;
 		this.users = userDBManager.getAllUsernames();

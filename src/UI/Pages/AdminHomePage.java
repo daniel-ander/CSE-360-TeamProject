@@ -114,7 +114,7 @@ public class AdminHomePage {
 	// ===================
 	
 	public void setTempPasswordInfoLabel(String text) {
-		tempPasswordInfoLabel.setText(text);;
+		tempPasswordInfoLabel.setText(text);
 	}
 	
 	public void setAdminCheckBox(boolean flag) {

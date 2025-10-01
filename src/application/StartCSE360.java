@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
 
+import UI.Pages.FirstPage;
+import UI.Pages.SetupLoginSelectionPage;
+
 import databasePart1.DBConnectionStore;
 
 
@@ -25,9 +28,9 @@ public class StartCSE360 extends Application {
         	sharedRepositoryProvider.getDatabaseHelper().connectToDatabase(); // Connect to the database
         	
             if (sharedRepositoryProvider.getDatabaseHelper().isDatabaseEmpty()) {
-            	new FirstPageController(sharedRepositoryProvider, primaryStage);
+            	new FirstPageController(sharedRepositoryProvider, primaryStage, new FirstPage());
             } else {
-            	new SetupLoginSelectionPageController(sharedRepositoryProvider, primaryStage);
+            	new SetupLoginSelectionPageController(sharedRepositoryProvider, primaryStage, new SetupLoginSelectionPage());
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());

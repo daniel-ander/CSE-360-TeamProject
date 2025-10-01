@@ -24,9 +24,10 @@ public class AdminSetupPageController {
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
-    public AdminSetupPageController(DBConnectionStore dBConnectionStore, Stage primaryStage) {
+    public AdminSetupPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, AdminSetupPage view) {
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
+        this.view = view;
         
         view = new AdminSetupPage();
         

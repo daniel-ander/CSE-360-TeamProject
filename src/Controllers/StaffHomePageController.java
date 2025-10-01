@@ -2,6 +2,7 @@ package Controllers;
 
 import Models.User;
 import UI.Pages.StaffHomePage;
+import UI.Pages.UserLoginPage;
 import Utils.Debug;
 import databasePart1.*;
 import javafx.stage.Stage;
@@ -17,13 +18,13 @@ public class StaffHomePageController {
 	private final IUserDBManager userDBManager;
 	
 	private final Stage primaryStage;
-	private final StaffHomePage view = new StaffHomePage();
+	private final StaffHomePage view;
 	private final String currentUser;
 	
-	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser) {
+	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser, StaffHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
-        
+        this.view = view;
         this.primaryStage = primaryStage;
         this.currentUser = currentUser;
         
@@ -44,7 +45,7 @@ public class StaffHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	        new UserLoginPageController(dBConnectionStore, primaryStage);
+	        new UserLoginPageController(dBConnectionStore, primaryStage, currentUser, new UserLoginPage());
 	    });
     }
     
@@ -54,7 +55,6 @@ public class StaffHomePageController {
 	    	String role = userDBManager.getUserRole(currentUser);
 	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
-
 	    });
     }
     

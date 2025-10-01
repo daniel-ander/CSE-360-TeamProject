@@ -8,7 +8,7 @@ import java.util.UUID;
  * The DatabaseHelper class is responsible for managing the connection to the database,
  * performing operations such as user registration, login validation, and handling invitation codes.
  */
-public class DatabaseHelper {
+public class DatabaseHelper implements IDatabaseHelper{
 
 	// JDBC driver name and database URL 
 	static final String JDBC_DRIVER = "org.h2.Driver";   
@@ -22,6 +22,7 @@ public class DatabaseHelper {
 	private Statement statement = null; 
 	//	PreparedStatement pstmt
 
+	@Override
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
@@ -37,7 +38,8 @@ public class DatabaseHelper {
 		}
 	}
 
-	private void createTables() throws SQLException {
+	@Override
+	public void createTables() throws SQLException {
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, "
@@ -52,7 +54,7 @@ public class DatabaseHelper {
 	    statement.execute(invitationCodesTable);
 	}
 
-
+	@Override
 	// Check if the database is empty
 	public boolean isDatabaseEmpty() throws SQLException {
 		String query = "SELECT COUNT(*) AS count FROM cse360users";
@@ -63,6 +65,7 @@ public class DatabaseHelper {
 		return true;
 	}
 	
+	@Override
 	// Generates a new invitation code and inserts it into the database.
 	public String generateInvitationCode(String roles) {
 		boolean generateInvitationCodeDebug = true;
@@ -81,6 +84,7 @@ public class DatabaseHelper {
 	    return code;
 	}
 	
+	@Override
 	public String getRoleFromInviteCode(String code) {
 		String roleBits = code.substring(0, code.indexOf('_'));
 		List<String> roles = new ArrayList<>();
@@ -95,6 +99,7 @@ public class DatabaseHelper {
 		return rolesStr;
 	}
 	
+	@Override
 	// Validates an invitation code to check if it is unused and valid.
 	public boolean validateInvitationCode(String code) {
 	    String query = "SELECT * FROM InvitationCodes WHERE code = ? AND isUsed = FALSE";
@@ -117,8 +122,9 @@ public class DatabaseHelper {
 	    return false;
 	}
 	
+	@Override
 	// Marks the invitation code as used in the database.
-	private void markInvitationCodeAsUsed(String code) {
+	public void markInvitationCodeAsUsed(String code) {
 	    String query = "UPDATE InvitationCodes SET isUsed = TRUE WHERE code = ?";
 	    try (Connection connection = getConnection();
 	    		PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -129,6 +135,7 @@ public class DatabaseHelper {
 	    }
 	}
 
+	@Override
 	public void printInvitationCodesTable() {
 	    String query = "SELECT code, isUsed FROM InvitationCodes";
 	    try (Connection connection = getConnection();
@@ -150,7 +157,7 @@ public class DatabaseHelper {
 	    }
 	}
 
-
+	@Override
 	// Closes the database connection and statement.
 	public void closeConnection() {
 		try{ 
