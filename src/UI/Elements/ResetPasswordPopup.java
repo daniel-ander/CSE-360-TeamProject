@@ -1,6 +1,5 @@
 package UI.Elements;  // or your package name
 
-import Utils.PasswordEvaluator;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;

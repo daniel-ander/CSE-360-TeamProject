@@ -29,8 +29,6 @@ public class AdminSetupPageController {
         this.primaryStage = primaryStage;
         this.view = view;
         
-        view = new AdminSetupPage();
-        
         setInitialLayout();
         
         setSetupButtonAction();

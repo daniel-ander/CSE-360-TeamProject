@@ -26,16 +26,14 @@ public class UserLoginPageController {
     private final ResetPasswordPopup resetPasswordPopupView = new ResetPasswordPopup();
     
  // --- Retrieve user inputs ---
-    private String userName;
-    private String password;
+    private String userName = "";
+    private String password = "";
 
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String userName, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
         this.primaryStage = primaryStage;
-        this.userName = view.getUsernameField().getText();
-        this.password = view.getPasswordField().getText();
         
         setInitialLayout();
         
@@ -53,7 +51,7 @@ public class UserLoginPageController {
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(a -> {
 	        // --- Flags ---
-	        boolean resetPasswordFlag = password.startsWith("R_") && password.length() > 2;
+	        boolean resetPasswordFlag = password.length() > 2 && password.startsWith("R_");
 	        
 	        userName = view.getUsernameField().getText();
 	        password = view.getPasswordField().getText();

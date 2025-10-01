@@ -114,12 +114,12 @@ public class UserDBManager implements IUserDBManager {
 	@Override
 	public List<String> getAllUsernames() {
 		List<String> usernames = new ArrayList<>();
-		String query = "SELECT username FROM cse360users";
+		String query = "SELECT userName FROM cse360users";
 		try (Connection connection = dbHelper.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        ResultSet rs = pstmt.executeQuery();
 	        while (rs.next()) {
-	        	usernames.add((rs.getString("username")));
+	        	usernames.add((rs.getString("userName")));
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();

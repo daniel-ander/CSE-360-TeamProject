@@ -9,7 +9,6 @@ public class DBConnectionStore {
 	
 	public DBConnectionStore(IDatabaseHelper dbHelper, IUserDBManager userDBManager) throws SQLException {
 		this.dbHelper = dbHelper;
-		dbHelper.connectToDatabase();
 		this.userDBManager = userDBManager;
 	}
 	
@@ -28,7 +27,6 @@ public class DBConnectionStore {
 	// Factory method for creating a repository provider
 	public static DBConnectionStore createInstance() throws SQLException {
 		DatabaseHelper dbHelper = new DatabaseHelper();
-		dbHelper.connectToDatabase();
 		IUserDBManager userRepo = new UserDBManager(dbHelper);
 		
 		return new DBConnectionStore(dbHelper, userRepo);

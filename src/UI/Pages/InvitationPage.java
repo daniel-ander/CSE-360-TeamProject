@@ -82,7 +82,7 @@ public class InvitationPage {
     public void setInitialLayout(Stage primaryStage) {
     	layout.getStyleClass().add("layout");
     	userLabel.getStyleClass().add("main-label");
-    	inviteCodeLabel.getStyleClass().add(".invite-code-label");
+    	inviteCodeLabel.getStyleClass().add("invite-code-label");
     	
     	roleBox.getChildren().addAll(adminCheckBox, studentCheckBox, instructorCheckBox, staffCheckBox, reviewerCheckBox);
     	roleBox.getStyleClass().add("centered");

@@ -60,7 +60,7 @@ public class ReviewerHomePageController {
 	}
 	
 	private void setChangeRolesButtonAction() {
-		view.getLogoutButton().setOnAction(a -> {
+		view.getChangeRolesButton().setOnAction(a -> {
 			// Return to welcome page
 	    	String role = userDBManager.getUserRole(currentUser);
 	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
