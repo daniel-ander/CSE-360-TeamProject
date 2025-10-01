@@ -56,13 +56,13 @@ public class SetupAccountPage {
     public void setInitialLayout(Stage primaryStage) {
     	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
     	
-    	userNameField.setPromptText("Enter userName");
+    	userNameField.setPromptText("Enter User Name");
         userNameField.setMaxWidth(250);
 
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
         
-        inviteCodeField.setPromptText("Enter InvitationCode");
+        inviteCodeField.setPromptText("Enter Invitation Code");
         inviteCodeField.setMaxWidth(250);
         
     	

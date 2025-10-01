@@ -54,6 +54,7 @@ public class SetupAccountPageController {
     
     private void setSetupButtonAction() {
     	view.getSetupButton().setOnAction(a -> {
+    		System.out.println("Button was pressed");
         	// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
