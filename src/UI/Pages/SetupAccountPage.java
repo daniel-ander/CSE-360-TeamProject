@@ -10,11 +10,20 @@ import javafx.stage.Stage;
  * Users provide their userName, password, and a valid invitation code to register.
  */
 public class SetupAccountPage {
+	private final VBox layout = new VBox(10);
+	private final Scene scene = new Scene(layout, 800, 400);
 	private final TextField userNameField = new TextField();
 	private final PasswordField passwordField = new PasswordField();
 	private final TextField inviteCodeField = new TextField();
 	private final Label errorLabel = new Label();
 	private final Button setupButton = new Button("Setup");
+	
+	public SetupAccountPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 	    
     // ===================
    	// Getters
@@ -45,23 +54,23 @@ public class SetupAccountPage {
     }
     
     public void setInitialLayout(Stage primaryStage) {
-    	userNameField.setPromptText("Enter userName");
+    	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
+    	
+    	userNameField.setPromptText("Enter User Name");
         userNameField.setMaxWidth(250);
 
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
         
-        inviteCodeField.setPromptText("Enter InvitationCode");
+        inviteCodeField.setPromptText("Enter Invitation Code");
         inviteCodeField.setMaxWidth(250);
         
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
     	
-        VBox layout = new VBox(10);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
+        layout.getStyleClass().add("layout");
         layout.getChildren().addAll(userNameField, passwordField,inviteCodeField, setupButton, errorLabel);
         
 
-        primaryStage.setScene(new Scene(layout, 800, 400));
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Account Setup");
         primaryStage.show();
     }

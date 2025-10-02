@@ -2,6 +2,8 @@ package Controllers;
 
 import Models.User;
 import UI.Pages.StaffHomePage;
+import UI.Pages.UserLoginPage;
+import Utils.Debug;
 import databasePart1.*;
 import javafx.stage.Stage;
 
@@ -12,13 +14,17 @@ import javafx.stage.Stage;
 public class StaffHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+	private final IUserDBManager userDBManager;
+	
 	private final Stage primaryStage;
-	private final StaffHomePage view = new StaffHomePage();
+	private final StaffHomePage view;
 	private final String currentUser;
 	
-	public StaffHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
-        this.databaseHelper = databaseHelper;
+	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser, StaffHomePage view) {
+		this.dBConnectionStore = dBConnectionStore;
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.view = view;
         this.primaryStage = primaryStage;
         this.currentUser = currentUser;
         
@@ -26,6 +32,10 @@ public class StaffHomePageController {
         
         setLogoutButtonAction();
         setChangeToRolesButtonAction();
+        
+        if(Debug.isEnabled) {
+        	setUpDebugEnvironment();
+        }
     }
 	
 	// ===================
@@ -35,22 +45,25 @@ public class StaffHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	        UserLoginPageController loginPage = new UserLoginPageController(databaseHelper, primaryStage);
+	        new UserLoginPageController(dBConnectionStore, primaryStage, currentUser, new UserLoginPage());
 	    });
     }
     
     private void setChangeToRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
 	    	// Return to welcome page
-	    	String role = databaseHelper.getUserRole(currentUser);
+	    	String role = userDBManager.getUserRole(currentUser);
 	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
-
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
 	    });
     }
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	view.setUserLabel(currentUser);
+    }
+    
+    private final void setUpDebugEnvironment() {
+    	view.addDebugLabel();
     }
 }

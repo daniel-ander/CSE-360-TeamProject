@@ -16,6 +16,14 @@ public class UserLoginPage {
     private final Button loginButton = new Button("Login");
     private final Button adminInfoAutoFillButton = new Button("Admin Login (TESTING)");
     private final VBox layout = new VBox(10);
+    private final Scene scene = new Scene(layout, 800, 400);
+    
+    public UserLoginPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
     
     // ===================
    	// Getters
@@ -45,7 +53,13 @@ public class UserLoginPage {
     	errorLabel.setText(text);
     }
     
+    public void setUserNameFieldText(String text) {
+    	userNameField.setText(text);
+    }
+    
     public void setInitialLayout(Stage primaryStage) {
+    	layout.getStyleClass().add("layout");
+    	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
     	// Input field for the user's userName, password
         userNameField.setPromptText("Enter userName");
         userNameField.setMaxWidth(250);
@@ -54,15 +68,14 @@ public class UserLoginPage {
         passwordField.setMaxWidth(250);
         
         // Label to display error messages
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
         
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         layout.getChildren().addAll(userNameField, passwordField, loginButton, errorLabel, adminInfoAutoFillButton);
 
-        primaryStage.setScene(new Scene(layout, 800, 400));
+        primaryStage.setScene(scene);
         primaryStage.setTitle("User Login");
         primaryStage.show();
     }
 }
+
 
 

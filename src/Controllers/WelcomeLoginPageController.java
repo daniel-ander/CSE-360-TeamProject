@@ -1,5 +1,7 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 
@@ -7,9 +9,13 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import javafx.application.Platform;
-
-import Models.User;
-
+import UI.Pages.AdminHomePage;
+import UI.Pages.InstructorHomePage;
+import UI.Pages.InvitationPage;
+import UI.Pages.ReviewerHomePage;
+import UI.Pages.StaffHomePage;
+import UI.Pages.StudentHomePage;
+import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 import databasePart1.*;
 
@@ -19,7 +25,9 @@ import databasePart1.*;
  */
 public class WelcomeLoginPageController {
 	
-    private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+    private final IDatabaseHelper databaseHelper;
+    private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
@@ -27,8 +35,11 @@ public class WelcomeLoginPageController {
     String roleStr;
     ArrayList<String> roles = new ArrayList<String>();
 
-    public WelcomeLoginPageController(DatabaseHelper databaseHelper, Stage primaryStage, User user) {
-        this.databaseHelper = databaseHelper;
+    public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, User user) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        
         this.primaryStage = primaryStage;
         this.user = user;
         this.view = new WelcomeLoginPage();
@@ -75,7 +86,7 @@ public class WelcomeLoginPageController {
     
     private void setInviteButtonAction() {
     	view.getInviteButton().setOnAction(a -> {
-            new InvitationPageController(databaseHelper, primaryStage, roleStr);
+            new InvitationPageController(dBConnectionStore, primaryStage, roleStr, new InvitationPage());
         });
     	
     	view.getLayout().getChildren().add(view.getInviteButton());
@@ -86,7 +97,7 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	this.roleStr = databaseHelper.getUserRole(user.getUserName());
+    	this.roleStr = userDBManager.getUserRole(user.getUserName());
         
         if (roleStr != null && !roleStr.isEmpty()) {
             for (String r : roleStr.split(",")) {
@@ -112,22 +123,22 @@ public class WelcomeLoginPageController {
         switch (role) {
             case "admin":
                 //new AdminHomePageController(databaseHelper, username).show(stage);
-            	new AdminHomePageController(databaseHelper, stage, username);
+            	new AdminHomePageController(dBConnectionStore, stage, username, new AdminHomePage());
                 break;
             case "student":
-                new StudentHomePageController(databaseHelper, stage, username);
+                new StudentHomePageController(dBConnectionStore, stage, username, new StudentHomePage());
                 break;
             case "instructor":
-                new InstructorHomePageController(databaseHelper, stage, username);
+                new InstructorHomePageController(dBConnectionStore, stage, username, new InstructorHomePage());
                 break;
             case "staff":
-                new StaffHomePageController(databaseHelper, stage, username);
+                new StaffHomePageController(dBConnectionStore, stage, username, new StaffHomePage());
                 break;
             case "reviewer":
-                new ReviewerHomePageController(databaseHelper, stage, username);
+                new ReviewerHomePageController(dBConnectionStore, stage, username, new ReviewerHomePage());
                 break;
             case "user":
-                new StudentHomePageController(databaseHelper, stage, username);
+                new StudentHomePageController(dBConnectionStore, stage, username, new StudentHomePage());
                 break;
             // Add more roles here as needed, following the same pattern.
                 

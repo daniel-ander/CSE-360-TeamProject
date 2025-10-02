@@ -14,7 +14,14 @@ public class FirstPage {
 	VBox layout = new VBox(5);
 	Label userLabel = new Label("Welcome!\n This is the special Admin page\n Only the first user sees this!");
 	Button continueButton = new Button("Continue");
-	Scene firstPageScene = new Scene(layout, 800, 400);
+	Scene scene = new Scene(layout, 800, 400);
+	
+	public FirstPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
     
 	// ===================
   	// Getters
@@ -29,13 +36,13 @@ public class FirstPage {
  	// ===================
     
     public void setInitialLayout(Stage primaryStage) {
-    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-    	userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+    	layout.getStyleClass().add("layout");
+    	userLabel.getStyleClass().add("main-label");
     	
     	layout.getChildren().addAll(userLabel, continueButton);
 
 	    // Set the scene to primary stage
-	    primaryStage.setScene(firstPageScene);
+	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("First Page");
     	primaryStage.show();
 	}

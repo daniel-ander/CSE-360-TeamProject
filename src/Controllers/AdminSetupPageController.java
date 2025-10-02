@@ -20,15 +20,14 @@ import databasePart1.*;
 // 
 public class AdminSetupPageController {
 	
-    private final DatabaseHelper databaseHelper;
+    private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
-    public AdminSetupPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+    public AdminSetupPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, AdminSetupPage view) {
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
-        
-        view = new AdminSetupPage();
+        this.view = view;
         
         setInitialLayout();
         
@@ -66,7 +65,7 @@ public class AdminSetupPageController {
             try {
             	// Create a new User object with admin role and register in the database
             	User user=new User(userName, password, "admin");
-                databaseHelper.register(user);
+                userDBManager.register(user);
                 System.out.println("Administrator setup completed.");
                 
                 // Navigate to the Welcome Login Page

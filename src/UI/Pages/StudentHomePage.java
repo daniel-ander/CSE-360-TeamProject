@@ -14,10 +14,18 @@ import javafx.stage.Stage;
 
 public class StudentHomePage {
 	private final VBox layout = new VBox();
+	private final Scene scene = new Scene(layout, 800, 400);
 	private final Label userLabel = new Label(); // "Hello, " + currentUser + "!"
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
+	
+	public StudentHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 		
     // ===================
    	// Getters
@@ -48,19 +56,22 @@ public class StudentHomePage {
     }
     
     public void setInitialLayout(Stage primaryStage) {
-    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+    	layout.getStyleClass().add("layout");
     	// Label to display Hello user
-	    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-	    debugLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
-	    
-	    
+	    userLabel.getStyleClass().add("main-label");
+	   
 	    // Add all elements to layout
 
 	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
-	    Scene userScene = new Scene(layout, 800, 400);
+	    
 	    // Set the scene to primary stage
-	    primaryStage.setScene(userScene);
+	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("Student Home Page");
 
+    }
+    
+    public void addDebugLabel() {
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
+    	layout.getChildren().add(debugLabel);
     }
 }

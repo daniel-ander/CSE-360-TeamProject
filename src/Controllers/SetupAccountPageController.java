@@ -16,14 +16,19 @@ import databasePart1.*;
  */
 public class SetupAccountPageController {
 
-    private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+    private final IDatabaseHelper databaseHelper;
+    private final IUserDBManager userDBManager;
     private final Stage primaryStage;
-    private final SetupAccountPage view = new SetupAccountPage();
+    private final SetupAccountPage view;
     
     // DatabaseHelper to handle database operations.
-    public SetupAccountPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+    public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
+        this.view = view;
         
         setInitialLayout();
         
@@ -49,6 +54,7 @@ public class SetupAccountPageController {
     
     private void setSetupButtonAction() {
     	view.getSetupButton().setOnAction(a -> {
+    		System.out.println("Button was pressed");
         	// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
@@ -66,17 +72,17 @@ public class SetupAccountPageController {
             
             try {
             	// Check if the user already exists
-            	if(!databaseHelper.doesUserExist(userName)) {
+            	if(!userDBManager.doesUserExist(userName)) {
             		
             		// Validate the invitation code
             		if(databaseHelper.validateInvitationCode(code)) {
             			
             			// Create a new user and register them in the database
 		            	User user=new User(userName, password, "user");
-		                databaseHelper.register(user);
+		            	userDBManager.register(user);
 		                
 		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
             		}
             		else {
             			view.setErrorMessage("Please enter a valid invitation code");
@@ -89,6 +95,8 @@ public class SetupAccountPageController {
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();
+            } finally {
+            	databaseHelper.closeConnection();
             }
         });
 	}

@@ -7,28 +7,30 @@ import java.sql.SQLException;
 import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
 
-import databasePart1.DatabaseHelper;
+import UI.Pages.FirstPage;
+import UI.Pages.SetupLoginSelectionPage;
+
+import databasePart1.DBConnectionStore;
 
 
 public class StartCSE360 extends Application {
 
-	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	
 	public static void main( String[] args )
 	{
-		 launch(args);
+		launch(args);
 	}
 	
 	@Override
     public void start(Stage primaryStage) {
         try {
-            databaseHelper.connectToDatabase(); // Connect to the database
-            if (databaseHelper.isDatabaseEmpty()) {
-            	
-            	new FirstPageController(databaseHelper, primaryStage);
+        	DBConnectionStore sharedRepositoryProvider = DBConnectionStore.createInstance();
+        	sharedRepositoryProvider.getDatabaseHelper().connectToDatabase(); // Connect to the database
+        	
+            if (sharedRepositoryProvider.getDatabaseHelper().isDatabaseEmpty()) {
+            	new FirstPageController(sharedRepositoryProvider, primaryStage, new FirstPage());
             } else {
-            	new SetupLoginSelectionPageController(databaseHelper, primaryStage);
-                
+            	new SetupLoginSelectionPageController(sharedRepositoryProvider, primaryStage, new SetupLoginSelectionPage());
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());
