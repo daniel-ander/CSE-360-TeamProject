@@ -5,10 +5,14 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 
 import Models.User;
+
 import UI.Pages.AdminSetupPage;
+import UI.Pages.UserLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
+
 import databasePart1.*;
 
 /**
@@ -20,12 +24,14 @@ import databasePart1.*;
 // 
 public class AdminSetupPageController {
 	
+	private final DBConnectionStore dbConnectionStore;
     private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
-    public AdminSetupPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, AdminSetupPage view) {
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+    public AdminSetupPageController(DBConnectionStore dbConnectionStore, Stage primaryStage, AdminSetupPage view) {
+    	this.dbConnectionStore = dbConnectionStore;
+        this.userDBManager = dbConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
         this.view = view;
         
@@ -64,12 +70,12 @@ public class AdminSetupPageController {
             
             try {
             	// Create a new User object with admin role and register in the database
-            	User user=new User(userName, password, "admin");
+            	User user=new User(userName, password, User.Role.admin);
                 userDBManager.register(user);
                 System.out.println("Administrator setup completed.");
                 
                 // Navigate to the Welcome Login Page
-                //new UserLoginPageController(databaseHelper, primaryStage);
+                new UserLoginPageController(dbConnectionStore, primaryStage, user.getUserName(), new UserLoginPage());
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();

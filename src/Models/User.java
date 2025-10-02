@@ -7,21 +7,38 @@ package Models;
 public class User {
     private String userName;
     private String password;
-    private String role;
+    private Role role;
 
     // Constructor to initialize a new User object with userName, password, and role.
-    public User( String userName, String password, String role) {
+    public User(String userName, String password, Role role) {
         this.userName = userName;
         this.password = password;
         this.role = role;
     }
     
     // Sets the role of the user.
-    public void setRole(String role) {
+    public void setRole(Role role) {
     	this.role=role;
     }
 
     public String getUserName() { return userName; }
     public String getPassword() { return password; }
-    public String getRole() { return role; }
+    public Role getRole() { return role; }
+    
+    public static enum Role {
+    	admin,
+    	student,
+    	instructor,
+    	staff,
+    	reviewer
+    }
+    
+    public static Role roleFromString(String value) {
+    	for(Role role : Role.values()) {
+    		if(role.name().equalsIgnoreCase(value))
+    			return role;
+    	}
+    	
+    	return null;
+    }
 }

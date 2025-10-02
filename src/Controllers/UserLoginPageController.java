@@ -70,10 +70,12 @@ public class UserLoginPageController {
 
 	        // --- Database check ---
 	        try {
-	            User user = new User(userName, password, "");
+	            User user = new User(userName, password, User.Role.student);
 	            new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
 
-	            String role = userDBManager.getUserRole(userName);
+	            String roleString = userDBManager.getUserRole(userName);
+	            User.Role role = User.roleFromString(roleString);
+	            
 	            if (role != null) {
 	                user.setRole(role);
 	                if (userDBManager.login(user)) {
