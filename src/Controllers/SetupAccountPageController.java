@@ -78,7 +78,7 @@ public class SetupAccountPageController {
             		if(databaseHelper.validateInvitationCode(code)) {
             			
             			// Create a new user and register them in the database
-		            	User user=new User(userName, password, "user");
+		            	User user=new User(userName, password, databaseHelper.getRoleFromInviteCode(code));
 		            	userDBManager.register(user);
 		                
 		             // Navigate to the Welcome Login Page
