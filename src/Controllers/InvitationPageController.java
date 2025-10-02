@@ -52,7 +52,7 @@ public class InvitationPageController {
         	if (view.isReviewerCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
         	
         	
-			String invitationCode = databaseHelper.generateInvitationCode("");
+			String invitationCode = databaseHelper.generateInvitationCode(selectedRoles.toString());
             view.getInviteCodeLabel().setText(invitationCode);
 		});
 	}
