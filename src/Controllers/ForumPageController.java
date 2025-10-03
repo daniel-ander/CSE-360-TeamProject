@@ -4,6 +4,7 @@ import Models.User;
 import Models.Questions;
 import Models.Answers;
 import UI.Pages.ForumPage;
+import UI.Pages.UserLoginPage;
 import UI.Elements.ForumListView;
 import databasePart1.*;
 import javafx.stage.Stage;
@@ -14,20 +15,25 @@ import javafx.stage.Stage;
  */
 public class ForumPageController {
 
-    // References
-    private final DatabaseHelper databaseHelper;
+    private final DBConnectionStore dBConnectionStore;
+    private final IUserDBManager userDBManager;
     private final Stage primaryStage;
-    private final ForumPage view = new ForumPage();
-    private final String currentUser;
+    private final ForumPage view;
+    private final String currentUserName;
 
     // Forum list components
     private ForumListView forumListView;
     private ForumListViewController forumListController;
 
-    public ForumPageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
-        this.databaseHelper = databaseHelper;
+    public ForumPageController(DBConnectionStore dBConnectionStore,
+                               Stage primaryStage,
+                               String currentUserName,
+                               ForumPage view) {
+        this.dBConnectionStore = dBConnectionStore;
+        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.currentUserName = currentUserName;
+        this.view = view;
 
         setInitialLayout();
         setLogoutButtonAction();
@@ -37,16 +43,15 @@ public class ForumPageController {
     private void setLogoutButtonAction() {
         view.getLogoutButton().setOnAction(a -> {
             // Return to login page
-            new UserLoginPageController(databaseHelper, primaryStage);
+            new UserLoginPageController(dBConnectionStore, primaryStage, currentUserName, new UserLoginPage());
         });
     }
 
     private void setChangeRolesButtonAction() {
         view.getChangeRolesButton().setOnAction(a -> {
-            // Return to welcome page
-            String role = databaseHelper.getUserRole(currentUser);
-            User user = new User(currentUser, "", role); // Password can be blank if not needed
-            new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+            String role = userDBManager.getUserRole(currentUserName);
+            User user = new User(currentUserName, "", role); // password blank if not needed
+            new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
         });
     }
 
@@ -57,9 +62,10 @@ public class ForumPageController {
         Questions qRepo = new Questions();   // questions repo
         Answers aRepo = new Answers();       // answers repo
 
-        forumListView = new ForumListView(); 
+        forumListView = new ForumListView();
         forumListController = new ForumListViewController(
-            forumListView, qRepo, aRepo, primaryStage, currentUser);
+            forumListView, qRepo, aRepo, primaryStage, currentUserName
+        );
 
         // Place the list view in the center of the page layout
         view.getRoot().setCenter(forumListView.getLayout());

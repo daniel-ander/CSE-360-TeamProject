@@ -33,6 +33,7 @@ public class StudentHomePageController {
         
         setLogoutButtonAction();
         setChangeRolesButtonAction();
+        setEnterForumButtonAction();
         
         if(Debug.isEnabled) {
         	setUpDebugEnvironment();
@@ -59,6 +60,13 @@ public class StudentHomePageController {
 
 	    });
     }
+    private void setEnterForumButtonAction() {
+		view.getEnterForumButton().setOnAction(a -> {
+	    	// Enter the forum page
+	    	new ForumPageController(dBConnectionStore, primaryStage, currentUser, null);
+
+	    });
+	}
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);

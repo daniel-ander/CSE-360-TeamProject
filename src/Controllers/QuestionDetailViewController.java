@@ -52,6 +52,7 @@ public class QuestionDetailViewController {
                 GeneratePostId.getNextId(),
                 question.getId(),
                 text,
+                true, // adding this to match the constructor, probably need to check correctness here in reality?
                 currentUser
 
             );
@@ -63,7 +64,7 @@ public class QuestionDetailViewController {
         view.getEditAnswerBtn().setOnAction(e -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
             if (sel != null) {
-                sel.updateText("Edited: " + sel.getText());
+                sel.setText("Edited: " + sel.getText());
                 refreshAnswers();
             }
         });
@@ -89,9 +90,9 @@ public class QuestionDetailViewController {
         });
         // Mark question as resolved
         view.getResolveBtn().setOnAction(e -> {
-			question.isResolved();
+			question.setResolved(true);
 			view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText() + " (Resolved)");
-			question.updateText(question.getText() + " (Resolved)");
+			question.setText(question.getText() + " (Resolved)");
 
 			
 		});
@@ -100,8 +101,7 @@ public class QuestionDetailViewController {
     }
 
     private void refreshAnswers() {
-        view.getAnswerList().setItems(FXCollections.observableArrayList(
-            answersRepo.getAnswersForQuestion(question.getId())
-        ));
+    	view.getAnswerList().setItems(
+    			FXCollections.observableArrayList(answersRepo.getAll()));
     }
 }

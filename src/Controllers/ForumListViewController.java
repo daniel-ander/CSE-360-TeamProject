@@ -47,16 +47,18 @@ public class ForumListViewController {
         view.getEditQuestionButton().setOnAction(e -> {
             Question sel = view.getForumListView().getSelectionModel().getSelectedItem();
             if (sel != null) {
-                sel.updateText("Edited: " + sel.getText());
+                sel.setText("Edited: " + sel.getText());
                 refresh();
             }
         });
 
         // Delete question
+
         view.getDeleteQuestionButton().setOnAction(e -> {
             Question sel = view.getForumListView().getSelectionModel().getSelectedItem();
             if (sel != null) {
-                questions.deleteQuestion(sel.getId());
+                // Gonna have to pass the answers here too somehow
+                questions.deleteQuestion(sel.getId(), answers);
                 refresh();
             }
         });
@@ -80,7 +82,7 @@ public class ForumListViewController {
 
     private void refresh() {
         view.getForumListView().setItems(
-            FXCollections.observableArrayList(questions.getQuestions())
+            FXCollections.observableArrayList(questions.getAll())
         );
     }
 }
