@@ -41,4 +41,8 @@ public class User {
     	
     	throw new IllegalArgumentException("Invalid role: " + value);
     }
+    
+    public void changeRole(Role newRole) {
+    	this.role = newRole;
+    }
 }
