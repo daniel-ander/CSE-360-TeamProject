@@ -5,23 +5,28 @@ import Models.Questions;
 import Models.Answers;
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
-import Utils.GeneratePostId;
+import databasePart1.DBConnectionStore;
+import databasePart1.IDatabaseHelper;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
 public class ForumListViewController {
+	private final DBConnectionStore dBConnectionStore;
+	private final IDatabaseHelper databaseHelper;
     private final ForumListView view;
     private final Questions questions;
     private final Answers answers;
     private final Stage primaryStage;
     private final String currentUser;
 
-    public ForumListViewController(ForumListView view, Questions questions, Answers answers, Stage primaryStage, String currentUser) {
+    public ForumListViewController(DBConnectionStore dBConnectionStore, ForumListView view, Questions questions, Answers answers, Stage primaryStage, String currentUser) {
         this.view = view;
+        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
         this.questions = questions;
         this.answers = answers;
         this.primaryStage = primaryStage;
         this.currentUser = currentUser;
+        this.dBConnectionStore = dBConnectionStore;
         wire();
         refresh();
     }
@@ -35,7 +40,7 @@ public class ForumListViewController {
         		return;
         	}
             Question q = new Question(
-                GeneratePostId.getNextId(),
+                databaseHelper.getNextForumPostId(), // Assuming a method to get next ID
                 currentUser,
                 text   
             );
@@ -72,7 +77,15 @@ public class ForumListViewController {
                 // Define back action → return to the main forum list
                 Runnable backAction = () -> primaryStage.getScene().setRoot(view.getLayout());
 
-                new QuestionDetailViewController(detailView, sel, questions ,answers, primaryStage, currentUser);
+                new QuestionDetailViewController(
+					dBConnectionStore, // DBConnectionStore not needed here
+					primaryStage,
+					detailView,
+					sel,
+					questions,
+					answers,
+					currentUser
+				);
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
                 System.out.println("Viewing details for Question ID: " + sel.getId());

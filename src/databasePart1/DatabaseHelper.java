@@ -20,6 +20,7 @@ public class DatabaseHelper implements IDatabaseHelper{
 
 	private Connection connection = null;
 	private Statement statement = null; 
+	private static int forumPostIdNumber = 0;
 	//	PreparedStatement pstmt
 
 	@Override
@@ -156,6 +157,15 @@ public class DatabaseHelper implements IDatabaseHelper{
 	        e.printStackTrace();
 	    }
 	}
+	@Override
+	public int getNextForumPostId() {
+		forumPostIdNumber += 1;
+		return forumPostIdNumber;
+		// This is a placeholder implementation, should should be replaced when answers and questions
+		// are added to the database instead of just being in a list in memory.
+	}
+
+
 
 	@Override
 	// Closes the database connection and statement.

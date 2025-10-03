@@ -7,12 +7,16 @@ import Models.Questions;
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
 import Utils.GeneratePostId;
+import databasePart1.DBConnectionStore;
+import databasePart1.IDatabaseHelper;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class QuestionDetailViewController {
-    private final QuestionDetailView view;
+    private final IDatabaseHelper databaseHelper;
+    private final DBConnectionStore dBConnectionStore;
+	private final QuestionDetailView view;
     private final Question question;
     private final Questions questions;
     private final Answers answersRepo;
@@ -20,14 +24,17 @@ public class QuestionDetailViewController {
 	private String currentUser;
 
     public QuestionDetailViewController(
+            DBConnectionStore dBConnectionStore,
+            Stage primaryStage, 
             QuestionDetailView view,
             Question question,
             Questions questions,
             Answers answersRepo,
-            Stage primaryStage, 
             String currentUser
     ) {
-        this.view = view;
+        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+        this.dBConnectionStore = dBConnectionStore;
+		this.view = view;
         this.question = question;
         this.answersRepo = answersRepo;
         this.primaryStage = primaryStage;
@@ -42,14 +49,14 @@ public class QuestionDetailViewController {
         view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText());
 
         // Add answer
-        view.getAddAnswerBtn().setOnAction(e -> {
+        view.getAddAnswerButton().setOnAction(e -> {
         	String text = view.getTextInputArea().getText();
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Answer text cannot be empty or placeholder.");
         		return;
         	}
             Answer a = new Answer(
-                GeneratePostId.getNextId(),
+                databaseHelper.getNextForumPostId(), // Assuming a method to get next ID
                 question.getId(),
                 text,
                 true, // adding this to match the constructor, probably need to check correctness here in reality?
@@ -61,7 +68,7 @@ public class QuestionDetailViewController {
         });
 
         // Edit answer
-        view.getEditAnswerBtn().setOnAction(e -> {
+        view.getEditAnswerButton().setOnAction(e -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
             if (sel != null) {
                 sel.setText("Edited: " + sel.getText());
@@ -70,7 +77,7 @@ public class QuestionDetailViewController {
         });
 
         // Delete answer
-        view.getDeleteAnswerBtn().setOnAction(e -> {
+        view.getDeleteAnswerButton().setOnAction(e -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
             if (sel != null) {
                 answersRepo.deleteAnswer(sel.getId());
@@ -79,17 +86,17 @@ public class QuestionDetailViewController {
         });
 
         // Back to ForumListView (new scene, same as other buttons)
-        view.getBackBtn().setOnAction(e -> {
+        view.getBackButton().setOnAction(e -> {
             ForumListView forumView = new ForumListView();
             ForumListViewController forumController =
-                new ForumListViewController(forumView, questions, answersRepo, primaryStage, currentUser);
+                new ForumListViewController(dBConnectionStore, forumView, questions, answersRepo, primaryStage, currentUser);
 
             Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
             primaryStage.setScene(forumScene);
             primaryStage.setTitle("Forum Page");
         });
         // Mark question as resolved
-        view.getResolveBtn().setOnAction(e -> {
+        view.getResolveButton().setOnAction(e -> {
 			question.setResolved(true);
 			view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText() + " (Resolved)");
 			question.setText(question.getText() + " (Resolved)");

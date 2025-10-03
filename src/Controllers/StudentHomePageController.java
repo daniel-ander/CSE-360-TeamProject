@@ -1,6 +1,6 @@
 package Controllers;
 import Models.User;
-
+import UI.Pages.ForumPage;
 import UI.Pages.StudentHomePage;
 import UI.Pages.UserLoginPage;
 
@@ -63,7 +63,7 @@ public class StudentHomePageController {
     private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(a -> {
 	    	// Enter the forum page
-	    	new ForumPageController(dBConnectionStore, primaryStage, currentUser, null);
+	    	new ForumPageController(dBConnectionStore, primaryStage, currentUser, new ForumPage());
 
 	    });
 	}

@@ -15,6 +15,7 @@ public interface IDatabaseHelper {
 	
 	public String generateInvitationCode(String roles);
 	public String getRoleFromInviteCode(String code);
+	public int getNextForumPostId();
 	
 	public Connection getConnection() throws SQLException;
 }

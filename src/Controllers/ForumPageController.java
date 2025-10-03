@@ -64,7 +64,7 @@ public class ForumPageController {
 
         forumListView = new ForumListView();
         forumListController = new ForumListViewController(
-            forumListView, qRepo, aRepo, primaryStage, currentUserName
+            dBConnectionStore,forumListView, qRepo, aRepo, primaryStage, currentUserName
         );
 
         // Place the list view in the center of the page layout
