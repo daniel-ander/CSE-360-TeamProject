@@ -1,9 +1,9 @@
 package Controllers;
 
 import Models.Answer;
-import Models.Answers;
+import Models.AnswerRepository;
 import Models.Question;
-import Models.Questions;
+import Models.QuestionRepository;
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
 import Utils.GeneratePostId;
@@ -18,8 +18,8 @@ public class QuestionDetailViewController {
     private final DBConnectionStore dBConnectionStore;
 	private final QuestionDetailView view;
     private final Question question;
-    private final Questions questions;
-    private final Answers answersRepo;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answersRepo;
     private final Stage primaryStage;
 	private String currentUser;
 
@@ -28,8 +28,8 @@ public class QuestionDetailViewController {
             Stage primaryStage, 
             QuestionDetailView view,
             Question question,
-            Questions questions,
-            Answers answersRepo,
+            QuestionRepository questionRepository,
+            AnswerRepository answersRepo,
             String currentUser
     ) {
         this.databaseHelper = dBConnectionStore.getDatabaseHelper();
@@ -38,7 +38,7 @@ public class QuestionDetailViewController {
         this.question = question;
         this.answersRepo = answersRepo;
         this.primaryStage = primaryStage;
-		this.questions = questions;
+		this.questionRepository = questionRepository;
 		this.currentUser = currentUser;
         wire();
         refreshAnswers();
@@ -89,7 +89,7 @@ public class QuestionDetailViewController {
         view.getBackButton().setOnAction(e -> {
             ForumListView forumView = new ForumListView();
             ForumListViewController forumController =
-                new ForumListViewController(dBConnectionStore, forumView, questions, answersRepo, primaryStage, currentUser);
+                new ForumListViewController(dBConnectionStore, forumView, questionRepository, answersRepo, primaryStage, currentUser);
 
             Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
             primaryStage.setScene(forumScene);

@@ -1,8 +1,8 @@
 package Controllers;
 
 import Models.Question;
-import Models.Questions;
-import Models.Answers;
+import Models.QuestionRepository;
+import Models.AnswerRepository;
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
 import databasePart1.DBConnectionStore;
@@ -14,16 +14,16 @@ public class ForumListViewController {
 	private final DBConnectionStore dBConnectionStore;
 	private final IDatabaseHelper databaseHelper;
     private final ForumListView view;
-    private final Questions questions;
-    private final Answers answers;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
     private final Stage primaryStage;
     private final String currentUser;
 
-    public ForumListViewController(DBConnectionStore dBConnectionStore, ForumListView view, Questions questions, Answers answers, Stage primaryStage, String currentUser) {
+    public ForumListViewController(DBConnectionStore dBConnectionStore, ForumListView view, QuestionRepository questionRepository, AnswerRepository answerRepository, Stage primaryStage, String currentUser) {
         this.view = view;
         this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.questions = questions;
-        this.answers = answers;
+        this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
         this.primaryStage = primaryStage;
         this.currentUser = currentUser;
         this.dBConnectionStore = dBConnectionStore;
@@ -44,15 +44,15 @@ public class ForumListViewController {
                 currentUser,
                 text   
             );
-            questions.addQuestion(q);
+            questionRepository.addQuestion(q);
             refresh();
         });
 
         // Edit question
         view.getEditQuestionButton().setOnAction(e -> {
-            Question sel = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (sel != null) {
-                sel.setText("Edited: " + sel.getText());
+            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            if (selectedQuestion != null) {
+                selectedQuestion.setText("Edited: " + selectedQuestion.getText());
                 refresh();
             }
         });
@@ -60,42 +60,40 @@ public class ForumListViewController {
         // Delete question
 
         view.getDeleteQuestionButton().setOnAction(e -> {
-            Question sel = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (sel != null) {
+            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            if (selectedQuestion != null) {
                 // Gonna have to pass the answers here too somehow
-                questions.deleteQuestion(sel.getId(), answers);
+                questionRepository.deleteQuestion(selectedQuestion.getId(), answerRepository);
                 refresh();
             }
         });
 
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(e -> {
-            Question sel = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (sel != null) {
+            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            if (selectedQuestion != null) {
                 QuestionDetailView detailView = new QuestionDetailView();
 
-                // Define back action → return to the main forum list
-                Runnable backAction = () -> primaryStage.getScene().setRoot(view.getLayout());
 
                 new QuestionDetailViewController(
 					dBConnectionStore, // DBConnectionStore not needed here
 					primaryStage,
 					detailView,
-					sel,
-					questions,
-					answers,
+					selectedQuestion,
+					questionRepository,
+					answerRepository,
 					currentUser
 				);
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
-                System.out.println("Viewing details for Question ID: " + sel.getId());
+                System.out.println("Viewing details for Question ID: " + selectedQuestion.getId());
             }
         });
     }
 
     private void refresh() {
         view.getForumListView().setItems(
-            FXCollections.observableArrayList(questions.getAll())
+            FXCollections.observableArrayList(questionRepository.getAll())
         );
     }
 }

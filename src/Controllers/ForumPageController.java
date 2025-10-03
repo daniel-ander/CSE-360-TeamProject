@@ -1,8 +1,8 @@
 package Controllers;
 
 import Models.User;
-import Models.Questions;
-import Models.Answers;
+import Models.QuestionRepository;
+import Models.AnswerRepository;
 import UI.Pages.ForumPage;
 import UI.Pages.UserLoginPage;
 import UI.Elements.ForumListView;
@@ -59,8 +59,8 @@ public class ForumPageController {
         view.setInitialLayout(primaryStage);
 
         // === Embed forum list ===
-        Questions qRepo = new Questions();   // questions repo
-        Answers aRepo = new Answers();       // answers repo
+        QuestionRepository qRepo = new QuestionRepository();   // questions repo
+        AnswerRepository aRepo = new AnswerRepository();       // answers repo
 
         forumListView = new ForumListView();
         forumListController = new ForumListViewController(
