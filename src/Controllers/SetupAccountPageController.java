@@ -85,7 +85,9 @@ public class SetupAccountPageController {
             			// Create a new user and register them in the database
 		            	User user = new User(userName, password, User.Role.student);
 		            	UserSession userSession = new UserSession(user);
-		            	
+                  
+		            	// TODO: - One of these doesn't belong.
+		            	//User user = new User(userName, password, databaseHelper.getRoleFromInviteCode(code));
 		            	userDBManager.register(user);
 		                
 		             // Navigate to the Welcome Login Page
