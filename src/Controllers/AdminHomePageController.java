@@ -130,7 +130,7 @@ public class AdminHomePageController {
             if (selectedUser == null) return;
 
             // Prevent deleting own admin account
-            if (selectedUser.equals(userSession.getUsername())) {
+            if (selectedUser.equals(userSession.getCurrentUserName())) {
                 view.getWarningAlert().setTitle("Action Not Allowed");
                 view.getWarningAlert().setHeaderText("You cannot delete your own admin account.");
                 view.getWarningAlert().setContentText("Please have another admin remove this account if needed.");
@@ -146,7 +146,7 @@ public class AdminHomePageController {
 
             Optional<ButtonType> result = view.getConfirmationAlert().showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean success = userDBManager.deleteUser(userSession.getUsername(), selectedUser);
+                boolean success = userDBManager.deleteUser(userSession.getCurrentUserName(), selectedUser);
                 if (success) {
                     view.getUserDropdown().getItems().remove(selectedUser);
                     view.getUserDropdown().setValue(null);

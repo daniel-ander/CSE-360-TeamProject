@@ -18,11 +18,11 @@ public class UserSession {
     	return user;
     }
     
-    public String getUsername() {
+    public String getCurrentUserName() {
     	return user.getUserName();
     }
     
-    public User.Role getRole() {
+    public User.Role getCurrentUserRole() {
     	return user.getRole();
     }
     

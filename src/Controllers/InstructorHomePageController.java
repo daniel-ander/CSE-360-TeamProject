@@ -57,7 +57,7 @@ public class InstructorHomePageController {
     
     private void setChangeRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
-	    	String roleString = userDBManager.getUserRole(userSession.getUsername());
+	    	String roleString = userDBManager.getUserRole(userSession.getCurrentUserName());
 	    	User.Role role = User.roleFromString(roleString);
 	    	
 	    	// TODO: -- Change role in DB and in userSession
@@ -69,7 +69,7 @@ public class InstructorHomePageController {
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	view.setUserLabel(userSession.getUsername());
+    	view.setUserLabel(userSession.getCurrentUserName());
     }
     
     private void setUpDebugEnvironment() {

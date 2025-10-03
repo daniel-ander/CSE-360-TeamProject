@@ -58,10 +58,10 @@ public class StaffHomePageController {
     
     private void setChangeToRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
-	    	String roleString = userDBManager.getUserRole(userSession.getUsername());
+	    	String roleString = userDBManager.getUserRole(userSession.getCurrentUserName());
 	    	User.Role role = User.roleFromString(roleString);
 	    	
-	    	User user = new User(userSession.getUsername(), "", role); // Password can be blank if not needed
+	    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
 	    	// Return to welcome page
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	    });
@@ -69,7 +69,7 @@ public class StaffHomePageController {
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	view.setUserLabel(userSession.getUsername());
+    	view.setUserLabel(userSession.getCurrentUserName());
     }
     
     private final void setUpDebugEnvironment() {
