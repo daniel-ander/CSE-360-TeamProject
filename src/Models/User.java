@@ -39,6 +39,6 @@ public class User {
     			return role;
     	}
     	
-    	return null;
+    	throw new IllegalArgumentException("Invalid role: " + value);
     }
 }

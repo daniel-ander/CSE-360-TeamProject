@@ -4,14 +4,10 @@ import Models.User;
 
 public class UserSession {
 	private final User user;
-    private final String userName;
-    private User.Role role;
     private boolean isLoggedIn;
     
     public UserSession(User user) {
     	this.user = user;
-    	this.userName = user.getUserName();
-    	this.role = user.getRole();
     }
     
     // ===================
@@ -23,11 +19,11 @@ public class UserSession {
     }
     
     public String getUsername() {
-    	return userName;
+    	return user.getUserName();
     }
     
     public User.Role getRole() {
-    	return role;
+    	return user.getRole();
     }
     
     public boolean getLoggedStatus() {
