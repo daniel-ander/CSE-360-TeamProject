@@ -60,7 +60,7 @@ public class InstructorHomePageController {
 	    	String roleString = userDBManager.getUserRole(userSession.getUsername());
 	    	User.Role role = User.roleFromString(roleString);
 	    	
-	    	User user = new User(userSession.getUsername(), "", role); // Password can be blank if not needed
+	    	// TODO: -- Change role in DB and in userSession
 	    	// Return to welcome page
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 

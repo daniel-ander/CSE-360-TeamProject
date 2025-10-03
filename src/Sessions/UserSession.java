@@ -3,10 +3,10 @@ package Sessions;
 import Models.User;
 
 public class UserSession {
-	private User user;
-    private String userName;
+	private final User user;
+    private final String userName;
     private User.Role role;
-    boolean isLoggedIn;
+    private boolean isLoggedIn;
     
     public UserSession(User user) {
     	this.user = user;
