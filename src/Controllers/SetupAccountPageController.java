@@ -1,13 +1,19 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
-import Models.User;
+import Sessions.UserSession;
+
 import UI.Pages.SetupAccountPage;
+import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
+
 import databasePart1.*;
 
 /**
@@ -76,13 +82,14 @@ public class SetupAccountPageController {
             		
             		// Validate the invitation code
             		if(databaseHelper.validateInvitationCode(code)) {
-            			
             			// Create a new user and register them in the database
-		            	User user=new User(userName, password, User.Role.student);
+		            	User user = new User(userName, password, User.Role.student);
+		            	UserSession userSession = new UserSession(user);
+		            	
 		            	userDBManager.register(user);
 		                
 		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
+		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
             		}
             		else {
             			view.setErrorMessage("Please enter a valid invitation code");

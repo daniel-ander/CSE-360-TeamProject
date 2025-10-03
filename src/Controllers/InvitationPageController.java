@@ -24,7 +24,7 @@ public class InvitationPageController {
 	private final Stage primaryStage;
 	private final InvitationPage view;
 		
-	public InvitationPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String userRole, InvitationPage view) {
+	public InvitationPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, InvitationPage view) {
 		this.databaseHelper = dBConnectionStore.getDatabaseHelper();
 	    this.primaryStage = primaryStage;
 	    this.view = view;    
