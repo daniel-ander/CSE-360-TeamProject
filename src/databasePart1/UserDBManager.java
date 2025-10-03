@@ -15,10 +15,10 @@ import Models.User;
 
 public class UserDBManager implements IUserDBManager {
 	
-	private final DatabaseHelper dbHelper;
+	private final IDatabaseHelper dbHelper;
 	//private final Connection connection;
 	
-	public UserDBManager(DatabaseHelper dbHelper) throws SQLException {
+	public UserDBManager(IDatabaseHelper dbHelper) throws SQLException {
 		this.dbHelper = dbHelper;
 	}
 

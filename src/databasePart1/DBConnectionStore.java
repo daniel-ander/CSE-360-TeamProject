@@ -26,7 +26,7 @@ public class DBConnectionStore {
 	
 	// Factory method for creating a repository provider
 	public static DBConnectionStore createInstance() throws SQLException {
-		DatabaseHelper dbHelper = new DatabaseHelper();
+		IDatabaseHelper dbHelper = new DatabaseHelper();
 		IUserDBManager userRepo = new UserDBManager(dbHelper);
 		
 		return new DBConnectionStore(dbHelper, userRepo);
