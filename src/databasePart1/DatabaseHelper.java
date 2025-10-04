@@ -158,11 +158,11 @@ public class DatabaseHelper implements IDatabaseHelper{
 	    }
 	}
 	@Override
-	public int getNextForumPostId() {
+	public synchronized int getNextForumPostId() {
 		forumPostIdNumber += 1;
 		return forumPostIdNumber;
-		// This is a placeholder implementation, should should be replaced when answers and questions
-		// are added to the database instead of just being in a list in memory.
+		// TODO: This method should be updated to fetch the next ID from the database once the forum posts table is implemented.
+
 	}
 
 

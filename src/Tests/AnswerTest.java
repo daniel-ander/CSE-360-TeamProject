@@ -9,7 +9,7 @@ public class AnswerTest {
 	
 	// CREATE TESTS
     @Test
-    public void Constructor__WithValidInptus_CreatesAnswer() {
+    public void Constructor__WithValidInputs_CreatesAnswer() {
     	Answer a = new Answer(1, -1, "This is an answer text", true, "Trevor");
     	
     	assertEquals(1, a.getId());
