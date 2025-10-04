@@ -1,7 +1,7 @@
 package Controllers;
 
 import Models.User;
-
+import Sessions.UserSession;
 import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 
@@ -15,7 +15,6 @@ import UI.Pages.InvitationPage;
 import UI.Pages.ReviewerHomePage;
 import UI.Pages.StaffHomePage;
 import UI.Pages.StudentHomePage;
-import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 import databasePart1.*;
 
@@ -31,18 +30,20 @@ public class WelcomeLoginPageController {
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
+    private final UserSession userSession;
     
     String roleStr;
     ArrayList<String> roles = new ArrayList<String>();
 
-    public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, User user) {
+    public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.databaseHelper = dBConnectionStore.getDatabaseHelper();
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userSession = userSession;
         
         this.primaryStage = primaryStage;
-        this.user = user;
-        this.view = new WelcomeLoginPage();
+        this.user = userSession.currentUser();
+        this.view = view;
         
         assignRoles(user);
         
@@ -86,7 +87,7 @@ public class WelcomeLoginPageController {
     
     private void setInviteButtonAction() {
     	view.getInviteButton().setOnAction(a -> {
-            new InvitationPageController(dBConnectionStore, primaryStage, roleStr, new InvitationPage());
+            new InvitationPageController(dBConnectionStore, primaryStage, new InvitationPage());
         });
     	
     	view.getLayout().getChildren().add(view.getInviteButton());
@@ -123,22 +124,22 @@ public class WelcomeLoginPageController {
         switch (role) {
             case "admin":
                 //new AdminHomePageController(databaseHelper, username).show(stage);
-            	new AdminHomePageController(dBConnectionStore, stage, username, new AdminHomePage());
+            	new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
                 break;
             case "student":
-                new StudentHomePageController(dBConnectionStore, stage, username, new StudentHomePage());
+                new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
             case "instructor":
-                new InstructorHomePageController(dBConnectionStore, stage, username, new InstructorHomePage());
+                new InstructorHomePageController(dBConnectionStore, stage, userSession, new InstructorHomePage());
                 break;
             case "staff":
-                new StaffHomePageController(dBConnectionStore, stage, username, new StaffHomePage());
+                new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage());
                 break;
             case "reviewer":
-                new ReviewerHomePageController(dBConnectionStore, stage, username, new ReviewerHomePage());
+                new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage());
                 break;
             case "user":
-                new StudentHomePageController(dBConnectionStore, stage, username, new StudentHomePage());
+                new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
             // Add more roles here as needed, following the same pattern.
                 

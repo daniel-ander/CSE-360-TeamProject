@@ -5,11 +5,16 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 
 import Models.User;
+
+import Sessions.UserSession;
+
 import UI.Elements.ResetPasswordPopup;
 import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
+
 import databasePart1.*;
 
 /**
@@ -26,10 +31,10 @@ public class UserLoginPageController {
     private final ResetPasswordPopup resetPasswordPopupView = new ResetPasswordPopup();
     
  // --- Retrieve user inputs ---
-    private String userName = "";
-    private String password = "";
+    private String userNameFieldText = "";
+    private String passwordFieldText = "";
 
-    public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String userName, UserLoginPage view) {
+    public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
@@ -51,38 +56,41 @@ public class UserLoginPageController {
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(a -> {
 	        // --- Flags ---
-	        boolean resetPasswordFlag = password.length() > 2 && password.startsWith("R_");
+	        boolean resetPasswordFlag = passwordFieldText.length() > 2 && passwordFieldText.startsWith("R_");
 	        
-	        userName = view.getUsernameField().getText();
-	        password = view.getPasswordField().getText();
+	        userNameFieldText = view.getUsernameField().getText();
+	        passwordFieldText = view.getPasswordField().getText();
 
 	        // --- Username validation ---
-	        if (!UserNameRecognizer.checkForValidUserName(userName)) {
+	        if (!UserNameRecognizer.checkForValidUserName(userNameFieldText)) {
 	        	view.setErrorLabelText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 	            return;
 	        }
 
 	        // --- Password validation ---
-	        if (!PasswordEvaluator.evaluatePassword(password)) {
+	        if (!PasswordEvaluator.evaluatePassword(passwordFieldText)) {
 	            view.setErrorLabelText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
 	            return;
 	        }
 
 	        // --- Database check ---
 	        try {
-	            User user = new User(userName, password, "");
-	            new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
+	            User user = new User(userNameFieldText, passwordFieldText, User.Role.student);
+	            UserSession userSession = new UserSession(user);
+	            userSession.setLoggedStatus(true);
+	            
+	            //new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
-	            String role = userDBManager.getUserRole(userName);
+	            String roleString = userDBManager.getUserRole(userNameFieldText);
+	            User.Role role = User.roleFromString(roleString);
+	            
 	            if (role != null) {
 	                user.setRole(role);
 	                if (userDBManager.login(user)) {
 	                	if (resetPasswordFlag) {
 	                	    new ResetPasswordPopup();
 	                	} else {
-	                		// TOCHANGE
-	                		new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
-//	                	    welcomeLoginPage.show(primaryStage, user);
+	                		new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	                	}
 	                } else {
 	                    view.setErrorLabelText("Error logging in");
@@ -99,8 +107,8 @@ public class UserLoginPageController {
     
     private void setSubmitButtonResetPasswordPopupAction() {
     	resetPasswordPopupView.getSubmitButton().setOnAction(ev -> {
-    		userName = view.getUsernameField().getText();
-	        password = view.getPasswordField().getText();
+    		userNameFieldText = view.getUsernameField().getText();
+    		passwordFieldText = view.getPasswordField().getText();
 	        
             String newPass = resetPasswordPopupView.getPasswordPromptLabelText();
             if (!PasswordEvaluator.evaluatePassword(newPass)) {
@@ -108,7 +116,7 @@ public class UserLoginPageController {
                 return;
             }
             try {
-            	userDBManager.updatePassword(userName, newPass);
+            	userDBManager.updatePassword(userNameFieldText, newPass);
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
             } catch (SQLException ex) {
