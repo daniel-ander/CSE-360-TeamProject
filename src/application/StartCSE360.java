@@ -34,7 +34,7 @@ public class StartCSE360 extends Application {
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());
-        }
+        } 
     }
 	
 

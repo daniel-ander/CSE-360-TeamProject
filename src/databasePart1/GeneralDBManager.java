@@ -19,16 +19,14 @@ public class GeneralDBManager implements IGeneralDBManager{
 	static final String PASS = ""; 
 
 	@Override
-	public void initializeDBIfNeeded() {
+	public void initializeDBIfNeeded() throws SQLException {
 		try {
 			// TODO: - Should probably display an alert if an error arises.
 			Class.forName(JDBC_DRIVER); // Necessary for database
 			
 			createTables();
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) { // feels like this catch belongs here rather than the implementer
 			System.err.println("JDBC Driver not found: " + e.getMessage());
-		} catch (SQLException e) {
-			System.err.println("Was not able to create the tables due to: " + e.getMessage());
 		}
 	}
 

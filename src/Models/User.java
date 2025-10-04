@@ -33,14 +33,15 @@ public class User {
     	reviewer
     }
     
-    public static Role roleFromString(String value) {
-    	System.out.println(value);
-    	
-    	
+    public static Role roleFromString(String value) {    	
     	for(Role role : Role.values()) {
     		if(role.name().equalsIgnoreCase(value))
     			return role;
     	}
+    	
+    	// NOTE/BUG: - This may cause an error if more than one role is selected.
+    	// We need to decide on how we'll handle the roles, but a check box is
+    	// not appropriate when only a single role can be had.
     	
     	throw new IllegalArgumentException("Invalid role: " + value);
     }
