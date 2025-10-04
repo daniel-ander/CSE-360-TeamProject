@@ -4,6 +4,7 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+import Database.*;
 import Models.User;
 
 import Sessions.UserSession;
@@ -14,8 +15,6 @@ import UI.Pages.WelcomeLoginPage;
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-
-import databasePart1.*;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.

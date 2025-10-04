@@ -1,8 +1,8 @@
 package Controllers;
 
 
+import Database.*;
 import UI.Pages.InvitationPage;
-import databasePart1.*;
 import javafx.stage.Stage;
 
 /**

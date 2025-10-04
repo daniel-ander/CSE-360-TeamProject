@@ -5,6 +5,7 @@ import Models.User;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
+import Database.*;
 import Sessions.UserSession;
 
 import UI.Pages.SetupAccountPage;
@@ -13,8 +14,6 @@ import UI.Pages.WelcomeLoginPage;
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-
-import databasePart1.*;
 
 /**
  * SetupAccountPage class handles the account setup process for new users.

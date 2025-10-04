@@ -1,4 +1,4 @@
-package databasePart1;
+package Database;
 
 public interface IInvitationRepository {
 	public void markInvitationCodeAsUsed(String code);

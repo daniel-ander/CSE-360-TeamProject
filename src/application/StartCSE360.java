@@ -6,11 +6,9 @@ import java.sql.SQLException;
 
 import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
-
+import Database.DBConnectionStore;
 import UI.Pages.FirstPage;
 import UI.Pages.SetupLoginSelectionPage;
-
-import databasePart1.DBConnectionStore;
 
 
 public class StartCSE360 extends Application {

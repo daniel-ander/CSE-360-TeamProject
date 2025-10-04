@@ -4,6 +4,7 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+import Database.*;
 import Models.User;
 
 import UI.Pages.AdminSetupPage;
@@ -12,8 +13,6 @@ import UI.Pages.UserLoginPage;
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-
-import databasePart1.*;
 
 /**
  * The SetupAdmin class handles the setup process for creating an administrator account.

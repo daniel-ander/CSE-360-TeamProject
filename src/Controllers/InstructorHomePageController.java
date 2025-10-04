@@ -1,5 +1,6 @@
 package Controllers;
 
+import Database.*;
 import Models.User;
 
 import Sessions.UserSession;
@@ -9,10 +10,7 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
-
 import javafx.stage.Stage;
-
-import databasePart1.*;
 
 /**
  * FirstPage class represents the initial screen for the first user.

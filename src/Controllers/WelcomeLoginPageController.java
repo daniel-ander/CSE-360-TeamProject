@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import Database.*;
 import javafx.application.Platform;
 import UI.Pages.AdminHomePage;
 import UI.Pages.InstructorHomePage;
@@ -16,7 +17,6 @@ import UI.Pages.ReviewerHomePage;
 import UI.Pages.StaffHomePage;
 import UI.Pages.StudentHomePage;
 import UI.Pages.WelcomeLoginPage;
-import databasePart1.*;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.

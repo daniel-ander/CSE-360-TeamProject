@@ -2,13 +2,13 @@ package Controllers;
 
 import java.util.*;
 
+import Database.*;
 import Sessions.UserSession;
 // -------------------- Should get this out of the controller
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import UI.Pages.AdminHomePage;
-import databasePart1.*;
 
 public class AdminHomePageController {
 	private final IUserRepository userRepository;

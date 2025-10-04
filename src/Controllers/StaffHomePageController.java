@@ -1,5 +1,6 @@
 package Controllers;
 
+import Database.*;
 import Models.User;
 
 import Sessions.UserSession;
@@ -9,9 +10,6 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
-
-import databasePart1.*;
-
 import javafx.stage.Stage;
 
 /**
