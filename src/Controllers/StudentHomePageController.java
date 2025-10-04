@@ -1,7 +1,9 @@
 package Controllers;
+import Models.User;
 
 import Sessions.UserSession;
 
+import UI.Pages.ForumPage;
 import UI.Pages.StudentHomePage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
@@ -37,6 +39,7 @@ public class StudentHomePageController {
         
         setLogoutButtonAction();
         setChangeRolesButtonAction();
+        setEnterForumButtonAction();
         
         if(Debug.isEnabled) {
         	setUpDebugEnvironment();
@@ -67,6 +70,13 @@ public class StudentHomePageController {
 
 	    });
     }
+    private void setEnterForumButtonAction() {
+		view.getEnterForumButton().setOnAction(a -> {
+	    	// Enter the forum page
+	    	new ForumPageController(dBConnectionStore, primaryStage, currentUser, new ForumPage());
+
+	    });
+	}
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);

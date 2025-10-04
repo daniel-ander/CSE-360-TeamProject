@@ -19,6 +19,7 @@ public class StudentHomePage {
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
+	private final Button enterForumButton = new Button("Enter Forum");
 	
 	public StudentHomePage() {
     	// import stylesheet
@@ -46,6 +47,9 @@ public class StudentHomePage {
     public Label getDebugLabel() {
     	return debugLabel;
     }
+    public Button getEnterForumButton() {
+		return enterForumButton;
+	}
     
     // ===================
    	// Setters
@@ -62,7 +66,7 @@ public class StudentHomePage {
 	   
 	    // Add all elements to layout
 
-	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
+	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton, enterForumButton);
 	    
 	    // Set the scene to primary stage
 	    primaryStage.setScene(scene);
