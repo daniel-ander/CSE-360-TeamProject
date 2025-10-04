@@ -45,7 +45,8 @@ public class SetupLoginSelectionPageController {
     // TODO: -- Fix how user works
     private void setLoginButtonAction() {
 		view.getLoginButton().setOnAction(a -> {
-			new UserLoginPageController(dBConnectionStore, primaryStage, "", new UserLoginPage());
+			
+			new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});
 	}
     

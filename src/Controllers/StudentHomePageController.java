@@ -1,11 +1,15 @@
 package Controllers;
-import Models.User;
+
+import Sessions.UserSession;
 
 import UI.Pages.StudentHomePage;
 import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
+
 import databasePart1.*;
+
 import javafx.stage.Stage;
 
 /**
@@ -20,14 +24,14 @@ public class StudentHomePageController {
 	
 	private final Stage primaryStage;
 	private final StudentHomePage view;
-	private final String currentUser;
+	private final UserSession userSession;
 	
-	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser, StudentHomePage view) {
+	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StudentHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.userSession = userSession;
         
         setInitialLayout();
         
@@ -46,16 +50,20 @@ public class StudentHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	        new UserLoginPageController(dBConnectionStore, primaryStage, currentUser, new UserLoginPage());
+    		userSession.setLoggedStatus(false);
+	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
     }
     
     private void setChangeRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
+    		// TODO: -- Something weird happening here. Might need to make a DB call to update roles
 	    	// Return to welcome page
-	    	String role = userDBManager.getUserRole(currentUser);
-	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
+//	    	String roleString = userDBManager.getUserRole(userSession.getUsername());
+//	    	User.Role role = User.roleFromString(roleString);
+//	    	
+//	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
 	    });
     }

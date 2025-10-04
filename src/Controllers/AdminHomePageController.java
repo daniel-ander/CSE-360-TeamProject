@@ -2,6 +2,7 @@ package Controllers;
 
 import java.util.*;
 
+import Sessions.UserSession;
 // -------------------- Should get this out of the controller
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
@@ -13,7 +14,8 @@ public class AdminHomePageController {
 	private final IUserDBManager userDBManager;
 	private final AdminHomePage view;
 	private final Stage primaryStage;
-	private final String currentAdmin;
+	private final UserSession userSession;
+	private String selectedDropdownUser = null;
 	
 	List<String> users;
 
@@ -22,12 +24,12 @@ public class AdminHomePageController {
 	 * 
 	 * @param primaryStage The primary stage where the scene will be displayed.
 	 */
-	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String username, AdminHomePage view) {
+	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminHomePage view) {
 		this.view = view;
 		this.userDBManager = dBConnectionStore.getUserDatabaseManager();
 		this.primaryStage = primaryStage;
 		this.users = userDBManager.getAllUsernames();
-		this.currentAdmin = username;
+		this.userSession = userSession;
 		
 		setInitialLayout();
 		
@@ -50,8 +52,8 @@ public class AdminHomePageController {
 	
 	private void setUpdateRolesButtonAction() {
 		view.getSaveRolesButton().setOnAction(a -> {
-			String selectedUser = view.getUserDropdown().getValue();
-			if (selectedUser == null) {
+			selectedDropdownUser = view.getUserDropdown().getValue();
+			if (selectedDropdownUser == null) {
 				return;
 			}
 			List<String> roles = new ArrayList<>();
@@ -66,8 +68,8 @@ public class AdminHomePageController {
 			if (view.isReviewerCheckBoxSelected())
 				roles.add("reviewer");
 
-			userDBManager.updateUserRoles(selectedUser, roles);
-			System.out.println("Updates Roles for " + selectedUser + ": " + roles);
+			userDBManager.updateUserRoles(selectedDropdownUser, roles);
+			System.out.println("Updates Roles for " + selectedDropdownUser + ": " + roles);
 		});
 	}
 	
@@ -128,7 +130,7 @@ public class AdminHomePageController {
             if (selectedUser == null) return;
 
             // Prevent deleting own admin account
-            if (selectedUser.equals(currentAdmin)) {
+            if (selectedUser.equals(userSession.getCurrentUserName())) {
                 view.getWarningAlert().setTitle("Action Not Allowed");
                 view.getWarningAlert().setHeaderText("You cannot delete your own admin account.");
                 view.getWarningAlert().setContentText("Please have another admin remove this account if needed.");
@@ -144,7 +146,7 @@ public class AdminHomePageController {
 
             Optional<ButtonType> result = view.getConfirmationAlert().showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean success = userDBManager.deleteUser(currentAdmin, selectedUser);
+                boolean success = userDBManager.deleteUser(userSession.getCurrentUserName(), selectedUser);
                 if (success) {
                     view.getUserDropdown().getItems().remove(selectedUser);
                     view.getUserDropdown().setValue(null);

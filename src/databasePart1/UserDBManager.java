@@ -15,10 +15,10 @@ import Models.User;
 
 public class UserDBManager implements IUserDBManager {
 	
-	private final DatabaseHelper dbHelper;
+	private final IDatabaseHelper dbHelper;
 	//private final Connection connection;
 	
-	public UserDBManager(DatabaseHelper dbHelper) throws SQLException {
+	public UserDBManager(IDatabaseHelper dbHelper) throws SQLException {
 		this.dbHelper = dbHelper;
 	}
 
@@ -31,7 +31,7 @@ public class UserDBManager implements IUserDBManager {
 				PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole());
+			pstmt.setString(3, user.getRole().name());
 			pstmt.executeUpdate();
 		}
 	}
@@ -44,7 +44,7 @@ public class UserDBManager implements IUserDBManager {
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole());
+			pstmt.setString(3, user.getRole().name());
 			try (ResultSet rs = pstmt.executeQuery()) {
 				return rs.next();
 			}
