@@ -3,9 +3,11 @@ import java.sql.*;
 
 
 /**
- * The DatabaseHelper class is responsible for managing the connection to the database,
- * performing operations such as user registration, login validation, and handling invitation codes.
+ * The GeneralDBManager class is responsible for managing the connection to the database,
+ * and general actions related to the meta functions of the database
  */
+
+
 public class GeneralDBManager implements IGeneralDBManager{
 
 	// JDBC driver name and database URL 
