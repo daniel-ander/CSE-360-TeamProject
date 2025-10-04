@@ -1,10 +1,17 @@
 package Controllers;
 
 import Models.User;
+
+import Sessions.UserSession;
+
 import UI.Pages.StaffHomePage;
 import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
+
 import databasePart1.*;
+
 import javafx.stage.Stage;
 
 /**
@@ -19,14 +26,14 @@ public class StaffHomePageController {
 	
 	private final Stage primaryStage;
 	private final StaffHomePage view;
-	private final String currentUser;
+	private final UserSession userSession;
 	
-	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, String currentUser, StaffHomePage view) {
+	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StaffHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.userSession = userSession;
         
         setInitialLayout();
         
@@ -45,22 +52,24 @@ public class StaffHomePageController {
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
 	        // Return to login page
-	        new UserLoginPageController(dBConnectionStore, primaryStage, currentUser, new UserLoginPage());
+	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
     }
     
     private void setChangeToRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
+	    	String roleString = userDBManager.getUserRole(userSession.getCurrentUserName());
+	    	User.Role role = User.roleFromString(roleString);
+	    	
+	    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
 	    	// Return to welcome page
-	    	String role = userDBManager.getUserRole(currentUser);
-	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, user);
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	    });
     }
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	view.setUserLabel(currentUser);
+    	view.setUserLabel(userSession.getCurrentUserName());
     }
     
     private final void setUpDebugEnvironment() {
