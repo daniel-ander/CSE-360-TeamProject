@@ -24,7 +24,7 @@ import databasePart1.*;
 public class UserLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IUserDBManager userDBManager;
+    private final IUserRepository userRepository;
     
     private final Stage primaryStage;
     private final UserLoginPage view;
@@ -36,7 +36,7 @@ public class UserLoginPageController {
 
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userRepository = dBConnectionStore.getUserRepository();
         this.view = view;
         this.primaryStage = primaryStage;
         
@@ -81,12 +81,12 @@ public class UserLoginPageController {
 	            
 	            //new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
-	            String roleString = userDBManager.getUserRole(userNameFieldText);
+	            String roleString = userRepository.getUserRole(userNameFieldText);
 	            User.Role role = User.roleFromString(roleString);
 	            
 	            if (role != null) {
 	                user.setRole(role);
-	                if (userDBManager.login(user)) {
+	                if (userRepository.login(user)) {
 	                	if (resetPasswordFlag) {
 	                	    new ResetPasswordPopup();
 	                	} else {
@@ -116,7 +116,7 @@ public class UserLoginPageController {
                 return;
             }
             try {
-            	userDBManager.updatePassword(userNameFieldText, newPass);
+            	userRepository.updatePassword(userNameFieldText, newPass);
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
             } catch (SQLException ex) {

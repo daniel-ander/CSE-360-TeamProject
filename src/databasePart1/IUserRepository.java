@@ -7,7 +7,7 @@ import Models.User;
 
 // NOTE: Interface added for the purposes of easier testing
 
-public interface IUserDBManager {
+public interface IUserRepository {
 	public boolean deleteUser(String currentUser, String targetUser);
 	public boolean doesUserExist(String userName);
 	public boolean login(User user) throws SQLException;

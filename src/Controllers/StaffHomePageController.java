@@ -22,7 +22,7 @@ public class StaffHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
-	private final IUserDBManager userDBManager;
+	private final IUserRepository userRepository;
 	
 	private final Stage primaryStage;
 	private final StaffHomePage view;
@@ -30,7 +30,7 @@ public class StaffHomePageController {
 	
 	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StaffHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userRepository = dBConnectionStore.getUserRepository();
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
@@ -58,7 +58,7 @@ public class StaffHomePageController {
     
     private void setChangeToRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(a -> {
-	    	String roleString = userDBManager.getUserRole(userSession.getCurrentUserName());
+	    	String roleString = userRepository.getUserRole(userSession.getCurrentUserName());
 	    	User.Role role = User.roleFromString(roleString);
 	    	
 	    	// Return to welcome page

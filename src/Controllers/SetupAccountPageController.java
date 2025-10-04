@@ -23,16 +23,16 @@ import databasePart1.*;
 public class SetupAccountPageController {
 
 	private final DBConnectionStore dBConnectionStore;
-	private final IInvitationDBManager invitationDBManager;
-    private final IUserDBManager userDBManager;
+	private final IInvitationRepository invitationRepository;
+    private final IUserRepository userRepository;
     private final Stage primaryStage;
     private final SetupAccountPage view;
     
     // DatabaseHelper to handle database operations.
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.invitationDBManager = dBConnectionStore.getInvitationDBManager();
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.invitationRepository = dBConnectionStore.getInvitationRepository();
+        this.userRepository = dBConnectionStore.getUserRepository();
         this.primaryStage = primaryStage;
         this.view = view;
         
@@ -54,7 +54,7 @@ public class SetupAccountPageController {
     	view.setInitialLayout(primaryStage);
     	
     	if(Debug.isEnabled) {
-    		invitationDBManager.printInvitationCodesTable();
+    		invitationRepository.printInvitationCodesTable();
     	}
     }
     
@@ -78,17 +78,17 @@ public class SetupAccountPageController {
             
             try {
             	// Check if the user already exists
-            	if(!userDBManager.doesUserExist(userName)) {
+            	if(!userRepository.doesUserExist(userName)) {
             		
             		// Validate the invitation code
-            		if(invitationDBManager.validateInvitationCode(code)) {
+            		if(invitationRepository.validateInvitationCode(code)) {
             			// Create a new user and register them in the database
 		            	User user = new User(userName, password, User.Role.student);
 		            	UserSession userSession = new UserSession(user);
                   
 		            	// TODO: - One of these doesn't belong.
 		            	//User user = new User(userName, password, databaseHelper.getRoleFromInviteCode(code));
-		            	userDBManager.register(user);
+		            	userRepository.register(user);
 		                
 		             // Navigate to the Welcome Login Page
 		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());

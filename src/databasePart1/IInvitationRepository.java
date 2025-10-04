@@ -1,6 +1,6 @@
 package databasePart1;
 
-public interface IInvitationDBManager {
+public interface IInvitationRepository {
 	public void markInvitationCodeAsUsed(String code);
 	public void printInvitationCodesTable();
 	

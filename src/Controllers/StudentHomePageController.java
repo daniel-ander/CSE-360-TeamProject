@@ -20,7 +20,6 @@ public class StudentHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
-	private final IUserDBManager userDBManager;
 	
 	private final Stage primaryStage;
 	private final StudentHomePage view;
@@ -28,7 +27,6 @@ public class StudentHomePageController {
 	
 	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StudentHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;

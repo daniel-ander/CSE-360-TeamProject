@@ -25,7 +25,7 @@ import databasePart1.*;
 public class WelcomeLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IUserDBManager userDBManager;
+    private final IUserRepository userRepository;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
@@ -36,7 +36,7 @@ public class WelcomeLoginPageController {
 
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userRepository = dBConnectionStore.getUserRepository();
         this.userSession = userSession;
         
         this.primaryStage = primaryStage;
@@ -95,7 +95,7 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	this.roleStr = userDBManager.getUserRole(user.getUserName());
+    	this.roleStr = userRepository.getUserRole(user.getUserName());
         
         if (roleStr != null && !roleStr.isEmpty()) {
             for (String r : roleStr.split(",")) {

@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class InvitationDBManager implements IInvitationDBManager {
+public class InvitationRepository implements IInvitationRepository {
 	
 	private final IGeneralDBManager generalDBManager;
 	
-	public InvitationDBManager(IGeneralDBManager generalDBManager) throws SQLException {
+	public InvitationRepository(IGeneralDBManager generalDBManager) throws SQLException {
 		this.generalDBManager = generalDBManager;
 	}
 	

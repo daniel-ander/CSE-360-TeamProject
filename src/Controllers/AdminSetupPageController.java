@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 
 import Models.User;
-import Sessions.UserSession;
+
 import UI.Pages.AdminSetupPage;
 import UI.Pages.UserLoginPage;
 
@@ -25,13 +25,13 @@ import databasePart1.*;
 public class AdminSetupPageController {
 	
 	private final DBConnectionStore dbConnectionStore;
-    private final IUserDBManager userDBManager;
+    private final IUserRepository userRepository;
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
     public AdminSetupPageController(DBConnectionStore dbConnectionStore, Stage primaryStage,  AdminSetupPage view) {
     	this.dbConnectionStore = dbConnectionStore;
-        this.userDBManager = dbConnectionStore.getUserDatabaseManager();
+        this.userRepository = dbConnectionStore.getUserRepository();
         this.primaryStage = primaryStage;
         this.view = view;
         
@@ -71,7 +71,7 @@ public class AdminSetupPageController {
             try {
             	// Create a new User object with admin role and register in the database
             	User user=new User(userName, password, User.Role.admin);
-                userDBManager.register(user);
+                userRepository.register(user);
                 
                 System.out.println("Administrator setup completed.");
                 
