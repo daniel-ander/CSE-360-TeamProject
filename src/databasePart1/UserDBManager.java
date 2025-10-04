@@ -15,11 +15,11 @@ import Models.User;
 
 public class UserDBManager implements IUserDBManager {
 	
-	private final IDatabaseHelper dbHelper;
+	private final IGeneralDBManager generalDBManager;
 	//private final Connection connection;
 	
-	public UserDBManager(IDatabaseHelper dbHelper) throws SQLException {
-		this.dbHelper = dbHelper;
+	public UserDBManager(IGeneralDBManager dbHelper) throws SQLException {
+		this.generalDBManager = dbHelper;
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class UserDBManager implements IUserDBManager {
 	public void register(User user) throws SQLException {
 		// TODO Auto-generated method stub
 		String insertUser = "INSERT INTO cse360users (userName, password, role) VALUES (?, ?, ?)";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
@@ -40,7 +40,7 @@ public class UserDBManager implements IUserDBManager {
 	// Validates a user's login credentials.
 	public boolean login(User user) throws SQLException {
 		String query = "SELECT * FROM cse360users WHERE userName = ? AND password = ? AND role = ?";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
@@ -55,7 +55,7 @@ public class UserDBManager implements IUserDBManager {
 	// Checks if a user already exists in the database based on their userName.
 	public boolean doesUserExist(String userName) {
 		String query = "SELECT COUNT(*) FROM cse360users WHERE userName = ?";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        
 	        pstmt.setString(1, userName);
@@ -74,7 +74,7 @@ public class UserDBManager implements IUserDBManager {
 	@Override
 	public String getUserRole(String userName) {
 		String query = "SELECT role FROM cse360users WHERE userName = ?";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
 	        ResultSet rs = pstmt.executeQuery();
@@ -101,7 +101,7 @@ public class UserDBManager implements IUserDBManager {
 	    String roleString = String.join(",", norm); // empty string means “no roles”
 
 	    String query = "UPDATE cse360users SET role = ? WHERE userName = ?";
-	    try (Connection connection = dbHelper.getConnection(); 
+	    try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, roleString);
 	        pstmt.setString(2, userName);
@@ -115,7 +115,7 @@ public class UserDBManager implements IUserDBManager {
 	public List<String> getAllUsernames() {
 		List<String> usernames = new ArrayList<>();
 		String query = "SELECT userName FROM cse360users";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        ResultSet rs = pstmt.executeQuery();
 	        while (rs.next()) {
@@ -140,7 +140,7 @@ public class UserDBManager implements IUserDBManager {
 	    }
 
 	    String query = "DELETE FROM cse360users WHERE userName = ?";
-	    try (Connection connection = dbHelper.getConnection(); 
+	    try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, targetUser);
 	        pstmt.executeUpdate();
@@ -154,7 +154,7 @@ public class UserDBManager implements IUserDBManager {
 	@Override
 	public void printUsersTable() {
 		String query = "SELECT id, userName, password, role FROM cse360users";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query);
 				ResultSet rs = pstmt.executeQuery()) {
 	
@@ -200,7 +200,7 @@ public class UserDBManager implements IUserDBManager {
 	    String tempPass = sb.toString();            // total length = 8
 
 	    String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
-	    try (Connection connection = dbHelper.getConnection(); 
+	    try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(sql)) {
 	        pstmt.setString(1, tempPass);
 	        pstmt.setString(2, userName);
@@ -215,7 +215,7 @@ public class UserDBManager implements IUserDBManager {
 	@Override
 	public void updatePassword(String userName, String newPassword) throws SQLException {
 		String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
-		try (Connection connection = dbHelper.getConnection(); 
+		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(sql)) {
 	        pstmt.setString(1, newPassword);
 	        pstmt.setString(2, userName);

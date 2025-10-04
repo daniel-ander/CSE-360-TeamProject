@@ -25,7 +25,6 @@ import databasePart1.*;
 public class WelcomeLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IDatabaseHelper databaseHelper;
     private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
@@ -37,7 +36,6 @@ public class WelcomeLoginPageController {
 
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.userSession = userSession;
         
@@ -80,7 +78,6 @@ public class WelcomeLoginPageController {
     
     private void setQuitButtonAction() {
     	view.getQuitButton().setOnAction(a -> {
-    		databaseHelper.closeConnection();
             Platform.exit(); // Exit the JavaFX application
         });
     }

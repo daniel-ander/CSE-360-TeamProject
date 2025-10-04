@@ -4,12 +4,18 @@ import java.sql.SQLException;
 
 // An object that holds every connection
 public class DBConnectionStore {
-	private final IDatabaseHelper dbHelper;
+	private final IGeneralDBManager generalDBManager;
 	private final IUserDBManager userDBManager;
+	private final IInvitationDBManager invitationDBManager;
 	
-	public DBConnectionStore(IDatabaseHelper dbHelper, IUserDBManager userDBManager) throws SQLException {
-		this.dbHelper = dbHelper;
+	public DBConnectionStore(
+			IGeneralDBManager generalDBManager, 
+			IUserDBManager userDBManager, 
+			IInvitationDBManager invitationDBManager
+	) throws SQLException {
+		this.generalDBManager = generalDBManager;
 		this.userDBManager = userDBManager;
+		this.invitationDBManager = invitationDBManager;
 	}
 	
 	// ===================
@@ -20,15 +26,20 @@ public class DBConnectionStore {
 		return userDBManager;
 	}
 	
-	public IDatabaseHelper getDatabaseHelper() {
-		return dbHelper;
+	public IGeneralDBManager getGeneralDBManager() {
+		return generalDBManager;
+	}
+	
+	public IInvitationDBManager getInvitationDBManager() {
+		return invitationDBManager;
 	}
 	
 	// Factory method for creating a repository provider
 	public static DBConnectionStore createInstance() throws SQLException {
-		IDatabaseHelper dbHelper = new DatabaseHelper();
-		IUserDBManager userRepo = new UserDBManager(dbHelper);
+		IGeneralDBManager dbHelper = new GeneralDBManager();
+		IUserDBManager userManager = new UserDBManager(dbHelper);
+		IInvitationDBManager invitationManager = new InvitationDBManager(dbHelper);
 		
-		return new DBConnectionStore(dbHelper, userRepo);
+		return new DBConnectionStore(dbHelper, userManager, invitationManager);
 	}
 }

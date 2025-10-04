@@ -23,7 +23,7 @@ import databasePart1.*;
 public class SetupAccountPageController {
 
 	private final DBConnectionStore dBConnectionStore;
-    private final IDatabaseHelper databaseHelper;
+	private final IInvitationDBManager invitationDBManager;
     private final IUserDBManager userDBManager;
     private final Stage primaryStage;
     private final SetupAccountPage view;
@@ -31,7 +31,7 @@ public class SetupAccountPageController {
     // DatabaseHelper to handle database operations.
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+        this.invitationDBManager = dBConnectionStore.getInvitationDBManager();
         this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.primaryStage = primaryStage;
         this.view = view;
@@ -54,7 +54,7 @@ public class SetupAccountPageController {
     	view.setInitialLayout(primaryStage);
     	
     	if(Debug.isEnabled) {
-    		databaseHelper.printInvitationCodesTable();
+    		invitationDBManager.printInvitationCodesTable();
     	}
     }
     
@@ -81,7 +81,7 @@ public class SetupAccountPageController {
             	if(!userDBManager.doesUserExist(userName)) {
             		
             		// Validate the invitation code
-            		if(databaseHelper.validateInvitationCode(code)) {
+            		if(invitationDBManager.validateInvitationCode(code)) {
             			// Create a new user and register them in the database
 		            	User user = new User(userName, password, User.Role.student);
 		            	UserSession userSession = new UserSession(user);
@@ -104,8 +104,6 @@ public class SetupAccountPageController {
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();
-            } finally {
-            	databaseHelper.closeConnection();
             }
         });
 	}

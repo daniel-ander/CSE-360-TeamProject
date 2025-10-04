@@ -25,9 +25,9 @@ public class StartCSE360 extends Application {
     public void start(Stage primaryStage) {
         try {
         	DBConnectionStore sharedRepositoryProvider = DBConnectionStore.createInstance();
-        	sharedRepositoryProvider.getDatabaseHelper().connectToDatabase(); // Connect to the database
+        	sharedRepositoryProvider.getGeneralDBManager().initializeDBIfNeeded(); // Connect to the database
         	
-            if (sharedRepositoryProvider.getDatabaseHelper().isDatabaseEmpty()) {
+            if (sharedRepositoryProvider.getGeneralDBManager().isDatabaseEmpty()) {
             	new FirstPageController(sharedRepositoryProvider, primaryStage, new FirstPage());
             } else {
             	new SetupLoginSelectionPageController(sharedRepositoryProvider, primaryStage, new SetupLoginSelectionPage());

@@ -15,17 +15,17 @@ public class InvitationPageController {
 	/**
      * Displays the Invite Page in the provided primary stage.
      * 
-     * @param databaseHelper An instance of DatabaseHelper to handle database operations.
+     * @param generalDBManager An instance of DatabaseHelper to handle database operations.
      * @param primaryStage   The primary stage where the scene will be displayed.
      */
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final IDatabaseHelper databaseHelper;
+	private final IInvitationDBManager invitationDBManager;
 	private final Stage primaryStage;
 	private final InvitationPage view;
 		
 	public InvitationPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, InvitationPage view) {
-		this.databaseHelper = dBConnectionStore.getDatabaseHelper();
+		this.invitationDBManager = dBConnectionStore.getInvitationDBManager();
 	    this.primaryStage = primaryStage;
 	    this.view = view;    
 	    
@@ -52,7 +52,7 @@ public class InvitationPageController {
         	if (view.isReviewerCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
         	
         	
-			String invitationCode = databaseHelper.generateInvitationCode(selectedRoles.toString());
+			String invitationCode = invitationDBManager.generateInvitationCode(selectedRoles.toString());
             view.getInviteCodeLabel().setText(invitationCode);
 		});
 	}

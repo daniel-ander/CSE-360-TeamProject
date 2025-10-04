@@ -5,7 +5,7 @@ import java.util.List;
 
 import Models.User;
 
-// Interface added for the purposes of easier testing
+// NOTE: Interface added for the purposes of easier testing
 
 public interface IUserDBManager {
 	public boolean deleteUser(String currentUser, String targetUser);
