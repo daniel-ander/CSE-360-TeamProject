@@ -34,6 +34,9 @@ public class User {
     }
     
     public static Role roleFromString(String value) {
+    	System.out.println(value);
+    	
+    	
     	for(Role role : Role.values()) {
     		if(role.name().equalsIgnoreCase(value))
     			return role;
