@@ -166,7 +166,7 @@ public class AdminHomePage {
 	}
 	
 	private void setUserRoleDropdownLayout() {
-		// TODO: - this is a bug machine. Checkboxes are not the right tool since only one role is ncessary per user.
+		// TODO: - This is a bug machine. There should only be allowed one role per user. Checkboxes are not the right tool.
 		roleBox.getChildren().addAll(
 	            userDropDown,
 	            new Label("Choose Role to add"),
