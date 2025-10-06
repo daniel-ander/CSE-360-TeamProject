@@ -16,14 +16,13 @@ public class Question {
  * */
 	
 	// CREATE SECTION
-	public Question(int id, String currentUser, String text) {
+	public Question(int id,  String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
 		this.id = id;		
 		this.text = text;
 		
-		this.author = currentUser;
 		this.answered = false;
 		this.resolved = false;
 		this.deleted = false;

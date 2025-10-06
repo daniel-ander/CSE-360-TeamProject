@@ -26,6 +26,7 @@ public class StudentHomePageController {
 	
 	private final Stage primaryStage;
 	private final StudentHomePage view;
+	private final User user;
 	private final UserSession userSession;
 	
 	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StudentHomePage view) {
@@ -34,6 +35,7 @@ public class StudentHomePageController {
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
+        this.user = userSession.currentUser();
         
         setInitialLayout();
         
@@ -73,7 +75,8 @@ public class StudentHomePageController {
     private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(a -> {
 	    	// Enter the forum page
-	    	new ForumPageController(dBConnectionStore, primaryStage, currentUser, new ForumPage());
+			
+	    	new ForumPageController(dBConnectionStore, primaryStage, userSession, new ForumPage());
 
 	    });
 	}

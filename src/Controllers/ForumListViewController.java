@@ -39,11 +39,7 @@ public class ForumListViewController {
         		System.out.println("Question text cannot be empty or placeholder.");
         		return;
         	}
-            Question q = new Question(
-                databaseHelper.getNextForumPostId(), // Assuming a method to get next ID
-                currentUser,
-                text   
-            );
+            Question q = new Question(databaseHelper.getNextForumPostId(), text);
             questionRepository.addQuestion(q);
             refresh();
         });
