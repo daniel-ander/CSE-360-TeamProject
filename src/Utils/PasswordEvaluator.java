@@ -37,6 +37,8 @@ public class PasswordEvaluator {
 	private static int currentCharNdx;					// The index of the current character
 	private static boolean running;						// The flag that specifies if the FSM is 
 														// running
+	private static boolean debug = false;						// The flag that specifies if debug 
+														// information is to be displayed
 
 	/**********
 	 * This private method display the input line and then on a line under it displays an up arrow
@@ -101,6 +103,8 @@ public class PasswordEvaluator {
 		foundNumericDigit = false;			// Reset the Boolean flag
 		foundLongEnough = false;			// Reset the Boolean flag
 		running = true;						// Start the loop
+		
+		// Debugg information
 
 		// The Directed Graph simulation continues until the end of the input is reached or at some 
 		// state the current character does not match any valid transition
@@ -109,16 +113,16 @@ public class PasswordEvaluator {
 			// The cascading if statement sequentially tries the current character against all of the
 			// valid transitions
 			if (currentChar >= 'A' && currentChar <= 'Z') {
-				System.out.println("Upper case letter found");
+				if (debug) System.out.println("Upper case letter found");
 				foundUpperCase = true;
 			} else if (currentChar >= 'a' && currentChar <= 'z') {
-				System.out.println("Lower case letter found");
+				if (debug) System.out.println("Lower case letter found");
 				foundLowerCase = true;
 			} else if (currentChar >= '0' && currentChar <= '9') {
-				System.out.println("Digit found");
+				if (debug) System.out.println("Digit found");
 				foundNumericDigit = true;
 			} else if ("~`!@#$%^&*()_-+{}[]|:,.?/".indexOf(currentChar) >= 0) { // changed allowed special characters to those found on the FSM
-				System.out.println("Special character found");
+				if (debug) System.out.println("Special character found");
 				foundSpecialChar = true;
 			} else {
 				passwordIndexofError = currentCharNdx;
@@ -126,7 +130,7 @@ public class PasswordEvaluator {
 				return false; 													// changed to allow for boolean since its much easier
 			}
 			if (currentCharNdx >= 7) {
-				System.out.println("At least 8 characters found");
+				if (debug) System.out.println("At least 8 characters found");
 				foundLongEnough = true;
 			}
 			
