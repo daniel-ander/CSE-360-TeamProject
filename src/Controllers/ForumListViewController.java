@@ -53,6 +53,7 @@ public class ForumListViewController {
         		return;
         	}
             Question q = new Question(databaseHelper.getNextForumPostId(), text);
+            q.setAuthor(currentUser);
             questionRepository.addQuestion(q);
             refresh();
         });

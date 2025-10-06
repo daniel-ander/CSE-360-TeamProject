@@ -49,7 +49,7 @@ public class Question {
 	public void setResolved(boolean resolvedStatus) {resolved = resolvedStatus;}
 	public void setAnswered(boolean answeredStatus) {answered = answeredStatus;}
 	public void setDeleted(boolean deletedStatus) {deleted = deletedStatus;}
-	
+	public void setAuthor(String author) {this.author = author;}
 	// this lets the question print out correctly
     @Override
     public String toString() {
