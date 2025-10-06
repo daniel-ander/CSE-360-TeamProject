@@ -140,8 +140,7 @@ public class PasswordEvaluator {
 				running = false;
 			else
 				currentChar = input.charAt(currentCharNdx);
-			
-			System.out.println();
+		
 		}
 		
 		String errMessage = "";
