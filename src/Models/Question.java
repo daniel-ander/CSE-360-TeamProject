@@ -16,19 +16,19 @@ public class Question {
  * */
 	
 	// CREATE SECTION
-	public Question(int id, String currentUser, String text) {
+	public Question(int id, String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
 		this.id = id;		
 		this.text = text;
 		
-		this.author = currentUser;
 		this.answered = false;
 		this.resolved = false;
 		this.deleted = false;
 
 	}
+	
 	
 	// READ SECTION
 	public int getId() {return id;}
@@ -49,7 +49,7 @@ public class Question {
 	public void setResolved(boolean resolvedStatus) {resolved = resolvedStatus;}
 	public void setAnswered(boolean answeredStatus) {answered = answeredStatus;}
 	public void setDeleted(boolean deletedStatus) {deleted = deletedStatus;}
-	
+	public void setAuthor(String author) {this.author = author;}
 	// this lets the question print out correctly
     @Override
     public String toString() {

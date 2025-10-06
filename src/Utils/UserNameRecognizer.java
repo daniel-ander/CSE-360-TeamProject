@@ -37,6 +37,7 @@ public class UserNameRecognizer {
 	private static int currentCharNdx;					// The index of the current character
 	private static boolean running;						// The flag that specifies if the FSM is 
 														// running
+	// Debugging support attributes
 	private static int userNameSize = 0;			// A numeric value may not exceed 16 characters
 	
 
@@ -94,7 +95,7 @@ public class UserNameRecognizer {
 		userNameRecognizerInput = input;	// Save a copy of the input
 		running = true;						// Start the loop
 		nextState = -1;						// There is no next state
-		System.out.println("\nCurrent Final Input  Next  Date\nState   State Char  State  Size");
+		if (Debug.isEnabled) System.out.println("\nCurrent Final Input  Next  Date\nState   State Char  State  Size");
 		
 		// This is the place where semantic actions for a transition to the initial state occur
 		
@@ -191,7 +192,11 @@ public class UserNameRecognizer {
 			}
 			
 			if (running) {
-				displayDebuggingInfo();
+				if (Debug.isEnabled) {
+					displayDebuggingInfo();
+				}
+					// Display the current state of the FSM as part of an execution trace
+				
 				// When the processing of a state has finished, the FSM proceeds to the next
 				// character in the input and if there is one, it fetches that character and
 				// updates the currentChar.  If there is no next character the currentChar is
@@ -210,9 +215,10 @@ public class UserNameRecognizer {
 			// Should the FSM get here, the loop starts again
 	
 		}
-		displayDebuggingInfo();
+		if (Debug.isEnabled) {
+			displayDebuggingInfo();
+		}
 		
-		System.out.println("The loop has ended.");
 		
 		// When the FSM halts, we must determine if the situation is an error or not.  That depends
 		// of the current state of the FSM and whether or not the whole string has been consumed.
