@@ -27,11 +27,24 @@ public class ForumListViewController {
         this.primaryStage = primaryStage;
         this.currentUser = currentUser;
         this.dBConnectionStore = dBConnectionStore;
-        wire();
-        refresh();
+        
+ 	    refresh();
+        setButtonActions();
+        
     }
-
-    private void wire() {
+    private void setButtonActions() {
+		setAddQuestionButtonAction();
+		setEditQuestionButtonAction();
+		setDeleteQuestionButtonAction();
+		setViewQuestionButtonAction();
+	}
+    
+    private void refresh() {
+        view.getForumListView().setItems(
+            FXCollections.observableArrayList(questionRepository.getAll())
+        );
+    }
+    private void setAddQuestionButtonAction() {
         // Add question
         view.getAddQuestionButton().setOnAction(e -> {
         	String text = view.getTextInputArea().getText();
@@ -43,7 +56,9 @@ public class ForumListViewController {
             questionRepository.addQuestion(q);
             refresh();
         });
-
+		
+	}
+    private void setEditQuestionButtonAction() {
         // Edit question
         view.getEditQuestionButton().setOnAction(e -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
@@ -52,9 +67,10 @@ public class ForumListViewController {
                 refresh();
             }
         });
-
+    	
+    }
+    private void setDeleteQuestionButtonAction() {
         // Delete question
-
         view.getDeleteQuestionButton().setOnAction(e -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestion != null) {
@@ -63,7 +79,9 @@ public class ForumListViewController {
                 refresh();
             }
         });
-
+		
+	}
+    private void setViewQuestionButtonAction() {
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(e -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
@@ -85,11 +103,8 @@ public class ForumListViewController {
                 System.out.println("Viewing details for Question ID: " + selectedQuestion.getId());
             }
         });
+    	
     }
+    
 
-    private void refresh() {
-        view.getForumListView().setItems(
-            FXCollections.observableArrayList(questionRepository.getAll())
-        );
-    }
 }

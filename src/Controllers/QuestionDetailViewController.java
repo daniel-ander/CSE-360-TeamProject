@@ -40,14 +40,29 @@ public class QuestionDetailViewController {
         this.primaryStage = primaryStage;
 		this.questionRepository = questionRepository;
 		this.currentUser = currentUser;
-        wire();
+		
+        setQuestionDetailViewButtonActions();
         refreshAnswers();
     }
-
-    private void wire() {
+    private void setQuestionDetailViewButtonActions() {
+		setQuestionLabelAction();
+		setAddAnswerButtonAction();
+		setEditAnswerButtonAction();
+		setDeleteAnswerButtonAction();
+		setBackButtonAction();
+		setResolveButtonAction();
+	}
+    private void refreshAnswers() {
+    	view.getAnswerList().setItems(
+    			FXCollections.observableArrayList(answersRepo.getAll()));
+    }
+    
+    private void setQuestionLabelAction() {
         // Show selected question at the top
         view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText());
-
+    	
+    }
+    private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(e -> {
         	String text = view.getTextInputArea().getText();
@@ -66,7 +81,9 @@ public class QuestionDetailViewController {
             answersRepo.addAnswer(a);
             refreshAnswers();
         });
-
+		
+	}
+    private void setEditAnswerButtonAction() {
         // Edit answer
         view.getEditAnswerButton().setOnAction(e -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
@@ -75,7 +92,9 @@ public class QuestionDetailViewController {
                 refreshAnswers();
             }
         });
-
+    	
+    }
+    private void setDeleteAnswerButtonAction() {
         // Delete answer
         view.getDeleteAnswerButton().setOnAction(e -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
@@ -84,8 +103,9 @@ public class QuestionDetailViewController {
                 refreshAnswers();
             }
         });
-
-        // Back to ForumListView (new scene, same as other buttons)
+		
+	}
+    private void setBackButtonAction() {
         view.getBackButton().setOnAction(e -> {
             ForumListView forumView = new ForumListView();
             ForumListViewController forumController =
@@ -95,6 +115,9 @@ public class QuestionDetailViewController {
             primaryStage.setScene(forumScene);
             primaryStage.setTitle("Forum Page");
         });
+    	
+    }
+    private void setResolveButtonAction() {
         // Mark question as resolved
         view.getResolveButton().setOnAction(e -> {
 			question.setResolved(true);
@@ -103,12 +126,7 @@ public class QuestionDetailViewController {
 
 			
 		});
+		
+	}
 
-
-    }
-
-    private void refreshAnswers() {
-    	view.getAnswerList().setItems(
-    			FXCollections.observableArrayList(answersRepo.getAll()));
-    }
 }
