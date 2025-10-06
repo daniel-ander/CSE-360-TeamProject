@@ -54,7 +54,7 @@ public class ForumPageController {
     private void setChangeRolesButtonAction() {
         view.getChangeRolesButton().setOnAction(a -> {
             String role = userDBManager.getUserRole(user.getUserName());
-            User user = new User(userSession.getCurrentUserName(), "", User.Role.student);
+            User user = new User(userSession.getCurrentUserName(), "", User.roleFromString(role));
             UserSession userSession = new UserSession(user);
             new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
         });

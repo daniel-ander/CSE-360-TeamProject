@@ -16,7 +16,7 @@ public class Question {
  * */
 	
 	// CREATE SECTION
-	public Question(int id,  String text) {
+	public Question(int id, String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
@@ -28,6 +28,7 @@ public class Question {
 		this.deleted = false;
 
 	}
+	
 	
 	// READ SECTION
 	public int getId() {return id;}
