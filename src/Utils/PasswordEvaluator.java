@@ -37,7 +37,6 @@ public class PasswordEvaluator {
 	private static int currentCharNdx;					// The index of the current character
 	private static boolean running;						// The flag that specifies if the FSM is 
 														// running
-														// information is to be displayed
 
 	/**********
 	 * This private method display the input line and then on a line under it displays an up arrow
