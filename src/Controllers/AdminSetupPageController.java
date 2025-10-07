@@ -4,16 +4,17 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+import Database.*;
+import Database.Repositories.Interfaces.IUserRepository;
+import Database.Services.Interfaces.IUserService;
 import Models.User;
-import Sessions.UserSession;
+
 import UI.Pages.AdminSetupPage;
 import UI.Pages.UserLoginPage;
 
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-
-import databasePart1.*;
 
 /**
  * The SetupAdmin class handles the setup process for creating an administrator account.
@@ -25,13 +26,13 @@ import databasePart1.*;
 public class AdminSetupPageController {
 	
 	private final DBConnectionStore dbConnectionStore;
-    private final IUserDBManager userDBManager;
+    private final IUserService userService;
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
     public AdminSetupPageController(DBConnectionStore dbConnectionStore, Stage primaryStage,  AdminSetupPage view) {
     	this.dbConnectionStore = dbConnectionStore;
-        this.userDBManager = dbConnectionStore.getUserDatabaseManager();
+    	this.userService = dbConnectionStore.getUserService();
         this.primaryStage = primaryStage;
         this.view = view;
         
@@ -45,7 +46,7 @@ public class AdminSetupPageController {
     }
     
     // ===================
-    // Setters
+    // 		 SETTERS 
  	// ===================
     
     private void setInitialLayout() {
@@ -71,7 +72,7 @@ public class AdminSetupPageController {
             try {
             	// Create a new User object with admin role and register in the database
             	User user=new User(userName, password, User.Role.admin);
-                userDBManager.register(user);
+                userService.register(user);
                 
                 System.out.println("Administrator setup completed.");
                 

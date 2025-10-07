@@ -1,4 +1,7 @@
 package Controllers;
+import Database.*;
+import Database.Repositories.Interfaces.IUserRepository;
+import Database.Services.Interfaces.IUserService;
 import Models.User;
 
 import Sessions.UserSession;
@@ -9,9 +12,6 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
-
-import databasePart1.*;
-
 import javafx.stage.Stage;
 
 /**
@@ -22,15 +22,13 @@ public class StudentHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
-	private final IUserDBManager userDBManager;
-	
+
 	private final Stage primaryStage;
 	private final StudentHomePage view;
 	private final UserSession userSession;
 	
 	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StudentHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
@@ -47,8 +45,8 @@ public class StudentHomePageController {
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(a -> {
@@ -73,8 +71,7 @@ public class StudentHomePageController {
     private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(a -> {
 	    	// Enter the forum page
-	    	new ForumPageController(dBConnectionStore, primaryStage, currentUser, new ForumPage());
-
+	    	new ForumPageController(dBConnectionStore, primaryStage, userSession, new ForumPage());
 	    });
 	}
     

@@ -1,35 +1,54 @@
 package Controllers;
 
 import Models.Question;
-import Models.QuestionRepository;
-import Models.AnswerRepository;
+import Sessions.UserSession;
+
+import java.sql.SQLException;
+
+import Database.DBConnectionStore;
+import Database.IGeneralDBManager;
+import Database.Repositories.AnswerRepository;
+import Database.Repositories.QuestionRepository;
+import Database.Services.Interfaces.IAnswerService;
+import Database.Services.Interfaces.IQuestionService;
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
-import databasePart1.DBConnectionStore;
-import databasePart1.IDatabaseHelper;
+import UI.Pages.ReviewerHomePage;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
 public class ForumListViewController {
 	private final DBConnectionStore dBConnectionStore;
-	private final IDatabaseHelper databaseHelper;
+	private final IGeneralDBManager generalDBManager;
+	private final IQuestionService questionService;
+    private final IAnswerService answerService;
+    private final UserSession userSession;
     private final ForumListView view;
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
     private final Stage primaryStage;
-    private final String currentUser;
 
-    public ForumListViewController(DBConnectionStore dBConnectionStore, ForumListView view, QuestionRepository questionRepository, AnswerRepository answerRepository, Stage primaryStage, String currentUser) {
+    public ForumListViewController(
+    		DBConnectionStore dBConnectionStore, 
+    		Stage primaryStage, 
+    		UserSession userSession, 
+    		ForumListView view
+    	) {
         this.view = view;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.questionRepository = questionRepository;
-        this.answerRepository = answerRepository;
+        this.generalDBManager = dBConnectionStore.getGeneralDBManager();
+        this.questionService = dBConnectionStore.getQuestionService();
+        this.answerService = dBConnectionStore.getAnswerService();
+        
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.userSession = userSession;
+
         this.dBConnectionStore = dBConnectionStore;
+        
         wire();
         refresh();
     }
+    
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
 
     private void wire() {
         // Add question
@@ -40,12 +59,17 @@ public class ForumListViewController {
         		return;
         	}
             Question q = new Question(
-                databaseHelper.getNextForumPostId(), // Assuming a method to get next ID
-                currentUser,
+                generalDBManager.getNextForumPostId(), // Assuming a method to get next ID
+                userSession.currentUser().getId(),
                 text   
             );
-            questionRepository.addQuestion(q);
-            refresh();
+            try {
+            	questionService.addQuestion(q);
+            } catch (SQLException exception) {
+            	// TODO:- Handle outcome if the question can't be added
+                System.err.println("Database error: " + exception.getMessage());
+                exception.printStackTrace();
+            } 
         });
 
         // Edit question
@@ -62,28 +86,31 @@ public class ForumListViewController {
         view.getDeleteQuestionButton().setOnAction(e -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestion != null) {
-                // Gonna have to pass the answers here too somehow
-                questionRepository.deleteQuestion(selectedQuestion.getId(), answerRepository);
-                refresh();
+                try {
+                	questionService.deleteQuestion(selectedQuestion.getId());
+                    refresh();
+                } catch (SQLException exception) {
+                	// TODO:- Handle outcome if the question can't be deleted
+                    System.err.println("Database error: " + exception.getMessage());
+                    exception.printStackTrace();
+                } 
             }
         });
 
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(e -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            
             if (selectedQuestion != null) {
                 QuestionDetailView detailView = new QuestionDetailView();
-
-
+                
                 new QuestionDetailViewController(
-					dBConnectionStore, // DBConnectionStore not needed here
-					primaryStage,
-					detailView,
-					selectedQuestion,
-					questionRepository,
-					answerRepository,
-					currentUser
-				);
+                		dBConnectionStore,
+                		primaryStage, 
+                		selectedQuestion,
+                		userSession,
+                		new QuestionDetailView()
+                );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
                 System.out.println("Viewing details for Question ID: " + selectedQuestion.getId());
@@ -93,7 +120,7 @@ public class ForumListViewController {
 
     private void refresh() {
         view.getForumListView().setItems(
-            FXCollections.observableArrayList(questionRepository.getAll())
+            FXCollections.observableArrayList(questionService.getAllQuestions())
         );
     }
 }

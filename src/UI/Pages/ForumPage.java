@@ -1,6 +1,7 @@
 package UI.Pages;
 
 import UI.Elements.ForumListView;
+import UI.Interfaces.IPage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,7 +12,7 @@ import javafx.stage.Stage;
 /**
  * ForumPage displays the forum list with a header containing user info and controls.
  */
-public class ForumPage {
+public class ForumPage implements IPage {
 
     private final BorderPane root = new BorderPane();
 
@@ -22,8 +23,8 @@ public class ForumPage {
     private ForumListView forumListView;
 
     // ===================
-    // Getters
-    // ===================
+    // 		 GETTERS 
+ 	// ===================
 
     public Button getLogoutButton() {
         return logoutButton;
@@ -38,8 +39,8 @@ public class ForumPage {
     }
 
     // ===================
-    // Setters
-    // ===================
+    // 		 SETTERS 
+ 	// ===================
 
     public void setUserLabel(String text) {
         userLabel.setText("Hello, " + text + "!");

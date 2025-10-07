@@ -1,14 +1,21 @@
 package Controllers;
 
 import Models.User;
+
 import Sessions.UserSession;
+
 import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+
+import java.sql.SQLException;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
-import javafx.application.Platform;
+import Database.*;
+
+import Database.Services.Interfaces.IUserService;
+
 import UI.Pages.AdminHomePage;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.InvitationPage;
@@ -16,7 +23,6 @@ import UI.Pages.ReviewerHomePage;
 import UI.Pages.StaffHomePage;
 import UI.Pages.StudentHomePage;
 import UI.Pages.WelcomeLoginPage;
-import databasePart1.*;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.
@@ -25,20 +31,18 @@ import databasePart1.*;
 public class WelcomeLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IDatabaseHelper databaseHelper;
-    private final IUserDBManager userDBManager;
+    private final IUserService userService;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
     private final UserSession userSession;
     
-    String roleStr;
+    String roleString;
     ArrayList<String> roles = new ArrayList<String>();
 
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userService = dBConnectionStore.getUserService();
         this.userSession = userSession;
         
         this.primaryStage = primaryStage;
@@ -52,6 +56,9 @@ public class WelcomeLoginPageController {
         setQuitButtonAction();
     }
     
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setContinueButtonAction() {
     	// 🎯 Continue button → routes user into their page
@@ -80,7 +87,6 @@ public class WelcomeLoginPageController {
     
     private void setQuitButtonAction() {
     	view.getQuitButton().setOnAction(a -> {
-    		databaseHelper.closeConnection();
             Platform.exit(); // Exit the JavaFX application
         });
     }
@@ -98,17 +104,16 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	this.roleStr = userDBManager.getUserRole(user.getUserName());
-        
-        if (roleStr != null && !roleStr.isEmpty()) {
-            for (String r : roleStr.split(",")) {
-                roles.add(r.trim().toLowerCase(Locale.ROOT));
-            }
-        }
- 
-       if(roles.contains("admin")) {
-    	   setInviteButtonAction();
-       }
+    	try {
+    		User.Role role = userService.getUserRole(user.getUserName());
+    		
+    		if(role == User.Role.admin) {
+    	    	setInviteButtonAction();
+    	    }
+    	} catch(SQLException e) {
+    		System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+    	}
     }
     
     /**

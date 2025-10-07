@@ -4,7 +4,7 @@ public class Question {
 
 	private int id;
 	private String text;
-	private String author;
+	private int authorId;
 	private boolean answered;
 	private boolean resolved;
 	private boolean deleted;
@@ -15,37 +15,41 @@ public class Question {
  * added setters: setAnswered, setResolved
  * */
 	
-	// CREATE SECTION
-	public Question(int id, String currentUser, String text) {
+	public Question(int id, int authorId, String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
 		this.id = id;		
 		this.text = text;
 		
-		this.author = currentUser;
+		this.authorId = authorId;
 		this.answered = false;
 		this.resolved = false;
 		this.deleted = false;
 
 	}
 	
-	// READ SECTION
+	// ===================
+    // GETTERS
+ 	// ===================
+	
 	public int getId() {return id;}
 	public String getText() {return text;}
-	public String getAuthor() {return author;}
 	public boolean getAnswered() {return answered;}
 	public boolean getResolved() {return resolved;}
 	public boolean getDeleted() {return deleted;}
 	
 	
-	// UPDATE SECTION
+	// ===================
+    // SETTERS
+ 	// ===================
 	public void setText(String newText) {
 		if (newText == null || newText.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
 		text = newText;
 	}
+	
 	public void setResolved(boolean resolvedStatus) {resolved = resolvedStatus;}
 	public void setAnswered(boolean answeredStatus) {answered = answeredStatus;}
 	public void setDeleted(boolean deletedStatus) {deleted = deletedStatus;}

@@ -1,17 +1,22 @@
 package Controllers;
 
+import java.sql.SQLException;
 import java.util.*;
 
+import Controllers.Interfaces.IPageController;
+import Database.*;
+
+import Database.Services.Interfaces.IUserService;
+import Models.User;
 import Sessions.UserSession;
-// -------------------- Should get this out of the controller
+
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import UI.Pages.AdminHomePage;
-import databasePart1.*;
 
-public class AdminHomePageController {
-	private final IUserDBManager userDBManager;
+public class AdminHomePageController implements IPageController {
+	private final IUserService userService;
 	private final AdminHomePage view;
 	private final Stage primaryStage;
 	private final UserSession userSession;
@@ -26,9 +31,8 @@ public class AdminHomePageController {
 	 */
 	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminHomePage view) {
 		this.view = view;
-		this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+		this.userService = dBConnectionStore.getUserService();
 		this.primaryStage = primaryStage;
-		this.users = userDBManager.getAllUsernames();
 		this.userSession = userSession;
 		
 		setInitialLayout();
@@ -41,12 +45,18 @@ public class AdminHomePageController {
 	}
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
 	
 	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
-		view.setUserDropDownLayout(users);
+		
+		try {
+			users = userService.getAllUsernames();
+		} catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+        }
 	}
 	
 	
@@ -68,8 +78,14 @@ public class AdminHomePageController {
 			if (view.isReviewerCheckBoxSelected())
 				roles.add("reviewer");
 
-			userDBManager.updateUserRoles(selectedDropdownUser, roles);
-			System.out.println("Updates Roles for " + selectedDropdownUser + ": " + roles);
+			// TODO :- Need to figure out what we're doing with roles
+			try {
+				userService.updateUserRole(selectedDropdownUser, User.Role.admin);
+				System.out.println("Updates Roles for " + selectedDropdownUser + ": " + roles);
+			} catch (SQLException e) {
+	            System.err.println("Database error: " + e.getMessage());
+	            e.printStackTrace();
+	        }
 		});
 	}
 	
@@ -77,8 +93,15 @@ public class AdminHomePageController {
 		view.getSetTempPasswordButton().setOnAction(a -> {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
-
-            String tempPass = userDBManager.issueResetPassword(selectedUser);
+            
+            String tempPass = null;
+            
+            try {
+            	tempPass = userService.resetPasswordForUser(selectedUser);
+            } catch (SQLException e) {
+	            System.err.println("Database error: " + e.getMessage());
+	            e.printStackTrace();
+	        }
 
             if (tempPass == null) {
                 view.setTempPasswordInfoLabel("Error setting temp password");
@@ -92,8 +115,17 @@ public class AdminHomePageController {
 		view.getUserDropdown().setOnAction(a -> {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
-
-            String roleStr = userDBManager.getUserRole(selectedUser);
+            
+            User.Role role;
+            
+            try {
+            	role = userService.getUserRole(selectedUser);
+            } catch (SQLException e) {
+	            System.err.println("Database error: " + e.getMessage());
+	            e.printStackTrace();
+	            
+	            return;
+	        }
 
             // Reset all checkboxes
             view.setAdminCheckBox(false);
@@ -102,22 +134,29 @@ public class AdminHomePageController {
             view.setStaffCheckBox(false);
             view.setReviewerCheckBox(false);
 
-            if (roleStr != null && !roleStr.isEmpty()) {
-                Set<String> roles = new HashSet<>();
-                for (String r : roleStr.split(",")) {
-                    roles.add(r.trim().toLowerCase(Locale.ROOT));
-                }
-                if (roles.contains("admin")) view.setAdminCheckBox(true);
-                if (roles.contains("student")) view.setStudentCheckBox(true);
-                if (roles.contains("instructor")) view.setInstructorCheckBox(true);
-                if (roles.contains("staff")) view.setStaffCheckBox(true);
-                if (roles.contains("reviewer")) view.setReviewerCheckBox(true);
-            }
+            // NOTE :- Again, based on 
+//            if (roleStr != null && !roleStr.isEmpty()) {
+//                Set<String> roles = new HashSet<>();
+//                for (String r : roleStr.split(",")) {
+//                    roles.add(r.trim().toLowerCase(Locale.ROOT));
+//                }
+//                if (roles.contains("admin")) view.setAdminCheckBox(true);
+//                if (roles.contains("student")) view.setStudentCheckBox(true);
+//                if (roles.contains("instructor")) view.setInstructorCheckBox(true);
+//                if (roles.contains("staff")) view.setStaffCheckBox(true);
+//                if (roles.contains("reviewer")) view.setReviewerCheckBox(true);
+//            }
+            
+            if (role.name().equals("admin")) view.setAdminCheckBox(true);
+            if (role.name().equals("student")) view.setStudentCheckBox(true);
+            if (role.name().equals("instructor")) view.setInstructorCheckBox(true);
+            if (role.name().equals("staff")) view.setStaffCheckBox(true);
+            if (role.name().equals("reviewer")) view.setReviewerCheckBox(true);
 
             // Update details section
             view.setUserDetailsLabel(
                 "User: " + selectedUser + "\n" +
-                "Roles: " + (roleStr == null || roleStr.isEmpty() ? "None" : roleStr) + "\n" +
+                "Roles: " + role.name() + "\n" +
                 "Other info: (e.g., last login, email, etc.)"
             );
         });
@@ -146,21 +185,26 @@ public class AdminHomePageController {
 
             Optional<ButtonType> result = view.getConfirmationAlert().showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean success = userDBManager.deleteUser(userSession.getCurrentUserName(), selectedUser);
-                if (success) {
-                    view.getUserDropdown().getItems().remove(selectedUser);
-                    view.getUserDropdown().setValue(null);
-
-                    view.getInfoAlert().setTitle("Deleted");
-                    view.getInfoAlert().setHeaderText(null);
-                    view.getInfoAlert().setContentText("User " + selectedUser + " deleted.");
-                    view.getInfoAlert().showAndWait();
-                } else {
-                    view.getErrorAlert().setTitle("Error");
-                    view.getErrorAlert().setHeaderText("Failed to delete user");
-                    view.getErrorAlert().setContentText("See logs for details.");
-                    view.getErrorAlert().showAndWait();
-                }
+            	try {
+	                boolean success = userService.deleteUser(userSession.getCurrentUserName(), selectedUser);
+	                if (success) {
+	                    view.getUserDropdown().getItems().remove(selectedUser);
+	                    view.getUserDropdown().setValue(null);
+	
+	                    view.getInfoAlert().setTitle("Deleted");
+	                    view.getInfoAlert().setHeaderText(null);
+	                    view.getInfoAlert().setContentText("User " + selectedUser + " deleted.");
+	                    view.getInfoAlert().showAndWait();
+	                } else {
+	                    view.getErrorAlert().setTitle("Error");
+	                    view.getErrorAlert().setHeaderText("Failed to delete user");
+	                    view.getErrorAlert().setContentText("See logs for details.");
+	                    view.getErrorAlert().showAndWait();
+	                }
+            	} catch (SQLException e) {
+    	            System.err.println("Database error: " + e.getMessage());
+    	            e.printStackTrace();
+    	        }
             }
         });
 	}
@@ -187,9 +231,14 @@ public class AdminHomePageController {
         );
 
         // Save roles in database
-        userDBManager.updateUserRoles(selectedUser, roles);
-        System.out.println("Updated Roles for " + selectedUser + ": " + roles);
-        userDBManager.printUsersTable();
+        try {
+	        userService.updateUserRole(selectedUser, User.Role.admin);
+	        System.out.println("Updated Roles for " + selectedUser + ": " + roles);
+	        userService.printUsersTable();
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+        }
     
 	}
 }

@@ -20,6 +20,11 @@
 	-fx-alignment: center;
 }
 
+.small-padding {
+	-fx-padding: 10;
+	padding: 10;
+}
+
 .debug-label, .info-label {
 	-fx-text-fill: blue;
 }

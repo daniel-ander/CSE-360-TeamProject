@@ -5,6 +5,10 @@ import Models.User;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
+import Database.*;
+
+import Database.Services.Interfaces.IInvitationService;
+import Database.Services.Interfaces.IUserService;
 import Sessions.UserSession;
 
 import UI.Pages.SetupAccountPage;
@@ -14,8 +18,6 @@ import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 
-import databasePart1.*;
-
 /**
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
@@ -23,16 +25,18 @@ import databasePart1.*;
 public class SetupAccountPageController {
 
 	private final DBConnectionStore dBConnectionStore;
-    private final IDatabaseHelper databaseHelper;
-    private final IUserDBManager userDBManager;
+    private final IGeneralDBManager generalDBManager;
+    private final IUserService userService;
+    private final IInvitationService invitationService;
     private final Stage primaryStage;
     private final SetupAccountPage view;
     
     // DatabaseHelper to handle database operations.
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.generalDBManager = dBConnectionStore.getGeneralDBManager();
+        this.userService = dBConnectionStore.getUserService();
+        this.invitationService = dBConnectionStore.getInvitationService();
         this.primaryStage = primaryStage;
         this.view = view;
         
@@ -47,14 +51,19 @@ public class SetupAccountPageController {
      */
     
     // ===================
-  	// Setters
-  	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	
     	if(Debug.isEnabled) {
-    		databaseHelper.printInvitationCodesTable();
+    		try {
+    			invitationService.printInvitationCodesTable();
+    		} catch(SQLException e) {
+    			System.err.println("Database error: " + e.getMessage());
+                e.printStackTrace();
+    		}
     	}
     }
     
@@ -78,17 +87,17 @@ public class SetupAccountPageController {
             
             try {
             	// Check if the user already exists
-            	if(!userDBManager.doesUserExist(userName)) {
+            	if(!userService.doesUserExistByName(userName)) {
             		
             		// Validate the invitation code
-            		if(databaseHelper.validateInvitationCode(code)) {
+            		if(invitationService.validateInvitationCode(code)) {
             			// Create a new user and register them in the database
 		            	User user = new User(userName, password, User.Role.student);
 		            	UserSession userSession = new UserSession(user);
                   
 		            	// TODO: - One of these doesn't belong.
 		            	//User user = new User(userName, password, databaseHelper.getRoleFromInviteCode(code));
-		            	userDBManager.register(user);
+		            	userService.register(user);
 		                
 		             // Navigate to the Welcome Login Page
 		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
@@ -104,9 +113,7 @@ public class SetupAccountPageController {
             } catch (SQLException e) {
                 System.err.println("Database error: " + e.getMessage());
                 e.printStackTrace();
-            } finally {
-            	databaseHelper.closeConnection();
-            }
+            } 
         });
 	}
 }

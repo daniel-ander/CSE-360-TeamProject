@@ -6,12 +6,15 @@ import javafx.scene.layout.*;
 
 public class ForumListView {
     private final BorderPane borderpane;
+    
     private final ListView<Question> forumListView;
+    
     private final Button addQuestionButton;
     private final Button editQuestionButton;
     private final Button deleteQuestionButton;
     private final Button returnButton;
 	private final Button viewQuestionButton;
+	
 	private final TextArea textInputArea;
 
     public ForumListView() {

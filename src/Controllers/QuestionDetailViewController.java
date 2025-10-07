@@ -1,48 +1,53 @@
 package Controllers;
 
 import Models.Answer;
-import Models.AnswerRepository;
 import Models.Question;
-import Models.QuestionRepository;
+import Sessions.UserSession;
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
-import Utils.GeneratePostId;
-import databasePart1.DBConnectionStore;
-import databasePart1.IDatabaseHelper;
+
+import java.sql.SQLException;
+
+import Database.DBConnectionStore;
+
+import Database.Services.Interfaces.IAnswerService;
+import Database.Services.Interfaces.IQuestionService;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class QuestionDetailViewController {
-    private final IDatabaseHelper databaseHelper;
-    private final DBConnectionStore dBConnectionStore;
+    private final DBConnectionStore dbConnectionStore;
 	private final QuestionDetailView view;
     private final Question question;
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answersRepo;
+    private final IQuestionService questionService;
+    private final IAnswerService answerService;
     private final Stage primaryStage;
-	private String currentUser;
+    private final UserSession userSession;
 
     public QuestionDetailViewController(
             DBConnectionStore dBConnectionStore,
             Stage primaryStage, 
-            QuestionDetailView view,
             Question question,
-            QuestionRepository questionRepository,
-            AnswerRepository answersRepo,
-            String currentUser
+            UserSession userSession,
+            QuestionDetailView view
     ) {
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.dBConnectionStore = dBConnectionStore;
+        this.dbConnectionStore = dBConnectionStore;
+        this.questionService = dBConnectionStore.getQuestionService();
+        this.answerService = dBConnectionStore.getAnswerService();
+        
+        this.primaryStage = primaryStage;
 		this.view = view;
         this.question = question;
-        this.answersRepo = answersRepo;
-        this.primaryStage = primaryStage;
-		this.questionRepository = questionRepository;
-		this.currentUser = currentUser;
+
+		this.userSession = userSession;
         wire();
         refreshAnswers();
     }
+    
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
 
     private void wire() {
         // Show selected question at the top
@@ -55,15 +60,15 @@ public class QuestionDetailViewController {
         		System.out.println("Answer text cannot be empty or placeholder.");
         		return;
         	}
-            Answer a = new Answer(
-                databaseHelper.getNextForumPostId(), // Assuming a method to get next ID
-                question.getId(),
-                text,
-                true, // adding this to match the constructor, probably need to check correctness here in reality?
-                currentUser
-
-            );
-            answersRepo.addAnswer(a);
+        	try {
+        		answerService.addAnswer(question.getId(), userSession.currentUser().getId(), text);
+        	} catch (SQLException exception) {
+        		// TODO: - Deal with answer not being able to be added
+                System.err.println("Database error: " + exception.getMessage());
+                exception.printStackTrace();
+            }
+        	
+        	
             refreshAnswers();
         });
 
@@ -80,16 +85,24 @@ public class QuestionDetailViewController {
         view.getDeleteAnswerButton().setOnAction(e -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
             if (sel != null) {
-                answersRepo.deleteAnswer(sel.getId());
-                refreshAnswers();
+            	try {
+            		answerService.deleteAnswer(sel.getId());
+            		refreshAnswers();
+            	} catch (SQLException exception) {
+            		// TODO: - Deal with answer not being able to be deleted
+                    System.err.println("Database error: " + exception.getMessage());
+                    exception.printStackTrace();
+                }
+                
             }
         });
 
         // Back to ForumListView (new scene, same as other buttons)
         view.getBackButton().setOnAction(e -> {
             ForumListView forumView = new ForumListView();
+
             ForumListViewController forumController =
-                new ForumListViewController(dBConnectionStore, forumView, questionRepository, answersRepo, primaryStage, currentUser);
+                new ForumListViewController(dbConnectionStore, primaryStage, userSession, new ForumListView());
 
             Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
             primaryStage.setScene(forumScene);
@@ -108,7 +121,13 @@ public class QuestionDetailViewController {
     }
 
     private void refreshAnswers() {
-    	view.getAnswerList().setItems(
-    			FXCollections.observableArrayList(answersRepo.getAll()));
+    		try {
+    			view.getAnswerList().setItems(
+    					FXCollections.observableArrayList(answerService.getAllAnswers()));
+    		} catch (SQLException exception) {
+    			// TODO: - Deal with answer not being able to be fetched
+    			System.err.println("Database error: " + exception.getMessage());
+                exception.printStackTrace();
+    		}
     }
 }

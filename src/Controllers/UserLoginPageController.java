@@ -4,6 +4,9 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+import Database.*;
+
+import Database.Services.Interfaces.IUserService;
 import Models.User;
 
 import Sessions.UserSession;
@@ -15,8 +18,6 @@ import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 
-import databasePart1.*;
-
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.
  * It validates the user's credentials and navigates to the appropriate page upon successful login.
@@ -24,7 +25,7 @@ import databasePart1.*;
 public class UserLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IUserDBManager userDBManager;
+    private final IUserService userService;
     
     private final Stage primaryStage;
     private final UserLoginPage view;
@@ -36,7 +37,7 @@ public class UserLoginPageController {
 
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userService = dBConnectionStore.getUserService();
         this.view = view;
         this.primaryStage = primaryStage;
         
@@ -52,6 +53,9 @@ public class UserLoginPageController {
     
     // TODO: set it up so each stroke updates field variables
     
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(a -> {
@@ -81,12 +85,11 @@ public class UserLoginPageController {
 	            
 	            //new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
-	            String roleString = userDBManager.getUserRole(userNameFieldText);
-	            User.Role role = User.roleFromString(roleString);
+	            User.Role role = userService.getUserRole(user.getUserName());
 	            
 	            if (role != null) {
 	                user.setRole(role);
-	                if (userDBManager.login(user)) {
+	                if (userService.doesUserExistByName(user.getUserName())) {
 	                	if (resetPasswordFlag) {
 	                	    new ResetPasswordPopup();
 	                	} else {
@@ -116,7 +119,7 @@ public class UserLoginPageController {
                 return;
             }
             try {
-            	userDBManager.updatePassword(userNameFieldText, newPass);
+            	userService.resetPasswordForUser(userNameFieldText);
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
             } catch (SQLException ex) {

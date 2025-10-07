@@ -1,5 +1,6 @@
 package Controllers;
 
+import Database.*;
 import Sessions.UserSession;
 
 import UI.Pages.ReviewerHomePage;
@@ -7,9 +8,6 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
-
-import databasePart1.*;
-
 import javafx.stage.Stage;
 
 /**
@@ -49,8 +47,8 @@ public class ReviewerHomePageController {
         }
 	}
 	
-    // ===================
- 	// Setters
+	// ===================
+    // 		 SETTERS 
  	// ===================
 	
 	private void setLogoutButtonAction() {

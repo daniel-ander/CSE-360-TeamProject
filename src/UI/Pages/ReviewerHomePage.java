@@ -1,6 +1,7 @@
 package UI.Pages;
 
 
+import UI.Interfaces.IPage;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,7 +12,7 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 
-public class ReviewerHomePage {
+public class ReviewerHomePage implements IPage {
 	private final VBox layout = new VBox();
 	private final Scene scene = new Scene(layout, 800, 400);
 	private final Label userLabel = new Label();
@@ -27,8 +28,8 @@ public class ReviewerHomePage {
     }
 	
 	// ===================
-   	// Getters
-   	// ===================
+    // 		 GETTERS 
+ 	// ===================
 	
 	public VBox getLayout() {
 		return layout;
@@ -47,8 +48,8 @@ public class ReviewerHomePage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     public void setUserLabel(String text) {
     	userLabel.setText("Hello, " + text + "!");

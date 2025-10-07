@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import UI.Interfaces.IPage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -9,7 +10,7 @@ import javafx.stage.Stage;
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
  */
-public class SetupAccountPage {
+public class SetupAccountPage implements IPage{
 	private final VBox layout = new VBox(10);
 	private final Scene scene = new Scene(layout, 800, 400);
 	private final TextField userNameField = new TextField();
@@ -25,9 +26,9 @@ public class SetupAccountPage {
     	);
     }
 	    
-    // ===================
-   	// Getters
-   	// ===================
+	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public Button getSetupButton() {
     	return setupButton;
@@ -46,8 +47,8 @@ public class SetupAccountPage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     public void setErrorMessage(String text) {
     	errorLabel.setText(text);

@@ -2,6 +2,7 @@ package UI.Pages;
 
 import java.util.*;
 
+import UI.Interfaces.IPage;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
@@ -12,7 +13,7 @@ import javafx.stage.Stage;
  * displays a simple welcome message for the admin.
  */
 
-public class AdminHomePage {
+public class AdminHomePage implements IPage {
 	/**
 	 * Displays the admin page in the provided primary stage.
 	 * 
@@ -54,8 +55,8 @@ public class AdminHomePage {
     }
 	
 	// ===================
-	// Getters
-	// ===================
+    // 		 GETTERS 
+ 	// ===================
 	
 	public ComboBox<String> getUserDropdown() {
 		return userDropDown;
@@ -110,8 +111,8 @@ public class AdminHomePage {
 	}
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
 	
 	public void setTempPasswordInfoLabel(String text) {
 		tempPasswordInfoLabel.setText(text);

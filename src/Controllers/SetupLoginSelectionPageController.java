@@ -1,11 +1,9 @@
 package Controllers;
 
+import Database.*;
 import UI.Pages.SetupAccountPage;
 import UI.Pages.SetupLoginSelectionPage;
 import UI.Pages.UserLoginPage;
-
-import databasePart1.*;
-
 import javafx.stage.Stage;
 
 /**
@@ -33,8 +31,8 @@ public class SetupLoginSelectionPageController {
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(a -> {

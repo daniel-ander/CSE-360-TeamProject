@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import UI.Interfaces.IPage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -13,7 +14,7 @@ import javafx.stage.Stage;
  * The invitation code is displayed upon clicking a button.
  */
 
-public class InvitationPage {
+public class InvitationPage implements IPage {
 
 	/**
      * Displays the Invite Page in the provided primary stage.
@@ -43,8 +44,8 @@ public class InvitationPage {
     }
     
     // ===================
-   	// Getters
-   	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public Button getShowCodeButton() {
     	return showCodeButton;
@@ -75,8 +76,8 @@ public class InvitationPage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     
     public void setInitialLayout(Stage primaryStage) {
