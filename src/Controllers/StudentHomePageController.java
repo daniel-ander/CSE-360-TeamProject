@@ -49,7 +49,7 @@ public class StudentHomePageController {
  	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
     		userSession.setLoggedStatus(false);
 	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
@@ -57,7 +57,7 @@ public class StudentHomePageController {
     }
     
     private void setChangeRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
+    	view.getChangeRolesButton().setOnAction(_ -> {
     		// TODO: -- Something weird happening here. Might need to make a DB call to update roles
 	    	// Return to welcome page
 //	    	String roleString = userDBManager.getUserRole(userSession.getUsername());
@@ -69,7 +69,7 @@ public class StudentHomePageController {
 	    });
     }
     private void setEnterForumButtonAction() {
-		view.getEnterForumButton().setOnAction(a -> {
+		view.getEnterForumButton().setOnAction(_ -> {
 	    	// Enter the forum page
 	    	new ForumPageController(dBConnectionStore, primaryStage, userSession, new ForumPage());
 	    });

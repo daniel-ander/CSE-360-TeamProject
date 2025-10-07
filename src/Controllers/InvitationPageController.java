@@ -1,11 +1,9 @@
 package Controllers;
 
-
-import java.sql.SQLException;
-
 import Database.*;
 
 import Database.Services.Interfaces.IInvitationService;
+import Exceptions.DBExceptions.DataAccessException;
 import UI.Pages.InvitationPage;
 import javafx.stage.Stage;
 
@@ -47,7 +45,7 @@ public class InvitationPageController {
     }
     
     private void setShowCodeButtonAction() {
-		view.getShowCodeButton().setOnAction(a -> {
+		view.getShowCodeButton().setOnAction(_ -> {
 			StringBuilder selectedRoles = new StringBuilder();
         	if (view.isAdminCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
         	if (view.isStudentCheckBoxSelected()) selectedRoles.append("1"); else selectedRoles.append("0");
@@ -58,8 +56,9 @@ public class InvitationPageController {
         	try {
         		String invitationCode = invitationService.generateInvitationCode(selectedRoles.toString());
         		view.getInviteCodeLabel().setText(invitationCode);
-        	} catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
+        	} catch (DataAccessException e) {
+        		// TODO: - Handle invitation code generation failure
+                System.err.println(e.getMessage());
                 e.printStackTrace();
             }
 		});

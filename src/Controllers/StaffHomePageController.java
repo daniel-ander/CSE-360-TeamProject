@@ -1,10 +1,9 @@
 package Controllers;
 
-import java.sql.SQLException;
-
 import Database.*;
-import Database.Repositories.Interfaces.IUserRepository;
+
 import Database.Services.Interfaces.IUserService;
+import Exceptions.DBExceptions.DataAccessException;
 import Models.User;
 
 import Sessions.UserSession;
@@ -24,7 +23,6 @@ public class StaffHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
-	private final IUserService userService;
 	
 	private final Stage primaryStage;
 	private final StaffHomePage view;
@@ -32,7 +30,6 @@ public class StaffHomePageController {
 	
 	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StaffHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userService = dBConnectionStore.getUserService();
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
@@ -52,22 +49,21 @@ public class StaffHomePageController {
  	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
 	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
     }
     
     private void setChangeToRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
+    	view.getChangeRolesButton().setOnAction(_ -> {
     		try {
-		    	User.Role role = userService.getUserRole(userSession.getCurrentUserName());
+//		    	User.Role role = userService.getUserRole(userSession.getCurrentUserName());
+//		    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
 		    	
-		    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
-		    	
-		    	// TODO: - Definitely some logic needs to be done 
-    		} catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+		    	// TODO: - SQL + Model + (UI Logic?)
+    		} catch (DataAccessException e) {
+	            System.err.println(e.getMessage());
 	            e.printStackTrace();
 	        }
 	    	// Return to welcome page

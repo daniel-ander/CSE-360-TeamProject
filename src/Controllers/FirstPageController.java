@@ -31,7 +31,7 @@ public class FirstPageController {
  	// ===================
     
     private void setContinueButtonAction() {
-		view.getContinueButton().setOnAction(a -> {
+		view.getContinueButton().setOnAction(_ -> {
 			new AdminSetupPageController(dBConnectionStore, primaryStage, new AdminSetupPage());
 		});
 	}

@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import Exceptions.UserDBExceptions.*;
+import Exceptions.DBExceptions.*;
 
 import Database.Repositories.Interfaces.IUserRepository;
 import Database.Services.Interfaces.IUserService;
@@ -29,12 +29,15 @@ public class UserService implements IUserService {
 	
 	@Override
 	
-	public void register(User user) throws SQLException, DuplicateUserException {
+	public void register(User user) throws DataAccessException, DuplicateRecordIDException {
 		if(doesUserExistByName(user.getUserName())) {
-			throw new DuplicateUserException("A user with that user name already exists.");
-		} else {
-			int newUserId = userRepository.insertNewUser(user);
-			
+			throw new DuplicateRecordIDException("A user with this id already exists.");
+		} 
+		
+		try {
+			userRepository.insertNewUser(user);
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not register user by username: " + user.getUserName() + " from the database due to: " + e);
 		}
 	}
 	
@@ -44,14 +47,24 @@ public class UserService implements IUserService {
 
 	// Validates a user's login credentials.
 	@Override
-	public boolean performLogin(User user) throws SQLException {
-		return userRepository.doesUserExist(user);
+	public boolean performLogin(User user) throws DataAccessException {
+		try {
+			return userRepository.doesUserExist(user);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not log in due to: " + e);
+		}
 	}
 
 	// Checks if a user already exists in the database based on their userName.
 	@Override
-	public boolean doesUserExistByName(String userName) throws SQLException {
-		return userRepository.doesUserExistByName(userName);
+	public boolean doesUserExistByName(String userName) throws DataAccessException {
+		try {
+			return userRepository.doesUserExistByName(userName);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not log in due to: " + e);
+		}
 	}
 	
 	// ===================
@@ -59,13 +72,18 @@ public class UserService implements IUserService {
  	// ===================
 	
 	@Override
-	public User.Role getUserRole(String userName) throws SQLException {
-		String roleString = userRepository.getUserRole(userName);
-		return User.roleFromString(roleString);
+	public User.Role getUserRole(String userName) throws DataAccessException {
+		try {
+			String roleString = userRepository.getUserRole(userName);
+			return User.roleFromString(roleString);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get user by user name: " + userName + " due to: " + e);
+		}
 	}
 	
 	@Override
-	public void updateUserRole(String userName, User.Role newRole) throws SQLException {
+	public void updateUserRole(String userName, User.Role newRole) throws DataAccessException {
 		// Normalize, de-dup, and join
 		
 		// NOTE: - Logic relevant only if we're doing multiple roles
@@ -78,18 +96,28 @@ public class UserService implements IUserService {
 //	        }
 //	    }
 //	    String roleString = String.join(",", norm); // empty string means “no roles”
-		userRepository.updateUserRole(userName, newRole.name());
+		try {
+			userRepository.updateUserRole(userName, newRole.name());
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not log in due to: " + e);
+		}
 	}
 	
 	@Override
-	public List<String> getAllUsernames() throws SQLException {
-		return userRepository.getAllUsernames();
+	public List<String> getAllUsernames() throws DataAccessException {
+		try {
+			return userRepository.getAllUsernames();
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get user names due to: " + e);
+		}
 	}
 	
 	
 	
 	@Override
-	public String resetPasswordForUser(String userName) throws SQLException {
+	public String updatePasswordForUser(String userName) throws DataAccessException {
 		Random rand = new Random();
 
 	    String lowers   = "abcdefghijklmnopqrstuvwxyz";
@@ -111,8 +139,13 @@ public class UserService implements IUserService {
 	    for (char c : tail) sb.append(c);
 	    String tempPass = sb.toString();            // total length = 8
 	    
-	    String newPass = userRepository.updatePasswordForUser(userName, tempPass);
-	    return newPass;
+	    try {
+	    	String newPass = userRepository.updatePasswordForUser(userName, tempPass);
+		    return newPass;
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get user names due to: " + e);
+		}
 	}
 	
 	// ===================
@@ -120,7 +153,7 @@ public class UserService implements IUserService {
  	// ===================
 
 	@Override
-	public boolean deleteUser(String currentUserName, String targetUserName) throws SQLException {
+	public boolean deleteUser(String currentUserName, String targetUserName) throws DataAccessException {
 	    // Prevent an admin from deleting their own account
 	    if (currentUserName.equals(targetUserName)) {
 	        User.Role currentRole = getUserRole(currentUserName);
@@ -132,14 +165,22 @@ public class UserService implements IUserService {
 	    }
 	    
 	    // If above check passes, proceed to delete user
-	    userRepository.deleteUser(targetUserName);  // May throw SQLException
-	    
-	    return true;  // If no exception thrown, delete was successful
+	    try {
+	    	return userRepository.deleteUser(targetUserName);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not delete user due to: " + e);
+		}
 	}
 	
 	@Override
-	public void printUsersTable() throws SQLException {
-		userRepository.printAllRows();
+	public void printUsersTable() throws DataAccessException {
+		try {
+			userRepository.printAllRows();
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not print user table due to: " + e);
+		}
 	}
 	
 

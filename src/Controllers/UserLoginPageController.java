@@ -2,16 +2,15 @@ package Controllers;
 
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
-
 import Database.*;
 
 import Database.Services.Interfaces.IUserService;
+import Exceptions.DBExceptions.DataAccessException;
 import Models.User;
 
 import Sessions.UserSession;
 
-import UI.Elements.ResetPasswordPopup;
+import UI.Elements.ResetPasswordPopupView;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 import Utils.Debug;
@@ -29,7 +28,7 @@ public class UserLoginPageController {
     
     private final Stage primaryStage;
     private final UserLoginPage view;
-    private final ResetPasswordPopup resetPasswordPopupView = new ResetPasswordPopup();
+    private final ResetPasswordPopupView resetPasswordPopupView = new ResetPasswordPopupView();
     
  // --- Retrieve user inputs ---
     private String userNameFieldText = "";
@@ -58,7 +57,7 @@ public class UserLoginPageController {
  	// ===================
     
     private void setLoginButtonAction() {
-    	view.getLoginButton().setOnAction(a -> {
+    	view.getLoginButton().setOnAction(_ -> {
 	        // --- Flags ---
 	        boolean resetPasswordFlag = passwordFieldText.length() > 2 && passwordFieldText.startsWith("R_");
 	        
@@ -91,7 +90,7 @@ public class UserLoginPageController {
 	                user.setRole(role);
 	                if (userService.doesUserExistByName(user.getUserName())) {
 	                	if (resetPasswordFlag) {
-	                	    new ResetPasswordPopup();
+	                	    new ResetPasswordPopupView();
 	                	} else {
 	                		new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	                	}
@@ -101,15 +100,16 @@ public class UserLoginPageController {
 	            } else {
 	            	view.setErrorLabelText("User account doesn't exist");
 	            }
-	        } catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+	        } catch (DataAccessException e) {
+	        	// TODO: - Handle the potential DB failures in the try clause
+	            System.err.println(e.getMessage());
 	            e.printStackTrace();
 	        }
 	    });
 	}
     
     private void setSubmitButtonResetPasswordPopupAction() {
-    	resetPasswordPopupView.getSubmitButton().setOnAction(ev -> {
+    	resetPasswordPopupView.getSubmitButton().setOnAction(_ -> {
     		userNameFieldText = view.getUsernameField().getText();
     		passwordFieldText = view.getPasswordField().getText();
 	        
@@ -119,11 +119,12 @@ public class UserLoginPageController {
                 return;
             }
             try {
-            	userService.resetPasswordForUser(userNameFieldText);
+            	userService.updatePasswordForUser(userNameFieldText);
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
-            } catch (SQLException ex) {
-            	resetPasswordPopupView.setFeedbackLabelText("Database error: " + ex.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the case where the user password could not be updated
+            	resetPasswordPopupView.setFeedbackLabelText(e.getMessage());
             }
         });
     }
@@ -136,7 +137,7 @@ public class UserLoginPageController {
     
     private void setDebugEnvironment() {
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
- 		view.getAdminInfoAutoFillButton().setOnAction(a -> {
+ 		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
  			view.getUsernameField().setText("admin");
  			view.getPasswordField().setText("Password1!");
  		});

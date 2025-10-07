@@ -80,15 +80,6 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean updateQuestion(int id, String newText) throws SQLException {
-		if (newText == null || newText.trim().isEmpty()) {
-		    throw new IllegalArgumentException("Question text cannot be empty.");
-		}
-		
-		Question q = getQuestionById(id);
-		if (q == null) {
-			return false;
-		}
-		q.setText(newText);
 		// TODO: - Perform query
 		return false;
 	}

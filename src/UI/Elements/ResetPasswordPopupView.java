@@ -5,7 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ResetPasswordPopup {
+public class ResetPasswordPopupView {
 	Stage resetStage = new Stage();
 	
 	VBox layout = new VBox();

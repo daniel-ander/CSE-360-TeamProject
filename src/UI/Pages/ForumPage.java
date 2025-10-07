@@ -1,7 +1,7 @@
 package UI.Pages;
 
 import UI.Elements.ForumListView;
-import UI.Interfaces.IPage;
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 /**
  * ForumPage displays the forum list with a header containing user info and controls.
  */
-public class ForumPage implements IPage {
+public class ForumPage implements IInitializable {
 
     private final BorderPane root = new BorderPane();
 

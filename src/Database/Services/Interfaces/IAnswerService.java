@@ -10,7 +10,6 @@ public interface IAnswerService {
 	public List<Answer> getAllAnswersForQuestion(int questionId) throws SQLException;
 	public List<Answer> getCorrectAnswers() throws SQLException;
 	public List<Answer> getAnswersBySearch(String searchString) throws SQLException;
-	public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException;
 	
 	public Answer getAnswerById(int answerId) throws SQLException;
 	public Answer addAnswer(int questionId, int currentUserId, String text) throws SQLException;

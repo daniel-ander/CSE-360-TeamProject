@@ -1,7 +1,7 @@
 package UI.Pages;
 
 
-import UI.Interfaces.IPage;
+import UI.Interfaces.IInitializable;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,7 +12,7 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 
-public class InstructorHomePage implements IPage {
+public class InstructorHomePage implements IInitializable {
 	
 	private final VBox layout = new VBox();
 	private final Scene scene = new Scene(layout, 800, 400);

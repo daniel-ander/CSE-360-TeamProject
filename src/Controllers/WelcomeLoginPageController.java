@@ -8,14 +8,12 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 
-import java.sql.SQLException;
-
 import java.util.ArrayList;
 
 import Database.*;
 
 import Database.Services.Interfaces.IUserService;
-
+import Exceptions.DBExceptions.DataAccessException;
 import UI.Pages.AdminHomePage;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.InvitationPage;
@@ -62,7 +60,7 @@ public class WelcomeLoginPageController {
     
     private void setContinueButtonAction() {
     	// 🎯 Continue button → routes user into their page
-        view.getContinueButton().setOnAction(a -> {
+        view.getContinueButton().setOnAction(_ -> {
             if (roles.isEmpty()) {
                 System.out.println("No roles found for user: " + user.getUserName());
                 return;
@@ -86,13 +84,13 @@ public class WelcomeLoginPageController {
 	}
     
     private void setQuitButtonAction() {
-    	view.getQuitButton().setOnAction(a -> {
+    	view.getQuitButton().setOnAction(_ -> {
             Platform.exit(); // Exit the JavaFX application
         });
     }
     
     private void setInviteButtonAction() {
-    	view.getInviteButton().setOnAction(a -> {
+    	view.getInviteButton().setOnAction(_ -> {
             new InvitationPageController(dBConnectionStore, primaryStage, new InvitationPage());
         });
     	
@@ -110,8 +108,8 @@ public class WelcomeLoginPageController {
     		if(role == User.Role.admin) {
     	    	setInviteButtonAction();
     	    }
-    	} catch(SQLException e) {
-    		System.err.println("Database error: " + e.getMessage());
+    	} catch(DataAccessException e) {
+    		System.err.println(e.getMessage());
             e.printStackTrace();
     	}
     }
@@ -144,6 +142,7 @@ public class WelcomeLoginPageController {
                 new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage());
                 break;
             case "user":
+            	// TODO: - Fix Roles
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
             // Add more roles here as needed, following the same pattern.

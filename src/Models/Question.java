@@ -30,10 +30,11 @@ public class Question {
 	}
 	
 	// ===================
-    // GETTERS
+    // 		GETTERS
  	// ===================
 	
 	public int getId() {return id;}
+	public int getAuthorId() {return authorId;}
 	public String getText() {return text;}
 	public boolean getAnswered() {return answered;}
 	public boolean getResolved() {return resolved;}
@@ -41,7 +42,7 @@ public class Question {
 	
 	
 	// ===================
-    // SETTERS
+    // 		SETTERS
  	// ===================
 	public void setText(String newText) {
 		if (newText == null || newText.strip().isEmpty()) {

@@ -1,6 +1,6 @@
 package UI.Pages;
 
-import UI.Interfaces.IPage;
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -10,7 +10,7 @@ import javafx.stage.Stage;
  * The UserLoginPage class provides a login interface for users to access their accounts.
  * It validates the user's credentials and navigates to the appropriate page upon successful login.
  */
-public class UserLoginPage implements IPage {
+public class UserLoginPage implements IInitializable {
     private final TextField userNameField = new TextField();
     private final PasswordField passwordField = new PasswordField();
     private final Label errorLabel = new Label();

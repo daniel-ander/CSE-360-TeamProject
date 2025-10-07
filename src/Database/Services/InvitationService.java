@@ -9,6 +9,8 @@ import java.util.UUID;
 import Database.Repositories.Interfaces.IInvitationRepository;
 import Database.Services.Interfaces.IInvitationService;
 
+import Exceptions.DBExceptions.*;
+
 public class InvitationService implements IInvitationService {
 	
 	private final IInvitationRepository invitationRepository;
@@ -22,12 +24,17 @@ public class InvitationService implements IInvitationService {
  	// ===================
 	
 	@Override
-	public String generateInvitationCode(String roles) throws SQLException {
-	    String code = roles + "_" + UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
-	    
-	    invitationRepository.insertInvitationCode(code);
-	    
-	    return code;
+	public String generateInvitationCode(String roles) throws DataAccessException {
+		try {
+			// NOTE: - Not sure why this is set up this way
+			String code = roles + "_" + UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
+																					  
+			invitationRepository.insertInvitationCode(code);
+
+			return code;
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to generate an invitation code in the database due to: " + e);
+		}
 	}
 	
 	// ===================
@@ -35,8 +42,8 @@ public class InvitationService implements IInvitationService {
  	// ===================
 	
 	@Override
-	public String getRoleFromInviteCode(String code) throws SQLException {
-		// TODO :- Not sure what this is for
+	public String getRoleFromInviteCode(String code) throws DataAccessException {
+		// TODO :- Write the SQL and implement
 		String roleBits = code.substring(0, code.indexOf('_'));
 		List<String> roles = new ArrayList<>();
 		String[] roleNames = {"admin","student","instructor","staff","reviewer"};
@@ -51,13 +58,21 @@ public class InvitationService implements IInvitationService {
 	}
 	
 	@Override
-	public void printInvitationCodesTable() throws SQLException {
-	    invitationRepository.printInvitationCodesTable();
+	public void printInvitationCodesTable() throws DataAccessException {
+		try {
+			invitationRepository.printInvitationCodesTable();
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not print invitation codes in the database due to: " + e);
+		}
 	}
 	
 	@Override
-	public boolean validateInvitationCode(String code) throws SQLException {
-	    return invitationRepository.validateInvitationCode(code);
+	public boolean validateInvitationCode(String code) throws DataAccessException {
+		try {
+			return invitationRepository.validateInvitationCode(code);
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not validate invitation code in the database due to: " + e);
+		}
 	}
 	
 	// ===================
@@ -65,8 +80,12 @@ public class InvitationService implements IInvitationService {
  	// ===================
 	
 	@Override
-	public void markInvitationCodeAsUsed(String code) throws SQLException {
-	    invitationRepository.markInvitationCodeAsUsed(code);
+	public void markInvitationCodeAsUsed(String code) throws DataAccessException {
+		try {
+			invitationRepository.markInvitationCodeAsUsed(code);
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not mark used invitation code in the database code due to: " + e);
+		}
 	}
 	
 	// ===================

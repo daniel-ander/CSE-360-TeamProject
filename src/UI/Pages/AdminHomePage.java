@@ -2,7 +2,7 @@ package UI.Pages;
 
 import java.util.*;
 
-import UI.Interfaces.IPage;
+import UI.Interfaces.IInitializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
@@ -13,7 +13,7 @@ import javafx.stage.Stage;
  * displays a simple welcome message for the admin.
  */
 
-public class AdminHomePage implements IPage {
+public class AdminHomePage implements IInitializable {
 	/**
 	 * Displays the admin page in the provided primary stage.
 	 * 

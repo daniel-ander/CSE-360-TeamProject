@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IInvitationRepository;
@@ -26,9 +25,9 @@ public class InvitationRepository implements IInvitationRepository {
 	
 	@Override
 	// Generates a new invitation code and inserts it into the database.
-	public boolean insertInvitationCode(String roles) throws SQLException {
+	public boolean insertInvitationCode(String code) throws SQLException {
 		boolean generateInvitationCodeDebug = true;
-	    String code = roles + "_" + UUID.randomUUID().toString().substring(0, 4); // Generate a random 4-character code
+
 	    String query = "INSERT INTO InvitationCodes (code) VALUES (?)";
 	    
 	    try (Connection connection = generalDBManager.getConnection();

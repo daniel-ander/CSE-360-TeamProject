@@ -1,11 +1,11 @@
 package Controllers;
 
-import java.sql.SQLException;
 import java.util.*;
 
 import Database.*;
 
 import Database.Services.Interfaces.IUserService;
+import Exceptions.DBExceptions.DataAccessException;
 import Models.User;
 import Sessions.UserSession;
 
@@ -52,15 +52,16 @@ public class AdminHomePageController {
 		
 		try {
 			users = userService.getAllUsernames();
-		} catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage());
+		} catch (DataAccessException e) {
+			// TODO: - Handle the case if user names can't be fetched
+            System.err.println(e.getMessage());
             e.printStackTrace();
         }
 	}
 	
 	
 	private void setUpdateRolesButtonAction() {
-		view.getSaveRolesButton().setOnAction(a -> {
+		view.getSaveRolesButton().setOnAction(_ -> {
 			selectedDropdownUser = view.getUserDropdown().getValue();
 			if (selectedDropdownUser == null) {
 				return;
@@ -81,24 +82,26 @@ public class AdminHomePageController {
 			try {
 				userService.updateUserRole(selectedDropdownUser, User.Role.admin);
 				System.out.println("Updates Roles for " + selectedDropdownUser + ": " + roles);
-			} catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+			} catch (DataAccessException e) {
+				// TODO: - Handle the case if user role can't be updated
+				System.err.println(e.getMessage());
 	            e.printStackTrace();
 	        }
 		});
 	}
 	
 	private void setSetTempPasswordButtonAction() {
-		view.getSetTempPasswordButton().setOnAction(a -> {
+		view.getSetTempPasswordButton().setOnAction(_ -> {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
             
             String tempPass = null;
             
             try {
-            	tempPass = userService.resetPasswordForUser(selectedUser);
-            } catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+            	tempPass = userService.updatePasswordForUser(selectedUser);
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the case if the user couldn't update their password
+            	System.err.println(e.getMessage());
 	            e.printStackTrace();
 	        }
 
@@ -111,7 +114,7 @@ public class AdminHomePageController {
 	}
 	
 	private void setOnUserDropdownAction() {
-		view.getUserDropdown().setOnAction(a -> {
+		view.getUserDropdown().setOnAction(_ -> {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
             
@@ -119,8 +122,9 @@ public class AdminHomePageController {
             
             try {
             	role = userService.getUserRole(selectedUser);
-            } catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the case if user role can't be fetched
+            	System.err.println(e.getMessage());
 	            e.printStackTrace();
 	            
 	            return;
@@ -133,7 +137,7 @@ public class AdminHomePageController {
             view.setStaffCheckBox(false);
             view.setReviewerCheckBox(false);
 
-            // NOTE :- Again, based on 
+            // NOTE :- Again, it seems like only one role should be available
 //            if (roleStr != null && !roleStr.isEmpty()) {
 //                Set<String> roles = new HashSet<>();
 //                for (String r : roleStr.split(",")) {
@@ -163,7 +167,7 @@ public class AdminHomePageController {
 	}
 	
 	private void setUserDeleteButtonAction() {
-		view.getDeleteUserButton().setOnAction(a -> {
+		view.getDeleteUserButton().setOnAction(_ -> {
             String selectedUser = view.getUserDropdown().getValue();
             if (selectedUser == null) return;
 
@@ -200,8 +204,9 @@ public class AdminHomePageController {
 	                    view.getErrorAlert().setContentText("See logs for details.");
 	                    view.getErrorAlert().showAndWait();
 	                }
-            	} catch (SQLException e) {
-    	            System.err.println("Database error: " + e.getMessage());
+            	} catch (DataAccessException e) {
+            		// TODO: - Handle the case if user names can't be fetched
+            		System.err.println(e.getMessage());
     	            e.printStackTrace();
     	        }
             }
@@ -234,8 +239,9 @@ public class AdminHomePageController {
 	        userService.updateUserRole(selectedUser, User.Role.admin);
 	        System.out.println("Updated Roles for " + selectedUser + ": " + roles);
 	        userService.printUsersTable();
-        } catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage());
+        } catch (DataAccessException e) {
+        	// TODO: - Handle the case if user role couldn't be updated or user table printed
+        	System.err.println(e.getMessage());
             e.printStackTrace();
         }
     

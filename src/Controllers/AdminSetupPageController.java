@@ -1,14 +1,15 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
 import Database.*;
-import Database.Repositories.Interfaces.IUserRepository;
-import Database.Services.Interfaces.IUserService;
-import Models.User;
 
+import Database.Services.Interfaces.IUserService;
+import Exceptions.DBExceptions.DataAccessException;
 import UI.Pages.AdminSetupPage;
 import UI.Pages.UserLoginPage;
 
@@ -54,7 +55,7 @@ public class AdminSetupPageController {
     }
     
     private void setSetupButtonAction() {
-		view.getSetupButton().setOnAction(a -> {
+		view.getSetupButton().setOnAction(_ -> {
 			// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
@@ -78,8 +79,9 @@ public class AdminSetupPageController {
                 
                 // Navigate to the Welcome Login Page
                 new UserLoginPageController(dbConnectionStore, primaryStage, new UserLoginPage());
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the case where user couldn't be registered
+                System.err.println(e.getMessage());
                 e.printStackTrace();
             }
 		});
@@ -87,7 +89,7 @@ public class AdminSetupPageController {
     
     private void setupDebugEnvironment() {
 		view.getAdminAutoFillButton().setText("AutoFill Admin Info (Debug)");
-		view.getAdminAutoFillButton().setOnAction(a -> {
+		view.getAdminAutoFillButton().setOnAction(_ -> {
 	    	view.setUsername("admin");
 	    	view.setPassword("Password1!");
 		});

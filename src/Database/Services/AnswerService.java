@@ -3,16 +3,15 @@ package Database.Services;
 import Models.Answer;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.List;
 
 import Database.Repositories.Interfaces.IAnswerRepository;
 
 import Database.Services.Interfaces.IAnswerService;
+import Exceptions.DBExceptions.*;
 
 public class AnswerService implements IAnswerService {
-	
-	private List<Answer> answers;
 
 	private final IAnswerRepository answerRepository;
 	
@@ -25,10 +24,14 @@ public class AnswerService implements IAnswerService {
  	// ===================
 	
 	@Override
-	public Answer addAnswer(int questionId, int creatorId, String text) throws SQLException {
-		int answerId = answerRepository.insertAnswer(questionId, creatorId, text);
-		
-		return new Answer(answerId, questionId, creatorId, text, false);
+	public Answer addAnswer(int questionId, int creatorId, String text) throws DataAccessException {
+		try {
+			int answerId = answerRepository.insertAnswer(questionId, creatorId, text);
+			
+			return new Answer(answerId, questionId, creatorId, text, false);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to add answer to database due to: " + e);
+		}
 	}
 	
 	// ===================
@@ -36,33 +39,48 @@ public class AnswerService implements IAnswerService {
  	// ===================
 	
 	@Override
-	public List<Answer> getAllAnswers() throws SQLException {
-		return new ArrayList<>(answers);
+	public List<Answer> getAllAnswers() throws DataAccessException {
+		try {
+			return answerRepository.getAll();
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get answers from database due to: " + e);
+		}
 	}
 	
 	@Override
-	public List<Answer> getAllAnswersForQuestion(int questionId) throws SQLException {
-		return answerRepository.getAllAnswersForQuestion(questionId);
+	public List<Answer> getAllAnswersForQuestion(int questionId) throws DataAccessException {
+		try {
+			return answerRepository.getAllAnswersForQuestion(questionId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get answers for question id: " + questionId + " from database due to: " + e);
+		}
 	}
 	
 	@Override
-	public List<Answer> getCorrectAnswers() throws SQLException {
-		return answerRepository.getCorrectAnswers();
+	public List<Answer> getCorrectAnswers() throws DataAccessException {
+		try {
+			return answerRepository.getCorrectAnswers();
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get correct answers from database due to: " + e);
+		}
 	}
 
 	@Override
-	public List<Answer> getAnswersBySearch(String searchString) throws SQLException {
-		return answerRepository.getAnswersBySearch(searchString);
-	}
-
-	@Override
-	public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException {
-		return answerRepository.getAnswersByQuestionId(questionId);
+	public List<Answer> getAnswersBySearch(String searchString) throws DataAccessException {
+		try {
+			return answerRepository.getAnswersBySearch(searchString);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get correct answers from database due to: " + e);
+		}
 	}
 	
 	@Override
-	public Answer getAnswerById(int answerId) throws SQLException {
-		return answerRepository.getAnswerById(answerId);
+	public Answer getAnswerById(int answerId) throws DataAccessException {
+		try {
+			return answerRepository.getAnswerById(answerId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get answer by id: " + answerId + " from database due to: " + e);
+		}
 	}
 	
 	// ===================
@@ -70,7 +88,7 @@ public class AnswerService implements IAnswerService {
  	// ===================
 	
 	@Override
-	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException {
+	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws DataAccessException {
 		if (newText == null || newText.trim().isEmpty()) {
 			throw new IllegalArgumentException("Answer text cannot be empty.");
 		}
@@ -80,7 +98,11 @@ public class AnswerService implements IAnswerService {
 			return false;
 		}
 
-		answerRepository.updateAnswer(id, newText, newCorrect);
+		try {
+			answerRepository.updateAnswer(id, newText, newCorrect);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to update answer in database due to: " + e);
+		}
 		
 		a.setText(newText);
 		a.setIsCorrect(newCorrect);
@@ -93,13 +115,21 @@ public class AnswerService implements IAnswerService {
  	// ===================
 	
 	@Override
-	public boolean deleteAnswer(int id) throws SQLException {
-		return answerRepository.deleteAnswerById(id);
+	public boolean deleteAnswer(int id) throws DataAccessException {
+		try {
+			return answerRepository.deleteAnswerById(id);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to delete answer by id: " + id + " from database due to: " + e);
+		}
 	}
 
 	@Override
-	public boolean deleteByQuestionId(int questionId) throws SQLException {
-		return answerRepository.deleteByQuestionId(questionId);
+	public boolean deleteByQuestionId(int questionId) throws DataAccessException {
+		try {
+			return answerRepository.deleteByQuestionId(questionId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to delete answers with question id: " + questionId + " from database due to: " + e);
+		}
 	}
 
 }

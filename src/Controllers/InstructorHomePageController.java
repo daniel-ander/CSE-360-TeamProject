@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import Database.*;
 import Database.Repositories.Interfaces.IUserRepository;
 import Database.Services.Interfaces.IUserService;
+import Exceptions.DBExceptions.DataAccessException;
 import Models.User;
 
 import Sessions.UserSession;
@@ -52,23 +53,23 @@ public class InstructorHomePageController {
  	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
 	         new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
 	}
     
     private void setChangeRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
+    	view.getChangeRolesButton().setOnAction(_ -> {
     		
     		try {
     			User.Role role = userService.getUserRole(userSession.getCurrentUserName());
-    		} catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+    			// TODO: -- Change role in DB 
+    		} catch (DataAccessException e) {
+	            System.err.println(e.getMessage());
 	            e.printStackTrace();
 	        }
 	    	
-	    	// TODO: -- Change role in DB and in userSession
 	    	// Return to welcome page
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 

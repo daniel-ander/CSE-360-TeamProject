@@ -3,12 +3,14 @@ package Controllers;
 import Models.User;
 
 import javafx.stage.Stage;
-import java.sql.SQLException;
 
 import Database.*;
 
 import Database.Services.Interfaces.IInvitationService;
 import Database.Services.Interfaces.IUserService;
+
+import Exceptions.DBExceptions.DataAccessException;
+
 import Sessions.UserSession;
 
 import UI.Pages.SetupAccountPage;
@@ -25,7 +27,6 @@ import Utils.UserNameRecognizer;
 public class SetupAccountPageController {
 
 	private final DBConnectionStore dBConnectionStore;
-    private final IGeneralDBManager generalDBManager;
     private final IUserService userService;
     private final IInvitationService invitationService;
     private final Stage primaryStage;
@@ -34,7 +35,6 @@ public class SetupAccountPageController {
     // DatabaseHelper to handle database operations.
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.generalDBManager = dBConnectionStore.getGeneralDBManager();
         this.userService = dBConnectionStore.getUserService();
         this.invitationService = dBConnectionStore.getInvitationService();
         this.primaryStage = primaryStage;
@@ -60,26 +60,28 @@ public class SetupAccountPageController {
     	if(Debug.isEnabled) {
     		try {
     			invitationService.printInvitationCodesTable();
-    		} catch(SQLException e) {
-    			System.err.println("Database error: " + e.getMessage());
+    		} catch(DataAccessException e) {
+    			// TODO: - Handle the case where invitation codes table can't be printed
+    			System.err.println(e.getMessage());
                 e.printStackTrace();
     		}
     	}
     }
     
     private void setSetupButtonAction() {
-    	view.getSetupButton().setOnAction(a -> {
+    	view.getSetupButton().setOnAction(_ -> {
     		System.out.println("Button was pressed");
         	// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
             String code = view.getInvitationCodeField().getText();
             
-         // Validate userName and password using FSM classes
+            // Validate userName and password using FSM classes
             if (!UserNameRecognizer.checkForValidUserName(userName)) {
 			    view.setErrorMessage("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 			    return;
-			    }
+			}
+            
             if (!PasswordEvaluator.evaluatePassword(password)) {
             	view.setErrorMessage("Password issues: " + PasswordEvaluator.passwordErrorMessage);
 				return;
@@ -107,11 +109,12 @@ public class SetupAccountPageController {
             		}
             	}
             	else {
-            		view.setErrorMessage("This useruserName is taken!!.. Please use another to setup an account");
+            		view.setErrorMessage("This user name is taken!!.. Please use another to setup an account");
             	}
             	
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the several potential DB call failures
+                System.err.println(e.getMessage());
                 e.printStackTrace();
             } 
         });

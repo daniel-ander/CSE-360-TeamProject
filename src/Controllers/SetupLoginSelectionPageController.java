@@ -35,14 +35,14 @@ public class SetupLoginSelectionPageController {
  	// ===================
     
     private void setSetupButtonAction() {
-		view.getSetupButton().setOnAction(a -> {
+		view.getSetupButton().setOnAction(_ -> {
 			new SetupAccountPageController(dBConnectionStore, primaryStage, new SetupAccountPage());
 		});
 	}
     
     // TODO: -- Fix how user works
     private void setLoginButtonAction() {
-		view.getLoginButton().setOnAction(a -> {
+		view.getLoginButton().setOnAction(_ -> {
 			
 			new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});

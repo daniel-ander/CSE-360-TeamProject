@@ -2,28 +2,27 @@ package Database.Services.Interfaces;
 
 import Models.User;
 
-import java.sql.SQLException;
-
 import java.util.List;
 
-import Exceptions.UserDBExceptions.*;
+import Exceptions.DBExceptions.DataAccessException;
+import Exceptions.DBExceptions.DuplicateRecordIDException;
 
 
 public interface IUserService {
 
-	public void register(User user) throws SQLException, DuplicateUserException;
-	public void printUsersTable() throws SQLException;
-	public void updateUserRole(String userName, User.Role newRole) throws SQLException;
+	public void register(User user) throws DataAccessException, DuplicateRecordIDException;
+	public void printUsersTable() throws DataAccessException;
+	public void updateUserRole(String userName, User.Role newRole) throws DataAccessException;
 	
-	public boolean performLogin(User user) throws SQLException;
-	public boolean doesUserExistByName(String userName) throws SQLException;
-	public boolean deleteUser(String currentUserName, String targetUserName) throws SQLException;
+	public boolean performLogin(User user) throws DataAccessException;
+	public boolean doesUserExistByName(String userName) throws DataAccessException;
+	public boolean deleteUser(String currentUserName, String targetUserName) throws DataAccessException;
 	
-	public User.Role getUserRole(String userName) throws SQLException;
+	public User.Role getUserRole(String userName) throws DataAccessException;
 	
-	public List<String> getAllUsernames() throws SQLException;
+	public List<String> getAllUsernames() throws DataAccessException;
 	
-	public String resetPasswordForUser(String userName) throws SQLException;
+	public String updatePasswordForUser(String userName) throws DataAccessException;
 
 }
 

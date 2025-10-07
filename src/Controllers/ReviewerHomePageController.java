@@ -52,15 +52,15 @@ public class ReviewerHomePageController {
  	// ===================
 	
 	private void setLogoutButtonAction() {
-		view.getLogoutButton().setOnAction(a -> {
+		view.getLogoutButton().setOnAction(_ -> {
 			// Return to login page
-			// TODO: -- Needs to make a logout call to DB
+			// TODO: -- Need to empty UserSession
 	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});
 	}
 	
 	private void setChangeRolesButtonAction() {
-		view.getChangeRolesButton().setOnAction(a -> {
+		view.getChangeRolesButton().setOnAction(_ -> {
 			// Return to welcome page
 			// TODO: -- Needs to be DB call here along with UI update
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());

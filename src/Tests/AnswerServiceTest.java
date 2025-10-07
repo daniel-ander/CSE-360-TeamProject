@@ -8,7 +8,7 @@ import Database.Repositories.AnswerRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AnswerRepositoryTest {
+public class AnswerServiceTest {
 	// CREATE TESTS
 	@Test
 	public void AddAnswer_WithUniqueId_ReturnsSuccesfully() {

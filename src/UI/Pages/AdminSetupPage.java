@@ -2,7 +2,7 @@ package UI.Pages;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import UI.Interfaces.IPage;
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 // This is the page that the first User to login will be sent to. 
 // 
-public class AdminSetupPage implements IPage {
+public class AdminSetupPage implements IInitializable {
 
 	// Input fields for userName and password
     // Label to display error messages

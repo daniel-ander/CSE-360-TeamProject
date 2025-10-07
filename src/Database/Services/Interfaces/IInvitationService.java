@@ -1,14 +1,14 @@
 package Database.Services.Interfaces;
 
-import java.sql.SQLException;
+import Exceptions.DBExceptions.DataAccessException;
 
 public interface IInvitationService {
 
-	public String generateInvitationCode(String roles) throws SQLException;
-	public String getRoleFromInviteCode(String code) throws SQLException;
+	public String generateInvitationCode(String roles) throws DataAccessException;
+	public String getRoleFromInviteCode(String code) throws DataAccessException;
 	
-	public boolean validateInvitationCode(String code) throws SQLException;
+	public boolean validateInvitationCode(String code) throws DataAccessException;
 	
-	public void markInvitationCodeAsUsed(String code) throws SQLException;
-	public void printInvitationCodesTable() throws SQLException;
+	public void markInvitationCodeAsUsed(String code) throws DataAccessException;
+	public void printInvitationCodesTable() throws DataAccessException;
 }

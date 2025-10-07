@@ -1,6 +1,6 @@
 package UI.Pages;
 
-import UI.Interfaces.IPage;
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -17,7 +17,7 @@ import javafx.stage.Stage;
  * - Adds "Invite" button for admins.
  * - Quit button closes DB + exits app.
  */
-public class WelcomeLoginPage implements IPage {
+public class WelcomeLoginPage implements IInitializable {
 	private final VBox layout = new VBox(5);
 	private final Scene scene = new Scene(layout, 800, 400);
 	// Page title / greeting
