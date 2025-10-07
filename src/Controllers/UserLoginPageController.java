@@ -91,6 +91,7 @@ public class UserLoginPageController {
 	            if (role != null) {
 	                user.setRole(role);
 	                if (userService.doesUserExistByName(user.getUserName())) {
+	                	// TODO: - This logic does not validate
 	                	if (resetPasswordFlag) {
 	                	    new ResetPasswordPopupView();
 	                	} else {
