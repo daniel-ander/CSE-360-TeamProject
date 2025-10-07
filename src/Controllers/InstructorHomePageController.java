@@ -1,12 +1,11 @@
 package Controllers;
 
-import java.sql.SQLException;
+import Models.User;
 
 import Database.*;
-import Database.Repositories.Interfaces.IUserRepository;
 import Database.Services.Interfaces.IUserService;
+
 import Exceptions.DBExceptions.DataAccessException;
-import Models.User;
 
 import Sessions.UserSession;
 

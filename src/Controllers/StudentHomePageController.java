@@ -1,8 +1,6 @@
 package Controllers;
+
 import Database.*;
-import Database.Repositories.Interfaces.IUserRepository;
-import Database.Services.Interfaces.IUserService;
-import Models.User;
 
 import Sessions.UserSession;
 
@@ -12,6 +10,7 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
+
 import javafx.stage.Stage;
 
 /**

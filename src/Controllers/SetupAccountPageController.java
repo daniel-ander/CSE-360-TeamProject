@@ -5,7 +5,6 @@ import Models.User;
 import javafx.stage.Stage;
 
 import Database.*;
-
 import Database.Services.Interfaces.IInvitationService;
 import Database.Services.Interfaces.IUserService;
 

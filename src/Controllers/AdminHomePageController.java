@@ -1,12 +1,14 @@
 package Controllers;
 
+import Models.User;
+
 import java.util.*;
 
 import Database.*;
-
 import Database.Services.Interfaces.IUserService;
+
 import Exceptions.DBExceptions.DataAccessException;
-import Models.User;
+
 import Sessions.UserSession;
 
 import javafx.scene.control.ButtonType;

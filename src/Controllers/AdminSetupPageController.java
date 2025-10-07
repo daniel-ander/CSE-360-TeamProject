@@ -4,12 +4,11 @@ import Models.User;
 
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
-
 import Database.*;
-
 import Database.Services.Interfaces.IUserService;
+
 import Exceptions.DBExceptions.DataAccessException;
+
 import UI.Pages.AdminSetupPage;
 import UI.Pages.UserLoginPage;
 

@@ -1,18 +1,20 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.stage.Stage;
 
 import Database.*;
-
 import Database.Services.Interfaces.IUserService;
+
 import Exceptions.DBExceptions.DataAccessException;
-import Models.User;
 
 import Sessions.UserSession;
 
 import UI.Elements.ResetPasswordPopupView;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;

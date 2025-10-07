@@ -11,9 +11,10 @@ import javafx.application.Platform;
 import java.util.ArrayList;
 
 import Database.*;
-
 import Database.Services.Interfaces.IUserService;
+
 import Exceptions.DBExceptions.DataAccessException;
+
 import UI.Pages.AdminHomePage;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.InvitationPage;

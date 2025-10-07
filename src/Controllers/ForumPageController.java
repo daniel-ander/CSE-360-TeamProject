@@ -7,6 +7,7 @@ import Sessions.UserSession;
 import UI.Pages.ForumPage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
+
 import UI.Elements.ForumListView;
 
 import javafx.stage.Stage;

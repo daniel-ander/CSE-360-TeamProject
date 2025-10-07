@@ -2,15 +2,17 @@ package Controllers;
 
 import Models.Answer;
 import Models.Question;
+
 import Sessions.UserSession;
+
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
 
 import java.sql.SQLException;
 
 import Database.DBConnectionStore;
-
 import Database.Services.Interfaces.IAnswerService;
+
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
