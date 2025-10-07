@@ -1,82 +1,103 @@
 package Controllers;
 
 import Models.Question;
-import Models.QuestionRepository;
-import Models.AnswerRepository;
+
+import Sessions.UserSession;
+
+import Database.DBConnectionStore;
+import Database.IGeneralDBManager;
+import Database.Services.Interfaces.IQuestionService;
+
+import Exceptions.DBExceptions.DataAccessException;
+
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
-import databasePart1.DBConnectionStore;
-import databasePart1.IDatabaseHelper;
+
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
 public class ForumListViewController {
 	private final DBConnectionStore dBConnectionStore;
-	private final IDatabaseHelper databaseHelper;
+	private final IGeneralDBManager generalDBManager;
+	private final IQuestionService questionService;
+    private final UserSession userSession;
     private final ForumListView view;
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
     private final Stage primaryStage;
-    private final String currentUser;
 
-    public ForumListViewController(DBConnectionStore dBConnectionStore, ForumListView view, QuestionRepository questionRepository, AnswerRepository answerRepository, Stage primaryStage, String currentUser) {
+    public ForumListViewController(
+    		DBConnectionStore dBConnectionStore, 
+    		Stage primaryStage, 
+    		UserSession userSession, 
+    		ForumListView view
+    	) {
         this.view = view;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.questionRepository = questionRepository;
-        this.answerRepository = answerRepository;
+        this.generalDBManager = dBConnectionStore.getGeneralDBManager();
+        this.questionService = dBConnectionStore.getQuestionService();
+        
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.userSession = userSession;
+
         this.dBConnectionStore = dBConnectionStore;
         
- 	    refresh();
-        setButtonActions();
-        
+        setUpActions();
+        refresh();
     }
-    private void setButtonActions() {
-		setAddQuestionButtonAction();
-		setEditQuestionButtonAction();
-		setDeleteQuestionButtonAction();
-		setViewQuestionButtonAction();
-	}
+    
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void refresh() {
         view.getForumListView().setItems(
-            FXCollections.observableArrayList(questionRepository.getAll())
+            FXCollections.observableArrayList(questionService.getAllQuestions())
         );
     }
     private void setAddQuestionButtonAction() {
         // Add question
-        view.getAddQuestionButton().setOnAction(e -> {
+        view.getAddQuestionButton().setOnAction(_ -> {
         	String text = view.getTextInputArea().getText();
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Question text cannot be empty or placeholder.");
         		return;
         	}
-            Question q = new Question(databaseHelper.getNextForumPostId(), text);
-            q.setAuthor(currentUser);
-            questionRepository.addQuestion(q);
-            refresh();
+            Question q = new Question(
+                generalDBManager.getNextForumPostId(), // Assuming a method to get next ID
+                userSession.currentUser().getId(),
+                text   
+            );
+            try {
+            	questionService.addQuestion(q);
+            } catch (DataAccessException dataAccessException) {
+            	// TODO:- Handle outcome if the question can't be added
+                System.err.println("Database error: " + dataAccessException.getMessage());
+                dataAccessException.printStackTrace();
+            } 
         });
-		
 	}
+    
     private void setEditQuestionButtonAction() {
         // Edit question
-        view.getEditQuestionButton().setOnAction(e -> {
+        view.getEditQuestionButton().setOnAction(_ -> {
+            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            if (selectedQuestion != null) {
+                try {
+                	questionService.deleteQuestion(selectedQuestion.getId());
+                    refresh();
+                } catch (DataAccessException dataAccessException) {
+                	// TODO:- Handle outcome if the question can't be deleted
+                    System.err.println("Database error: " + dataAccessException.getMessage());
+                    dataAccessException.printStackTrace();
+                } 
+            }
+        });
+	}
+    
+    private void setDeleteQuestionButtonAction() {
+    	// TODO: - Work with the DB
+        view.getDeleteQuestionButton().setOnAction(_ -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestion != null) {
                 selectedQuestion.setText("Edited: " + selectedQuestion.getText());
-                refresh();
-            }
-        });
-    	
-    }
-    private void setDeleteQuestionButtonAction() {
-        // Delete question
-        view.getDeleteQuestionButton().setOnAction(e -> {
-            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (selectedQuestion != null) {
-                // Gonna have to pass the answers here too somehow
-                questionRepository.deleteQuestion(selectedQuestion.getId(), answerRepository);
                 refresh();
             }
         });
@@ -84,27 +105,31 @@ public class ForumListViewController {
 	}
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
-        view.getViewQuestionButton().setOnAction(e -> {
+        view.getViewQuestionButton().setOnAction(_ -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            
             if (selectedQuestion != null) {
                 QuestionDetailView detailView = new QuestionDetailView();
-
-
+                
                 new QuestionDetailViewController(
-					dBConnectionStore, // DBConnectionStore not needed here
-					primaryStage,
-					detailView,
-					selectedQuestion,
-					questionRepository,
-					answerRepository,
-					currentUser
-				);
+                		dBConnectionStore,
+                		primaryStage, 
+                		selectedQuestion,
+                		userSession,
+                		new QuestionDetailView()
+                );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
                 System.out.println("Viewing details for Question ID: " + selectedQuestion.getId());
             }
         });
-    	
+	}
+    
+    private void setUpActions() {
+    	setAddQuestionButtonAction();
+    	setDeleteQuestionButtonAction();
+    	setEditQuestionButtonAction();
+    	setViewQuestionButtonAction();
     }
     
 

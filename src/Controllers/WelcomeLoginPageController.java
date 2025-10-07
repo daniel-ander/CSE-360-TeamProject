@@ -1,14 +1,19 @@
 package Controllers;
 
 import Models.User;
+
 import Sessions.UserSession;
-import javafx.scene.control.ChoiceDialog;
+
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
-import javafx.application.Platform;
+import Database.*;
+import Database.Services.Interfaces.IUserService;
+
+import Exceptions.DBExceptions.DataAccessException;
+
 import UI.Pages.AdminHomePage;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.InvitationPage;
@@ -16,7 +21,6 @@ import UI.Pages.ReviewerHomePage;
 import UI.Pages.StaffHomePage;
 import UI.Pages.StudentHomePage;
 import UI.Pages.WelcomeLoginPage;
-import databasePart1.*;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.
@@ -25,20 +29,18 @@ import databasePart1.*;
 public class WelcomeLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IDatabaseHelper databaseHelper;
-    private final IUserDBManager userDBManager;
+    private final IUserService userService;
     private final Stage primaryStage;
     private final WelcomeLoginPage view;
     private final User user;
     private final UserSession userSession;
     
-    String roleStr;
+    String roleString;
     ArrayList<String> roles = new ArrayList<String>();
 
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userService = dBConnectionStore.getUserService();
         this.userSession = userSession;
         
         this.primaryStage = primaryStage;
@@ -52,41 +54,43 @@ public class WelcomeLoginPageController {
         setQuitButtonAction();
     }
     
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setContinueButtonAction() {
     	// 🎯 Continue button → routes user into their page
-        view.getContinueButton().setOnAction(a -> {
-            if (roles.isEmpty()) {
-                System.out.println("No roles found for user: " + user.getUserName());
-                return;
-            }
-            System.out.println("No page mapped for role: " + roles.size());
-            if (roles.size() == 1) {
-                // ✅ CASE 1: Only one role → jump straight in
-                navigateToPage(primaryStage, roles.get(0), user.getUserName());
-            } else {
-                // ✅ CASE 2: Multiple roles → ask which to use
-                ChoiceDialog<String> dialog = new ChoiceDialog<>(roles.get(0), roles);
-                dialog.setTitle("Select Role");
-                dialog.setHeaderText("You have multiple roles");
-                dialog.setContentText("Choose the role to continue with:");
-
-                dialog.showAndWait().ifPresent(selectedRole -> {
-                    navigateToPage(primaryStage, selectedRole, user.getUserName());
-                });
-            }
+        view.getContinueButton().setOnAction(_ -> {
+//            if (roles.isEmpty()) {
+//                System.out.println("No roles found for user: " + user.getUserName());
+//                return;
+//            }
+//            System.out.println("No page mapped for role: " + roles.size());
+//            if (roles.size() == 1) {
+//                // ✅ CASE 1: Only one role → jump straight in
+                navigateToPage(primaryStage, userSession.currentUser().getRole(), user.getUserName());
+//            } else {
+//                // ✅ CASE 2: Multiple roles → ask which to use
+//                ChoiceDialog<String> dialog = new ChoiceDialog<>(roles.get(0), roles);
+//                dialog.setTitle("Select Role");
+//                dialog.setHeaderText("You have multiple roles");
+//                dialog.setContentText("Choose the role to continue with:");
+//
+//                dialog.showAndWait().ifPresent(selectedRole -> {
+//                    navigateToPage(primaryStage, selectedRole, user.getUserName());
+//                });
+//            }
         });
 	}
     
     private void setQuitButtonAction() {
-    	view.getQuitButton().setOnAction(a -> {
-    		databaseHelper.closeConnection();
+    	view.getQuitButton().setOnAction(_ -> {
             Platform.exit(); // Exit the JavaFX application
         });
     }
     
     private void setInviteButtonAction() {
-    	view.getInviteButton().setOnAction(a -> {
+    	view.getInviteButton().setOnAction(_ -> {
             new InvitationPageController(dBConnectionStore, primaryStage, new InvitationPage());
         });
     	
@@ -98,17 +102,16 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	this.roleStr = userDBManager.getUserRole(user.getUserName());
-        
-        if (roleStr != null && !roleStr.isEmpty()) {
-            for (String r : roleStr.split(",")) {
-                roles.add(r.trim().toLowerCase(Locale.ROOT));
-            }
-        }
- 
-       if(roles.contains("admin")) {
-    	   setInviteButtonAction();
-       }
+    	try {
+    		User.Role role = userService.getUserRole(user.getUserName());
+    		
+    		if(role == User.Role.admin) {
+    	    	setInviteButtonAction();
+    	    }
+    	} catch(DataAccessException e) {
+    		System.err.println(e.getMessage());
+            e.printStackTrace();
+    	}
     }
     
     /**
@@ -120,8 +123,8 @@ public class WelcomeLoginPageController {
      * 2. Add checkbox in AdminHomePage if needed.
      * 3. Add a case here → launch NewRoleHomePage.
      */
-    private void navigateToPage(Stage stage, String role, String username) {
-        switch (role) {
+    private void navigateToPage(Stage stage, User.Role role, String username) {
+        switch (role.name()) {
             case "admin":
                 //new AdminHomePageController(databaseHelper, username).show(stage);
             	new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
@@ -139,6 +142,7 @@ public class WelcomeLoginPageController {
                 new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage());
                 break;
             case "user":
+            	// TODO: - Fix Roles
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
             // Add more roles here as needed, following the same pattern.

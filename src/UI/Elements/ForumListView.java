@@ -1,33 +1,29 @@
 package UI.Elements;
 
 import Models.Question;
+
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+
 public class ForumListView {
-    private final BorderPane borderpane;
+	
+    private final BorderPane borderpane = new BorderPane();
+    
     private final ListView<Question> forumListView;
-    private final Button addQuestionButton;
-    private final Button editQuestionButton;
-    private final Button deleteQuestionButton;
-    private final Button returnButton;
-	private final Button viewQuestionButton;
-	private final TextArea textInputArea;
+    
+    private final Button addQuestionButton = new Button("Add Question");
+    private final Button editQuestionButton = new Button("Edit Question");
+    private final Button deleteQuestionButton = new Button("Delete Question");
+    private final Button returnButton = new Button("Back");
+	private final Button viewQuestionButton = new Button("View Question Details");
+	
+	private final TextArea textInputArea = new TextArea("Input text here...");
 
     public ForumListView() {
-        borderpane = new BorderPane();
-
         // ListView in center
         forumListView = new ListView<>();
         borderpane.setCenter(forumListView);
-
-        // Buttons
-        addQuestionButton = new Button("Add Question");
-        viewQuestionButton = new Button("View Question Details");
-        editQuestionButton = new Button("Edit Question");
-        deleteQuestionButton = new Button("Delete Question");
-        returnButton = new Button("Back");
-        textInputArea = new TextArea("Input text here...");
 
         textInputArea.setWrapText(true);
         
@@ -37,12 +33,15 @@ public class ForumListView {
     }
 
     public BorderPane getLayout() { return borderpane; }
+    
     public ListView<Question> getForumListView() { return forumListView; }
+    
     public Button getAddQuestionButton() { return addQuestionButton; }
     public Button getEditQuestionButton() { return editQuestionButton; }
     public Button getDeleteQuestionButton() { return deleteQuestionButton; }
     public Button getViewQuestionButton() { return viewQuestionButton; }
     public Button getReturnButton() { return returnButton; }
+    
     public TextArea getTextInputArea() { return textInputArea; }
 
 }

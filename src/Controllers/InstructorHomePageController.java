@@ -2,6 +2,11 @@ package Controllers;
 
 import Models.User;
 
+import Database.*;
+import Database.Services.Interfaces.IUserService;
+
+import Exceptions.DBExceptions.DataAccessException;
+
 import Sessions.UserSession;
 
 import UI.Pages.InstructorHomePage;
@@ -12,8 +17,6 @@ import Utils.Debug;
 
 import javafx.stage.Stage;
 
-import databasePart1.*;
-
 /**
  * FirstPage class represents the initial screen for the first user.
  * It prompts the user to set up administrator access and navigate to the setup screen.
@@ -22,14 +25,14 @@ public class InstructorHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
-	private final IUserDBManager userDBManager;
+	private final IUserService userService;
 	private final Stage primaryStage;
 	private final InstructorHomePage view;
 	private final UserSession userSession;
 	
 	public InstructorHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, InstructorHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userService = dBConnectionStore.getUserService();
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
@@ -45,22 +48,27 @@ public class InstructorHomePageController {
 	}
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
 	         new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
 	}
     
     private void setChangeRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
-	    	String roleString = userDBManager.getUserRole(userSession.getCurrentUserName());
-	    	User.Role role = User.roleFromString(roleString);
+    	view.getChangeRolesButton().setOnAction(_ -> {
+    		
+    		try {
+    			User.Role role = userService.getUserRole(userSession.getCurrentUserName());
+    			// TODO: -- Change role in DB 
+    		} catch (DataAccessException e) {
+	            System.err.println(e.getMessage());
+	            e.printStackTrace();
+	        }
 	    	
-	    	// TODO: -- Change role in DB and in userSession
 	    	// Return to welcome page
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 

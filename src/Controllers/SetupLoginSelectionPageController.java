@@ -1,10 +1,10 @@
 package Controllers;
 
+import Database.*;
+
 import UI.Pages.SetupAccountPage;
 import UI.Pages.SetupLoginSelectionPage;
 import UI.Pages.UserLoginPage;
-
-import databasePart1.*;
 
 import javafx.stage.Stage;
 
@@ -33,18 +33,18 @@ public class SetupLoginSelectionPageController {
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setSetupButtonAction() {
-		view.getSetupButton().setOnAction(a -> {
+		view.getSetupButton().setOnAction(_ -> {
 			new SetupAccountPageController(dBConnectionStore, primaryStage, new SetupAccountPage());
 		});
 	}
     
     // TODO: -- Fix how user works
     private void setLoginButtonAction() {
-		view.getLoginButton().setOnAction(a -> {
+		view.getLoginButton().setOnAction(_ -> {
 			
 			new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});

@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -9,7 +10,7 @@ import javafx.stage.Stage;
  * The SetupLoginSelectionPage class allows users to choose between setting up a new account
  * or logging into an existing account. It provides two buttons for navigation to the respective pages.
  */
-public class SetupLoginSelectionPage {
+public class SetupLoginSelectionPage implements IInitializable {
 	// Buttons to select Login / Setup options that redirect to respective pages
     private final Button setupButton = new Button("Don't have an account? Setup here");
     private final Button loginButton = new Button("Login");
@@ -24,8 +25,8 @@ public class SetupLoginSelectionPage {
     }
     
     // ===================
-   	// Getters
-   	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public Button getSetupButton() {
     	return setupButton;
@@ -36,8 +37,8 @@ public class SetupLoginSelectionPage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     public void setInitialLayout(Stage primaryStage) {
         layout.getStyleClass().add("layout");

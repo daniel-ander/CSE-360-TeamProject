@@ -1,6 +1,8 @@
 package Controllers;
 
-import Models.User;
+import Database.*;
+
+import Exceptions.DBExceptions.DataAccessException;
 
 import Sessions.UserSession;
 
@@ -9,8 +11,6 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
-
-import databasePart1.*;
 
 import javafx.stage.Stage;
 
@@ -22,7 +22,6 @@ public class StaffHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
-	private final IUserDBManager userDBManager;
 	
 	private final Stage primaryStage;
 	private final StaffHomePage view;
@@ -30,7 +29,6 @@ public class StaffHomePageController {
 	
 	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StaffHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
@@ -46,22 +44,27 @@ public class StaffHomePageController {
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
 	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
     }
     
     private void setChangeToRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
-	    	String roleString = userDBManager.getUserRole(userSession.getCurrentUserName());
-	    	User.Role role = User.roleFromString(roleString);
-	    	
-	    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
+    	view.getChangeRolesButton().setOnAction(_ -> {
+    		try {
+//		    	User.Role role = userService.getUserRole(userSession.getCurrentUserName());
+//		    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
+		    	
+		    	// TODO: - SQL + Model + (UI Logic?)
+    		} catch (DataAccessException e) {
+	            System.err.println(e.getMessage());
+	            e.printStackTrace();
+	        }
 	    	// Return to welcome page
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	    });

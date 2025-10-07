@@ -3,7 +3,12 @@ package Controllers;
 import Models.User;
 
 import javafx.stage.Stage;
-import java.sql.SQLException;
+
+import Database.*;
+import Database.Services.Interfaces.IInvitationService;
+import Database.Services.Interfaces.IUserService;
+
+import Exceptions.DBExceptions.DataAccessException;
 
 import Sessions.UserSession;
 
@@ -14,8 +19,6 @@ import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 
-import databasePart1.*;
-
 /**
  * SetupAccountPage class handles the account setup process for new users.
  * Users provide their userName, password, and a valid invitation code to register.
@@ -23,16 +26,16 @@ import databasePart1.*;
 public class SetupAccountPageController {
 
 	private final DBConnectionStore dBConnectionStore;
-    private final IDatabaseHelper databaseHelper;
-    private final IUserDBManager userDBManager;
+    private final IUserService userService;
+    private final IInvitationService invitationService;
     private final Stage primaryStage;
     private final SetupAccountPage view;
     
     // DatabaseHelper to handle database operations.
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.databaseHelper = dBConnectionStore.getDatabaseHelper();
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userService = dBConnectionStore.getUserService();
+        this.invitationService = dBConnectionStore.getInvitationService();
         this.primaryStage = primaryStage;
         this.view = view;
         
@@ -47,48 +50,70 @@ public class SetupAccountPageController {
      */
     
     // ===================
-  	// Setters
-  	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	
     	if(Debug.isEnabled) {
-    		databaseHelper.printInvitationCodesTable();
+    		try {
+    			invitationService.printInvitationCodesTable();
+    		} catch(DataAccessException e) {
+    			// TODO: - Handle the case where invitation codes table can't be printed
+    			System.err.println(e.getMessage());
+                e.printStackTrace();
+    		}
     	}
     }
     
     private void setSetupButtonAction() {
-    	view.getSetupButton().setOnAction(a -> {
+    	view.getSetupButton().setOnAction(_ -> {
     		System.out.println("Button was pressed");
         	// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
             String code = view.getInvitationCodeField().getText();
             
-         // Validate userName and password using FSM classes
+            // Validate userName and password using FSM classes
             if (!UserNameRecognizer.checkForValidUserName(userName)) {
 			    view.setErrorMessage("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 			    return;
-			    }
+			}
+            
             if (!PasswordEvaluator.evaluatePassword(password)) {
             	view.setErrorMessage("Password issues: " + PasswordEvaluator.passwordErrorMessage);
 				return;
 			}
             
             try {
-            	// Check if the user already exists
-            	if(!userDBManager.doesUserExist(userName)) {
-            		
-            		// Validate the invitation code
-            		if(databaseHelper.validateInvitationCode(code)) {
+            	boolean didFindUser = false;
+            	
+            	try {
+            		didFindUser = userService.doesUserExistByName(userName);
+            	} catch (DataAccessException e) {
+            		// TODO: - Handle the case of not being able to check for user existence
+            		System.err.println(e.getMessage());
+                    e.printStackTrace();
+            	}
+            	
+            	if(!didFindUser) {
+            		boolean didValidateCode = invitationService.validateInvitationCode(code);
+            		try {
+            			didValidateCode = invitationService.validateInvitationCode(code);
+                	} catch (DataAccessException e) {
+                		// TODO: - Handle the case of not being able to validate invitation code
+                		System.err.println(e.getMessage());
+                        e.printStackTrace();
+                	}
+            		if(didValidateCode) {
             			// Create a new user and register them in the database
 		            	User user = new User(userName, password, User.Role.student);
 		            	UserSession userSession = new UserSession(user);
                   
 		            	// TODO: - One of these doesn't belong.
 		            	//User user = new User(userName, password, databaseHelper.getRoleFromInviteCode(code));
-		            	userDBManager.register(user);
+		            	userService.register(user);
 		                
 		             // Navigate to the Welcome Login Page
 		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
@@ -98,15 +123,14 @@ public class SetupAccountPageController {
             		}
             	}
             	else {
-            		view.setErrorMessage("This useruserName is taken!!.. Please use another to setup an account");
+            		view.setErrorMessage("This user name is taken!!.. Please use another to setup an account");
             	}
             	
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the several potential DB call failures
+                System.err.println(e.getMessage());
                 e.printStackTrace();
-            } finally {
-            	databaseHelper.closeConnection();
-            }
+            } 
         });
 	}
 }

@@ -1,21 +1,23 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
+import Database.*;
+import Database.Services.Interfaces.IUserService;
 
-import Models.User;
+import Exceptions.DBExceptions.DataAccessException;
 
 import Sessions.UserSession;
 
-import UI.Elements.ResetPasswordPopup;
+import UI.Elements.ResetPasswordPopupView;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-
-import databasePart1.*;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.
@@ -24,11 +26,11 @@ import databasePart1.*;
 public class UserLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
-    private final IUserDBManager userDBManager;
+    private final IUserService userService;
     
     private final Stage primaryStage;
     private final UserLoginPage view;
-    private final ResetPasswordPopup resetPasswordPopupView = new ResetPasswordPopup();
+    private final ResetPasswordPopupView resetPasswordPopupView = new ResetPasswordPopupView();
     
  // --- Retrieve user inputs ---
     private String userNameFieldText = "";
@@ -36,7 +38,7 @@ public class UserLoginPageController {
 
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
-        this.userDBManager = dBConnectionStore.getUserDatabaseManager();
+        this.userService = dBConnectionStore.getUserService();
         this.view = view;
         this.primaryStage = primaryStage;
         
@@ -52,9 +54,12 @@ public class UserLoginPageController {
     
     // TODO: set it up so each stroke updates field variables
     
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLoginButtonAction() {
-    	view.getLoginButton().setOnAction(a -> {
+    	view.getLoginButton().setOnAction(_ -> {
 	        // --- Flags ---
 	        boolean resetPasswordFlag = passwordFieldText.length() > 2 && passwordFieldText.startsWith("R_");
 	        
@@ -81,14 +86,14 @@ public class UserLoginPageController {
 	            
 	            //new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
-	            String roleString = userDBManager.getUserRole(userNameFieldText);
-	            User.Role role = User.roleFromString(roleString);
+	            User.Role role = userService.getUserRole(user.getUserName());
 	            
 	            if (role != null) {
 	                user.setRole(role);
-	                if (userDBManager.login(user)) {
+	                if (userService.doesUserExistByName(user.getUserName())) {
+	                	// TODO: - This logic does not validate
 	                	if (resetPasswordFlag) {
-	                	    new ResetPasswordPopup();
+	                	    new ResetPasswordPopupView();
 	                	} else {
 	                		new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	                	}
@@ -98,15 +103,16 @@ public class UserLoginPageController {
 	            } else {
 	            	view.setErrorLabelText("User account doesn't exist");
 	            }
-	        } catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+	        } catch (DataAccessException e) {
+	        	// TODO: - Handle the potential DB failures in the try clause
+	            System.err.println(e.getMessage());
 	            e.printStackTrace();
 	        }
 	    });
 	}
     
     private void setSubmitButtonResetPasswordPopupAction() {
-    	resetPasswordPopupView.getSubmitButton().setOnAction(ev -> {
+    	resetPasswordPopupView.getSubmitButton().setOnAction(_ -> {
     		userNameFieldText = view.getUsernameField().getText();
     		passwordFieldText = view.getPasswordField().getText();
 	        
@@ -116,11 +122,12 @@ public class UserLoginPageController {
                 return;
             }
             try {
-            	userDBManager.updatePassword(userNameFieldText, newPass);
+            	userService.updatePasswordForUser(userNameFieldText);
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
-            } catch (SQLException ex) {
-            	resetPasswordPopupView.setFeedbackLabelText("Database error: " + ex.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the case where the user password could not be updated
+            	resetPasswordPopupView.setFeedbackLabelText(e.getMessage());
             }
         });
     }
@@ -133,7 +140,7 @@ public class UserLoginPageController {
     
     private void setDebugEnvironment() {
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
- 		view.getAdminInfoAutoFillButton().setOnAction(a -> {
+ 		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
  			view.getUsernameField().setText("admin");
  			view.getPasswordField().setText("Password1!");
  		});

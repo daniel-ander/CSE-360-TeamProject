@@ -2,6 +2,7 @@ package UI.Pages;
 
 import java.util.*;
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
@@ -12,7 +13,7 @@ import javafx.stage.Stage;
  * displays a simple welcome message for the admin.
  */
 
-public class AdminHomePage {
+public class AdminHomePage implements IInitializable {
 	/**
 	 * Displays the admin page in the provided primary stage.
 	 * 
@@ -54,8 +55,8 @@ public class AdminHomePage {
     }
 	
 	// ===================
-	// Getters
-	// ===================
+    // 		 GETTERS 
+ 	// ===================
 	
 	public ComboBox<String> getUserDropdown() {
 		return userDropDown;
@@ -110,8 +111,8 @@ public class AdminHomePage {
 	}
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
 	
 	public void setTempPasswordInfoLabel(String text) {
 		tempPasswordInfoLabel.setText(text);
@@ -147,6 +148,8 @@ public class AdminHomePage {
 		userDetailsLabel.getStyleClass().add("minor-label");
         tempPasswordInfoLabel.getStyleClass().addAll("auxilary-label", "info-label");
         
+        userDropDown.setPromptText("Select user");
+        
 		roleBox.setStyle(null);
         adminCheckBox.setDisable(true); // Admins can't be un-admined by UI, so disable interaction
 		
@@ -161,7 +164,6 @@ public class AdminHomePage {
 	
 	public void setUserDropDownLayout(List<String> users) {
 		// Create drop down w/ all users names
-		userDropDown.setPromptText("Select user");
 		userDropDown.getItems().addAll(users);
 	}
 	

@@ -1,6 +1,7 @@
 package UI.Pages;
 
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,7 +12,7 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 
-public class InstructorHomePage {
+public class InstructorHomePage implements IInitializable {
 	
 	private final VBox layout = new VBox();
 	private final Scene scene = new Scene(layout, 800, 400);
@@ -28,9 +29,9 @@ public class InstructorHomePage {
     	);
     }
     
-    // ===================
-   	// Getters
-   	// ===================
+	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public Button getLogoutButton() {
     	return logoutButton;
@@ -49,8 +50,8 @@ public class InstructorHomePage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     public void setUserLabel(String text) {
     	userLabel.setText("Hello, " + text + "!");

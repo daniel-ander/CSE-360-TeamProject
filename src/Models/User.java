@@ -7,23 +7,8 @@ package Models;
 public class User {
     private String userName;
     private String password;
+    private int id; // -1 if user isn't in the database yet
     private Role role;
-
-    // Constructor to initialize a new User object with userName, password, and role.
-    public User(String userName, String password, Role role) {
-        this.userName = userName;
-        this.password = password;
-        this.role = role;
-    }
-    
-    // Sets the role of the user.
-    public void setRole(Role role) {
-    	this.role=role;
-    }
-
-    public String getUserName() { return userName; }
-    public String getPassword() { return password; }
-    public Role getRole() { return role; }
     
     public static enum Role {
     	admin,
@@ -32,12 +17,47 @@ public class User {
     	staff,
     	reviewer
     }
+ 
+    public User(String userName, String password, Role role) {
+    	this(-1, userName, password, role);
+    }
     
-    public static Role roleFromString(String value) {
+    public User(int id, String userName, String password, Role role) {
+        this.userName = userName;
+        this.password = password;
+        this.role = role;
+    }
+    
+    // ===================
+    // 		  GETTERS 
+ 	// ===================
+    
+    public String getUserName() { return userName; }
+    public String getPassword() { return password; }
+    public int getId() { return id; }
+    public Role getRole() { return role; }
+    
+    // ===================
+    // 		  SETTERS 
+ 	// ===================
+    
+    // Sets the role of the user.
+    public void setRole(Role role) {
+    	this.role = role;
+    }
+    
+    public void setId(int newId) { this.id = newId; }
+    
+    public static Role roleFromString(String value) {    	
+
     	for(Role role : Role.values()) {
     		if(role.name().equalsIgnoreCase(value))
     			return role;
     	}
+    	
+    	// NOTE/BUG: - This may cause an error if more than one role is selected.
+    	// We need to decide on how we'll handle the roles, but a check box is
+    	// not appropriate when only a single role can be had.
     	
     	throw new IllegalArgumentException("Invalid role: " + value);
     }
