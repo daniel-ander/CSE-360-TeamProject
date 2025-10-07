@@ -39,29 +39,22 @@ public class ForumListViewController {
 
         this.dBConnectionStore = dBConnectionStore;
         
-        setUpAction();
+        setUpActions();
         refresh();
     }
     
     // ===================
     // 		 SETTERS 
- 	  // ===================
-  
-    private void setButtonActions() {
-		setAddQuestionButtonAction();
-		setEditQuestionButtonAction();
-		setDeleteQuestionButtonAction();
-		setViewQuestionButtonAction();
-	}
+ 	// ===================
     
     private void refresh() {
         view.getForumListView().setItems(
-            FXCollections.observableArrayList(questionRepository.getAll())
+            FXCollections.observableArrayList(questionService.getAllQuestions())
         );
     }
     private void setAddQuestionButtonAction() {
         // Add question
-        view.getAddQuestionButton().setOnAction(e -> {
+        view.getAddQuestionButton().setOnAction(_ -> {
         	String text = view.getTextInputArea().getText();
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Question text cannot be empty or placeholder.");
@@ -82,18 +75,9 @@ public class ForumListViewController {
         });
 	}
     
-    private void setDeleteQuestionButtonAction() {
-    	view.getDeleteQuestionButton().setOnAction(_ -> {
-            Question q = new Question(databaseHelper.getNextForumPostId(), text);
-            q.setAuthor(currentUser);
-            questionRepository.addQuestion(q);
-            refresh();
-        });
-		
-	}
     private void setEditQuestionButtonAction() {
         // Edit question
-        view.getEditQuestionButton().setOnAction(e -> {
+        view.getEditQuestionButton().setOnAction(_ -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestion != null) {
                 try {
@@ -108,19 +92,9 @@ public class ForumListViewController {
         });
 	}
     
-    private void setEditQuestionButtonAction() {
-    	// TODO: - DB Call?
-    	view.getAddQuestionButton().setOnAction(_ -> {
-    		Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
-        if (selectedQuestion != null) {
-            selectedQuestion.setText("Edited: " + selectedQuestion.getText());
-            refresh();
-        }
-    	
-    }
     private void setDeleteQuestionButtonAction() {
-        // Delete question
-        view.getDeleteQuestionButton().setOnAction(e -> {
+    	// TODO: - Work with the DB
+        view.getDeleteQuestionButton().setOnAction(_ -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestion != null) {
                 selectedQuestion.setText("Edited: " + selectedQuestion.getText());
@@ -131,7 +105,7 @@ public class ForumListViewController {
 	}
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
-        view.getViewQuestionButton().setOnAction(e -> {
+        view.getViewQuestionButton().setOnAction(_ -> {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             
             if (selectedQuestion != null) {
@@ -151,7 +125,7 @@ public class ForumListViewController {
         });
 	}
     
-    private void setUpAction() {
+    private void setUpActions() {
     	setAddQuestionButtonAction();
     	setDeleteQuestionButtonAction();
     	setEditQuestionButtonAction();
