@@ -3,7 +3,6 @@ package Controllers;
 import java.sql.SQLException;
 import java.util.*;
 
-import Controllers.Interfaces.IPageController;
 import Database.*;
 
 import Database.Services.Interfaces.IUserService;
@@ -15,7 +14,7 @@ import javafx.stage.Stage;
 
 import UI.Pages.AdminHomePage;
 
-public class AdminHomePageController implements IPageController {
+public class AdminHomePageController {
 	private final IUserService userService;
 	private final AdminHomePage view;
 	private final Stage primaryStage;
