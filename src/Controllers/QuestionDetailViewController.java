@@ -36,23 +36,21 @@ public class QuestionDetailViewController {
         this.answerService = dBConnectionStore.getAnswerService();
         
         this.primaryStage = primaryStage;
-		this.view = view;
+		    this.view = view;
         this.question = question;
 
-		this.userSession = userSession;
-		setInitialLayout();
-		
-        wire();
+		    this.userSession = userSession;
+		    setInitialLayout();
+		    
+        setUpAction();
         refreshAnswers();
     }
     
     // ===================
     // 		 SETTERS 
- 	// ===================
-
-    private void wire() {
-        view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText());
-
+ 	  // ===================
+  
+    private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(_ -> {
         	String text = view.getTextInputArea().getText();
@@ -71,7 +69,9 @@ public class QuestionDetailViewController {
         	
             refreshAnswers();
         });
-
+		
+	}
+    private void setEditAnswerButtonAction() {
         // Edit answer
         view.getEditAnswerButton().setOnAction(_ -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
@@ -80,7 +80,9 @@ public class QuestionDetailViewController {
                 refreshAnswers();
             }
         });
-
+    	
+    }
+    private void setDeleteAnswerButtonAction() {
         // Delete answer
         view.getDeleteAnswerButton().setOnAction(_ -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
@@ -96,7 +98,9 @@ public class QuestionDetailViewController {
                 
             }
         });
-
+    }
+  
+    private void setBackButtonAction() {
         // Back to ForumListView (new scene, same as other buttons)
         view.getBackButton().setOnAction(_ -> {
             ForumListView forumView = new ForumListView();
@@ -107,14 +111,24 @@ public class QuestionDetailViewController {
             primaryStage.setScene(forumScene);
             primaryStage.setTitle("Forum Page");
         });
+    }
+  
+    private void setResolveButtonAction() {
         // Mark question as resolved
         view.getResolveButton().setOnAction(_ -> {
-			question.setResolved(true);
-			view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText() + " (Resolved)");
-			question.setText(question.getText() + " (Resolved)");
-		});
-
-
+			  question.setResolved(true);
+			  view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText() + " (Resolved)");
+			  question.setText(question.getText() + " (Resolved)");
+		  });
+		
+	  }
+    
+    private void setUpAction() {
+    	setAddAnswerButtonAction();
+    	setEditAnswerButtonAction();
+    	setDeleteAnswerButtonAction();
+    	setBackButtonAction();
+      setResolveButtonAction();
     }
     
     private void setInitialLayout() {

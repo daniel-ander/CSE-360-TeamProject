@@ -24,6 +24,7 @@ public class StudentHomePageController {
 
 	private final Stage primaryStage;
 	private final StudentHomePage view;
+	private final User user;
 	private final UserSession userSession;
 	
 	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StudentHomePage view) {
@@ -31,6 +32,7 @@ public class StudentHomePageController {
         this.view = view;
         this.primaryStage = primaryStage;
         this.userSession = userSession;
+        this.user = userSession.currentUser();
         
         setInitialLayout();
         

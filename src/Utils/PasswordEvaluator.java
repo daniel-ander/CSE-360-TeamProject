@@ -48,9 +48,9 @@ public class PasswordEvaluator {
 	 * @return					Two lines, the entire input line followed by a line with an up arrow
 	 */
 	
-	private static final boolean DEBUG = false;	// Set to true to get detailed processing information
+	
+
 	private static void displayInputState() {
-		if (!DEBUG) return;  // If not debugging, do not display anything because youre extremely annoying
 		// Display the entire input line
 		System.out.println(inputLine);
 		System.out.println(inputLine.substring(0,currentCharNdx) + "?");
@@ -101,24 +101,29 @@ public class PasswordEvaluator {
 		foundNumericDigit = false;			// Reset the Boolean flag
 		foundLongEnough = false;			// Reset the Boolean flag
 		running = true;						// Start the loop
+		
+		// Debugg information
 
 		// The Directed Graph simulation continues until the end of the input is reached or at some 
 		// state the current character does not match any valid transition
 		while (running) {
-			displayInputState();
+			if (Debug.isEnabled) {
+				displayInputState();
+			}
+
 			// The cascading if statement sequentially tries the current character against all of the
 			// valid transitions
 			if (currentChar >= 'A' && currentChar <= 'Z') {
-				System.out.println("Upper case letter found");
+				if (Debug.isEnabled) System.out.println("Upper case letter found");
 				foundUpperCase = true;
 			} else if (currentChar >= 'a' && currentChar <= 'z') {
-				System.out.println("Lower case letter found");
+				if (Debug.isEnabled) System.out.println("Lower case letter found");
 				foundLowerCase = true;
 			} else if (currentChar >= '0' && currentChar <= '9') {
-				System.out.println("Digit found");
+				if (Debug.isEnabled) System.out.println("Digit found");
 				foundNumericDigit = true;
 			} else if ("~`!@#$%^&*()_-+{}[]|:,.?/".indexOf(currentChar) >= 0) { // changed allowed special characters to those found on the FSM
-				System.out.println("Special character found");
+				if (Debug.isEnabled) System.out.println("Special character found");
 				foundSpecialChar = true;
 			} else {
 				passwordIndexofError = currentCharNdx;
@@ -126,7 +131,7 @@ public class PasswordEvaluator {
 				return false; 													// changed to allow for boolean since its much easier
 			}
 			if (currentCharNdx >= 7) {
-				System.out.println("At least 8 characters found");
+				if (Debug.isEnabled) System.out.println("At least 8 characters found");
 				foundLongEnough = true;
 			}
 			
@@ -136,8 +141,7 @@ public class PasswordEvaluator {
 				running = false;
 			else
 				currentChar = input.charAt(currentCharNdx);
-			
-			System.out.println();
+		
 		}
 		
 		String errMessage = "";
