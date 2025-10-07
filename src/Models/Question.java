@@ -55,6 +55,10 @@ public class Question {
 	public void setAnswered(boolean answeredStatus) {answered = answeredStatus;}
 	public void setDeleted(boolean deletedStatus) {deleted = deletedStatus;}
 	
+	// ===================
+    // 		  UTILS 
+ 	// ===================
+	
 	// this lets the question print out correctly
     @Override
     public String toString() {

@@ -1,7 +1,6 @@
 package Database.Repositories;
 
 import Models.Answer;
-import Models.Question;
 
 import java.sql.SQLException;
 
@@ -19,7 +18,7 @@ public class AnswerRepository implements IAnswerRepository {
 	}
 	
 	// ===================
-    // CREATE Section
+    // 		 CREATE 
  	// ===================
 
 	@Override
@@ -29,7 +28,7 @@ public class AnswerRepository implements IAnswerRepository {
 	}
 	
 	// ===================
-    // READ Section
+    // 		 READ 
  	// ===================
 	
 	@Override
@@ -69,7 +68,7 @@ public class AnswerRepository implements IAnswerRepository {
     }
 	
 	// ===================
-    // UPDATE Section
+    // 		 UPDATE 
  	// ===================
     
 	@Override
@@ -79,7 +78,7 @@ public class AnswerRepository implements IAnswerRepository {
 	}
 	
 	// ===================
-    // DESTROY Section
+    // 		 DESTROY 
  	// ===================
 	
 	@Override

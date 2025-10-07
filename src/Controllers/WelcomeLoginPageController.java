@@ -4,7 +4,6 @@ import Models.User;
 
 import Sessions.UserSession;
 
-import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 
@@ -62,25 +61,25 @@ public class WelcomeLoginPageController {
     private void setContinueButtonAction() {
     	// 🎯 Continue button → routes user into their page
         view.getContinueButton().setOnAction(_ -> {
-            if (roles.isEmpty()) {
-                System.out.println("No roles found for user: " + user.getUserName());
-                return;
-            }
-            System.out.println("No page mapped for role: " + roles.size());
-            if (roles.size() == 1) {
-                // ✅ CASE 1: Only one role → jump straight in
-                navigateToPage(primaryStage, roles.get(0), user.getUserName());
-            } else {
-                // ✅ CASE 2: Multiple roles → ask which to use
-                ChoiceDialog<String> dialog = new ChoiceDialog<>(roles.get(0), roles);
-                dialog.setTitle("Select Role");
-                dialog.setHeaderText("You have multiple roles");
-                dialog.setContentText("Choose the role to continue with:");
-
-                dialog.showAndWait().ifPresent(selectedRole -> {
-                    navigateToPage(primaryStage, selectedRole, user.getUserName());
-                });
-            }
+//            if (roles.isEmpty()) {
+//                System.out.println("No roles found for user: " + user.getUserName());
+//                return;
+//            }
+//            System.out.println("No page mapped for role: " + roles.size());
+//            if (roles.size() == 1) {
+//                // ✅ CASE 1: Only one role → jump straight in
+                navigateToPage(primaryStage, userSession.currentUser().getRole(), user.getUserName());
+//            } else {
+//                // ✅ CASE 2: Multiple roles → ask which to use
+//                ChoiceDialog<String> dialog = new ChoiceDialog<>(roles.get(0), roles);
+//                dialog.setTitle("Select Role");
+//                dialog.setHeaderText("You have multiple roles");
+//                dialog.setContentText("Choose the role to continue with:");
+//
+//                dialog.showAndWait().ifPresent(selectedRole -> {
+//                    navigateToPage(primaryStage, selectedRole, user.getUserName());
+//                });
+//            }
         });
 	}
     
@@ -124,8 +123,8 @@ public class WelcomeLoginPageController {
      * 2. Add checkbox in AdminHomePage if needed.
      * 3. Add a case here → launch NewRoleHomePage.
      */
-    private void navigateToPage(Stage stage, String role, String username) {
-        switch (role) {
+    private void navigateToPage(Stage stage, User.Role role, String username) {
+        switch (role.name()) {
             case "admin":
                 //new AdminHomePageController(databaseHelper, username).show(stage);
             	new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());

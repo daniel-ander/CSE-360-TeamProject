@@ -9,6 +9,7 @@ import java.util.List;
 
 import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IUserRepository;
+import java.sql.Statement;
 
 import java.sql.Connection;
 
@@ -28,24 +29,25 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public int insertNewUser(User user) throws SQLException {
-		// TODO Auto-generated method stub
 		String insertUser = "INSERT INTO cse360users (userName, password, role) VALUES (?, ?, ?)";
+		
 		try (Connection connection = generalDBManager.getConnection(); 
-				PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
+		     PreparedStatement pstmt = connection.prepareStatement(insertUser, Statement.RETURN_GENERATED_KEYS)) {
+
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getRole().name());
 			pstmt.executeUpdate();
-			
+
 			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-		        if (generatedKeys.next()) {
-		            int userId = generatedKeys.getInt(1); 
-		            System.out.println("Inserted user ID: " + userId);
-		            return userId;
-		        } else {
-		            throw new SQLException("Inserting user failed, no ID obtained.");
-		        }
-		    }
+				if (generatedKeys.next()) {
+					int userId = generatedKeys.getInt(1);
+					System.out.println("Inserted user ID: " + userId);
+					return userId;
+				} else {
+					throw new SQLException("Inserting user failed, no ID obtained.");
+				}
+			}
 		}
 	}
 	

@@ -148,6 +148,8 @@ public class AdminHomePage implements IInitializable {
 		userDetailsLabel.getStyleClass().add("minor-label");
         tempPasswordInfoLabel.getStyleClass().addAll("auxilary-label", "info-label");
         
+        userDropDown.setPromptText("Select user");
+        
 		roleBox.setStyle(null);
         adminCheckBox.setDisable(true); // Admins can't be un-admined by UI, so disable interaction
 		
@@ -162,7 +164,6 @@ public class AdminHomePage implements IInitializable {
 	
 	public void setUserDropDownLayout(List<String> users) {
 		// Create drop down w/ all users names
-		userDropDown.setPromptText("Select user");
 		userDropDown.getItems().addAll(users);
 	}
 	

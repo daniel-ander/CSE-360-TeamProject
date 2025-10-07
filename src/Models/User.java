@@ -9,25 +9,6 @@ public class User {
     private String password;
     private int id;
     private Role role;
-
-    // Constructor to initialize a new User object with userName, password, and role.
-    public User(String userName, String password, Role role) {
-        this.userName = userName;
-        this.password = password;
-        this.role = role;
-    }
-    
-    // Sets the role of the user.
-    public void setRole(Role role) {
-    	this.role = role;
-    }
-    
-    public void setId(int newId) { this.id = newId; }
-
-    public String getUserName() { return userName; }
-    public String getPassword() { return password; }
-    public int getId() { return id; }
-    public Role getRole() { return role; }
     
     public static enum Role {
     	admin,
@@ -36,6 +17,33 @@ public class User {
     	staff,
     	reviewer
     }
+
+    // Constructor to initialize a new User object with userName, password, and role.
+    public User(String userName, String password, Role role) {
+        this.userName = userName;
+        this.password = password;
+        this.role = role;
+    }
+    
+    // ===================
+    // 		  GETTERS 
+ 	// ===================
+    
+    public String getUserName() { return userName; }
+    public String getPassword() { return password; }
+    public int getId() { return id; }
+    public Role getRole() { return role; }
+    
+    // ===================
+    // 		  SETTERS 
+ 	// ===================
+    
+    // Sets the role of the user.
+    public void setRole(Role role) {
+    	this.role = role;
+    }
+    
+    public void setId(int newId) { this.id = newId; }
     
     public static Role roleFromString(String value) {    	
 

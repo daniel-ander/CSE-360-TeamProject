@@ -1,6 +1,7 @@
 package Controllers;
 
 import Models.User;
+import Models.User.Role;
 
 import java.util.*;
 
@@ -26,10 +27,10 @@ public class AdminHomePageController {
 	List<String> users;
 
 	/**
-	 * Displays the admin page in the provided primary stage.
-	 * 
-	 * @param primaryStage The primary stage where the scene will be displayed.
+	 * The AdminHomePageController class handles tasks 
+	 * This is intended to be used by the first user to initialize the system with admin credentials.
 	 */
+	
 	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminHomePage view) {
 		this.view = view;
 		this.userService = dBConnectionStore.getUserService();
@@ -54,6 +55,7 @@ public class AdminHomePageController {
 		
 		try {
 			users = userService.getAllUsernames();
+			view.setUserDropDownLayout(users);
 		} catch (DataAccessException e) {
 			// TODO: - Handle the case if user names can't be fetched
             System.err.println(e.getMessage());
@@ -68,17 +70,17 @@ public class AdminHomePageController {
 			if (selectedDropdownUser == null) {
 				return;
 			}
-			List<String> roles = new ArrayList<>();
+			List<User.Role> roles = new ArrayList<>();
 			if (view.isAdminCheckBoxSelected())
-				roles.add("admin");
+				roles.add(User.Role.admin);
 			if (view.isStudentCheckBoxSelected())
-				roles.add("student");
+				roles.add(User.Role.student);
 			if (view.isInstructorCheckBoxSelected())
-				roles.add("instructor");
+				roles.add(User.Role.instructor);
 			if (view.isStaffCheckBoxSelected())
-				roles.add("staff");
+				roles.add(User.Role.staff);
 			if (view.isReviewerCheckBoxSelected())
-				roles.add("reviewer");
+				roles.add(User.Role.reviewer);
 
 			// TODO :- Need to figure out what we're doing with roles
 			try {
