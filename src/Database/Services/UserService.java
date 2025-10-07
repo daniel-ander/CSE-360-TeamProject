@@ -31,7 +31,7 @@ public class UserService implements IUserService {
 	
 	public void register(User user) throws DataAccessException, DuplicateRecordIDException {
 		if(doesUserExistByName(user.getUserName())) {
-			throw new DuplicateRecordIDException("A user with this id already exists.");
+			throw new DuplicateRecordIDException("A user by this user name already exists.");
 		} 
 		
 		try {

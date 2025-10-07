@@ -2,7 +2,7 @@ package Models;
 
 public class Question {
 
-	private int id;
+	private int id; // -1 if question isn't in the database yet
 	private String text;
 	private int authorId;
 	private boolean answered;
@@ -14,6 +14,11 @@ public class Question {
  * added getters: getAuthor, isAnswered, isResolved
  * added setters: setAnswered, setResolved
  * */
+	
+	public Question(int authorId, String text) {
+		this(-1, authorId, text);
+
+	}
 	
 	public Question(int id, int authorId, String text) {
 		if (text == null || text.strip().isEmpty()) {

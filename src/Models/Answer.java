@@ -1,11 +1,15 @@
 package Models;
 
 public class Answer {
-	private int id;
+	private int id; // -1 if answer isn't in the database yet
 	private String text;
 	private boolean isCorrect;
 	private int questionId;
 	private int userId;
+	
+	public Answer(int questionId, int userId, String text, boolean isCorrect) {
+		this(-1, questionId, userId, text, isCorrect);
+	}
 	
 	public Answer(int id, int questionId, int userId, String text, boolean isCorrect) {
 		if (text == null || text.strip().isEmpty()) {

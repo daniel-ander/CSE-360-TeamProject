@@ -87,11 +87,26 @@ public class SetupAccountPageController {
 			}
             
             try {
-            	// Check if the user already exists
-            	if(!userService.doesUserExistByName(userName)) {
-            		
-            		// Validate the invitation code
-            		if(invitationService.validateInvitationCode(code)) {
+            	boolean didFindUser = false;
+            	
+            	try {
+            		didFindUser = userService.doesUserExistByName(userName);
+            	} catch (DataAccessException e) {
+            		// TODO: - Handle the case of not being able to check for user existence
+            		System.err.println(e.getMessage());
+                    e.printStackTrace();
+            	}
+            	
+            	if(!didFindUser) {
+            		boolean didValidateCode = invitationService.validateInvitationCode(code);
+            		try {
+            			didValidateCode = invitationService.validateInvitationCode(code);
+                	} catch (DataAccessException e) {
+                		// TODO: - Handle the case of not being able to validate invitation code
+                		System.err.println(e.getMessage());
+                        e.printStackTrace();
+                	}
+            		if(didValidateCode) {
             			// Create a new user and register them in the database
 		            	User user = new User(userName, password, User.Role.student);
 		            	UserSession userSession = new UserSession(user);
