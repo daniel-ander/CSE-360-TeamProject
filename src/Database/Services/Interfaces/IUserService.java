@@ -25,31 +25,3 @@ public interface IUserService {
 	public String updatePasswordForUser(String userName) throws DataAccessException;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
