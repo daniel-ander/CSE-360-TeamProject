@@ -110,7 +110,7 @@ public class QuestionRepository implements IQuestionRepository {
 				unansweredQuestions.add(q);
 			}
 		}
-		return questions;
+		return unansweredQuestions;
 	}
 	
 	// TODO: Likely need a way to return Answered/Unanswered by User/other characteristics
