@@ -59,7 +59,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 	            + "answered BOOLEAN DEFAULT FALSE, "
 	            + "resolved BOOLEAN DEFAULT FALSE, "
-	            + "softDeleted BOOLEAN DEFAULT FALSE, "
+	            + "isDeleted BOOLEAN DEFAULT FALSE, "
 	            + "upvoteCount INT DEFAULT 0, "
 	            + "FOREIGN KEY (userId) REFERENCES cse360users(id))";
 	    
@@ -71,7 +71,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "body TEXT, "
 	            + "isCorrect BOOLEAN DEFAULT FALSE, "
 	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-	            + "softDeleted BOOLEAN DEFAULT FALSE, "
+	            + "isDeleted BOOLEAN DEFAULT FALSE, "
 	            + "upvoteCount INT DEFAULT 0, "
 	            + "FOREIGN KEY (questionId) REFERENCES ForumQuestions(id), "
 	            + "FOREIGN KEY (parentAnswerId) REFERENCES ForumAnswers(id), "

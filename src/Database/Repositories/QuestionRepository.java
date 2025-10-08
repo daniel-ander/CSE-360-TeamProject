@@ -59,7 +59,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAllQuestions() throws SQLException {
 		List<Question> allQuestions = new ArrayList<>();
-		String getAllQuestions = "SELECT * FROM ForumQuestions";
+		String getAllQuestions = "SELECT * FROM ForumQuestions WHERE isDeleted = FALSE";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -71,7 +71,7 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getString("body"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
-						rs.getBoolean("softDeleted"),
+						rs.getBoolean("isDeleted"),
 						rs.getInt("upvoteCount")
 				);
 				allQuestions.add(q);
