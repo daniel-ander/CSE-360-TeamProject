@@ -67,11 +67,8 @@ public class ForumListViewController {
         		System.out.println("Question text cannot be empty or placeholder.");
         		return;
         	}
-            Question q = new Question(
-                generalDBManager.getNextForumPostId(), // Assuming a method to get next ID
-                userSession.currentUser().getId(),
-                text   
-            );
+        	// TODO: - Add title input field, set to default for now
+            Question q = new Question("Default Title", userSession.currentUser().getId(), text);
             try {
             	questionService.addQuestion(q);
             	refresh(); //test

@@ -45,9 +45,36 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "password VARCHAR(255), "
 	            + "role VARCHAR(225))";
 
+	    //TODO: - Invitation codes should probably have a foreign key to the user that created it and used it
 	    String invitationCodesTableQuery = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 	            + "code VARCHAR(10) PRIMARY KEY, "
 	            + "isUsed BOOLEAN DEFAULT FALSE)";
+	    
+	    String forumQuestionsTableQuery = "CREATE TABLE IF NOT EXISTS ForumQuestions ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "userId INT, "
+	            + "title VARCHAR(255), "
+	            + "body TEXT, "
+	            + "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+	            + "answered BOOLEAN DEFAULT FALSE, "
+	            + "resolved BOOLEAN DEFAULT FALSE, "
+	            + "softDeleted BOOLEAN DEFAULT FALSE, "
+	            + "upvoteCount INT DEFAULT 0)"
+	            + "FOREIGN KEY (userId) REFERENCES cse360users(id))";
+	    
+	    String forumAnswersTableQuery = "CREATE TABLE IF NOT EXISTS ForumAnswers ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "questionId INT, "
+	            + "parentAnswerId INT DEFAULT -1, "
+	            + "userId INT, "
+	            + "body TEXT, "
+	            + "isCorrect BOOLEAN DEFAULT FALSE, "
+	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+	            + "softDeleted BOOLEAN DEFAULT FALSE, "
+	            + "upvoteCount INT DEFAULT 0)"
+	            + "FOREIGN KEY (questionId) REFERENCES ForumQuestions(id), "
+	            + "FOREIGN KEY (parentAnswerId) REFERENCES ForumAnswers(id), "
+	            + "FOREIGN KEY (userId) REFERENCES cse360users(id)";
 	    
 	    //TODO: - Other tables need to be added
 
@@ -56,6 +83,8 @@ public class GeneralDBManager implements IGeneralDBManager{
 
 	        stmt.execute(userTableQuery);
 	        stmt.execute(invitationCodesTableQuery);
+	        stmt.execute(forumQuestionsTableQuery);
+	        stmt.execute(forumAnswersTableQuery);
 	    }
 	}
 	
