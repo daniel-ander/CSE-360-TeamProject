@@ -69,10 +69,10 @@ public class ForumPageController {
     private void setInitialLayout() {
         view.setInitialLayout(primaryStage);    
         
-        ForumListView forumListView = new ForumListView();
-        
+        ForumListView forumListView = view.getForumListView();
         new ForumListViewController(
-            dBConnectionStore, primaryStage, userSession, forumListView);
+            dBConnectionStore, primaryStage, userSession, forumListView
+        );
 
         // Place the list view in the center of the page layout
         view.getRoot().setCenter(forumListView.getLayout());

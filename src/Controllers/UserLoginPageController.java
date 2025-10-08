@@ -139,6 +139,12 @@ public class UserLoginPageController {
     }
     
     private void setDebugEnvironment() {
+    	
+    	view.studentInfoAutoFillButton().setText("AutoFill Student Info (Debug)");
+    	view.studentInfoAutoFillButton().setOnAction(_ -> {
+    		view.getUsernameField().setText("student1");
+    		view.getPasswordField().setText("Password1!");
+    	});
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
  		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
  			view.getUsernameField().setText("admin");

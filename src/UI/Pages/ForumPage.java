@@ -37,6 +37,9 @@ public class ForumPage implements IInitializable {
     public BorderPane getRoot() {
         return root;
     }
+    public ForumListView getForumListView() {
+		return forumListView;
+	}
 
     // ===================
     // 		 SETTERS 

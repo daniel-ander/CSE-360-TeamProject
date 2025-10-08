@@ -26,6 +26,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public boolean insertQuestion(Question q) throws SQLException {
 		// TODO: - Perform query
+		questions.add(q);
 		return true; // Question created
 	}
 	
@@ -35,9 +36,7 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public List<Question> getAllQuestions() throws SQLException {
-		List<Question> questions = new ArrayList<>();
-		// TODO: - Perform query
-		return questions;
+		return new ArrayList<>(questions);
 	}
 	
 	@Override

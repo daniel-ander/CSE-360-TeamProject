@@ -12,9 +12,10 @@ import Exceptions.DBExceptions.DataAccessException;
 
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
-
+import Utils.Debug;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
+
 
 public class ForumListViewController {
 	private final DBConnectionStore dBConnectionStore;
@@ -48,10 +49,16 @@ public class ForumListViewController {
  	// ===================
     
     private void refresh() {
-        view.getForumListView().setItems(
-            FXCollections.observableArrayList(questionService.getAllQuestions())
-        );
+        view.getForumListView().setItems(FXCollections.observableArrayList(questionService.getAllQuestions()));
+        if (Debug.isEnabled) System.out.println("Forum list refreshed.");
     }
+    private void setUpActions() {
+    	setAddQuestionButtonAction();
+    	setDeleteQuestionButtonAction();
+    	setEditQuestionButtonAction();
+    	setViewQuestionButtonAction();
+    }
+    
     private void setAddQuestionButtonAction() {
         // Add question
         view.getAddQuestionButton().setOnAction(_ -> {
@@ -67,6 +74,8 @@ public class ForumListViewController {
             );
             try {
             	questionService.addQuestion(q);
+            	refresh(); //test
+            	System.out.println("Added question: " + text);
             } catch (DataAccessException dataAccessException) {
             	// TODO:- Handle outcome if the question can't be added
                 System.err.println("Database error: " + dataAccessException.getMessage());
@@ -125,12 +134,7 @@ public class ForumListViewController {
         });
 	}
     
-    private void setUpActions() {
-    	setAddQuestionButtonAction();
-    	setDeleteQuestionButtonAction();
-    	setEditQuestionButtonAction();
-    	setViewQuestionButtonAction();
-    }
+
     
 
 }

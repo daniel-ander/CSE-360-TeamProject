@@ -71,6 +71,10 @@ public class QuestionDetailViewController {
         });
 		
 	}
+    private void setReplyToAnswerButtonAction() {
+    	// Reply to an answer
+    	
+    }
     private void setEditAnswerButtonAction() {
         // Edit answer
         view.getEditAnswerButton().setOnAction(_ -> {
@@ -128,7 +132,8 @@ public class QuestionDetailViewController {
     	setEditAnswerButtonAction();
     	setDeleteAnswerButtonAction();
     	setBackButtonAction();
-      setResolveButtonAction();
+    	setResolveButtonAction();
+    	setReplyToAnswerButtonAction();
     }
     
     private void setInitialLayout() {

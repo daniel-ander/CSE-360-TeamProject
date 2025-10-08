@@ -1,6 +1,7 @@
 package Database.Services;
 
 import Models.Question;
+import Utils.Debug;
 
 import java.sql.SQLException;
 
@@ -48,8 +49,10 @@ public class QuestionService implements IQuestionService {
 	
 	@Override
 	public List<Question> getAllQuestions(){
-		try {
+		try {			
+			if (Debug.isEnabled) System.out.println("Questions fetched successfully.");
 			return questionRepository.getAllQuestions();
+
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not get all questions from the database due to: " + e);
 		}

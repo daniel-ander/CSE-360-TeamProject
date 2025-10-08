@@ -12,8 +12,10 @@ public interface IAnswerRepository {
 	public List<Answer> getCorrectAnswers() throws SQLException;
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException;
     public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException;
+    public List<Answer> getRepliesToAnswerId(int parentAnswerId) throws SQLException;
 	
 	public int insertAnswer(int questionId, int currentUserId, String text) throws SQLException;
+	public int insertReply(int questionId, int parentAnswerId, int currentUserId, String text) throws SQLException;
 	
 	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException;
 	public boolean deleteAnswerById(int id) throws SQLException;
