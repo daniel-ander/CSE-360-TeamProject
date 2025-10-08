@@ -59,7 +59,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "answered BOOLEAN DEFAULT FALSE, "
 	            + "resolved BOOLEAN DEFAULT FALSE, "
 	            + "softDeleted BOOLEAN DEFAULT FALSE, "
-	            + "upvoteCount INT DEFAULT 0)"
+	            + "upvoteCount INT DEFAULT 0, "
 	            + "FOREIGN KEY (userId) REFERENCES cse360users(id))";
 	    
 	    String forumAnswersTableQuery = "CREATE TABLE IF NOT EXISTS ForumAnswers ("
@@ -71,10 +71,10 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "isCorrect BOOLEAN DEFAULT FALSE, "
 	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 	            + "softDeleted BOOLEAN DEFAULT FALSE, "
-	            + "upvoteCount INT DEFAULT 0)"
+	            + "upvoteCount INT DEFAULT 0, "
 	            + "FOREIGN KEY (questionId) REFERENCES ForumQuestions(id), "
 	            + "FOREIGN KEY (parentAnswerId) REFERENCES ForumAnswers(id), "
-	            + "FOREIGN KEY (userId) REFERENCES cse360users(id)";
+	            + "FOREIGN KEY (userId) REFERENCES cse360users(id))";
 	    
 	    //TODO: - Other tables need to be added
 

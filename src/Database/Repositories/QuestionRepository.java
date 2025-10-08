@@ -33,7 +33,7 @@ public class QuestionRepository implements IQuestionRepository {
 		String insertQuestion = "INSERT INTO ForumQuestions (userId, title, body) VALUES (?, ?, ?)";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
-			pstmt.setInt(1, q.getId());
+			pstmt.setInt(1, q.getAuthorId());
 			pstmt.setString(2,q.getTitle());
 			pstmt.setString(3,q.getText());
 			pstmt.executeUpdate();

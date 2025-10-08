@@ -43,6 +43,7 @@ public class UserRepository implements IUserRepository {
 				if (generatedKeys.next()) {
 					int userId = generatedKeys.getInt(1);
 					System.out.println("Inserted user ID: " + userId);
+					user.setId(userId);
 					return userId;
 				} else {
 					throw new SQLException("Inserting user failed, no ID obtained.");
