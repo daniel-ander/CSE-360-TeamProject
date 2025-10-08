@@ -17,6 +17,7 @@ public class QuestionDetailView {
     private final Button deleteAnswerButton = new Button("Delete Answer");
     private final Button backButton = new Button("Back");
     private final Button resolveButton = new Button("Question Resolved");
+    private final Button replyToAnswerButton = new Button("Reply to Answer");
     
     private final TextArea textInputArea = new TextArea("Input text here...");
     
@@ -48,6 +49,7 @@ public class QuestionDetailView {
     public Button getDeleteAnswerButton() { return deleteAnswerButton; }
     public Button getBackButton() { return backButton; }
     public Button getResolveButton() { return resolveButton; }
+    public Button getReplyToAnswerButton() { return replyToAnswerButton; }
     
     public TextArea getTextInputArea() { return textInputArea; }
     

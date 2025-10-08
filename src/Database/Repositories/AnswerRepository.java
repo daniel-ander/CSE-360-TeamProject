@@ -26,6 +26,10 @@ public class AnswerRepository implements IAnswerRepository {
 		// TODO: - Perform query
 		return 1; // We need to return the ID of the newly-created answer
 	}
+	@Override
+	public int insertReply(int questionId, int parentAnswerId, int currentUserId, String text) throws SQLException {
+		return 1; // We need to return the ID of the newly-created answer
+	}
 	
 	// ===================
     // 		 READ 
@@ -42,6 +46,11 @@ public class AnswerRepository implements IAnswerRepository {
 		// TODO: - Perform query
 		return null;
 	}
+	@Override
+	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
+		return null;
+	}
+	
 	
 	@Override
 	public Answer getAnswerById(int answerId) throws SQLException {
