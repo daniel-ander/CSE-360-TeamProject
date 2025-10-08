@@ -29,7 +29,6 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean insertQuestion(Question q) throws SQLException {
-		// TODO: - Perform query
 		String insertQuestion = "INSERT INTO ForumQuestions (userId, title, body) VALUES (?, ?, ?)";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {

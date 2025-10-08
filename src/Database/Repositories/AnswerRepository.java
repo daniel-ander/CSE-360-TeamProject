@@ -47,7 +47,7 @@ public class AnswerRepository implements IAnswerRepository {
 		return null;
 	}
 	@Override
-	public List<Answer> getRepliesToAnswerId(int parentAnswerId) throws SQLException {
+	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
 		return null;
 	}
 	

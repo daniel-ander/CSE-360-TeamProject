@@ -46,6 +46,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "role VARCHAR(225))";
 
 	    //TODO: - Invitation codes should probably have a foreign key to the user that created it and used it
+	    //      - or an entirely new table that tracks which user created which invitation code
 	    String invitationCodesTableQuery = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 	            + "code VARCHAR(10) PRIMARY KEY, "
 	            + "isUsed BOOLEAN DEFAULT FALSE)";
