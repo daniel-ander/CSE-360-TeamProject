@@ -10,6 +10,9 @@ import UI.Elements.AnswerListView;
 import Utils.Debug;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import Database.DBConnectionStore;
 import Database.Services.Interfaces.IAnswerService;
@@ -53,8 +56,13 @@ public class AnswerListViewController {
     
     private void refreshAnswers() {
     	try {
+    		List<Answer> allAnswers = answerService.getAllAnswersForQuestion(question.getId());
+    		for (Answer a : allAnswers) {
+    		    System.out.printf("Fetched answer ID %d parent=%d%n", a.getId(), a.getParentAnswerId());
+    		}
+    		calculateDepths(allAnswers);
     		view.getAnswerList().setItems(
-    				FXCollections.observableArrayList(answerService.getAllAnswersForQuestion(question.getId())));
+    				FXCollections.observableArrayList(allAnswers));
     		if (Debug.isEnabled) System.out.println("Answers refreshed.");
     	} catch (DataAccessException exception) {
     		// TODO: - Deal with answer not being able to be fetched
@@ -109,7 +117,8 @@ public class AnswerListViewController {
 			try {
 				answerService.addAnswer(reply);
 				refreshAnswers();
-				if (Debug.isEnabled) System.out.println("Added reply: " + text + " to answer ID: " + selectedAnswer.getId());
+				if (Debug.isEnabled) System.out.println("Added reply Id#" + reply.getId() + "with parentAnswerId#" + reply.getParentAnswerId() + ": " + text);
+				
 			} catch (DataAccessException dataAccessException) {
 				
 			}
@@ -168,6 +177,45 @@ public class AnswerListViewController {
 		  });
 		
 	  }
+    
+    private void calculateDepths(List<Answer> answers) {
+        Map<Integer, Integer> depthMap = new HashMap<>();
+        Map<Integer, Answer> answerById = new HashMap<>();
+        for (Answer a : answers) {
+        	answerById.put(a.getId(), a);
+        	if (Debug.isEnabled) {
+        		System.out.println("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
+        	}
+        }
+
+        for (Answer answer : answers) {
+            int depth = 0;
+            int parentId = answer.getParentAnswerId();
+            if (Debug.isEnabled) {
+				System.out.println("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
+			}
+
+            while (parentId > 0 && depth < 10) { // Prevent infinite loops
+                depth++;
+                Integer knownDepth = depthMap.get(parentId);
+                if (knownDepth != null) {
+                    depth += knownDepth;
+                    break;
+                }
+                Answer parentAnswer = answerById.get(parentId);
+                if (parentAnswer == null) break;
+                parentId = parentAnswer.getParentAnswerId();
+            }
+            depthMap.put(answer.getId(), depth);
+            answer.setReplyDepth(depth);
+            if (Debug.isEnabled) {
+                System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
+            }
+        }
+    }
+
+    
+    
     
     private void setUpAction() {
     	setAddAnswerButtonAction();

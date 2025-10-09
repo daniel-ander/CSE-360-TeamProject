@@ -12,6 +12,7 @@ public class Answer {
 	private Timestamp timestamp;
 	private boolean isDeleted;
 	private int upvoteCount;
+	private int replyDepth;
 	
 
 	// Constructor for creating a new answer (not yet in DB)
@@ -27,10 +28,11 @@ public class Answer {
 		this.isDeleted = false;
 		this.upvoteCount = 0;
 		this.parentAnswerId = -1; // -1 represents that it is not a reply to another answer
+		this.replyDepth = 0;
 	}
 	
 	// Constructor for pulling from DB with all fields
-	public Answer(int id, int questionId, int parentAnswerId, int userId, String body,Timestamp timestamp, int upvoteCount, boolean isCorrect, boolean isDeleted) {
+	public Answer(int id, int questionId, int parentAnswerId, int userId, String body,Timestamp timestamp, int upvoteCount, boolean isCorrect, boolean isDeleted, int replyDepth) {
 		if (body == null || body.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
@@ -42,6 +44,7 @@ public class Answer {
 		this.text = body;
 		this.timestamp = timestamp;
 		this.upvoteCount = upvoteCount;
+		this.replyDepth = replyDepth;
 		
 		this.isCorrect = isCorrect;
 		this.isDeleted = isDeleted;
@@ -60,6 +63,7 @@ public class Answer {
 	public int getUpvoteCount() {return upvoteCount;}
 	public String getText() {return text;}
 	public boolean isCorrect() {return isCorrect;}
+	public int getReplyDepth() {return replyDepth;}
 	
 	// ===================
     // 		 SETTERS 
@@ -71,6 +75,7 @@ public class Answer {
 	public void setUpvoteCount(int newCount) { upvoteCount = newCount;}
 	public void setParentAnswerId(int givenId) {parentAnswerId = givenId;}
 	public void setTimestamp(Timestamp newTimestamp) { timestamp = newTimestamp; }
+	public void setReplyDepth(int depth) { replyDepth = depth; }
 	public void setUserId(int newUserId) { authorId = newUserId; }
 	public void setId(int newId) { id = newId; }
 	public void setText(String newText) {

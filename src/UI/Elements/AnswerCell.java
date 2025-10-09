@@ -31,15 +31,18 @@ public class AnswerCell extends ListCell<Answer> {
             textLabel.setText(a.getText());
             metaLabel.setText(formatMeta(a));
 
-            // simple indentation for threaded replies
-            double indent = (a.getParentAnswerId() > 0) ? 25 : 0;
-            layout.setPadding(new Insets(0, 0, 0, indent));
+            // Create wrapper so padding shifts the entire block
+            HBox wrapper = new HBox(layout);
+            wrapper.setPadding(new Insets(0, 0, 0, a.getReplyDepth() * 25));
+            wrapper.setFillHeight(true);
 
-            setGraphic(layout);
+            setGraphic(wrapper);
         }
     }
 
-    private String formatMeta(Answer a) {
+
+
+	private String formatMeta(Answer a) {
         StringBuilder sb = new StringBuilder();
         sb.append("ID ").append(a.getId())
           .append(" • Upvotes: ").append(a.getUpvoteCount());

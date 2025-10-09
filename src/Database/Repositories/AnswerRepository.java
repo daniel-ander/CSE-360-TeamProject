@@ -26,50 +26,24 @@ public class AnswerRepository implements IAnswerRepository {
     // 		 CREATE 
  	// ===================
 
-	@Override
 	public boolean insertAnswer(Answer a) throws SQLException {
-		String insertAnswer = "INSERT INTO ForumAnswers (questionId, userId, body) VALUES (?, ?, ?)";
-		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(insertAnswer, Statement.RETURN_GENERATED_KEYS)) {
-			pstmt.setInt(1, a.getQuestionId());
-			pstmt.setInt(2, a.getAuthorId());
-			pstmt.setString(3, a.getText());
-			pstmt.executeUpdate();
-			
-			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-				if (generatedKeys.next()) {
-					int answerId = generatedKeys.getInt(1);
-					if (Debug.isEnabled) System.out.println("Inserted answer ID: " + answerId + " for question ID: ");
-					a.setId(answerId);
-				} else {
-					throw new SQLException("Inserting answer failed, no ID obtained.");
-				}
-			} 
-		}
-		return true; // Answer created
+	    String insertSQL = "INSERT INTO ForumAnswers (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)";
+	    try (Connection connection = generalDBManager.getConnection();
+	         PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+
+	        pstmt.setInt(1, a.getQuestionId());
+	        pstmt.setInt(2, a.getParentAnswerId());
+	        pstmt.setInt(3, a.getAuthorId());
+	        pstmt.setString(4, a.getText());
+	        pstmt.executeUpdate();
+
+	        try (ResultSet keys = pstmt.getGeneratedKeys()) {
+	            if (keys.next()) a.setId(keys.getInt(1));
+	        }
+	    }
+	    return true;
 	}
-	@Override
-	public boolean insertReply(Answer a) throws SQLException {
-		String insertReply = "INSERT INTO ForumAnswers (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)";
-		try (Connection connection = generalDBManager.getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(insertReply, Statement.RETURN_GENERATED_KEYS)) {
-				pstmt.setInt(1, a.getQuestionId());
-				pstmt.setInt(2, a.getParentAnswerId());
-				pstmt.setInt(3, a.getAuthorId());
-				pstmt.setString(4, a.getText());
-				pstmt.executeUpdate();
-				try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-					if (generatedKeys.next()) {
-						int answerId = generatedKeys.getInt(1);
-						if (Debug.isEnabled) System.out.println("Inserted reply ID: " + answerId + " for question ID: " + a.getQuestionId() + " and parent answer ID: " + a.getParentAnswerId());
-						a.setId(answerId);
-					} else {
-						throw new SQLException("Inserting reply failed, no ID obtained.");
-					}
-				}
-		}
-		return true; // Reply created
-	}
+
 	
 	// ===================
     // 		 READ 
@@ -92,7 +66,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted")
+						rs.getBoolean("isDeleted"), 0
 				);
 				allAnswers.add(a);
 			}
@@ -120,7 +94,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted")
+						rs.getBoolean("isDeleted"), 0
 				);
 				allAnswersForQuestion.add(a);
 			}
@@ -145,7 +119,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted")
+						rs.getBoolean("isDeleted"), 0
 				);
 				repliesToAnswerById.add(a);
 			}
@@ -172,7 +146,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted")
+						rs.getBoolean("isDeleted"), 0
 				);
 				return a;
 			}
@@ -197,7 +171,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted")
+						rs.getBoolean("isDeleted"), 0
 				);
 				correctAnswers.add(a);
 			}
@@ -223,7 +197,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted")
+						rs.getBoolean("isDeleted"), 0
 				);
 				answersBySearch.add(a);
 			}
