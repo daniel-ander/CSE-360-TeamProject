@@ -5,6 +5,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+//TODO: we're currently accurately setting the new password, but the popup isnt working right now
+
 public class ResetPasswordPopupView {
 	Stage resetStage = new Stage();
 	

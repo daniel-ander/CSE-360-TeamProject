@@ -23,6 +23,10 @@ public class QuestionListView {
     public QuestionListView() {
         // ListView in center
         forumListView = new ListView<>();
+        
+        //XXX: working on this, could break. trying to add cells to the UI 
+        forumListView.setCellFactory(_-> new QuestionCell());
+        
         borderpane.setCenter(forumListView);
 
         textInputArea.setWrapText(true);

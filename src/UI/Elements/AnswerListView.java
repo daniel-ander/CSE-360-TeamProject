@@ -28,6 +28,11 @@ public class AnswerListView {
         
         root.setTop(topBox);
         answerListView = new ListView<>();
+        
+        //XXX: Working on a cell factory to make answers look better
+        answerListView.setCellFactory(_ -> new AnswerCell());
+
+        
         root.setCenter(answerListView);
 
         VBox controls = new VBox(8, 
