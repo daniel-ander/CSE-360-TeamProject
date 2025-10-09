@@ -6,7 +6,7 @@ import Models.Question;
 import Sessions.UserSession;
 
 import UI.Elements.QuestionListView;
-import UI.Elements.QuestionDetailView;
+import UI.Elements.AnswerListView;
 import Utils.Debug;
 
 import java.sql.SQLException;
@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 
 public class AnswerListViewController {
     private final DBConnectionStore dbConnectionStore;
-	private final QuestionDetailView view;
+	private final AnswerListView view;
     private final Question question;
     private final IAnswerService answerService;
     private final Stage primaryStage;
@@ -31,7 +31,7 @@ public class AnswerListViewController {
             Stage primaryStage, 
             Question question,
             UserSession userSession,
-            QuestionDetailView view
+            AnswerListView view
     ) {
         this.dbConnectionStore = dBConnectionStore;
         this.answerService = dBConnectionStore.getAnswerService();

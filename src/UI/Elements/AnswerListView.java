@@ -5,7 +5,7 @@ import Models.Answer;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-public class QuestionDetailView {
+public class AnswerListView {
     private final BorderPane root = new BorderPane();
     
     private final Label questionLabel = new Label();
@@ -22,7 +22,7 @@ public class QuestionDetailView {
     private final TextArea textInputArea = new TextArea("Input text here...");
     
 
-    public QuestionDetailView() {
+    public AnswerListView() {
         VBox topBox = new VBox(10, questionLabel);
         topBox.getStyleClass().addAll("main-label", "small-padding");
         

@@ -11,7 +11,7 @@ import Database.Services.Interfaces.IQuestionService;
 import Exceptions.DBExceptions.DataAccessException;
 
 import UI.Elements.QuestionListView;
-import UI.Elements.QuestionDetailView;
+import UI.Elements.AnswerListView;
 import Utils.Debug;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
@@ -115,7 +115,7 @@ public class QuestionListViewController {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             
             if (selectedQuestion != null) {
-                QuestionDetailView detailView = new QuestionDetailView();
+                AnswerListView detailView = new AnswerListView();
                 
                 new AnswerListViewController(
                 		dBConnectionStore,
