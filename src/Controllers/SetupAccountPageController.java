@@ -107,16 +107,23 @@ public class SetupAccountPageController {
                         e.printStackTrace();
                 	}
             		if(didValidateCode) {
-            			// Create a new user and register them in the database
-		            	User user = new User(userName, password, User.Role.student);
-		            	UserSession userSession = new UserSession(user);
-                  
-		            	// TODO: - One of these doesn't belong.
-		            	//User user = new User(userName, password, databaseHelper.getRoleFromInviteCode(code));
-		            	userService.register(user);
-		                
-		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
+            			// Create and register new user
+            			User user = new User(userName, password, User.Role.student);
+            			userService.register(user);
+
+            			// Now reload the user so it has the correct ID
+            			User registeredUser = userService.getUserByNameAndPassword(userName, password);
+            			if (registeredUser == null) {
+            			    view.setErrorMessage("Error retrieving user from database after registration.");
+            			    return;
+            			}
+
+            			UserSession userSession = new UserSession(registeredUser);
+            			userSession.setLoggedStatus(true);
+
+            			// Navigate to WelcomeLoginPage
+            			new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
+
             		}
             		else {
             			view.setErrorMessage("Please enter a valid invitation code");

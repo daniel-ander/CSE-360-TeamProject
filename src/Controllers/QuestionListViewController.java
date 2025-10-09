@@ -68,7 +68,7 @@ public class QuestionListViewController {
         		return;
         	}
         	// TODO: - Add title input field, set to default for now
-            Question q = new Question("Default Title", userSession.currentUser().getId(), text);
+            Question q = new Question(userSession.currentUser().getId(), "Default Title", text);
             try {
             	questionService.addQuestion(q);
             	refresh(); //test

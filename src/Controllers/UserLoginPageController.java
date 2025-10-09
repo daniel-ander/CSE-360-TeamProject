@@ -19,10 +19,6 @@ import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 
-/**
- * The UserLoginPage class provides a login interface for users to access their accounts.
- * It validates the user's credentials and navigates to the appropriate page upon successful login.
- */
 public class UserLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
@@ -32,7 +28,6 @@ public class UserLoginPageController {
     private final UserLoginPage view;
     private final ResetPasswordPopupView resetPasswordPopupView = new ResetPasswordPopupView();
     
- // --- Retrieve user inputs ---
     private String userNameFieldText = "";
     private String passwordFieldText = "";
 
@@ -43,74 +38,65 @@ public class UserLoginPageController {
         this.primaryStage = primaryStage;
         
         setInitialLayout();
-        
         setLoginButtonAction();
         setSubmitButtonResetPasswordPopupAction();
         
-        if(Debug.isEnabled) {
+        if (Debug.isEnabled) {
         	setDebugEnvironment();
         }
     }
-    
-    // TODO: set it up so each stroke updates field variables
-    
-    // ===================
-    // 		 SETTERS 
- 	// ===================
-    
+
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(_ -> {
-	        // --- Flags ---
-	        boolean resetPasswordFlag = passwordFieldText.length() > 2 && passwordFieldText.startsWith("R_");
-	        
 	        userNameFieldText = view.getUsernameField().getText();
 	        passwordFieldText = view.getPasswordField().getText();
+	        
+	        boolean resetPasswordFlag = passwordFieldText.length() > 2 && passwordFieldText.startsWith("R_");
 
-	        // --- Username validation ---
+	        // --- Validate username ---
 	        if (!UserNameRecognizer.checkForValidUserName(userNameFieldText)) {
 	        	view.setErrorLabelText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 	            return;
 	        }
 
-	        // --- Password validation ---
+	        // --- Validate password ---
 	        if (!PasswordEvaluator.evaluatePassword(passwordFieldText)) {
 	            view.setErrorLabelText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
 	            return;
 	        }
 
-	        // --- Database check ---
 	        try {
-	            User user = new User(userNameFieldText, passwordFieldText, User.Role.student);
+	            // ✅ Pull the actual user from the DB
+	            User user = userService.getUserByNameAndPassword(userNameFieldText, passwordFieldText);
+	            if (user == null) {
+	                view.setErrorLabelText("Invalid username or password.");
+	                return;
+	            }
+
+	            // ✅ Ensure we have the DB ID
+	            if (Debug.isEnabled) {
+	                System.out.println("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
+	            }
+
+	            // --- Initialize user session ---
 	            UserSession userSession = new UserSession(user);
 	            userSession.setLoggedStatus(true);
-	            
-	            //new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
-	            User.Role role = userService.getUserRole(user.getUserName());
-	            
-	            if (role != null) {
-	                user.setRole(role);
-	                if (userService.doesUserExistByName(user.getUserName())) {
-	                	// TODO: - This logic does not validate
-	                	if (resetPasswordFlag) {
-	                	    new ResetPasswordPopupView();
-	                	} else {
-	                		new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
-	                	}
-	                } else {
-	                    view.setErrorLabelText("Error logging in");
-	                }
+	            // --- Handle reset or normal login flow ---
+	            if (resetPasswordFlag) {
+	                new ResetPasswordPopupView();
 	            } else {
-	            	view.setErrorLabelText("User account doesn't exist");
+	                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	            }
+
 	        } catch (DataAccessException e) {
-	        	// TODO: - Handle the potential DB failures in the try clause
-	            System.err.println(e.getMessage());
+	            System.err.println("Database access error during login: " + e.getMessage());
 	            e.printStackTrace();
+	            view.setErrorLabelText("Database error. Please try again later.");
 	        }
 	    });
 	}
-    
+
     private void setSubmitButtonResetPasswordPopupAction() {
     	resetPasswordPopupView.getSubmitButton().setOnAction(_ -> {
     		userNameFieldText = view.getUsernameField().getText();
@@ -126,30 +112,26 @@ public class UserLoginPageController {
                 resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
                 resetPasswordPopupView.closeStage();
             } catch (DataAccessException e) {
-            	// TODO: - Handle the case where the user password could not be updated
-            	resetPasswordPopupView.setFeedbackLabelText(e.getMessage());
+            	resetPasswordPopupView.setFeedbackLabelText("Error updating password: " + e.getMessage());
             }
         });
     }
-    
-    
+
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-//    	resetPasswordPopupView.setInitialLayout();
     }
-    
+
     private void setDebugEnvironment() {
-    	
     	view.studentInfoAutoFillButton().setText("AutoFill Student Info (Debug)");
     	view.studentInfoAutoFillButton().setOnAction(_ -> {
     		view.getUsernameField().setText("student1");
     		view.getPasswordField().setText("Password1!");
     	});
+
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
  		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
  			view.getUsernameField().setText("admin");
  			view.getPasswordField().setText("Password1!");
  		});
     }
-
 }

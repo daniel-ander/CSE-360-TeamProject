@@ -21,7 +21,8 @@ public interface IUserService {
 	public User.Role getUserRole(String userName) throws DataAccessException;
 	
 	public List<String> getAllUsernames() throws DataAccessException;
-	
+	public User getUserByNameAndPassword(String userName, String password) throws DataAccessException;
+	public int getUserIdByName(String userName) throws DataAccessException;
 	public String updatePasswordForUser(String userName) throws DataAccessException;
 
 }

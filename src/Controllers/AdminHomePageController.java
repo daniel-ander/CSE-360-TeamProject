@@ -123,9 +123,11 @@ public class AdminHomePageController {
             if (selectedUser == null) return;
             
             User.Role role;
+            int userId;
             
             try {
             	role = userService.getUserRole(selectedUser);
+            	userId = userService.getUserIdByName(selectedUser);
             } catch (DataAccessException e) {
             	// TODO: - Handle the case if user role can't be fetched
             	System.err.println(e.getMessage());
@@ -163,6 +165,7 @@ public class AdminHomePageController {
             // Update details section
             view.setUserDetailsLabel(
                 "User: " + selectedUser + "\n" +
+                "User ID: " + userId + "\n" +
                 "Roles: " + role.name() + "\n" +
                 "Other info: (e.g., last login, email, etc.)"
             );

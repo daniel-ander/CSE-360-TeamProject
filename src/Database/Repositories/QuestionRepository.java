@@ -42,7 +42,6 @@ public class QuestionRepository implements IQuestionRepository {
 					int questionId = generatedKeys.getInt(1);
 					if (Debug.isEnabled) System.out.println("Inserted question ID: " + questionId);
 					q.setId(questionId);
-					questions.add(q);
 				} else {
 					throw new SQLException("Inserting question failed, no ID obtained.");
 				}

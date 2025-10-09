@@ -32,7 +32,7 @@ public class Question {
 	}
 	
 	
-	public Question(String title, int authorId, String text) {
+	public Question(int authorId, String title, String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}

@@ -20,5 +20,9 @@ public interface IUserRepository {
 	public boolean deleteUser(String targetUser) throws SQLException;
 
 	public String getUserRole(String userName) throws SQLException;
+	public User getUserByNameAndPassword(String userName, String password) throws SQLException;
+	public User getUserByName(String userName) throws SQLException;
 	public String updatePasswordForUser(String userName, String newPassword) throws SQLException;
+
+	public int getUserIdByName(String userName) throws SQLException;
 }

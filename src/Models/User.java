@@ -7,7 +7,7 @@ package Models;
 public class User {
     private String userName;
     private String password;
-    private int id; // -1 if user isn't in the database yet
+    private int id; //
     private Role role;
     
     public static enum Role {
@@ -19,7 +19,9 @@ public class User {
     }
  
     public User(String userName, String password, Role role) {
-    	this(-1, userName, password, role);
+    	this.userName = userName;
+    	this.password = password;
+    	this.role = role;
     }
     
     public User(int id, String userName, String password, Role role) {

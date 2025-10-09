@@ -66,6 +66,24 @@ public class UserService implements IUserService {
 			throw new DataAccessException("Could not log in due to: " + e);
 		}
 	}
+	@Override
+	public User getUserByNameAndPassword(String userName, String password) throws DataAccessException {
+		try {
+			return userRepository.getUserByNameAndPassword(userName, password);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not log in due to: " + e);
+		}
+	}
+	@Override
+	public int getUserIdByName(String userName) throws DataAccessException {
+		try {
+			return userRepository.getUserIdByName(userName);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get user ID by user name: " + userName + " due to: " + e);
+		}
+	}
 	
 	// ===================
     // 		 UPDATE 

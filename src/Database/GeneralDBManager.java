@@ -40,7 +40,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	@Override
 	public void createTables() throws SQLException {
 	    String userTableQuery = "CREATE TABLE IF NOT EXISTS cse360users ("
-	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "id IDENTITY PRIMARY KEY, "
 	            + "userName VARCHAR(255) UNIQUE, "
 	            + "password VARCHAR(255), "
 	            + "role VARCHAR(225))";
@@ -52,7 +52,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "isUsed BOOLEAN DEFAULT FALSE)";
 	    
 	    String forumQuestionsTableQuery = "CREATE TABLE IF NOT EXISTS ForumQuestions ("
-	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "id IDENTITY PRIMARY KEY, "
 	            + "userId INT, "
 	            + "title VARCHAR(255), "
 	            + "body TEXT, "
@@ -64,7 +64,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "FOREIGN KEY (userId) REFERENCES cse360users(id))";
 	    
 	    String forumAnswersTableQuery = "CREATE TABLE IF NOT EXISTS ForumAnswers ("
-	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "id IDENTITY PRIMARY KEY, "
 	            + "questionId INT, "
 	            + "parentAnswerId INT DEFAULT NULL, "
 	            + "userId INT, "
