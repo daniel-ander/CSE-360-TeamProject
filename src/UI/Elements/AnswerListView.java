@@ -30,7 +30,13 @@ public class AnswerListView {
         answerListView = new ListView<>();
         root.setCenter(answerListView);
 
-        VBox controls = new VBox(8, addAnswerButton, resolveButton, editAnswerButton, deleteAnswerButton, backButton);
+        VBox controls = new VBox(8, 
+        		addAnswerButton, 
+        		resolveButton, 
+        		editAnswerButton, 
+        		deleteAnswerButton, 
+        		backButton,
+        		replyToAnswerButton);
         controls.getStyleClass().add("small-padding");
         
         textInputArea.setWrapText(true);

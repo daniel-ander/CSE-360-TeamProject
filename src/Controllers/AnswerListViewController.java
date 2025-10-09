@@ -85,8 +85,36 @@ public class AnswerListViewController {
         });
 		
 	}
+    
+    //TODO: - We're gonna need to figure out how to organize the replies to answers visually
+    //      - Whether a nested list view or a tree view or something else. 
+    // 		- For now this just adds a reply as a normal answer with a parentAnswerId set.
+    
     private void setReplyToAnswerButtonAction() {
     	// Reply to an answer
+    	view.getReplyToAnswerButton().setOnAction(_-> {
+    		if (Debug.isEnabled) System.out.println("Reply to Answer button clicked.");
+    		String text = view.getTextInputArea().getText();
+    		if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
+				System.out.println("Answer text cannot be empty or placeholder.");
+				return;
+			}
+    		Answer selectedAnswer = view.getAnswerList().getSelectionModel().getSelectedItem();
+			if (selectedAnswer == null) {
+				System.out.println("Select an answer to reply to.");
+				return;
+			}
+			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), text);
+			reply.setParentAnswerId(selectedAnswer.getId());
+			try {
+				answerService.addAnswer(reply);
+				refreshAnswers();
+				if (Debug.isEnabled) System.out.println("Added reply: " + text + " to answer ID: " + selectedAnswer.getId());
+			} catch (DataAccessException dataAccessException) {
+				
+			}
+    		
+    	});
     	
     }
     private void setEditAnswerButtonAction() {
