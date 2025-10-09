@@ -15,7 +15,6 @@ import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IQuestionRepository;
 
 public class QuestionRepository implements IQuestionRepository {
-	private List<Question> questions = new ArrayList<>();
 	
 	IGeneralDBManager generalDBManager;
 	
@@ -82,8 +81,22 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public Question getQuestionById(int searchId) throws SQLException {
-		for (Question q : questions) {
-			if (q.getId() == searchId) {
+		String getQuestionById = "SELECT * FROM ForumQuestions WHERE id = ? AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getQuestionById)) {
+			pstmt.setInt(1, searchId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
 				return q;
 			}
 		}
@@ -93,8 +106,21 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAnsweredQuestions() throws SQLException {
 		List<Question> answeredQuestions = new ArrayList<>();
-		for (Question q : questions) {
-			if (q.getAnswered()) {
+		String getAnsweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = TRUE AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAnsweredQuestions)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
 				answeredQuestions.add(q);
 			}
 		}
@@ -104,8 +130,21 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getUnansweredQuestions() throws SQLException {
 		List<Question> unansweredQuestions = new ArrayList<>();
-		for (Question q : questions) {
-			if (!q.getAnswered()) {
+		String getUnansweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = FALSE AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getUnansweredQuestions)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
 				unansweredQuestions.add(q);
 			}
 		}
@@ -117,14 +156,52 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsBySearch(String searchString) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		// TODO: - Perform query
+		String getQuestionsBySearch = "SELECT * FROM ForumQuestions WHERE (title LIKE ? OR body LIKE ?) AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getQuestionsBySearch)) {
+			String searchPattern = "%" + searchString + "%";
+			pstmt.setString(1, searchPattern);
+			pstmt.setString(2, searchPattern);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
+				questions.add(q);
+			}
+		}
 		return questions;
 	}
 	
 	@Override
 	public List<Question> getQuestionsFromUser(int userId) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		// TODO: - Perform query
+		String getQuestionsFromUser = "SELECT * FROM ForumQuestions WHERE userId = ? AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getQuestionsFromUser)) {
+			pstmt.setInt(1, userId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
+				questions.add(q);
+			}
+		}
 		return questions;
 	}
 	
@@ -134,7 +211,19 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean updateQuestion(int id, String newText) throws SQLException {
-		// TODO: - Perform query
+		String updateQuestion = "UPDATE ForumQuestions SET body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ? AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(updateQuestion)) {
+			pstmt.setString(1, newText);
+			pstmt.setInt(2, id);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected > 0) {
+				if (Debug.isEnabled) System.out.println("Question with ID " + id + " updated successfully.");
+				return true;
+			} else {
+				if (Debug.isEnabled) System.out.println("No question found with ID " + id + " to update.");
+			}
+		}
 		return false;
 	}
 	
@@ -145,7 +234,18 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean deleteQuestion(int id) throws SQLException {
-		// TODO: - Perform query
-		return true;
+		String deleteQuestion = "UPDATE ForumQuestions SET isDeleted = TRUE WHERE id = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(deleteQuestion)) {
+			pstmt.setInt(1, id);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected > 0) {
+				if (Debug.isEnabled) System.out.println("Question with ID " + id + " marked as deleted.");
+				return true;
+			} else {
+				if (Debug.isEnabled) System.out.println("No question found with ID " + id + " to delete.");
+			}
+		}
+		return false;
 	}
 }
