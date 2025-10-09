@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 
-public class ForumListView {
+public class QuestionListView {
 	
     private final BorderPane borderpane = new BorderPane();
     
@@ -20,7 +20,7 @@ public class ForumListView {
 	
 	private final TextArea textInputArea = new TextArea("Input text here...");
 
-    public ForumListView() {
+    public QuestionListView() {
         // ListView in center
         forumListView = new ListView<>();
         borderpane.setCenter(forumListView);

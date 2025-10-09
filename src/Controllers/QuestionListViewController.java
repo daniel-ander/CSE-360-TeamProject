@@ -10,26 +10,26 @@ import Database.Services.Interfaces.IQuestionService;
 
 import Exceptions.DBExceptions.DataAccessException;
 
-import UI.Elements.ForumListView;
+import UI.Elements.QuestionListView;
 import UI.Elements.QuestionDetailView;
 import Utils.Debug;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
 
-public class ForumListViewController {
+public class QuestionListViewController {
 	private final DBConnectionStore dBConnectionStore;
 	private final IGeneralDBManager generalDBManager;
 	private final IQuestionService questionService;
     private final UserSession userSession;
-    private final ForumListView view;
+    private final QuestionListView view;
     private final Stage primaryStage;
 
-    public ForumListViewController(
+    public QuestionListViewController(
     		DBConnectionStore dBConnectionStore, 
     		Stage primaryStage, 
     		UserSession userSession, 
-    		ForumListView view
+    		QuestionListView view
     	) {
         this.view = view;
         this.generalDBManager = dBConnectionStore.getGeneralDBManager();
@@ -117,7 +117,7 @@ public class ForumListViewController {
             if (selectedQuestion != null) {
                 QuestionDetailView detailView = new QuestionDetailView();
                 
-                new QuestionDetailViewController(
+                new AnswerListViewController(
                 		dBConnectionStore,
                 		primaryStage, 
                 		selectedQuestion,

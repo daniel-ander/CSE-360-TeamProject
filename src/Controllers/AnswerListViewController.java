@@ -5,7 +5,7 @@ import Models.Question;
 
 import Sessions.UserSession;
 
-import UI.Elements.ForumListView;
+import UI.Elements.QuestionListView;
 import UI.Elements.QuestionDetailView;
 import Utils.Debug;
 
@@ -18,7 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class QuestionDetailViewController {
+public class AnswerListViewController {
     private final DBConnectionStore dbConnectionStore;
 	private final QuestionDetailView view;
     private final Question question;
@@ -26,7 +26,7 @@ public class QuestionDetailViewController {
     private final Stage primaryStage;
     private final UserSession userSession;
 
-    public QuestionDetailViewController(
+    public AnswerListViewController(
             DBConnectionStore dBConnectionStore,
             Stage primaryStage, 
             Question question,
@@ -121,9 +121,9 @@ public class QuestionDetailViewController {
     private void setBackButtonAction() {
         // Back to ForumListView (new scene, same as other buttons)
         view.getBackButton().setOnAction(_ -> {
-            ForumListView forumView = new ForumListView();
+            QuestionListView forumView = new QuestionListView();
 
-            new ForumListViewController(dbConnectionStore, primaryStage, userSession, forumView);
+            new QuestionListViewController(dbConnectionStore, primaryStage, userSession, forumView);
 
             Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
             primaryStage.setScene(forumScene);

@@ -8,7 +8,7 @@ import UI.Pages.ForumPage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
-import UI.Elements.ForumListView;
+import UI.Elements.QuestionListView;
 
 import javafx.stage.Stage;
 
@@ -69,12 +69,12 @@ public class ForumPageController {
     private void setInitialLayout() {
         view.setInitialLayout(primaryStage);    
         
-        ForumListView forumListView = view.getForumListView();
-        new ForumListViewController(
-            dBConnectionStore, primaryStage, userSession, forumListView
+        QuestionListView questionListView = view.getForumListView();
+        new QuestionListViewController(
+            dBConnectionStore, primaryStage, userSession, questionListView
         );
 
         // Place the list view in the center of the page layout
-        view.getRoot().setCenter(forumListView.getLayout());
+        view.getRoot().setCenter(questionListView.getLayout());
     }
 }
