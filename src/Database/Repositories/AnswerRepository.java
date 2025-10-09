@@ -16,7 +16,8 @@ import Database.Repositories.Interfaces.IAnswerRepository;
 
 
 public class AnswerRepository implements IAnswerRepository {
-	private final IGeneralDBManager generalDBManager;
+	private List<Answer> answers = new ArrayList<>();
+	IGeneralDBManager generalDBManager;
 	
 	public AnswerRepository(IGeneralDBManager generalDBManager) {
 		this.generalDBManager = generalDBManager;
@@ -27,29 +28,31 @@ public class AnswerRepository implements IAnswerRepository {
  	// ===================
 
 	@Override
-	public int insertAnswer(int questionId, int currentUserId, String text) throws SQLException {
-		String insertAnswer = "INSERT INTO answers (questionId, userId, body) VALUES (?, ?, ?)";
+	public boolean insertAnswer(Answer a) throws SQLException {
+		String insertAnswer = "INSERT INTO ForumAnswers (questionId, userId, body) VALUES (?, ?, ?)";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertAnswer, Statement.RETURN_GENERATED_KEYS)) {
-			pstmt.setInt(1, questionId);
-			pstmt.setInt(2, currentUserId);
-			pstmt.setString(3, text);
+			pstmt.setInt(1, a.getQuestionId());
+			pstmt.setInt(2, a.getAuthorId());
+			pstmt.setString(3, a.getText());
 			pstmt.executeUpdate();
 			
 			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					int answerId = generatedKeys.getInt(1);
-					if (Debug.isEnabled) System.out.println("Inserted answer ID: " + answerId + " for question ID: " + questionId);
-					return answerId;
+					if (Debug.isEnabled) System.out.println("Inserted answer ID: " + answerId + " for question ID: ");
+					a.setId(answerId);
+					answers.add(a);
 				} else {
 					throw new SQLException("Inserting answer failed, no ID obtained.");
 				}
 			} 
 		}
+		return true; // Answer created
 	}
 	@Override
 	public int insertReply(int questionId, int parentAnswerId, int currentUserId, String text) throws SQLException {
-		String insertReply = "INSERT INTO answers (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)";
+		String insertReply = "INSERT INTO ForumAnswers (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)";
 		try (Connection connection = generalDBManager.getConnection();
 			PreparedStatement pstmt = connection.prepareStatement(insertReply, Statement.RETURN_GENERATED_KEYS)) {
 				pstmt.setInt(1, questionId);
@@ -100,8 +103,30 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	@Override
 	public List<Answer> getAllAnswersForQuestion(int questionId) throws SQLException {
-		// TODO: - Perform query
-		return null;
+		List<Answer> allAnswersForQuestion = new ArrayList<>();
+		//TODO: we might need this to check parentId depending on how we want to display answers
+		//		for now we will just get all answers for a question
+		String getAllAnswersForQuestion = "SELECT * FROM ForumAnswers WHERE questionId = ? AND isDeleted = FALSE";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestion)){
+			pstmt.setInt(1, questionId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted")
+				);
+				allAnswersForQuestion.add(a);
+			}
+		}
+		return allAnswersForQuestion;
 	}
 	@Override
 	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {

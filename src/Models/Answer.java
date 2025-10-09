@@ -7,7 +7,7 @@ public class Answer {
 	private String text;
 	private boolean isCorrect;
 	private int questionId;
-	private int userId;
+	private int authorId;
 	private int parentAnswerId; // -1 if it is not a reply to another answer
 	private Timestamp timestamp;
 	private boolean isDeleted;
@@ -15,15 +15,17 @@ public class Answer {
 	
 
 	// Constructor for creating a new answer (not yet in DB)
-	public Answer(int id, int questionId, int userId, String text, boolean isCorrect) {
+	public Answer(int questionId, int userId, String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
-		this.id = id;
+		this.id = -1; // -1 represents that it is not assigned
 		this.text = text;
-		this.isCorrect = isCorrect;
 		this.questionId = questionId; // -1 represents that it is not assigned
-		this.userId = userId;
+		this.authorId = userId;
+		this.isCorrect = false;
+		this.isDeleted = false;
+		this.upvoteCount = 0;
 		this.parentAnswerId = -1; // -1 represents that it is not a reply to another answer
 	}
 	
@@ -36,7 +38,7 @@ public class Answer {
 		this.id = id;
 		this.questionId = questionId; // -1 represents that it is not assigned
 		this.parentAnswerId = parentAnswerId; // -1 represents that it is not a reply to another answer
-		this.userId = userId;
+		this.authorId = userId;
 		this.text = body;
 		this.timestamp = timestamp;
 		this.upvoteCount = upvoteCount;
@@ -50,7 +52,7 @@ public class Answer {
     // 		 GETTERS 
  	// ===================
 	public int getId() {return id;}
-	public int getUserId() {return userId;}
+	public int getAuthorId() {return authorId;}
 	public int getQuestionId() {return questionId;}
 	public int getParentAnswerId() {return parentAnswerId;}
 	public Timestamp getTimestamp() {return timestamp;}
@@ -69,8 +71,8 @@ public class Answer {
 	public void setUpvoteCount(int newCount) { upvoteCount = newCount;}
 	public void setParentAnswerId(int givenId) {parentAnswerId = givenId;}
 	public void setTimestamp(Timestamp newTimestamp) { timestamp = newTimestamp; }
-	public void setUserId(int newUserId) { userId = newUserId; }
-	
+	public void setUserId(int newUserId) { authorId = newUserId; }
+	public void setId(int newId) { id = newId; }
 	public void setText(String newText) {
 		if (newText == null || newText.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");

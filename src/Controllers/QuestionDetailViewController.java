@@ -7,12 +7,13 @@ import Sessions.UserSession;
 
 import UI.Elements.ForumListView;
 import UI.Elements.QuestionDetailView;
+import Utils.Debug;
 
 import java.sql.SQLException;
 
 import Database.DBConnectionStore;
 import Database.Services.Interfaces.IAnswerService;
-
+import Exceptions.DBExceptions.DataAccessException;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -36,11 +37,11 @@ public class QuestionDetailViewController {
         this.answerService = dBConnectionStore.getAnswerService();
         
         this.primaryStage = primaryStage;
-		    this.view = view;
+		this.view = view;
         this.question = question;
 
-		    this.userSession = userSession;
-		    setInitialLayout();
+        this.userSession = userSession;
+		setInitialLayout();
 		    
         setUpAction();
         refreshAnswers();
@@ -58,16 +59,16 @@ public class QuestionDetailViewController {
         		System.out.println("Answer text cannot be empty or placeholder.");
         		return;
         	}
+        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), text);
         	try {
-        		answerService.addAnswer(question.getId(), userSession.currentUser().getId(), text);
-        	} catch (SQLException exception) {
+        		answerService.addAnswer(a);
+                refreshAnswers();
+                if (Debug.isEnabled) System.out.println("Added answer: " + text);
+        	} catch (DataAccessException dataAccessException) {
         		// TODO: - Deal with answer not being able to be added
-                System.err.println("Database error: " + exception.getMessage());
-                exception.printStackTrace();
+                System.err.println("Database error: " + dataAccessException.getMessage());
+                dataAccessException.printStackTrace();
             }
-        	
-        	
-            refreshAnswers();
         });
 		
 	}

@@ -1,6 +1,7 @@
 package Database.Services;
 
 import Models.Answer;
+import Utils.Debug;
 
 import java.sql.SQLException;
 
@@ -24,14 +25,19 @@ public class AnswerService implements IAnswerService {
  	// ===================
 	
 	@Override
-	public Answer addAnswer(int questionId, int creatorId, String text) throws DataAccessException {
+	public boolean addAnswer(Answer a) throws DataAccessException, DuplicateRecordIDException {
+		boolean doesAnswerExist = (getAnswerById(a.getId()) != null);
+		
+		if (doesAnswerExist) {
+			throw new DuplicateRecordIDException("Answer with this id already exists!");
+		}
 		try {
-			int answerId = answerRepository.insertAnswer(questionId, creatorId, text);
-			
-			return new Answer(answerId, questionId, creatorId, text, false);
+			answerRepository.insertAnswer(a);
+			if (Debug.isEnabled) System.out.println("Answer added successfully.");
 		} catch (SQLException e) {
 			throw new DataAccessException("Failed to add answer to database due to: " + e);
 		}
+		return true;
 	}
 	
 	// ===================

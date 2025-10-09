@@ -36,6 +36,7 @@ public class QuestionService implements IQuestionService {
 		
 		try {
 			questionRepository.insertQuestion(q);
+			if (Debug.isEnabled) System.out.println("Question added successfully.");
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not add the question to the database due to: " + e);
 		}

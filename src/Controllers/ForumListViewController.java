@@ -72,7 +72,7 @@ public class ForumListViewController {
             try {
             	questionService.addQuestion(q);
             	refresh(); //test
-            	System.out.println("Added question: " + text);
+            	if (Debug.isEnabled) System.out.println("Added question: " + text);
             } catch (DataAccessException dataAccessException) {
             	// TODO:- Handle outcome if the question can't be added
                 System.err.println("Database error: " + dataAccessException.getMessage());
