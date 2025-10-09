@@ -58,7 +58,7 @@ public class AnswerService implements IAnswerService {
 	@Override
 	public List<Answer> getAllAnswersForQuestion(int questionId) throws DataAccessException {
 		try {
-			return answerRepository.getAllAnswersForQuestion(questionId);
+			return answerRepository.getAnswersByQuestionId(questionId);
 		} catch (SQLException e) {
 			throw new DataAccessException("Failed to get answers for question id: " + questionId + " from database due to: " + e);
 		}
