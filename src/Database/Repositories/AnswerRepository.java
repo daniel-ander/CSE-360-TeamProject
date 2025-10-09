@@ -16,7 +16,6 @@ import Database.Repositories.Interfaces.IAnswerRepository;
 
 
 public class AnswerRepository implements IAnswerRepository {
-	private List<Answer> answers = new ArrayList<>();
 	IGeneralDBManager generalDBManager;
 	
 	public AnswerRepository(IGeneralDBManager generalDBManager) {
@@ -42,7 +41,6 @@ public class AnswerRepository implements IAnswerRepository {
 					int answerId = generatedKeys.getInt(1);
 					if (Debug.isEnabled) System.out.println("Inserted answer ID: " + answerId + " for question ID: ");
 					a.setId(answerId);
-					answers.add(a);
 				} else {
 					throw new SQLException("Inserting answer failed, no ID obtained.");
 				}

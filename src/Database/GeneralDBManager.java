@@ -66,7 +66,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	    String forumAnswersTableQuery = "CREATE TABLE IF NOT EXISTS ForumAnswers ("
 	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
 	            + "questionId INT, "
-	            + "parentAnswerId INT DEFAULT -1, "
+	            + "parentAnswerId INT DEFAULT NULL, "
 	            + "userId INT, "
 	            + "body TEXT, "
 	            + "isCorrect BOOLEAN DEFAULT FALSE, "
@@ -118,7 +118,9 @@ public class GeneralDBManager implements IGeneralDBManager{
 	
 	public Connection getConnection() throws SQLException {
 		System.out.println("Connecting to database...");
-		return DriverManager.getConnection(DB_URL, USER, PASS);
+		Connection connection =  DriverManager.getConnection(DB_URL, USER, PASS);
+		connection.setAutoCommit(true); // Enable auto-commit mode
+		return connection;
 	}
 
 }

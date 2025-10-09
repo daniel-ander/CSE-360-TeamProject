@@ -10,7 +10,7 @@ public class QuestionDetailView {
     
     private final Label questionLabel = new Label();
     
-    private final ListView<Answer> answerList = new ListView<>();
+    private final ListView<Answer> answerListView;
     
     private final Button addAnswerButton = new Button("Add Answer");
     private final Button editAnswerButton = new Button("Edit Answer");
@@ -27,7 +27,8 @@ public class QuestionDetailView {
         topBox.getStyleClass().addAll("main-label", "small-padding");
         
         root.setTop(topBox);
-        root.setCenter(answerList);
+        answerListView = new ListView<>();
+        root.setCenter(answerListView);
 
         VBox controls = new VBox(8, addAnswerButton, resolveButton, editAnswerButton, deleteAnswerButton, backButton);
         controls.getStyleClass().add("small-padding");
@@ -42,7 +43,7 @@ public class QuestionDetailView {
     
     public Label getQuestionLabel() { return questionLabel; }
     
-    public ListView<Answer> getAnswerList() { return answerList; }
+    public ListView<Answer> getAnswerList() { return answerListView; }
     
     public Button getAddAnswerButton() { return addAnswerButton; }
     public Button getEditAnswerButton() { return editAnswerButton; }

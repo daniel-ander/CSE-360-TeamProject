@@ -50,10 +50,23 @@ public class QuestionDetailViewController {
     // ===================
     // 		 SETTERS 
  	  // ===================
+    
+    private void refreshAnswers() {
+    	try {
+    		view.getAnswerList().setItems(
+    				FXCollections.observableArrayList(answerService.getAllAnswersForQuestion(question.getId())));
+    		if (Debug.isEnabled) System.out.println("Answers refreshed.");
+    	} catch (DataAccessException exception) {
+    		// TODO: - Deal with answer not being able to be fetched
+    		System.err.println("Database error: " + exception.getMessage());
+            exception.printStackTrace();
+    	}
+    }
   
     private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(_ -> {
+        	if (Debug.isEnabled) System.out.println("Add Answer button clicked.");
         	String text = view.getTextInputArea().getText();
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Answer text cannot be empty or placeholder.");
@@ -95,7 +108,7 @@ public class QuestionDetailViewController {
             	try {
             		answerService.deleteAnswer(sel.getId());
             		refreshAnswers();
-            	} catch (SQLException exception) {
+            	} catch (DataAccessException exception) {
             		// TODO: - Deal with answer not being able to be deleted
                     System.err.println("Database error: " + exception.getMessage());
                     exception.printStackTrace();
@@ -110,7 +123,7 @@ public class QuestionDetailViewController {
         view.getBackButton().setOnAction(_ -> {
             ForumListView forumView = new ForumListView();
 
-            new ForumListViewController(dbConnectionStore, primaryStage, userSession, new ForumListView());
+            new ForumListViewController(dbConnectionStore, primaryStage, userSession, forumView);
 
             Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
             primaryStage.setScene(forumScene);
@@ -142,14 +155,5 @@ public class QuestionDetailViewController {
     	view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText());
     }
 
-    private void refreshAnswers() {
-    	try {
-    		view.getAnswerList().setItems(
-    				FXCollections.observableArrayList(answerService.getAllAnswers()));
-    	} catch (SQLException exception) {
-    		// TODO: - Deal with answer not being able to be fetched
-    		System.err.println("Database error: " + exception.getMessage());
-            exception.printStackTrace();
-    	}
-    }
+
 }

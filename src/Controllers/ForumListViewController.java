@@ -122,7 +122,7 @@ public class ForumListViewController {
                 		primaryStage, 
                 		selectedQuestion,
                 		userSession,
-                		new QuestionDetailView()
+                		detailView
                 );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
