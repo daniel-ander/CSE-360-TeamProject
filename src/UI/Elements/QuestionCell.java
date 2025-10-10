@@ -44,10 +44,10 @@ public class QuestionCell extends ListCell<Question> {
     }
 
     private String formatStatus(Question q) {
-        StringBuilder s = new StringBuilder();
-        if (q.getAnswered()) s.append("Answered ");
-        if (q.getResolved()) s.append("• Resolved ");
-        s.append("• Upvotes: ").append(q.getUpvoteCount());
-        return s.toString().trim();
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        if (q.getAnswered()) parts.add("Answered");
+        if (q.getResolved()) parts.add("Resolved");
+        parts.add("Upvotes: " + q.getUpvoteCount());
+        return String.join(" • ", parts);
     }
 }
