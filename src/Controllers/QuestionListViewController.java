@@ -4,6 +4,8 @@ import Models.Question;
 
 import Sessions.UserSession;
 
+import java.util.List;
+
 import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
 import Database.Services.Interfaces.IQuestionService;
@@ -49,7 +51,14 @@ public class QuestionListViewController {
  	// ===================
     
     private void refresh() {
-        view.getForumListView().setItems(FXCollections.observableArrayList(questionService.getAllQuestions()));
+    	List<Question> allQuestions = questionService.getAllQuestions();
+    	
+    	if (!view.getShowDeletedQuestionsCheckbox().isSelected()) {
+    	    allQuestions.removeIf(Question::getDeleted);
+    	}
+
+    	
+        view.getForumListView().setItems(FXCollections.observableArrayList(allQuestions));
         if (Debug.isEnabled) System.out.println("Forum list refreshed.");
     }
     private void setUpActions() {
@@ -57,7 +66,14 @@ public class QuestionListViewController {
     	setDeleteQuestionButtonAction();
     	setEditQuestionButtonAction();
     	setViewQuestionButtonAction();
+    	setShowDeletedQuestionsCheckboxAction();
     }
+    
+    private void setShowDeletedQuestionsCheckboxAction() {
+		view.getShowDeletedQuestionsCheckbox().setOnAction(_ -> {
+			refresh();
+		});
+	}
     
     private void setAddQuestionButtonAction() {
         // Add question
@@ -99,15 +115,20 @@ public class QuestionListViewController {
 	}
     
     private void setDeleteQuestionButtonAction() {
-    	// TODO: - Work with the DB
-        view.getDeleteQuestionButton().setOnAction(_ -> {
-            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (selectedQuestion != null) {
-                selectedQuestion.setText("Edited: " + selectedQuestion.getText());
-                refresh();
-            }
-        });
-		
+		// Delete question
+    	view.getDeleteQuestionButton().setOnAction(_-> {
+			Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+			if (selectedQuestion != null) {
+				try {
+					questionService.deleteQuestion(selectedQuestion.getId());
+					refresh();
+				} catch (DataAccessException dataAccessException) {
+					
+					System.err.println("Database error: " + dataAccessException.getMessage());
+					dataAccessException.printStackTrace();
+				}
+			}
+    	});
 	}
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page

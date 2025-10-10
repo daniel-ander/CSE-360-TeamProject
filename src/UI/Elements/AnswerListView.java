@@ -18,7 +18,7 @@ public class AnswerListView {
     private final Button backButton = new Button("Back");
     private final Button resolveButton = new Button("Question Resolved");
     private final Button replyToAnswerButton = new Button("Reply to Answer");
-    
+    private final CheckBox showDeletedAnswersCheckbox = new CheckBox("Show Deleted Answers");
     private final TextArea textInputArea = new TextArea("Input text here...");
     
 
@@ -41,7 +41,8 @@ public class AnswerListView {
         		editAnswerButton, 
         		deleteAnswerButton, 
         		backButton,
-        		replyToAnswerButton);
+        		replyToAnswerButton, 
+        		showDeletedAnswersCheckbox);
         controls.getStyleClass().add("small-padding");
         
         textInputArea.setWrapText(true);
@@ -64,5 +65,7 @@ public class AnswerListView {
     public Button getReplyToAnswerButton() { return replyToAnswerButton; }
     
     public TextArea getTextInputArea() { return textInputArea; }
+
+	public CheckBox getShowDeletedAnswersCheckbox() {return showDeletedAnswersCheckbox; }
     
 }

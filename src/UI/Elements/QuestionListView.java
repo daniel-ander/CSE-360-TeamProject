@@ -17,7 +17,7 @@ public class QuestionListView {
     private final Button deleteQuestionButton = new Button("Delete Question");
     private final Button returnButton = new Button("Back");
 	private final Button viewQuestionButton = new Button("View Question Details");
-	
+	private final CheckBox showDeletedQuestionsCheckbox = new CheckBox("Show Deleted Questions");
 	private final TextArea textInputArea = new TextArea("Input text here...");
 
     public QuestionListView() {
@@ -31,7 +31,7 @@ public class QuestionListView {
 
         textInputArea.setWrapText(true);
         
-        VBox controlBox = new VBox(8, addQuestionButton, viewQuestionButton, editQuestionButton, deleteQuestionButton);
+        VBox controlBox = new VBox(8, addQuestionButton, viewQuestionButton, editQuestionButton, deleteQuestionButton, showDeletedQuestionsCheckbox, returnButton);
         borderpane.setRight(controlBox);
         borderpane.setBottom(textInputArea);
     }
@@ -47,5 +47,7 @@ public class QuestionListView {
     public Button getReturnButton() { return returnButton; }
     
     public TextArea getTextInputArea() { return textInputArea; }
+
+	public CheckBox getShowDeletedQuestionsCheckbox() {return showDeletedQuestionsCheckbox;}
 
 }

@@ -57,6 +57,12 @@ public class AnswerListViewController {
     private void refreshAnswers() {
     	try {
     		List<Answer> allAnswers = answerService.getAllAnswersForQuestion(question.getId());
+    		
+    		if (!view.getShowDeletedAnswersCheckbox().isSelected()) {
+    		    allAnswers.removeIf(Answer::getIsDeleted);
+    		}
+
+    		
     		for (Answer a : allAnswers) {
     		    System.out.printf("Fetched answer ID %d parent=%d%n", a.getId(), a.getParentAnswerId());
     		}
@@ -70,7 +76,7 @@ public class AnswerListViewController {
             exception.printStackTrace();
     	}
     }
-  
+    
     private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(_ -> {
@@ -92,6 +98,12 @@ public class AnswerListViewController {
             }
         });
 		
+	}
+    
+    private void setShowDeletedAnswersCheckboxAction() {
+		view.getShowDeletedAnswersCheckbox().setOnAction(_ -> {
+			refreshAnswers();
+		});
 	}
     
     //TODO: - We're gonna need to figure out how to organize the replies to answers visually
@@ -224,6 +236,7 @@ public class AnswerListViewController {
     	setBackButtonAction();
     	setResolveButtonAction();
     	setReplyToAnswerButtonAction();
+    	setShowDeletedAnswersCheckboxAction();
     }
     
     private void setInitialLayout() {

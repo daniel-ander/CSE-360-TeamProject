@@ -96,13 +96,13 @@ public class AdminHomePageController {
 	
 	private void setSetTempPasswordButtonAction() {
 		view.getSetTempPasswordButton().setOnAction(_ -> {
-            String selectedUser = view.getUserDropdown().getValue();
-            if (selectedUser == null) return;
+            String selectedUserName = view.getUserDropdown().getValue();
+            if (selectedUserName == null) return;
             
             String tempPass = null;
             
             try {
-            	tempPass = userService.updatePasswordForUser(selectedUser);
+            	tempPass = userService.updatePasswordForUser(selectedUserName);
             } catch (DataAccessException e) {
             	// TODO: - Handle the case if the user couldn't update their password
             	System.err.println(e.getMessage());
@@ -112,22 +112,22 @@ public class AdminHomePageController {
             if (tempPass == null) {
                 view.setTempPasswordInfoLabel("Error setting temp password");
             } else {
-                view.setTempPasswordInfoLabel("Temp password for " + selectedUser + " is: " + tempPass);
+                view.setTempPasswordInfoLabel("Temp password for " + selectedUserName + " is: " + tempPass);
             }
         });
 	}
 	
 	private void setOnUserDropdownAction() {
 		view.getUserDropdown().setOnAction(_ -> {
-            String selectedUser = view.getUserDropdown().getValue();
-            if (selectedUser == null) return;
+            String selectedUserName = view.getUserDropdown().getValue();
+            if (selectedUserName == null) return;
             
             User.Role role;
             int userId;
             
             try {
-            	role = userService.getUserRole(selectedUser);
-            	userId = userService.getUserIdByName(selectedUser);
+            	role = userService.getUserRole(selectedUserName);
+            	userId = userService.getUserIdByName(selectedUserName);
             } catch (DataAccessException e) {
             	// TODO: - Handle the case if user role can't be fetched
             	System.err.println(e.getMessage());
@@ -164,7 +164,7 @@ public class AdminHomePageController {
 
             // Update details section
             view.setUserDetailsLabel(
-                "User: " + selectedUser + "\n" +
+                "User: " + selectedUserName + "\n" +
                 "User ID: " + userId + "\n" +
                 "Roles: " + role.name() + "\n" +
                 "Other info: (e.g., last login, email, etc.)"
@@ -175,11 +175,11 @@ public class AdminHomePageController {
 	
 	private void setUserDeleteButtonAction() {
 		view.getDeleteUserButton().setOnAction(_ -> {
-            String selectedUser = view.getUserDropdown().getValue();
-            if (selectedUser == null) return;
+            String selectedUserName = view.getUserDropdown().getValue();
+            if (selectedUserName == null) return;
 
             // Prevent deleting own admin account
-            if (selectedUser.equals(userSession.getCurrentUserName())) {
+            if (selectedUserName.equals(userSession.getCurrentUserName())) {
                 view.getWarningAlert().setTitle("Action Not Allowed");
                 view.getWarningAlert().setHeaderText("You cannot delete your own admin account.");
                 view.getWarningAlert().setContentText("Please have another admin remove this account if needed.");
@@ -190,20 +190,20 @@ public class AdminHomePageController {
             // Confirm deletion
             
             view.getConfirmationAlert().setTitle("Delete User");
-            view.getConfirmationAlert().setHeaderText("Are you sure you want to delete user: " + selectedUser + "?");
+            view.getConfirmationAlert().setHeaderText("Are you sure you want to delete user: " + selectedUserName + "?");
             view.getConfirmationAlert().setContentText("This action cannot be undone.");
 
             Optional<ButtonType> result = view.getConfirmationAlert().showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
             	try {
-	                boolean success = userService.deleteUser(userSession.getCurrentUserName(), selectedUser);
+	                boolean success = userService.deleteUser(userSession.getCurrentUserName(), selectedUserName);
 	                if (success) {
-	                    view.getUserDropdown().getItems().remove(selectedUser);
+	                    view.getUserDropdown().getItems().remove(selectedUserName);
 	                    view.getUserDropdown().setValue(null);
 	
 	                    view.getInfoAlert().setTitle("Deleted");
 	                    view.getInfoAlert().setHeaderText(null);
-	                    view.getInfoAlert().setContentText("User " + selectedUser + " deleted.");
+	                    view.getInfoAlert().setContentText("User " + selectedUserName + " deleted.");
 	                    view.getInfoAlert().showAndWait();
 	                } else {
 	                    view.getErrorAlert().setTitle("Error");
@@ -222,8 +222,8 @@ public class AdminHomePageController {
 	
 	private void setSaveRolesButtonAction() {
 
-        String selectedUser = view.getUserDropdown().getValue();
-        if (selectedUser == null) return;
+        String selectedUserName = view.getUserDropdown().getValue();
+        if (selectedUserName == null) return;
 
         // Build new role list from checkboxes
         List<String> roles = new ArrayList<>();
@@ -236,15 +236,15 @@ public class AdminHomePageController {
         // Update details view
         String roleStr = String.join(",", roles);
         view.setUserDetailsLabel(
-            "User: " + selectedUser + "\n" +
+            "User: " + selectedUserName + "\n" +
             "Roles: " + (roleStr.isEmpty() ? "None" : roleStr) + "\n" +
             "Other info: (e.g., last login, email, etc.)"
         );
 
         // Save roles in database
         try {
-	        userService.updateUserRole(selectedUser, User.Role.admin);
-	        System.out.println("Updated Roles for " + selectedUser + ": " + roles);
+	        userService.updateUserRole(selectedUserName, User.Role.admin);
+	        System.out.println("Updated Roles for " + selectedUserName + ": " + roles);
 	        userService.printUsersTable();
         } catch (DataAccessException e) {
         	// TODO: - Handle the case if user role couldn't be updated or user table printed

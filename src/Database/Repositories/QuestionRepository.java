@@ -57,7 +57,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAllQuestions() throws SQLException {
 		List<Question> allQuestions = new ArrayList<>();
-		String getAllQuestions = "SELECT * FROM ForumQuestions WHERE isDeleted = FALSE";
+		String getAllQuestions = "SELECT * FROM ForumQuestions";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -81,7 +81,7 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public Question getQuestionById(int searchId) throws SQLException {
-		String getQuestionById = "SELECT * FROM ForumQuestions WHERE id = ? AND isDeleted = FALSE";
+		String getQuestionById = "SELECT * FROM ForumQuestions WHERE id = ?";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionById)) {
 			pstmt.setInt(1, searchId);
@@ -106,7 +106,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAnsweredQuestions() throws SQLException {
 		List<Question> answeredQuestions = new ArrayList<>();
-		String getAnsweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = TRUE AND isDeleted = FALSE";
+		String getAnsweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = TRUE";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnsweredQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -130,7 +130,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getUnansweredQuestions() throws SQLException {
 		List<Question> unansweredQuestions = new ArrayList<>();
-		String getUnansweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = FALSE AND isDeleted = FALSE";
+		String getUnansweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = FALSE";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getUnansweredQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -156,7 +156,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsBySearch(String searchString) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getQuestionsBySearch = "SELECT * FROM ForumQuestions WHERE (title LIKE ? OR body LIKE ?) AND isDeleted = FALSE";
+		String getQuestionsBySearch = "SELECT * FROM ForumQuestions WHERE (title LIKE ? OR body LIKE ?)";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionsBySearch)) {
 			String searchPattern = "%" + searchString + "%";
@@ -183,7 +183,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsFromUser(int userId) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getQuestionsFromUser = "SELECT * FROM ForumQuestions WHERE userId = ? AND isDeleted = FALSE";
+		String getQuestionsFromUser = "SELECT * FROM ForumQuestions WHERE userId = ?";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionsFromUser)) {
 			pstmt.setInt(1, userId);
@@ -211,7 +211,7 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean updateQuestion(int id, String newText) throws SQLException {
-		String updateQuestion = "UPDATE ForumQuestions SET body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ? AND isDeleted = FALSE";
+		String updateQuestion = "UPDATE ForumQuestions SET body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ?";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(updateQuestion)) {
 			pstmt.setString(1, newText);
