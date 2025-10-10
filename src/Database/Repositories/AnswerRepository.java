@@ -16,7 +16,7 @@ import Database.Repositories.Interfaces.IAnswerRepository;
 
 
 public class AnswerRepository implements IAnswerRepository {
-	IGeneralDBManager generalDBManager;
+	private final IGeneralDBManager generalDBManager;
 	
 	public AnswerRepository(IGeneralDBManager generalDBManager) {
 		this.generalDBManager = generalDBManager;
@@ -48,6 +48,10 @@ public class AnswerRepository implements IAnswerRepository {
 	// ===================
     // 		 READ 
  	// ===================
+	
+	// TODO: we likely want to retrieve all and let the UI handle filtering
+	//       All of these queries currently filter deleted answers
+	
 	
 	@Override
 	public List<Answer> getAll() throws SQLException {
