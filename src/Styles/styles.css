@@ -54,7 +54,46 @@
 	font-style: italic;
 }
 
+.answer-cell {
+    -fx-spacing: 4;
+    -fx-padding: 8;
+}
 
+.answer-text {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-wrap-text: true;
+}
+
+.answer-meta {
+    -fx-font-family: "System";
+    -fx-font-size: 10px;
+    -fx-font-weight: normal;
+    -fx-text-fill: gray;
+}
+
+.question-cell {
+    -fx-padding: 8;
+    -fx-spacing: 4;
+}
+
+.question-title {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.question-body {
+    -fx-font-family: "System";
+    -fx-font-size: 12px;
+}
+
+.question-status {
+    -fx-font-family: "System";
+    -fx-font-size: 11px;
+    -fx-text-fill: gray;
+}
 
 
 

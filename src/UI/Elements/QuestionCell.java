@@ -3,27 +3,31 @@ package UI.Elements;
 import Models.Question;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.text.*;
 
 public class QuestionCell extends ListCell<Question> {
-    private final VBox layout = new VBox(4);
+    private final VBox layout = new VBox();
     private final Label titleLabel = new Label();
     private final Label textLabel = new Label();
     private final Label statusLabel = new Label();
 
     public QuestionCell() {
-        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         titleLabel.setWrapText(true);
-
-        textLabel.setFont(Font.font(12));
         textLabel.setWrapText(true);
-
-        statusLabel.setFont(Font.font(11));
-        statusLabel.setStyle("-fx-text-fill: gray;");
 
         layout.getChildren().addAll(titleLabel, textLabel, statusLabel);
         layout.setFillWidth(true);
         layout.setMaxWidth(Double.MAX_VALUE);
+
+        // Attach stylesheet
+        layout.getStylesheets().add(
+            getClass().getResource("/Styles/styles.css").toExternalForm()
+        );
+
+        // Assign style classes
+        layout.getStyleClass().add("question-cell");
+        titleLabel.getStyleClass().add("question-title");
+        textLabel.getStyleClass().add("question-body");
+        statusLabel.getStyleClass().add("question-status");
     }
 
     @Override
@@ -33,7 +37,7 @@ public class QuestionCell extends ListCell<Question> {
             setGraphic(null);
         } else {
             titleLabel.setText(q.getTitle());
-            textLabel.setText(truncate(q.getText(), 150)); // preview
+            textLabel.setText(truncate(q.getText(), 150));
             statusLabel.setText(formatStatus(q));
             setGraphic(layout);
         }
@@ -44,7 +48,7 @@ public class QuestionCell extends ListCell<Question> {
     }
 
     private String formatStatus(Question q) {
-        java.util.List<String> parts = new java.util.ArrayList<>();
+        var parts = new java.util.ArrayList<String>();
         if (q.getAnswered()) parts.add("Answered");
         if (q.getResolved()) parts.add("Resolved");
         parts.add("Upvotes: " + q.getUpvoteCount());

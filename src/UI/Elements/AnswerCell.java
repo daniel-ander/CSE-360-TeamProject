@@ -4,7 +4,6 @@ import Models.Answer;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.text.*;
 
 public class AnswerCell extends ListCell<Answer> {
     private final VBox layout = new VBox(4);
@@ -13,15 +12,17 @@ public class AnswerCell extends ListCell<Answer> {
 
     public AnswerCell() {
         textLabel.setWrapText(true);
-        textLabel.setFont(Font.font("System", FontWeight.NORMAL, 13));
-
-        metaLabel.setFont(Font.font("System", FontWeight.NORMAL, 10));
-        metaLabel.setStyle("-fx-text-fill: gray;");
 
         layout.getChildren().addAll(textLabel, metaLabel);
         layout.setFillWidth(true);
-    }
+        layout.getStylesheets().add(
+            getClass().getResource("/Styles/styles.css").toExternalForm()
+        );
 
+        layout.getStyleClass().add("answer-cell");
+        textLabel.getStyleClass().add("answer-text");
+        metaLabel.getStyleClass().add("answer-meta");
+    }
     @Override
     protected void updateItem(Answer a, boolean empty) {
         super.updateItem(a, empty);
