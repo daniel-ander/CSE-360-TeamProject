@@ -40,7 +40,7 @@ public class GeneralDBManager implements IGeneralDBManager{
 	@Override
 	public void createTables() throws SQLException {
 	    String userTableQuery = "CREATE TABLE IF NOT EXISTS cse360users ("
-	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "id IDENTITY PRIMARY KEY, "
 	            + "userName VARCHAR(255) UNIQUE, "
 	            + "password VARCHAR(255), "
 	            + "role VARCHAR(225))";
@@ -52,26 +52,26 @@ public class GeneralDBManager implements IGeneralDBManager{
 	            + "isUsed BOOLEAN DEFAULT FALSE)";
 	    
 	    String forumQuestionsTableQuery = "CREATE TABLE IF NOT EXISTS ForumQuestions ("
-	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "id IDENTITY PRIMARY KEY, "
 	            + "userId INT, "
 	            + "title VARCHAR(255), "
 	            + "body TEXT, "
 	            + "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 	            + "answered BOOLEAN DEFAULT FALSE, "
 	            + "resolved BOOLEAN DEFAULT FALSE, "
-	            + "softDeleted BOOLEAN DEFAULT FALSE, "
+	            + "isDeleted BOOLEAN DEFAULT FALSE, "
 	            + "upvoteCount INT DEFAULT 0, "
 	            + "FOREIGN KEY (userId) REFERENCES cse360users(id))";
 	    
 	    String forumAnswersTableQuery = "CREATE TABLE IF NOT EXISTS ForumAnswers ("
-	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "id IDENTITY PRIMARY KEY, "
 	            + "questionId INT, "
-	            + "parentAnswerId INT DEFAULT -1, "
+	            + "parentAnswerId INT DEFAULT NULL, "
 	            + "userId INT, "
 	            + "body TEXT, "
 	            + "isCorrect BOOLEAN DEFAULT FALSE, "
 	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-	            + "softDeleted BOOLEAN DEFAULT FALSE, "
+	            + "isDeleted BOOLEAN DEFAULT FALSE, "
 	            + "upvoteCount INT DEFAULT 0, "
 	            + "FOREIGN KEY (questionId) REFERENCES ForumQuestions(id), "
 	            + "FOREIGN KEY (parentAnswerId) REFERENCES ForumAnswers(id), "
@@ -118,7 +118,9 @@ public class GeneralDBManager implements IGeneralDBManager{
 	
 	public Connection getConnection() throws SQLException {
 		System.out.println("Connecting to database...");
-		return DriverManager.getConnection(DB_URL, USER, PASS);
+		Connection connection =  DriverManager.getConnection(DB_URL, USER, PASS);
+		connection.setAutoCommit(true); // Enable auto-commit mode
+		return connection;
 	}
 
 }

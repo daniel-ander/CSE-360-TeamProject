@@ -116,6 +116,47 @@ public class UserRepository implements IUserRepository {
 		return usernames;
 	}
 	
+	@Override
+	public User getUserByNameAndPassword(String userName, String password) throws SQLException {
+	    String query = "SELECT * FROM cse360users WHERE userName = ? AND password = ?";
+	    try (Connection connection = generalDBManager.getConnection();
+	         PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, userName);
+	        pstmt.setString(2, password);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            int id = rs.getInt("id");
+	            String dbUserName = rs.getString("userName");
+	            String dbPassword = rs.getString("password");
+	            String roleString = rs.getString("role");
+	            User.Role role = User.roleFromString(roleString);
+
+	            User user = new User(dbUserName, dbPassword, role);
+	            user.setId(id);
+	            return user;
+	        }
+	    }
+	    return null; // If no user exists or an error occurs
+	}
+
+	@Override
+	public int getUserIdByName(String userName) throws SQLException {
+		String query = "SELECT id FROM cse360users WHERE userName = ?";
+		try (Connection connection = generalDBManager.getConnection(); 
+				PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, userName);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return rs.getInt("id"); // Return the ID if user exists
+	        }
+	    }
+		return -1; // If no user exists or an error occurs
+	}
+
+
+	
 	// ===================
     // 		 UPDATE 
  	// ===================
@@ -183,5 +224,13 @@ public class UserRepository implements IUserRepository {
 
 	    } 
 	}
+
+	@Override
+	public User getUserByName(String userName) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 		
 }

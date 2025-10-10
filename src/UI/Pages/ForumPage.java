@@ -1,6 +1,6 @@
 package UI.Pages;
 
-import UI.Elements.ForumListView;
+import UI.Elements.QuestionListView;
 import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,7 +20,7 @@ public class ForumPage implements IInitializable {
     private final Button logoutButton = new Button("Logout");
     private final Button changeRolesButton = new Button("Change Roles");
 
-    private ForumListView forumListView;
+    private QuestionListView questionListView;
 
     // ===================
     // 		 GETTERS 
@@ -37,8 +37,8 @@ public class ForumPage implements IInitializable {
     public BorderPane getRoot() {
         return root;
     }
-    public ForumListView getForumListView() {
-		return forumListView;
+    public QuestionListView getForumListView() {
+		return questionListView;
 	}
 
     // ===================
@@ -57,8 +57,8 @@ public class ForumPage implements IInitializable {
         root.setTop(header);
 
         // Embed ForumListView in the center (empty for now, controller will attach)
-        forumListView = new ForumListView();
-        root.setCenter(forumListView.getLayout());
+        questionListView = new QuestionListView();
+        root.setCenter(questionListView.getLayout());
 
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);

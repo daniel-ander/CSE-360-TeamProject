@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 
-public class ForumListView {
+public class QuestionListView {
 	
     private final BorderPane borderpane = new BorderPane();
     
@@ -17,17 +17,21 @@ public class ForumListView {
     private final Button deleteQuestionButton = new Button("Delete Question");
     private final Button returnButton = new Button("Back");
 	private final Button viewQuestionButton = new Button("View Question Details");
-	
+	private final CheckBox showDeletedQuestionsCheckbox = new CheckBox("Show Deleted Questions");
 	private final TextArea textInputArea = new TextArea("Input text here...");
 
-    public ForumListView() {
+    public QuestionListView() {
         // ListView in center
         forumListView = new ListView<>();
+        
+        //XXX: working on this, could break. trying to add cells to the UI 
+        forumListView.setCellFactory(_-> new QuestionCell());
+        
         borderpane.setCenter(forumListView);
 
         textInputArea.setWrapText(true);
         
-        VBox controlBox = new VBox(8, addQuestionButton, viewQuestionButton, editQuestionButton, deleteQuestionButton);
+        VBox controlBox = new VBox(8, addQuestionButton, viewQuestionButton, editQuestionButton, deleteQuestionButton, showDeletedQuestionsCheckbox, returnButton);
         borderpane.setRight(controlBox);
         borderpane.setBottom(textInputArea);
     }
@@ -43,5 +47,7 @@ public class ForumListView {
     public Button getReturnButton() { return returnButton; }
     
     public TextArea getTextInputArea() { return textInputArea; }
+
+	public CheckBox getShowDeletedQuestionsCheckbox() {return showDeletedQuestionsCheckbox;}
 
 }

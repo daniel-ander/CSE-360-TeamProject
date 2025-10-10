@@ -73,6 +73,12 @@ public class AdminSetupPageController {
             	// Create a new User object with admin role and register in the database
             	User user=new User(userName, password, User.Role.admin);
                 userService.register(user);
+
+                User registeredUser = userService.getUserByNameAndPassword(userName, password);
+                if (registeredUser == null) {
+                    view.setErrorLabel("Error retrieving user from database after registration.");
+                    return;
+                }
                 
                 System.out.println("Administrator setup completed.");
                 

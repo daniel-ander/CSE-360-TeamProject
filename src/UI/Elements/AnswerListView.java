@@ -5,12 +5,12 @@ import Models.Answer;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-public class QuestionDetailView {
+public class AnswerListView {
     private final BorderPane root = new BorderPane();
     
     private final Label questionLabel = new Label();
     
-    private final ListView<Answer> answerList = new ListView<>();
+    private final ListView<Answer> answerListView;
     
     private final Button addAnswerButton = new Button("Add Answer");
     private final Button editAnswerButton = new Button("Edit Answer");
@@ -18,18 +18,31 @@ public class QuestionDetailView {
     private final Button backButton = new Button("Back");
     private final Button resolveButton = new Button("Question Resolved");
     private final Button replyToAnswerButton = new Button("Reply to Answer");
-    
+    private final CheckBox showDeletedAnswersCheckbox = new CheckBox("Show Deleted Answers");
     private final TextArea textInputArea = new TextArea("Input text here...");
     
 
-    public QuestionDetailView() {
+    public AnswerListView() {
         VBox topBox = new VBox(10, questionLabel);
         topBox.getStyleClass().addAll("main-label", "small-padding");
         
         root.setTop(topBox);
-        root.setCenter(answerList);
+        answerListView = new ListView<>();
+        
+        //XXX: Working on a cell factory to make answers look better
+        answerListView.setCellFactory(_ -> new AnswerCell());
 
-        VBox controls = new VBox(8, addAnswerButton, resolveButton, editAnswerButton, deleteAnswerButton, backButton);
+        
+        root.setCenter(answerListView);
+
+        VBox controls = new VBox(8, 
+        		addAnswerButton, 
+        		resolveButton, 
+        		editAnswerButton, 
+        		deleteAnswerButton, 
+        		backButton,
+        		replyToAnswerButton, 
+        		showDeletedAnswersCheckbox);
         controls.getStyleClass().add("small-padding");
         
         textInputArea.setWrapText(true);
@@ -42,7 +55,7 @@ public class QuestionDetailView {
     
     public Label getQuestionLabel() { return questionLabel; }
     
-    public ListView<Answer> getAnswerList() { return answerList; }
+    public ListView<Answer> getAnswerList() { return answerListView; }
     
     public Button getAddAnswerButton() { return addAnswerButton; }
     public Button getEditAnswerButton() { return editAnswerButton; }
@@ -52,5 +65,7 @@ public class QuestionDetailView {
     public Button getReplyToAnswerButton() { return replyToAnswerButton; }
     
     public TextArea getTextInputArea() { return textInputArea; }
+
+	public CheckBox getShowDeletedAnswersCheckbox() {return showDeletedAnswersCheckbox; }
     
 }

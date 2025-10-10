@@ -4,32 +4,34 @@ import Models.Question;
 
 import Sessions.UserSession;
 
+import java.util.List;
+
 import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
 import Database.Services.Interfaces.IQuestionService;
 
 import Exceptions.DBExceptions.DataAccessException;
 
-import UI.Elements.ForumListView;
-import UI.Elements.QuestionDetailView;
+import UI.Elements.QuestionListView;
+import UI.Elements.AnswerListView;
 import Utils.Debug;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 
 
-public class ForumListViewController {
+public class QuestionListViewController {
 	private final DBConnectionStore dBConnectionStore;
 	private final IGeneralDBManager generalDBManager;
 	private final IQuestionService questionService;
     private final UserSession userSession;
-    private final ForumListView view;
+    private final QuestionListView view;
     private final Stage primaryStage;
 
-    public ForumListViewController(
+    public QuestionListViewController(
     		DBConnectionStore dBConnectionStore, 
     		Stage primaryStage, 
     		UserSession userSession, 
-    		ForumListView view
+    		QuestionListView view
     	) {
         this.view = view;
         this.generalDBManager = dBConnectionStore.getGeneralDBManager();
@@ -49,7 +51,14 @@ public class ForumListViewController {
  	// ===================
     
     private void refresh() {
-        view.getForumListView().setItems(FXCollections.observableArrayList(questionService.getAllQuestions()));
+    	List<Question> allQuestions = questionService.getAllQuestions();
+    	
+    	if (!view.getShowDeletedQuestionsCheckbox().isSelected()) {
+    	    allQuestions.removeIf(Question::getDeleted);
+    	}
+
+    	
+        view.getForumListView().setItems(FXCollections.observableArrayList(allQuestions));
         if (Debug.isEnabled) System.out.println("Forum list refreshed.");
     }
     private void setUpActions() {
@@ -57,7 +66,14 @@ public class ForumListViewController {
     	setDeleteQuestionButtonAction();
     	setEditQuestionButtonAction();
     	setViewQuestionButtonAction();
+    	setShowDeletedQuestionsCheckboxAction();
     }
+    
+    private void setShowDeletedQuestionsCheckboxAction() {
+		view.getShowDeletedQuestionsCheckbox().setOnAction(_ -> {
+			refresh();
+		});
+	}
     
     private void setAddQuestionButtonAction() {
         // Add question
@@ -68,11 +84,11 @@ public class ForumListViewController {
         		return;
         	}
         	// TODO: - Add title input field, set to default for now
-            Question q = new Question("Default Title", userSession.currentUser().getId(), text);
+            Question q = new Question(userSession.currentUser().getId(), "Default Title", text);
             try {
             	questionService.addQuestion(q);
             	refresh(); //test
-            	System.out.println("Added question: " + text);
+            	if (Debug.isEnabled) System.out.println("Added question: " + text);
             } catch (DataAccessException dataAccessException) {
             	// TODO:- Handle outcome if the question can't be added
                 System.err.println("Database error: " + dataAccessException.getMessage());
@@ -99,15 +115,20 @@ public class ForumListViewController {
 	}
     
     private void setDeleteQuestionButtonAction() {
-    	// TODO: - Work with the DB
-        view.getDeleteQuestionButton().setOnAction(_ -> {
-            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (selectedQuestion != null) {
-                selectedQuestion.setText("Edited: " + selectedQuestion.getText());
-                refresh();
-            }
-        });
-		
+		// Delete question
+    	view.getDeleteQuestionButton().setOnAction(_-> {
+			Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+			if (selectedQuestion != null) {
+				try {
+					questionService.deleteQuestion(selectedQuestion.getId());
+					refresh();
+				} catch (DataAccessException dataAccessException) {
+					
+					System.err.println("Database error: " + dataAccessException.getMessage());
+					dataAccessException.printStackTrace();
+				}
+			}
+    	});
 	}
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
@@ -115,14 +136,14 @@ public class ForumListViewController {
             Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             
             if (selectedQuestion != null) {
-                QuestionDetailView detailView = new QuestionDetailView();
+                AnswerListView detailView = new AnswerListView();
                 
-                new QuestionDetailViewController(
+                new AnswerListViewController(
                 		dBConnectionStore,
                 		primaryStage, 
                 		selectedQuestion,
                 		userSession,
-                		new QuestionDetailView()
+                		detailView
                 );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());

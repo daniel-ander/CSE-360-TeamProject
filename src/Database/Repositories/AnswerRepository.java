@@ -1,9 +1,14 @@
 package Database.Repositories;
 
 import Models.Answer;
+import Utils.Debug;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import Database.IGeneralDBManager;
@@ -21,60 +26,194 @@ public class AnswerRepository implements IAnswerRepository {
     // 		 CREATE 
  	// ===================
 
-	@Override
-	public int insertAnswer(int questionId, int currentUserId, String text) throws SQLException {
-		// TODO: - Perform query
-		return 1; // We need to return the ID of the newly-created answer
+	public boolean insertAnswer(Answer a) throws SQLException {
+	    String insertSQL = "INSERT INTO ForumAnswers (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)";
+	    try (Connection connection = generalDBManager.getConnection();
+	         PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+
+	        pstmt.setInt(1, a.getQuestionId());
+	        if (a.getParentAnswerId() == null) {
+	            pstmt.setNull(2, java.sql.Types.INTEGER);
+	        } else {
+	            pstmt.setInt(2, a.getParentAnswerId());
+	        }
+	        pstmt.setInt(3, a.getAuthorId());
+	        pstmt.setString(4, a.getText());
+	        pstmt.executeUpdate();
+
+	        try (ResultSet keys = pstmt.getGeneratedKeys()) {
+	            if (keys.next()) a.setId(keys.getInt(1));
+	        }
+	    }
+	    return true;
 	}
-	@Override
-	public int insertReply(int questionId, int parentAnswerId, int currentUserId, String text) throws SQLException {
-		return 1; // We need to return the ID of the newly-created answer
-	}
+
 	
 	// ===================
     // 		 READ 
  	// ===================
 	
+	// TODO: we likely want to retrieve all and let the UI handle filtering
+	//       All of these queries currently filter deleted answers
+	
+	
+	
 	@Override
 	public List<Answer> getAll() throws SQLException {
-		// TODO: - Perform query
-		return null;
+		List<Answer> allAnswers = new ArrayList<>();
+		String getAllAnswers = "SELECT * FROM ForumAnswers";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAllAnswers)){
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				allAnswers.add(a);
+			}
+		}
+		return allAnswers;
 	}
 	
 	@Override
-	public List<Answer> getAllAnswersForQuestion(int questionId) throws SQLException {
-		// TODO: - Perform query
-		return null;
+	public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException {
+		List<Answer> allAnswersForQuestion = new ArrayList<>();
+		//TODO: we might need this to check parentId depending on how we want to display answers
+		//		for now we will just get all answers for a question
+		String getAllAnswersForQuestion = "SELECT * FROM ForumAnswers WHERE questionId = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestion)){
+			pstmt.setInt(1, questionId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				allAnswersForQuestion.add(a);
+			}
+		}
+		return allAnswersForQuestion;
 	}
 	@Override
 	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
-		return null;
+		List<Answer> repliesToAnswerById = new ArrayList<>();
+		String getRepliesToAnswerById = "SELECT * FROM ForumAnswers WHERE parentAnswerId = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getRepliesToAnswerById)){
+			pstmt.setInt(1, parentAnswerId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				repliesToAnswerById.add(a);
+			}
+		}
+		
+		return repliesToAnswerById;
 	}
 	
 	
 	@Override
 	public Answer getAnswerById(int answerId) throws SQLException {
-		// TODO: - Perform query
-		return null;
+		String getAnswerById = "SELECT * FROM ForumAnswers WHERE id = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAnswerById)){
+			pstmt.setInt(1, answerId);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				return a;
+			}
+		}
+		return null; // Answer not found
 	}
 	
 	@Override
 	public List<Answer> getCorrectAnswers() throws SQLException {
-    	// TODO: - Perform query
-    	return null;
+		List<Answer> correctAnswers = new ArrayList<>();
+    	String getCorrectAnswers = "SELECT * FROM ForumAnswers WHERE isCorrect = TRUE";
+    	try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswers)){
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				correctAnswers.add(a);
+			}
+    	}
+    	return correctAnswers;
     }
     
 	@Override
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException {
-    	// TODO: - Perform query
-    	return null;
+    	List<Answer> answersBySearch = new ArrayList<>();
+    	String getAnswersBySearch = "SELECT * FROM ForumAnswers WHERE body LIKE ?";
+    	try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAnswersBySearch)){
+			pstmt.setString(1, "%" + searchString + "%");
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				answersBySearch.add(a);
+			}
+    	}
+    	return answersBySearch;
     }
     
-	@Override
-    public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException {
-    	// TODO: - Perform query
-    	return null;
-    }
 	
 	// ===================
     // 		 UPDATE 
@@ -82,7 +221,18 @@ public class AnswerRepository implements IAnswerRepository {
     
 	@Override
     public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException {
-		// TODO: - Perform query
+		String updateAnswer = "UPDATE ForumAnswers SET body = ?, isCorrect = ? WHERE id = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(updateAnswer)){
+			pstmt.setString(1, newText);
+			pstmt.setBoolean(2, newCorrect);
+			pstmt.setInt(3, id);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected == 0) {
+				if (Debug.isEnabled) System.out.println("No answer found with ID: " + id + " to update.");
+				return false; // No answer found to update
+			}
+		}
 		return true;
 	}
 	
@@ -92,13 +242,31 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	@Override
 	public boolean deleteAnswerById(int id) throws SQLException {
-		// TODO: - Perform query
+		String deleteAnswerById = "UPDATE ForumAnswers SET isDeleted = TRUE WHERE id = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(deleteAnswerById)){
+			pstmt.setInt(1, id);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected == 0) {
+				if (Debug.isEnabled) System.out.println("No answer found with ID: " + id + " to delete.");
+				return false; // No answer found to delete
+			}
+		}
 		return true;
 	}
 	
 	@Override
 	public boolean deleteByQuestionId(int questionId) throws SQLException {
-		// TODO: - Perform query
+		String deleteByQuestionId = "UPDATE ForumAnswers SET isDeleted = TRUE WHERE questionId = ?";
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(deleteByQuestionId)){
+			pstmt.setInt(1, questionId);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected == 0) {
+				if (Debug.isEnabled) System.out.println("No answers found for question ID: " + questionId + " to delete.");
+				return false; // No answers found to delete
+			}
+		}
 		return true;
 	}
 

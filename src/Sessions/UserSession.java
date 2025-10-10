@@ -26,6 +26,10 @@ public class UserSession {
     	return user.getRole();
     }
     
+    public int getCurrentUserId() {
+		return user.getId();
+	}
+    
     public boolean getLoggedStatus() {
     	return isLoggedIn;
     }
