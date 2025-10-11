@@ -271,9 +271,10 @@ public class PermissionRepository implements IPermissionRepository {
 					pstmt.addBatch(); 
 				}
 			}
-			pstmt.executeBatch(); 
+			pstmt.executeBatch();
 			System.out.println("Role-permission mappings seeded successfully.");
 		}
+		
 		
 		Map<String, List<String>> answerRolePermissions = new HashMap<>();
 
