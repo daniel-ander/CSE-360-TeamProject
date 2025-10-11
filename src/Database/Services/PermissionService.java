@@ -2,6 +2,7 @@ package Database.Services;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import Database.Repositories.Interfaces.IPermissionRepository;
 import Database.Services.Interfaces.IPermissionService;
@@ -14,6 +15,16 @@ public class PermissionService implements IPermissionService {
     public PermissionService(IPermissionRepository permissionRepository) {
         this.permissionRepository = permissionRepository;
     }
+    
+    @Override
+	public Map<Integer, List<String>> getEffectivePermissions(int userId, List<Integer> postIds, boolean isQuestion)
+			throws DataAccessException {
+    	try {
+			return permissionRepository.getEffectivePermissions(userId, postIds, isQuestion);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to effective permissions for userId: " + e.getMessage());
+		}
+	}
     
     // We get the list of permissions a user has in relation to a post. IE: ["CREATE", "UPVOTE", "EDIT"]
     public List<String> getEffectivePermissions(int userId, int postId, boolean isQuestion) throws DataAccessException {
@@ -41,4 +52,5 @@ public class PermissionService implements IPermissionService {
     		System.out.println("Could not seed role permissions due to: " + e.getMessage());
     	}
     }
+
 }

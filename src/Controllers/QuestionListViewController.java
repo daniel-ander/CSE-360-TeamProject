@@ -64,6 +64,16 @@ public class QuestionListViewController {
             }
 
             List<QuestionDisplayViewModel> viewModels = new ArrayList<>();
+            List<Integer> questionIds = new ArrayList<>();
+            
+//            permissionService.togglePermissionException(userSession.getCurrentUserId(), 5, "COMMENT", true);
+//           
+//            System.out.println(String.join(", ", permissionService.getEffectivePermissions(userSession.getCurrentUserId(), 5, true)));
+            //permissionService.getEffectivePermissions(userSession.getCurrentUserId(), 5, true);
+            
+            for (Question question : allQuestions) {
+                questionIds.add(question.getId());
+            }
 
             for (Question question : allQuestions) {
                 List<String> userPermissions = permissionService
