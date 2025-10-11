@@ -33,7 +33,6 @@ public class StartCSE360 extends Application {
         	PermissionService permissionService = (PermissionService)sharedConnectionProvider.getPermissionService();
         	
         	if(!initializingConnectionManager.doesDatabaseExist(databaseLocation)) {  
-        		System.out.println("Blah");
             	initializingConnectionManager.initializeDB();
             	permissionService.seedRolePermissions();  													
         	

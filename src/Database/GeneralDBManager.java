@@ -3,11 +3,13 @@ package Database;
 import java.io.File;
 import java.sql.*;
 
+import Config.DefaultRolePermissions;
 import Models.Answer;
 import Models.Invitation;
 import Models.Permission;
 import Models.Question;
 import Models.User;
+
 
 /**
  * The GeneralDBManager class is responsible for managing the connection to the
@@ -74,17 +76,17 @@ public class GeneralDBManager implements IGeneralDBManager {
 		String permissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ( " + "id SERIAL PRIMARY KEY, "
 				+ "name VARCHAR(20) UNIQUE NOT NULL)", Permission.tableName);
 
-		String questionPermissionTableQuery = "CREATE TABLE IF NOT EXISTS question_permissions ( "
+		String questionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS question_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN ('admin', 'student', 'instructor', 'staff', 'reviewer')), "
-				+ "CHECK (permission IN ('VIEW', 'COMMENT', 'EDIT', 'DELETE', 'APPROVE', 'UPVOTE')))";
+				+ "CHECK (permission IN (%s)))", String.join(", ", DefaultRolePermissions.QuestionPermissions.getAllPermissions()));
 
-		String answerPermissionTableQuery = "CREATE TABLE IF NOT EXISTS answer_permissions ( "
+		String answerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS answer_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN ('admin', 'student', 'instructor', 'staff', 'reviewer')), "
-				+ "CHECK (permission IN ('VIEW', 'COMMENT', 'EDIT', 'DELETE', 'UPVOTE')))";
+				+ "CHECK (permission IN ('VIEW', 'COMMENT', 'EDIT', 'DELETE', 'UPVOTE')))", String.join(", ", DefaultRolePermissions.AnswerPermissions.getAllPermissions()));
 
 		String userQuestionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_question_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
@@ -237,5 +239,6 @@ public class GeneralDBManager implements IGeneralDBManager {
         System.out.println("Checking file: " + dbFile.getAbsolutePath());
         return dbFile.exists();
     }
+	
 
 }

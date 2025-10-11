@@ -1,5 +1,9 @@
 package Database.Repositories;
 
+import Config.DefaultRolePermissions;
+
+import Models.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -250,12 +254,10 @@ public class PermissionRepository implements IPermissionRepository {
     // Set default permissions for each type of user in relation to a regular post(question/answer)
     public void seedRolePermissions() throws SQLException {
 		Map<String, List<String>> questionRolePermissions = new HashMap<>();
-
-		questionRolePermissions.put("admin", Arrays.asList("VIEW", "COMMENT", "DELETE", "APPROVE", "UPVOTE"));
-		questionRolePermissions.put("instructor", Arrays.asList("VIEW", "COMMENT", "EDIT", "UPVOTE"));
-		questionRolePermissions.put("student", Arrays.asList("VIEW", "COMMENT", "UPVOTE"));
-		questionRolePermissions.put("staff", Arrays.asList("VIEW", "EDIT", "UPVOTE"));
-		questionRolePermissions.put("reviewer", Arrays.asList("VIEW", "COMMENT", "APPROVE", "UPVOTE"));
+		
+		for(User.Role role : User.Role.values()) {
+			questionRolePermissions.put(role.name(), DefaultRolePermissions.QuestionPermissions.getDefaultPermissionsForRole(role));
+		}
 
 		String query = "MERGE INTO question_permissions (role, permission) VALUES (?, ?)";
 
@@ -297,4 +299,5 @@ public class PermissionRepository implements IPermissionRepository {
 			System.out.println("Role-permission mappings seeded successfully.");
 		}
 	}
+    
 }
