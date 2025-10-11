@@ -2,6 +2,7 @@ package Database;
 
 import java.io.File;
 import java.sql.*;
+import java.util.stream.Collectors;
 
 import Config.DefaultRolePermissions;
 import Models.Answer;
@@ -9,6 +10,8 @@ import Models.Invitation;
 import Models.Permission;
 import Models.Question;
 import Models.User;
+
+import Utils.StringUtils;
 
 
 /**
@@ -79,28 +82,40 @@ public class GeneralDBManager implements IGeneralDBManager {
 		String questionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS question_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
-				+ "CHECK (role IN ('admin', 'student', 'instructor', 'staff', 'reviewer')), "
-				+ "CHECK (permission IN (%s)))", String.join(", ", DefaultRolePermissions.QuestionPermissions.getAllPermissions()));
+				+ "CHECK (role IN (%s)), "
+				+ "CHECK (permission IN (%s)))", 
+					StringUtils.listToSQLString(User.Role.getAllRolesStrings()),
+					StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions
+							.getAllPermissions()));
 
 		String answerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS answer_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
-				+ "CHECK (role IN ('admin', 'student', 'instructor', 'staff', 'reviewer')), "
-				+ "CHECK (permission IN ('VIEW', 'COMMENT', 'EDIT', 'DELETE', 'UPVOTE')))", String.join(", ", DefaultRolePermissions.AnswerPermissions.getAllPermissions()));
+				+ "CHECK (role IN (%s)), "
+				+ "CHECK (permission IN (%s)))", 
+					StringUtils.listToSQLString(User.Role.getAllRolesStrings()),
+					StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions
+							.getAllPermissions()));
 
 		String userQuestionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_question_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
 				+ "post_id INTEGER REFERENCES %s(id) ON DELETE CASCADE, "
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
-				+ "CHECK (permission IN ('VIEW', 'COMMENT', 'EDIT', 'DELETE', 'APPROVE', 'UPVOTE')))", Question.tableName);
+				+ "CHECK (permission IN (%s)))", 
+					Question.tableName, 
+					StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions
+							.getAllPermissions()));
 
 		String userAnswerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_answer_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
 				+ "post_id INTEGER REFERENCES %s(id) ON DELETE CASCADE, "
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
-				+ "CHECK (permission IN ('VIEW', 'COMMENT', 'EDIT', 'DELETE', 'APPROVE', 'UPVOTE')))", Answer.tableName);
+				+ "CHECK (permission IN (%s)))", 
+					Answer.tableName,
+					StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions
+							.getAllPermissions()));
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
