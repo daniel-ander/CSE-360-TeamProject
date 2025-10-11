@@ -129,10 +129,10 @@ public class QuestionListViewController {
     private void setEditQuestionButtonAction() {
         // Edit question
         view.getEditQuestionButton().setOnAction(_ -> {
-            QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
-            if (selectedQuestion != null) {
+            QuestionDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
+            if (selectedQuestionVM != null) {
                 try {
-                	questionService.deleteQuestion(selectedQuestion.getQuestion().getId());
+                	questionService.deleteQuestion(selectedQuestionVM.getQuestion().getId());
                     refresh();
                 } catch (DataAccessException dataAccessException) {
                 	// TODO:- Handle outcome if the question can't be deleted
