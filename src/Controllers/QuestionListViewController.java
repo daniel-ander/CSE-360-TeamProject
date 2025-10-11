@@ -162,21 +162,21 @@ public class QuestionListViewController {
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(_ -> {
-        	QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+        	QuestionDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
             
-            if (selectedQuestion != null) {
+            if (selectedQuestionVM != null) {
                 AnswerListView detailView = new AnswerListView();
                 
                 new AnswerListViewController(
                 		dBConnectionStore,
                 		primaryStage, 
-                		selectedQuestion.getQuestion(),
+                		selectedQuestionVM.getQuestion(),
                 		userSession,
                 		detailView
                 );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
-                System.out.println("Viewing details for Question ID: " + selectedQuestion.getQuestion().getId());
+                System.out.println("Viewing details for Question ID: " + selectedQuestionVM.getQuestion().getId());
             }
         });
 	}
