@@ -1,7 +1,8 @@
 package Models;
 
 public class Question {
-
+	public static String tableName = "questions";
+	
 	private int id; // -1 if question isn't in the database yet
 	private String text;
 	private String title;

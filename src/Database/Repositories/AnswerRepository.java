@@ -27,7 +27,7 @@ public class AnswerRepository implements IAnswerRepository {
  	// ===================
 
 	public boolean insertAnswer(Answer a) throws SQLException {
-	    String insertSQL = "INSERT INTO ForumAnswers (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)";
+	    String insertSQL = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)", Answer.tableName);
 	    try (Connection connection = generalDBManager.getConnection();
 	         PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -61,7 +61,7 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getAll() throws SQLException {
 		List<Answer> allAnswers = new ArrayList<>();
-		String getAllAnswers = "SELECT * FROM ForumAnswers";
+		String getAllAnswers = String.format("SELECT * FROM %s", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswers)){
 			ResultSet rs = pstmt.executeQuery();
@@ -88,7 +88,7 @@ public class AnswerRepository implements IAnswerRepository {
 		List<Answer> allAnswersForQuestion = new ArrayList<>();
 		//TODO: we might need this to check parentId depending on how we want to display answers
 		//		for now we will just get all answers for a question
-		String getAllAnswersForQuestion = "SELECT * FROM ForumAnswers WHERE questionId = ?";
+		String getAllAnswersForQuestion = String.format("SELECT * FROM %s WHERE questionId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestion)){
 			pstmt.setInt(1, questionId);
@@ -113,7 +113,7 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
 		List<Answer> repliesToAnswerById = new ArrayList<>();
-		String getRepliesToAnswerById = "SELECT * FROM ForumAnswers WHERE parentAnswerId = ?";
+		String getRepliesToAnswerById = String.format("SELECT * FROM %s WHERE parentAnswerId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getRepliesToAnswerById)){
 			pstmt.setInt(1, parentAnswerId);
@@ -140,7 +140,7 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	@Override
 	public Answer getAnswerById(int answerId) throws SQLException {
-		String getAnswerById = "SELECT * FROM ForumAnswers WHERE id = ?";
+		String getAnswerById = String.format("SELECT * FROM %s WHERE id = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnswerById)){
 			pstmt.setInt(1, answerId);
@@ -166,7 +166,7 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getCorrectAnswers() throws SQLException {
 		List<Answer> correctAnswers = new ArrayList<>();
-    	String getCorrectAnswers = "SELECT * FROM ForumAnswers WHERE isCorrect = TRUE";
+    	String getCorrectAnswers = String.format("SELECT * FROM %s WHERE isCorrect = TRUE", Answer.tableName);
     	try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswers)){
 			ResultSet rs = pstmt.executeQuery();
@@ -191,7 +191,7 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException {
     	List<Answer> answersBySearch = new ArrayList<>();
-    	String getAnswersBySearch = "SELECT * FROM ForumAnswers WHERE body LIKE ?";
+    	String getAnswersBySearch = String.format("SELECT * FROM %s WHERE body LIKE ?", Answer.tableName);
     	try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnswersBySearch)){
 			pstmt.setString(1, "%" + searchString + "%");
@@ -221,7 +221,7 @@ public class AnswerRepository implements IAnswerRepository {
     
 	@Override
     public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException {
-		String updateAnswer = "UPDATE ForumAnswers SET body = ?, isCorrect = ? WHERE id = ?";
+		String updateAnswer = String.format("UPDATE %s SET body = ?, isCorrect = ? WHERE id = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(updateAnswer)){
 			pstmt.setString(1, newText);
@@ -242,7 +242,7 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	@Override
 	public boolean deleteAnswerById(int id) throws SQLException {
-		String deleteAnswerById = "UPDATE ForumAnswers SET isDeleted = TRUE WHERE id = ?";
+		String deleteAnswerById = String.format("UPDATE %s SET isDeleted = TRUE WHERE id = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(deleteAnswerById)){
 			pstmt.setInt(1, id);
@@ -257,7 +257,7 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	@Override
 	public boolean deleteByQuestionId(int questionId) throws SQLException {
-		String deleteByQuestionId = "UPDATE ForumAnswers SET isDeleted = TRUE WHERE questionId = ?";
+		String deleteByQuestionId = String.format("UPDATE %s SET isDeleted = TRUE WHERE questionId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(deleteByQuestionId)){
 			pstmt.setInt(1, questionId);

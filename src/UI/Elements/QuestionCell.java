@@ -10,12 +10,14 @@ public class QuestionCell extends ListCell<QuestionDisplayViewModel> {
     private final Label titleLabel = new Label();
     private final Label textLabel = new Label();
     private final Label statusLabel = new Label();
+    private final Label permissionLabel = new Label(); // This is for illustrative purposes
 
     public QuestionCell() {
         titleLabel.setWrapText(true);
         textLabel.setWrapText(true);
+        permissionLabel.setWrapText(true);
 
-        layout.getChildren().addAll(titleLabel, textLabel, statusLabel);
+        layout.getChildren().addAll(titleLabel, textLabel, statusLabel, permissionLabel);
         layout.setFillWidth(true);
         layout.setMaxWidth(Double.MAX_VALUE);
 
@@ -40,6 +42,7 @@ public class QuestionCell extends ListCell<QuestionDisplayViewModel> {
             titleLabel.setText(vm.getQuestion().getTitle());
             textLabel.setText(truncate(vm.getQuestion().getText(), 150));
             statusLabel.setText(formatStatus(vm.getQuestion()));
+            permissionLabel.setText(String.join(", ", vm.getPermissionList()));
             setGraphic(layout);
         }
     }

@@ -5,6 +5,8 @@ package Models;
  * It contains the user's details such as userName, password, and role.
  */
 public class User {
+	public static String tableName = "users";
+	
     private String userName;
     private String password;
     private int id; //

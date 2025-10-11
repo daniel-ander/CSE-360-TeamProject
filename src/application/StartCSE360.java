@@ -24,17 +24,18 @@ public class StartCSE360 extends Application {
 	
 	@Override
     public void start(Stage primaryStage) {
+		String databaseLocation = "database/FoundationDatabase";
+		
         try {
         	DBConnectionStore sharedConnectionProvider = DBConnectionStore.createInstance();
         	
         	GeneralDBManager initializingConnectionManager = (GeneralDBManager)sharedConnectionProvider.getGeneralDBManager();
         	PermissionService permissionService = (PermissionService)sharedConnectionProvider.getPermissionService();
         	
-//        	initializingConnectionManager.initializeDBIfNeeded();
-//        	permissionService.seedRolePermissions(); 
-        	if(initializingConnectionManager.isDatabaseEmpty()) {      	// If there is no database records 
-        		//initializingConnectionManager.initializeDBIfNeeded();  	// Populate the database
-        		permissionService.seedRolePermissions();  				// Seed the proper permissions tables
+        	if(!initializingConnectionManager.doesDatabaseExist(databaseLocation)) {  
+        		System.out.println("Blah");
+            	initializingConnectionManager.initializeDB();
+            	permissionService.seedRolePermissions();  													
         	
             	new FirstPageController(sharedConnectionProvider, primaryStage, new FirstPage());
             } else {

@@ -3,6 +3,8 @@ package Models;
 import java.sql.Timestamp;
 
 public class Answer {
+	public static String tableName = "answers";
+	
 	private int id; // -1 if answer isn't in the database yet
 	private String text;
 	private boolean isCorrect;

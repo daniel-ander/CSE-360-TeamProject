@@ -9,6 +9,7 @@ import java.util.List;
 
 import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IInvitationRepository;
+import Models.Invitation;
 import Utils.Debug;
 
 public class InvitationRepository implements IInvitationRepository {
@@ -28,7 +29,7 @@ public class InvitationRepository implements IInvitationRepository {
 	public boolean insertInvitationCode(String code) throws SQLException {
 		boolean generateInvitationCodeDebug = true;
 
-	    String query = "INSERT INTO InvitationCodes (code) VALUES (?)";
+	    String query = String.format("INSERT INTO %s (code) VALUES (?)", Invitation.tableName);
 	    
 	    try (Connection connection = generalDBManager.getConnection();
 	    		PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -63,7 +64,7 @@ public class InvitationRepository implements IInvitationRepository {
 	@Override
 	// Validates an invitation code to check if it is unused and valid.
 	public boolean validateInvitationCode(String code) throws SQLException {
-	    String query = "SELECT * FROM InvitationCodes WHERE code = ? AND isUsed = FALSE";
+	    String query = String.format("SELECT * FROM %s WHERE code = ? AND isUsed = FALSE", Invitation.tableName);
 	    
 	    try (Connection connection = generalDBManager.getConnection();
 	    		PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -88,7 +89,7 @@ public class InvitationRepository implements IInvitationRepository {
 	@Override
 	// Marks the invitation code as used in the database.
 	public void markInvitationCodeAsUsed(String code) throws SQLException {
-	    String query = "UPDATE InvitationCodes SET isUsed = TRUE WHERE code = ?";
+	    String query = String.format("UPDATE %s SET isUsed = TRUE WHERE code = ?", Invitation.tableName);
 	    try (Connection connection = generalDBManager.getConnection();
 	    		PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
@@ -106,7 +107,7 @@ public class InvitationRepository implements IInvitationRepository {
 
 	@Override
 	public void printInvitationCodesTable() throws SQLException {
-	    String query = "SELECT code, isUsed FROM InvitationCodes";
+	    String query = String.format("SELECT code, isUsed FROM %s", Invitation.tableName);
 	    try (Connection connection = generalDBManager.getConnection();
 	    		PreparedStatement pstmt = connection.prepareStatement(query);
 	         ResultSet rs = pstmt.executeQuery()) {

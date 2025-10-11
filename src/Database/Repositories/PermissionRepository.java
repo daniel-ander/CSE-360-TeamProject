@@ -6,11 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IPermissionRepository;
@@ -25,99 +25,104 @@ public class PermissionRepository implements IPermissionRepository {
 	
 	// Get permissions for a post(question/answer) in relation to a user
 	public Map<Integer, List<String>> getEffectivePermissions(int userId, List<Integer> postIds, boolean isQuestion) throws SQLException {
-	    if (postIds == null || postIds.isEmpty()) return Collections.emptyMap();
-	    String type = isQuestion ? "question" : "answer";
-	    String placeholders = postIds.stream().map(id -> "?").collect(Collectors.joining(", "));
-
-	    String query = String.format("""
-	        SELECT DISTINCT final_permissions.post_id, final_permissions.permission
-	        FROM (
-	            -- User-specific overrides (explicitly allowed)
-	            SELECT upp.post_id, upp.permission
-	            FROM user_%s_permissions upp
-	            WHERE upp.user_id = ?
-	              AND upp.post_id IN (%s)
-	              AND upp.is_allowed = TRUE
-
-	            UNION
-
-	            -- Author override: grant full access if user is the author
-	            SELECT fq.id AS post_id, ap.permission
-	            FROM ForumQuestions fq
-	            JOIN (
-	                SELECT 'VIEW' AS permission
-	                UNION ALL SELECT 'COMMENT'
-	                UNION ALL SELECT 'EDIT'
-	                UNION ALL SELECT 'DELETE'
-	            ) ap ON 1=1
-	            WHERE fq.userId = ?
-	              AND fq.id IN (%s)
-
-	            UNION
-
-	            -- Role-based defaults if NOT overridden or author
-	            SELECT fq.id AS post_id, rpp.permission
-	            FROM cse360users u
-	            JOIN %s_permissions rpp ON u.role = rpp.role
-	            JOIN ForumQuestions fq ON fq.id IN (%s)
-	            WHERE u.id = ?
-	              AND NOT EXISTS (
-	                  SELECT 1
-	                  FROM user_%s_permissions upp
-	                  WHERE upp.user_id = u.id
-	                    AND upp.post_id = fq.id
-	                    AND upp.permission = rpp.permission
-	                    AND upp.is_allowed = TRUE
-	              )
-	              AND fq.userId <> u.id
-	        ) final_permissions
-	        ORDER BY post_id;
-	        """, type, placeholders, placeholders, type, placeholders, type);
-
-	    Map<Integer, List<String>> permissionMap = new HashMap<>();
-
-	    try (Connection connection = generalDBManager.getConnection();
-	         PreparedStatement pstmt = connection.prepareStatement(query)) {
-
-	        int paramIndex = 1;
-
-	        // post_list values
-	        for (Integer postId : postIds) {
-	            pstmt.setInt(paramIndex++, postId);
-	        }
-
-	        // user-specific
-	        pstmt.setInt(paramIndex++, userId);
-	        for (Integer postId : postIds) {
-	            pstmt.setInt(paramIndex++, postId);
-	        }
-
-	        // author
-	        pstmt.setInt(paramIndex++, userId);
-	        for (Integer postId : postIds) {
-	            pstmt.setInt(paramIndex++, postId);
-	        }
-
-	        // role-based
-	        pstmt.setInt(paramIndex++, userId);
-	        for (Integer postId : postIds) {
-	            pstmt.setInt(paramIndex++, postId);
-	        }
-
-	        ResultSet rs = pstmt.executeQuery();
-
-	        while (rs.next()) {
-	            int postId = rs.getInt("post_id");
-	            String permission = rs.getString("permission");
-	            permissionMap.computeIfAbsent(postId, k -> new ArrayList<>()).add(permission);
-	        }
-	    }
-
-	    return permissionMap;
+		// TODO: - This will be the actual query to get permissions
+		
+//	    if (postIds == null || postIds.isEmpty()) return Collections.emptyMap();
+//	    String type = isQuestion ? "question" : "answer";
+//	    
+//	    String placeholders = postIds.stream().map(id -> "?").collect(Collectors.joining(", "));
+//
+//	    String query = String.format("""
+//	        SELECT DISTINCT final_permissions.post_id, final_permissions.permission
+//	        FROM (
+//	            -- User-specific overrides (explicitly allowed)
+//	            SELECT upp.post_id, upp.permission
+//	            FROM user_%s_permissions upp
+//	            WHERE upp.user_id = ?
+//	              AND upp.post_id IN (%s)
+//	              AND upp.is_allowed = TRUE
+//
+//	            UNION
+//
+//	            -- Author override: grant full access if user is the author
+//	            SELECT fq.id AS post_id, ap.permission
+//	            FROM %ss fq
+//	            JOIN (
+//	                SELECT 'VIEW' AS permission
+//	                UNION ALL SELECT 'COMMENT'
+//	                UNION ALL SELECT 'EDIT'
+//	                UNION ALL SELECT 'DELETE'
+//	            ) ap ON 1=1
+//	            WHERE fq.userId = ?
+//	              AND fq.id IN (%s)
+//
+//	            UNION
+//
+//	            -- Role-based defaults if NOT overridden or author
+//	            SELECT fq.id AS post_id, rpp.permission
+//	            FROM users u
+//	            JOIN %s_permissions rpp ON u.role = rpp.role
+//	            JOIN %ss fq ON fq.id IN (%s)
+//	            WHERE u.id = ?
+//	              AND NOT EXISTS (
+//	                  SELECT 1
+//	                  FROM user_%s_permissions upp
+//	                  WHERE upp.user_id = u.id
+//	                    AND upp.post_id = fq.id
+//	                    AND upp.permission = rpp.permission
+//	                    AND upp.is_allowed = TRUE
+//	              )
+//	              AND fq.userId <> u.id
+//	        ) final_permissions
+//	        ORDER BY post_id;
+//	        """, type, placeholders, placeholders, type, placeholders, type);
+//
+//	    Map<Integer, List<String>> permissionMap = new HashMap<>();
+//
+//	    try (Connection connection = generalDBManager.getConnection();
+//	         PreparedStatement pstmt = connection.prepareStatement(query)) {
+//
+//	        int paramIndex = 1;
+//
+//	        // post_list values
+//	        for (Integer postId : postIds) {
+//	            pstmt.setInt(paramIndex++, postId);
+//	        }
+//
+//	        // user-specific
+//	        pstmt.setInt(paramIndex++, userId);
+//	        for (Integer postId : postIds) {
+//	            pstmt.setInt(paramIndex++, postId);
+//	        }
+//
+//	        // author
+//	        pstmt.setInt(paramIndex++, userId);
+//	        for (Integer postId : postIds) {
+//	            pstmt.setInt(paramIndex++, postId);
+//	        }
+//
+//	        // role-based
+//	        pstmt.setInt(paramIndex++, userId);
+//	        for (Integer postId : postIds) {
+//	            pstmt.setInt(paramIndex++, postId);
+//	        }
+//
+//	        ResultSet rs = pstmt.executeQuery();
+//
+//	        while (rs.next()) {
+//	            int postId = rs.getInt("post_id");
+//	            String permission = rs.getString("permission");
+//	            permissionMap.computeIfAbsent(postId, k -> new ArrayList<>()).add(permission);
+//	        }
+//	    }
+//
+//	    return permissionMap;
+	    return new HashMap<>();
 	}
 
 	// Get permissions for a post(question/answer) in relation to a user
     public List<String> getEffectivePermissions(int userId, int postId, boolean isQuestion) throws SQLException {
+    	// TODO:- This is an inefficient way of doing this. The query above, once figured out, is the right approach
 		String type = isQuestion ? "question" : "answer";
 		String query = String.format("""
 			SELECT DISTINCT permission
@@ -140,7 +145,7 @@ public class PermissionRepository implements IPermissionRepository {
 					) AS author_perms
 					WHERE EXISTS (
 						SELECT 1	
-						FROM ForumQuestions fq
+						FROM %ss fq
 						WHERE fq.id = ?
 							AND fq.userId = ?
 						)
@@ -149,7 +154,7 @@ public class PermissionRepository implements IPermissionRepository {
 
 				    -- Role-based defaults if NOT overridden or author
 				    SELECT rpp.permission
-				    FROM cse360users u
+				    FROM users u
 				    JOIN %s_permissions rpp ON u.role = rpp.role
 				    WHERE u.id = ?
 				      AND NOT EXISTS (
@@ -162,12 +167,12 @@ public class PermissionRepository implements IPermissionRepository {
 				      )
 				      AND NOT EXISTS (
 				          SELECT 1
-				          FROM ForumQuestions fq
+				          FROM %ss fq
 				          WHERE fq.id = ?
 				            AND fq.userId = u.id
 				      )
 				) AS final_permissions;
-			""", type, type, type);
+			""", type, type, type, type, type);
 		
 		try (Connection connection = generalDBManager.getConnection();
 	    		PreparedStatement pstmt = connection.prepareStatement(query)) {

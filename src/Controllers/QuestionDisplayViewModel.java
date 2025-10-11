@@ -7,13 +7,13 @@ import Models.Question;
 
 public class QuestionDisplayViewModel {
     private Question question;
-    private List<String> userStatus; // fetched from a service in the controller
+    public List<String> permissionList; // fetched from a service in the controller
 
-    public QuestionDisplayViewModel(Question question, List<String> userStatus) {
+    public QuestionDisplayViewModel(Question question, List<String> permissionList) {
         this.question = question;
-        this.userStatus = userStatus;
+        this.permissionList = permissionList;
     }
 
     public Question getQuestion() { return question; }
-    public List<String> getUserStatus() { return userStatus; }
+    public List<String> getPermissionList() { return permissionList; }
 }
