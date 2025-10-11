@@ -31,7 +31,7 @@ public class PermissionService implements IPermissionService {
     	try {
 			return permissionRepository.getEffectivePermissions(userId, postId, isQuestion);
 		} catch (SQLException e) {
-			throw new DataAccessException("Failed to effective permissions for userId: " + userId + " postId: " + postId + " due to: " + e.getMessage());
+			throw new DataAccessException("Failed to get effective permissions for userId: " + userId + " postId: " + postId + " due to: " + e.getMessage());
 		}
     }
 

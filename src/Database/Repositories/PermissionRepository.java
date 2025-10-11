@@ -241,7 +241,7 @@ public class PermissionRepository implements IPermissionRepository {
 		String query = "SELECT COUNT(*) FROM question_permissions";
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
-			ResultSet rs = pstmt.executeQuery(query);
+			ResultSet rs = pstmt.executeQuery();
 			if (rs.next()) {
 				return rs.getInt(1) == 0;
 			}

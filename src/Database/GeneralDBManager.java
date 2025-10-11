@@ -2,7 +2,6 @@ package Database;
 
 import java.io.File;
 import java.sql.*;
-import java.util.stream.Collectors;
 
 import Config.DefaultRolePermissions;
 import Models.Answer;

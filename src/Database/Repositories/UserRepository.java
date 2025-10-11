@@ -105,7 +105,7 @@ public class UserRepository implements IUserRepository {
 	@Override
 	public List<String> getAllUsernames() throws SQLException {
 		List<String> usernames = new ArrayList<>();
-		String query = String.format("SELECT userName FROM users", User.tableName);
+		String query = String.format("SELECT userName FROM %s", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        ResultSet rs = pstmt.executeQuery();
