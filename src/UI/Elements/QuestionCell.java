@@ -1,10 +1,11 @@
 package UI.Elements;
 
+import Controllers.QuestionDisplayViewModel;
 import Models.Question;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-public class QuestionCell extends ListCell<Question> {
+public class QuestionCell extends ListCell<QuestionDisplayViewModel> {
     private final VBox layout = new VBox();
     private final Label titleLabel = new Label();
     private final Label textLabel = new Label();
@@ -31,14 +32,14 @@ public class QuestionCell extends ListCell<Question> {
     }
 
     @Override
-    protected void updateItem(Question q, boolean empty) {
-        super.updateItem(q, empty);
-        if (empty || q == null) {
+    protected void updateItem(QuestionDisplayViewModel vm, boolean empty) {
+        super.updateItem(vm, empty);
+        if (empty || vm.getQuestion() == null) {
             setGraphic(null);
         } else {
-            titleLabel.setText(q.getTitle());
-            textLabel.setText(truncate(q.getText(), 150));
-            statusLabel.setText(formatStatus(q));
+            titleLabel.setText(vm.getQuestion().getTitle());
+            textLabel.setText(truncate(vm.getQuestion().getText(), 150));
+            statusLabel.setText(formatStatus(vm.getQuestion()));
             setGraphic(layout);
         }
     }

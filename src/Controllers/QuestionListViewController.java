@@ -4,10 +4,12 @@ import Models.Question;
 
 import Sessions.UserSession;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
+import Database.Services.Interfaces.IPermissionService;
 import Database.Services.Interfaces.IQuestionService;
 
 import Exceptions.DBExceptions.DataAccessException;
@@ -16,6 +18,7 @@ import UI.Elements.QuestionListView;
 import UI.Elements.AnswerListView;
 import Utils.Debug;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 
@@ -23,6 +26,7 @@ public class QuestionListViewController {
 	private final DBConnectionStore dBConnectionStore;
 	private final IGeneralDBManager generalDBManager;
 	private final IQuestionService questionService;
+	private final IPermissionService permissionService;
     private final UserSession userSession;
     private final QuestionListView view;
     private final Stage primaryStage;
@@ -36,6 +40,7 @@ public class QuestionListViewController {
         this.view = view;
         this.generalDBManager = dBConnectionStore.getGeneralDBManager();
         this.questionService = dBConnectionStore.getQuestionService();
+        this.permissionService = dBConnectionStore.getPermissionService();
         
         this.primaryStage = primaryStage;
         this.userSession = userSession;
@@ -51,16 +56,34 @@ public class QuestionListViewController {
  	// ===================
     
     private void refresh() {
-    	List<Question> allQuestions = questionService.getAllQuestions();
-    	
-    	if (!view.getShowDeletedQuestionsCheckbox().isSelected()) {
-    	    allQuestions.removeIf(Question::getDeleted);
-    	}
+        try {
+            List<Question> allQuestions = questionService.getAllQuestions();
 
-    	
-        view.getForumListView().setItems(FXCollections.observableArrayList(allQuestions));
-        if (Debug.isEnabled) System.out.println("Forum list refreshed.");
+            if (!view.getShowDeletedQuestionsCheckbox().isSelected()) {
+                allQuestions.removeIf(Question::getDeleted);
+            }
+
+            List<QuestionDisplayViewModel> viewModels = new ArrayList<>();
+
+            for (Question question : allQuestions) {
+                List<String> userPermissions = permissionService
+                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), true);
+
+                viewModels.add(new QuestionDisplayViewModel(question, userPermissions));
+            }
+
+            // Set view model list to the ListView
+            ObservableList<QuestionDisplayViewModel> observableVMs =
+                    FXCollections.observableArrayList(viewModels);
+
+            view.getForumListView().setItems(observableVMs);
+
+            if (Debug.isEnabled) System.out.println("Forum list refreshed with " + observableVMs.size() + " questions.");
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
     }
+    
     private void setUpActions() {
     	setAddQuestionButtonAction();
     	setDeleteQuestionButtonAction();
@@ -100,10 +123,10 @@ public class QuestionListViewController {
     private void setEditQuestionButtonAction() {
         // Edit question
         view.getEditQuestionButton().setOnAction(_ -> {
-            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+            QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestion != null) {
                 try {
-                	questionService.deleteQuestion(selectedQuestion.getId());
+                	questionService.deleteQuestion(selectedQuestion.getQuestion().getId());
                     refresh();
                 } catch (DataAccessException dataAccessException) {
                 	// TODO:- Handle outcome if the question can't be deleted
@@ -117,10 +140,10 @@ public class QuestionListViewController {
     private void setDeleteQuestionButtonAction() {
 		// Delete question
     	view.getDeleteQuestionButton().setOnAction(_-> {
-			Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+    		QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
 			if (selectedQuestion != null) {
 				try {
-					questionService.deleteQuestion(selectedQuestion.getId());
+					questionService.deleteQuestion(selectedQuestion.getQuestion().getId());
 					refresh();
 				} catch (DataAccessException dataAccessException) {
 					
@@ -133,7 +156,7 @@ public class QuestionListViewController {
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(_ -> {
-            Question selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+        	QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
             
             if (selectedQuestion != null) {
                 AnswerListView detailView = new AnswerListView();
@@ -141,13 +164,13 @@ public class QuestionListViewController {
                 new AnswerListViewController(
                 		dBConnectionStore,
                 		primaryStage, 
-                		selectedQuestion,
+                		selectedQuestion.getQuestion(),
                 		userSession,
                 		detailView
                 );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
-                System.out.println("Viewing details for Question ID: " + selectedQuestion.getId());
+                System.out.println("Viewing details for Question ID: " + selectedQuestion.getQuestion().getId());
             }
         });
 	}

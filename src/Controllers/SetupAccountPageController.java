@@ -98,7 +98,7 @@ public class SetupAccountPageController {
             	}
             	
             	if(!didFindUser) {
-            		boolean didValidateCode = invitationService.validateInvitationCode(code);
+            		boolean didValidateCode = false;
             		try {
             			didValidateCode = invitationService.validateInvitationCode(code);
                 	} catch (DataAccessException e) {

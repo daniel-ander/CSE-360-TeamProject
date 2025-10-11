@@ -30,8 +30,10 @@ public class StartCSE360 extends Application {
         	GeneralDBManager initializingConnectionManager = (GeneralDBManager)sharedConnectionProvider.getGeneralDBManager();
         	PermissionService permissionService = (PermissionService)sharedConnectionProvider.getPermissionService();
         	
+//        	initializingConnectionManager.initializeDBIfNeeded();
+//        	permissionService.seedRolePermissions(); 
         	if(initializingConnectionManager.isDatabaseEmpty()) {      	// If there is no database records 
-        		initializingConnectionManager.initializeDBIfNeeded();  	// Populate the database
+        		//initializingConnectionManager.initializeDBIfNeeded();  	// Populate the database
         		permissionService.seedRolePermissions();  				// Seed the proper permissions tables
         	
             	new FirstPageController(sharedConnectionProvider, primaryStage, new FirstPage());

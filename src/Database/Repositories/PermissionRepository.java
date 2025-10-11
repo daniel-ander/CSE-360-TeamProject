@@ -173,11 +173,11 @@ public class PermissionRepository implements IPermissionRepository {
 		
 		Map<String, List<String>> answerRolePermissions = new HashMap<>();
 
-		answerRolePermissions.put("admin", Arrays.asList("VIEW", "COMMENT", "DELETE", "APPROVE", "UPVOTE"));
+		answerRolePermissions.put("admin", Arrays.asList("VIEW", "COMMENT", "DELETE", "UPVOTE"));
 		answerRolePermissions.put("instructor", Arrays.asList("VIEW", "COMMENT", "EDIT", "UPVOTE"));
 		answerRolePermissions.put("student", Arrays.asList("VIEW", "COMMENT", "UPVOTE"));
 		answerRolePermissions.put("staff", Arrays.asList("VIEW", "EDIT", "UPVOTE"));
-		answerRolePermissions.put("reviewer", Arrays.asList("VIEW", "COMMENT", "APPROVE", "UPVOTE"));
+		answerRolePermissions.put("reviewer", Arrays.asList("VIEW", "COMMENT", "UPVOTE"));
 
 		query = "MERGE INTO answer_permissions (role, permission) VALUES (?, ?)";
 
