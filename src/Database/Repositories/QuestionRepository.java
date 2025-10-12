@@ -36,7 +36,7 @@ public class QuestionRepository implements IQuestionRepository {
 			pstmt.setString(3,q.getText());
 			pstmt.setBoolean(4, q.getAnsweredStatus());
 			pstmt.setBoolean(5, q.getResolvedStatus());
-			pstmt.setBoolean(6, q.getDeletedStatus());
+			pstmt.setBoolean(6, q.getDeleted());
 			pstmt.setInt(7, q.getUpvoteCount());
 			pstmt.executeUpdate();
 			
