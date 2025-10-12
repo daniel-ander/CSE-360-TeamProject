@@ -27,6 +27,13 @@ public class GeneralDBManager implements IGeneralDBManager {
 	// Database credentials
 	static final String USER = "sa";
 	static final String PASS = "";
+	
+	// CRUD-related
+	private final String userTableName = User.tableName;
+	private final String questionTableName = Question.tableName;
+	private final String answerTableName = Answer.tableName;
+	private final String invitationTableName = Invitation.tableName;
+	private final String permissionTableName = Permission.tableName;
 
 	// TODO: - Not entirely sure what this is.
 	private static int forumPostIdNumber = 0;
@@ -54,18 +61,22 @@ public class GeneralDBManager implements IGeneralDBManager {
 		// created it and used it
 		// - or an entirely new table that tracks which user created which invitation
 		// code
+		
+		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRolesStrings());
+		String questionPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions.getAllPermissions());
+		String answerPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions.getAllPermissions());
 
 		String userTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "userName VARCHAR(255) UNIQUE, " + "password VARCHAR(255), " + "role VARCHAR(225))", User.tableName);
+				+ "userName VARCHAR(255) UNIQUE, " + "password VARCHAR(255), " + "role VARCHAR(225))", userTableName);
 
 		String invitationCodesTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ("
-				+ "code VARCHAR(10) PRIMARY KEY, " + "isUsed BOOLEAN DEFAULT FALSE)", Invitation.tableName);
+				+ "code VARCHAR(10) PRIMARY KEY, " + "isUsed BOOLEAN DEFAULT FALSE)", invitationTableName);
 
 		String forumQuestionsTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
 				+ "userId INT, " + "title VARCHAR(255), " + "body TEXT, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "answered BOOLEAN DEFAULT FALSE, "
 				+ "resolved BOOLEAN DEFAULT FALSE, " + "isDeleted BOOLEAN DEFAULT FALSE, "
-				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES users(id))", Question.tableName);
+				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES users(id))", questionTableName);
 
 		String forumAnswersTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
 				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "body TEXT, "
@@ -73,28 +84,24 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
-				+ "FOREIGN KEY (userId) REFERENCES users(id))", Answer.tableName, Question.tableName, Answer.tableName);
+				+ "FOREIGN KEY (userId) REFERENCES users(id))", answerTableName, questionTableName, answerTableName);
 
 		String permissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ( " + "id SERIAL PRIMARY KEY, "
-				+ "name VARCHAR(20) UNIQUE NOT NULL)", Permission.tableName);
+				+ "name VARCHAR(20) UNIQUE NOT NULL)", permissionTableName);
 
 		String questionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS question_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN (%s)), "
 				+ "CHECK (permission IN (%s)))", 
-					StringUtils.listToSQLString(User.Role.getAllRolesStrings()),
-					StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions
-							.getAllPermissions()));
+					userRolesSQL, questionPermissionSQL);
 
 		String answerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS answer_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN (%s)), "
 				+ "CHECK (permission IN (%s)))", 
-					StringUtils.listToSQLString(User.Role.getAllRolesStrings()),
-					StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions
-							.getAllPermissions()));
+					userRolesSQL, answerPermissionSQL);
 
 		String userQuestionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_question_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
@@ -102,9 +109,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
-					Question.tableName, 
-					StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions
-							.getAllPermissions()));
+					questionTableName, questionPermissionSQL);
 
 		String userAnswerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_answer_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
@@ -112,9 +117,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
-					Answer.tableName,
-					StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions
-							.getAllPermissions()));
+					answerTableName, answerPermissionSQL);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -135,7 +138,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 		String populateUserTable = String.format("INSERT INTO %s (userName, password, role) VALUES"
 				+ "('student', 'Password1!', 'student')," + "('instructor', 'Password1!', 'instructor'),"
 				+ "('reviewer', 'Password1!', 'reviewer')," + "('admin1', 'Password1!', 'admin'),"
-				+ "('staff', 'Password1!', 'staff');", User.tableName);
+				+ "('staff', 'Password1!', 'staff');", userTableName);
 
 		String populateQuestionTable = String.format("INSERT INTO %s (userId, title, body, answered, resolved, isDeleted, upvoteCount) VALUES "
 				+ "(1, 'What is polymorphism?', 'Can someone explain polymorphism in Java with examples?', FALSE, FALSE, FALSE, 5),"
@@ -161,7 +164,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "(5, 'User session persistence', 'How do I keep a user logged in between restarts?', TRUE, TRUE, FALSE, 14),"
 				+ "(5, 'MVC vs MVVM', 'Should I use MVVM or MVC for JavaFX projects?', TRUE, FALSE, FALSE, 5),"
 				+ "(5, 'Multilingual UI', 'How to implement i18n (internationalization) in JavaFX?', FALSE, FALSE, FALSE, 3),"
-				+ "(5, 'Dark mode toggle', 'Best approach for a dark/light theme switch in JavaFX?', FALSE, FALSE, FALSE, 7);", Question.tableName);
+				+ "(5, 'Dark mode toggle', 'Best approach for a dark/light theme switch in JavaFX?', FALSE, FALSE, FALSE, 7);", questionTableName);
 
 		String populateAnswersTable = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, body, isCorrect, upvoteCount) VALUES "
 				+ "(1, NULL, 1, 'Polymorphism allows methods to behave differently based on the object.', FALSE, 4),"
@@ -203,7 +206,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "(14, 17, 2, 'Use BCrypt to hash passwords.', FALSE, 3),"
 				+ "(15, 18, 3, 'SQLite is good for fast prototyping.', FALSE, 2),"
 				+ "(16, 19, 4, 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, 2),"
-				+ "(17, 20, 1, 'Save tokens or use Java Preferences API.', FALSE, 3);", Answer.tableName);
+				+ "(17, 20, 1, 'Save tokens or use Java Preferences API.', FALSE, 3);", answerTableName);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -221,7 +224,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 	@Override
 	// Check if the database is empty
 	public boolean isDatabaseEmpty() throws SQLException {
-		String query = String.format("SELECT COUNT(*) AS count FROM %s", User.tableName);
+		String query = String.format("SELECT COUNT(*) AS count FROM %s", userTableName);
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 			ResultSet resultSet = stmt.executeQuery(query);
 
