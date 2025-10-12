@@ -62,7 +62,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 		// - or an entirely new table that tracks which user created which invitation
 		// code
 		
-		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRolesStrings());
+		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRoles());
 		String questionPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions.getAllPermissions());
 		String answerPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions.getAllPermissions());
 

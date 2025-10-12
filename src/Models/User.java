@@ -24,7 +24,7 @@ public class User {
     	staff,
     	reviewer;
     	
-    	public static List<String> getAllRolesStrings() {
+    	public static List<String> getAllRoles() {
 			return Arrays.stream(Role.values())
 					.map(Enum::name)
 					.toList();
