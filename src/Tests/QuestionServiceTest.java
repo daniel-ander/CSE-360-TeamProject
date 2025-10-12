@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class QuestionRepositoryTest {
+public class QuestionServiceTest {
 	
     private IQuestionRepository questionRepo;
     private QuestionService questionService;
