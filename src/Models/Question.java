@@ -58,7 +58,7 @@ public class Question {
 	public String getText() {return text;}
 	public boolean getAnsweredStatus() {return isAnswered;}
 	public boolean getResolvedStatus() {return isResolved;}
-	public boolean getDeletedStatus() {return isDeleted;}
+	public boolean getDeleted() {return isDeleted;}
 	public int getUpvoteCount() {return upvoteCount;}
 	
 	

@@ -60,7 +60,7 @@ public class QuestionListViewController {
             List<Question> allQuestions = questionService.getAllQuestions();
 
             if (!view.getShowDeletedQuestionsCheckbox().isSelected()) {
-                allQuestions.removeIf(Question::getDeletedStatus);
+                allQuestions.removeIf(Question::getDeleted);
             }
 
             List<QuestionDisplayViewModel> viewModels = new ArrayList<>();
