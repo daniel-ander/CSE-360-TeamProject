@@ -9,23 +9,29 @@ public class QuestionTest {
 	// CREATE TESTS
     @Test
     public void Constructor__WithValidInputs_CreatesQuestion() {
-    	Question q = new Question(1, "This is a question text");
-    	
-    	assertEquals(1, q.getId());
-    	assertEquals("This is a question text", q.getText());
+        Question q = new Question(1, "Title", "This is a question text");
+        
+        assertEquals(-1, q.getId()); // -1 since not yet in DB
+        assertEquals(1, q.getAuthorId());
+        assertEquals("Title", q.getTitle());
+        assertEquals("This is a question text", q.getText());
+        assertFalse(q.getAnswered());
+        assertFalse(q.getResolved());
+        assertFalse(q.getDeleted());
     }
 
     @Test
     public void Constructor_WithEmptyString_ThrowsException() {
         Exception testError = assertThrows(IllegalArgumentException.class,
-            () -> new Question(2, " "));
-        assertEquals("Text is empty", testError.getMessage());
+                () -> new Question(2, "Title", " "));
+            
+            assertEquals("Text is empty", testError.getMessage());
     }
     
     // UPDATE TESTS
     @Test
     public void SetText_WithValidString_ChangesText() {
-        Question q = new Question(1, "Old question");
+        Question q = new Question(1, "Title", "Old question");
         
         q.setText("New question");
         
@@ -34,7 +40,7 @@ public class QuestionTest {
 
     @Test
     public void SetText_WithEmptyString_ThrowsException() {
-        Question q = new Question(1, "QuestionText");
+        Question q = new Question(1, "Title", "QuestionText");
         
         Exception testError = assertThrows(IllegalArgumentException.class,
                 () -> q.setText(" "));
