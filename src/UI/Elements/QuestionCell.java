@@ -53,8 +53,8 @@ public class QuestionCell extends ListCell<QuestionDisplayViewModel> {
 
     private String formatStatus(Question q) {
         var parts = new java.util.ArrayList<String>();
-        if (q.getAnswered()) parts.add("Answered");
-        if (q.getResolved()) parts.add("Resolved");
+        if (q.getAnsweredStatus()) parts.add("Answered");
+        if (q.getResolvedStatus()) parts.add("Resolved");
         parts.add("Upvotes: " + q.getUpvoteCount());
         return String.join(" • ", parts);
     }

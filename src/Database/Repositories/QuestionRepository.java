@@ -28,12 +28,16 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean insertQuestion(Question q) throws SQLException {
-		String insertQuestion = String.format("INSERT INTO %s (userId, title, body) VALUES (?, ?, ?)", Question.tableName);
+		String insertQuestion = String.format("INSERT INTO %s (userId, title, body, answered, resolved, isDeleted, upvoteCount) VALUES (?, ?, ?, ?, ?, ?, ?)", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
 			pstmt.setInt(1, q.getAuthorId());
 			pstmt.setString(2,q.getTitle());
 			pstmt.setString(3,q.getText());
+			pstmt.setBoolean(4, q.getAnsweredStatus());
+			pstmt.setBoolean(5, q.getResolvedStatus());
+			pstmt.setBoolean(6, q.getDeletedStatus());
+			pstmt.setInt(7, q.getUpvoteCount());
 			pstmt.executeUpdate();
 			
 			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {

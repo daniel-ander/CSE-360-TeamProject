@@ -8,9 +8,9 @@ public class Question {
 	private String title;
 	private int authorId;
 	private int upvoteCount;
-	private boolean answered;
-	private boolean resolved;
-	private boolean deleted;
+	private boolean isAnswered;
+	private boolean isResolved;
+	private boolean isDeleted;
 	
 /* Added class fields: author, isAnswered, isResolved, isDeleted
  * added author to constructor
@@ -27,9 +27,9 @@ public class Question {
 		this.text = text;
 		this.upvoteCount = upvoteCount;
 		this.authorId = authorId;
-		this.answered = answered;
-		this.resolved = resolved;
-		this.deleted = deleted;
+		this.isAnswered = answered;
+		this.isResolved = resolved;
+		this.isDeleted = deleted;
 	}
 	
 	
@@ -42,9 +42,9 @@ public class Question {
 		this.text = text;
 		
 		this.authorId = authorId;
-		this.answered = false;
-		this.resolved = false;
-		this.deleted = false;
+		this.isAnswered = false;
+		this.isResolved = false;
+		this.isDeleted = false;
 
 	}
 	
@@ -56,9 +56,9 @@ public class Question {
 	public String getTitle() {return title;}
 	public int getAuthorId() {return authorId;}
 	public String getText() {return text;}
-	public boolean getAnswered() {return answered;}
-	public boolean getResolved() {return resolved;}
-	public boolean getDeleted() {return deleted;}
+	public boolean getAnsweredStatus() {return isAnswered;}
+	public boolean getResolvedStatus() {return isResolved;}
+	public boolean getDeletedStatus() {return isDeleted;}
 	public int getUpvoteCount() {return upvoteCount;}
 	
 	
@@ -73,9 +73,9 @@ public class Question {
 	}
 	
 	public void setId(int newId) { this.id = newId; }
-	public void setResolved(boolean resolvedStatus) {resolved = resolvedStatus;}
-	public void setAnswered(boolean answeredStatus) {answered = answeredStatus;}
-	public void setDeleted(boolean deletedStatus) {deleted = deletedStatus;}
+	public void setResolved(boolean resolvedStatus) {isResolved = resolvedStatus;}
+	public void setAnswered(boolean answeredStatus) {isAnswered = answeredStatus;}
+	public void setDeleted(boolean deletedStatus) {isDeleted = deletedStatus;}
 	public void setTitle(String newTitle) { this.title = newTitle; }
 	public void setUpvoteCount(int newCount) { this.upvoteCount = newCount; }
 	
