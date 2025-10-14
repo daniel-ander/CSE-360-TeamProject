@@ -29,7 +29,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public int insertNewUser(User user) throws SQLException {
-		String insertUser = "INSERT INTO cse360users (userName, password, role) VALUES (?, ?, ?)";
+		String insertUser = String.format("INSERT INTO %s (userName, password, role) VALUES (?, ?, ?)", User.tableName);
 		
 		try (Connection connection = generalDBManager.getConnection(); 
 		     PreparedStatement pstmt = connection.prepareStatement(insertUser, Statement.RETURN_GENERATED_KEYS)) {
@@ -58,7 +58,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public boolean doesUserExist(User user) throws SQLException {
-		String query = "SELECT * FROM cse360users WHERE userName = ? AND password = ? AND role = ?";
+		String query = String.format("SELECT * FROM %s WHERE userName = ? AND password = ? AND role = ?", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
@@ -72,7 +72,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public boolean doesUserExistByName(String userName) throws SQLException {
-		String query = "SELECT COUNT(*) FROM cse360users WHERE userName = ?";
+		String query = String.format("SELECT COUNT(*) FROM %s WHERE userName = ?", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        
@@ -89,7 +89,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public String getUserRole(String userName) throws SQLException {
-		String query = "SELECT role FROM cse360users WHERE userName = ?";
+		String query = String.format("SELECT role FROM %s WHERE userName = ?", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
@@ -105,7 +105,7 @@ public class UserRepository implements IUserRepository {
 	@Override
 	public List<String> getAllUsernames() throws SQLException {
 		List<String> usernames = new ArrayList<>();
-		String query = "SELECT userName FROM cse360users";
+		String query = String.format("SELECT userName FROM %s", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        ResultSet rs = pstmt.executeQuery();
@@ -118,7 +118,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public User getUserByNameAndPassword(String userName, String password) throws SQLException {
-	    String query = "SELECT * FROM cse360users WHERE userName = ? AND password = ?";
+	    String query = String.format("SELECT * FROM %s WHERE userName = ? AND password = ?", User.tableName);
 	    try (Connection connection = generalDBManager.getConnection();
 	         PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
@@ -142,7 +142,7 @@ public class UserRepository implements IUserRepository {
 
 	@Override
 	public int getUserIdByName(String userName) throws SQLException {
-		String query = "SELECT id FROM cse360users WHERE userName = ?";
+		String query = String.format("SELECT id FROM %s WHERE userName = ?", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
@@ -163,7 +163,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public void updateUserRole(String userName, String roleString) throws SQLException {
-	    String query = "UPDATE cse360users SET role = ? WHERE userName = ?";
+	    String query = String.format("UPDATE %s SET role = ? WHERE userName = ?", User.tableName);
 	    try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, roleString);
@@ -174,7 +174,7 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public String updatePasswordForUser(String userName, String newPassword) throws SQLException {
-	    String sql = "UPDATE cse360users SET password = ? WHERE userName = ?";
+	    String sql = String.format("UPDATE %s SET password = ? WHERE userName = ?", User.tableName);
 	    try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(sql)) {
 	        pstmt.setString(1, newPassword);
@@ -190,7 +190,7 @@ public class UserRepository implements IUserRepository {
 
 	@Override
 	public boolean deleteUser(String targetUser) throws SQLException {
-	    String query = "DELETE FROM cse360users WHERE userName = ?";
+	    String query = String.format("DELETE FROM %s WHERE userName = ?", User.tableName);
 	    try (Connection connection = generalDBManager.getConnection(); 
 	         PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, targetUser);
@@ -205,7 +205,7 @@ public class UserRepository implements IUserRepository {
 
 	@Override
 	public void printAllRows() throws SQLException {
-		String query = "SELECT id, userName, password, role FROM cse360users";
+		String query = String.format("SELECT id, userName, password, role FROM %s", User.tableName);
 		try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query);
 				ResultSet rs = pstmt.executeQuery()) {

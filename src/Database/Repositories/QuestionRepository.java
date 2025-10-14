@@ -28,12 +28,16 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean insertQuestion(Question q) throws SQLException {
-		String insertQuestion = "INSERT INTO ForumQuestions (userId, title, body) VALUES (?, ?, ?)";
+		String insertQuestion = String.format("INSERT INTO %s (userId, title, body, answered, resolved, isDeleted, upvoteCount) VALUES (?, ?, ?, ?, ?, ?, ?)", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
 			pstmt.setInt(1, q.getAuthorId());
 			pstmt.setString(2,q.getTitle());
 			pstmt.setString(3,q.getText());
+			pstmt.setBoolean(4, q.getAnsweredStatus());
+			pstmt.setBoolean(5, q.getResolvedStatus());
+			pstmt.setBoolean(6, q.getDeleted());
+			pstmt.setInt(7, q.getUpvoteCount());
 			pstmt.executeUpdate();
 			
 			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -57,7 +61,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAllQuestions() throws SQLException {
 		List<Question> allQuestions = new ArrayList<>();
-		String getAllQuestions = "SELECT * FROM ForumQuestions";
+		String getAllQuestions = String.format("SELECT * FROM %s", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -81,7 +85,7 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public Question getQuestionById(int searchId) throws SQLException {
-		String getQuestionById = "SELECT * FROM ForumQuestions WHERE id = ?";
+		String getQuestionById = String.format("SELECT * FROM %s WHERE id = ?", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionById)) {
 			pstmt.setInt(1, searchId);
@@ -106,7 +110,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAnsweredQuestions() throws SQLException {
 		List<Question> answeredQuestions = new ArrayList<>();
-		String getAnsweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = TRUE";
+		String getAnsweredQuestions = String.format("SELECT * FROM %s WHERE answered = TRUE", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnsweredQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -130,7 +134,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getUnansweredQuestions() throws SQLException {
 		List<Question> unansweredQuestions = new ArrayList<>();
-		String getUnansweredQuestions = "SELECT * FROM ForumQuestions WHERE answered = FALSE";
+		String getUnansweredQuestions = String.format("SELECT * FROM %s WHERE answered = FALSE", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getUnansweredQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
@@ -156,7 +160,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsBySearch(String searchString) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getQuestionsBySearch = "SELECT * FROM ForumQuestions WHERE (title LIKE ? OR body LIKE ?)";
+		String getQuestionsBySearch = String.format("SELECT * FROM %s WHERE (title LIKE ? OR body LIKE ?)", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionsBySearch)) {
 			String searchPattern = "%" + searchString + "%";
@@ -183,7 +187,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsFromUser(int userId) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getQuestionsFromUser = "SELECT * FROM ForumQuestions WHERE userId = ?";
+		String getQuestionsFromUser = String.format("SELECT * FROM %s WHERE userId = ?", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionsFromUser)) {
 			pstmt.setInt(1, userId);
@@ -211,7 +215,7 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean updateQuestion(int id, String newText) throws SQLException {
-		String updateQuestion = "UPDATE ForumQuestions SET body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ?";
+		String updateQuestion = String.format("UPDATE %s SET body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ?", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(updateQuestion)) {
 			pstmt.setString(1, newText);
@@ -234,7 +238,7 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	@Override
 	public boolean deleteQuestion(int id) throws SQLException {
-		String deleteQuestion = "UPDATE ForumQuestions SET isDeleted = TRUE WHERE id = ?";
+		String deleteQuestion = String.format("UPDATE %s SET isDeleted = TRUE WHERE id = ?", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(deleteQuestion)) {
 			pstmt.setInt(1, id);

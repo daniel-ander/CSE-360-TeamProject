@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public interface IGeneralDBManager {
 	public int getNextForumPostId();
 	
-	public void initializeDBIfNeeded() throws SQLException;
+	public void initializeDB() throws SQLException;
 	public void createTables() throws SQLException;
 	
 	public boolean isDatabaseEmpty() throws SQLException;

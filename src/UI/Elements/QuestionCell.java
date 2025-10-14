@@ -1,20 +1,23 @@
 package UI.Elements;
 
+import Controllers.QuestionDisplayViewModel;
 import Models.Question;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-public class QuestionCell extends ListCell<Question> {
+public class QuestionCell extends ListCell<QuestionDisplayViewModel> {
     private final VBox layout = new VBox();
     private final Label titleLabel = new Label();
     private final Label textLabel = new Label();
     private final Label statusLabel = new Label();
+    private final Label permissionLabel = new Label(); // This is for illustrative purposes
 
     public QuestionCell() {
         titleLabel.setWrapText(true);
         textLabel.setWrapText(true);
+        permissionLabel.setWrapText(true);
 
-        layout.getChildren().addAll(titleLabel, textLabel, statusLabel);
+        layout.getChildren().addAll(titleLabel, textLabel, statusLabel, permissionLabel);
         layout.setFillWidth(true);
         layout.setMaxWidth(Double.MAX_VALUE);
 
@@ -31,14 +34,15 @@ public class QuestionCell extends ListCell<Question> {
     }
 
     @Override
-    protected void updateItem(Question q, boolean empty) {
-        super.updateItem(q, empty);
-        if (empty || q == null) {
+    protected void updateItem(QuestionDisplayViewModel vm, boolean empty) {
+        super.updateItem(vm, empty);
+        if (empty || vm.getQuestion() == null) {
             setGraphic(null);
         } else {
-            titleLabel.setText(q.getTitle());
-            textLabel.setText(truncate(q.getText(), 150));
-            statusLabel.setText(formatStatus(q));
+            titleLabel.setText(vm.getQuestion().getTitle());
+            textLabel.setText(truncate(vm.getQuestion().getText(), 150));
+            statusLabel.setText(formatStatus(vm.getQuestion()));
+            permissionLabel.setText(String.join(", ", vm.getPermissionList()));
             setGraphic(layout);
         }
     }
@@ -49,8 +53,8 @@ public class QuestionCell extends ListCell<Question> {
 
     private String formatStatus(Question q) {
         var parts = new java.util.ArrayList<String>();
-        if (q.getAnswered()) parts.add("Answered");
-        if (q.getResolved()) parts.add("Resolved");
+        if (q.getAnsweredStatus()) parts.add("Answered");
+        if (q.getResolvedStatus()) parts.add("Resolved");
         parts.add("Upvotes: " + q.getUpvoteCount());
         return String.join(" • ", parts);
     }

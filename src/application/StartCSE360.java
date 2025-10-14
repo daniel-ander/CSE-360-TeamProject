@@ -8,7 +8,8 @@ import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
 
 import Database.DBConnectionStore;
-
+import Database.GeneralDBManager;
+import Database.Services.PermissionService;
 import UI.Pages.FirstPage;
 import UI.Pages.SetupLoginSelectionPage;
 
@@ -23,14 +24,21 @@ public class StartCSE360 extends Application {
 	
 	@Override
     public void start(Stage primaryStage) {
+		String databaseLocation = "database/FoundationDatabase";
+		
         try {
-        	DBConnectionStore sharedServiceProvider = DBConnectionStore.createInstance();
-        	sharedServiceProvider.getGeneralDBManager().initializeDBIfNeeded();
+        	DBConnectionStore sharedConnectionProvider = DBConnectionStore.createInstance();
         	
-            if (sharedServiceProvider.getGeneralDBManager().isDatabaseEmpty()) {
-            	new FirstPageController(sharedServiceProvider, primaryStage, new FirstPage());
+        	GeneralDBManager initializingConnectionManager = (GeneralDBManager)sharedConnectionProvider.getGeneralDBManager();
+        	PermissionService permissionService = (PermissionService)sharedConnectionProvider.getPermissionService();
+        	
+        	if(!initializingConnectionManager.doesDatabaseExist(databaseLocation)) {  
+            	initializingConnectionManager.initializeDB();
+            	permissionService.seedRolePermissions();  													
+        	
+            	new FirstPageController(sharedConnectionProvider, primaryStage, new FirstPage());
             } else {
-            	new SetupLoginSelectionPageController(sharedServiceProvider, primaryStage, new SetupLoginSelectionPage());
+            	new SetupLoginSelectionPageController(sharedConnectionProvider, primaryStage, new SetupLoginSelectionPage());
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());

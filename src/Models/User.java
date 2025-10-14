@@ -1,10 +1,17 @@
 package Models;
 
+import java.util.Arrays;
+import java.util.List;
+
+import Config.DefaultRolePermissions.QuestionPermissions;
+
 /**
  * The User class represents a user entity in the system.
  * It contains the user's details such as userName, password, and role.
  */
 public class User {
+	public static String tableName = "users";
+	
     private String userName;
     private String password;
     private int id; //
@@ -15,7 +22,13 @@ public class User {
     	student,
     	instructor,
     	staff,
-    	reviewer
+    	reviewer;
+    	
+    	public static List<String> getAllRoles() {
+			return Arrays.stream(Role.values())
+					.map(Enum::name)
+					.toList();
+		}
     }
  
     public User(String userName, String password, Role role) {

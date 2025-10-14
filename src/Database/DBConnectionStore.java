@@ -6,31 +6,35 @@ import Database.Repositories.AnswerRepository;
 import Database.Repositories.InvitationRepository;
 import Database.Repositories.QuestionRepository;
 import Database.Repositories.UserRepository;
+import Database.Repositories.PermissionRepository;
 import Database.Repositories.Interfaces.IInvitationRepository;
 import Database.Repositories.Interfaces.*;
 import Database.Services.Interfaces.*;
 import Database.Services.*;
 
-// An object that holds every connection
+// An object that holds every connection service
 public class DBConnectionStore {
 	private final IGeneralDBManager generalDBManager;
 	private final IUserService userService;
 	private final IInvitationService invitationService;
 	private final IQuestionService questionService;
 	private final IAnswerService answerService;
+	private final IPermissionService permissionService;
 	
 	public DBConnectionStore(
 			IGeneralDBManager generalDBManager, 
 			IUserService userService, 
 			IInvitationService invitationService,
 			IQuestionService questionService,
-			IAnswerService answerService
+			IAnswerService answerService,
+			IPermissionService permissionService
 	) {
 		this.generalDBManager = generalDBManager;
 		this.userService = userService;
 		this.invitationService = invitationService;
 		this.questionService = questionService;
 		this.answerService = answerService;
+		this.permissionService = permissionService;
 	}
 	
 	// ===================
@@ -57,6 +61,10 @@ public class DBConnectionStore {
 		return answerService;
 	}
 	
+	public IPermissionService getPermissionService() {
+		return permissionService;
+	}
+	
 	// ===================
     // 		FACTORY 
  	// ===================
@@ -77,9 +85,10 @@ public class DBConnectionStore {
 		IAnswerRepository answerRepository = new AnswerRepository(dbHelper);
 		IAnswerService answerService = new AnswerService(answerRepository);
 		
+		IPermissionRepository permissionRepository = new PermissionRepository(dbHelper);
+		IPermissionService permissionService = new PermissionService(permissionRepository);
 		
-		return new DBConnectionStore(dbHelper, userService, invitationService, questionService, answerService);
+		
+		return new DBConnectionStore(dbHelper, userService, invitationService, questionService, answerService, permissionService);
 	}
 }
-
-
