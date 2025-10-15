@@ -15,8 +15,8 @@ public class QuestionTest {
         assertEquals(1, q.getAuthorId());
         assertEquals("Title", q.getTitle());
         assertEquals("This is a question text", q.getText());
-        assertFalse(q.getAnswered());
-        assertFalse(q.getResolved());
+        assertFalse(q.getAnsweredStatus());
+        assertFalse(q.getResolvedStatus());
         assertFalse(q.getDeleted());
     }
 
