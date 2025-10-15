@@ -61,7 +61,7 @@ public class QuestionListViewController {
     // 		 SETTERS 
  	// ===================
     
-    private void refresh() {
+    public void refresh() {
         try {
             List<Question> allQuestions = questionService.getAllQuestions();
 
@@ -82,9 +82,16 @@ public class QuestionListViewController {
                         .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), true);
                 
                 List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
+                
+                List<List<String>> allAnswerUserPermissions = new ArrayList<>();
+                for(Answer answer : answers) {
+                	allAnswerUserPermissions.add(permissionService
+                            .getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), false));
+                }
+                
                 calculateDepths(answers);
 
-                viewModels.add(new QuestionDisplayViewModel(question, userPermissions, answers));
+                viewModels.add(new QuestionDisplayViewModel(question, userPermissions, answers, allAnswerUserPermissions, questionService, this));
             }
 
             // Set view model list to the ListView

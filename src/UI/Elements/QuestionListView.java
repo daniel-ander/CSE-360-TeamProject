@@ -30,9 +30,9 @@ public class QuestionListView {
         forumListView.setCellFactory(_-> {
         	QuestionCell questionCell = new QuestionCell();
         	
-        	questionCell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-                event.consume(); // Prevents selection highlight
-            });
+//        	questionCell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+//                event.consume(); // Prevents selection highlight
+//            });
         	return questionCell;
         });
         
