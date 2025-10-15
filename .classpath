@@ -20,5 +20,9 @@
 	<classpathentry kind="lib" path="lib/jfx.incubator.input.jar"/>
 	<classpathentry kind="lib" path="lib/jfx.incubator.richtext.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="lib/mockito-core-5.20.0.jar"/>
+	<classpathentry kind="lib" path="lib/objenesis-3.4.jar"/>
+	<classpathentry kind="lib" path="lib/byte-buddy-1.15.0.jar"/>
+	<classpathentry kind="lib" path="lib/byte-buddy-agent-1.15.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
