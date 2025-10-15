@@ -96,8 +96,8 @@ public class AnswerListViewController {
 						FXCollections.observableArrayList(searchResults));
 				if (Debug.isEnabled) System.out.println("Answers searched with term: " + searchTerm);
 			} catch (DataAccessException exception) {
-			System.err.println("Database error: " + exception.getMessage());
-			exception.printStackTrace();
+				System.err.println("Database error: " + exception.getMessage());
+				exception.printStackTrace();
 			}
     	});
     }

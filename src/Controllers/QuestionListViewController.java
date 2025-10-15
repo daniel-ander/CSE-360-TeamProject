@@ -112,12 +112,17 @@ public class QuestionListViewController {
 				refresh();
 				return;
 			}
+			try {
 			ObservableList<QuestionDisplayViewModel> currentItems = view.getForumListView().getItems();
 			ObservableList<QuestionDisplayViewModel> filteredItems = currentItems.filtered(qvm -> 
 				qvm.getQuestion().getTitle().toLowerCase().contains(searchTerm) || 
 				qvm.getQuestion().getText().toLowerCase().contains(searchTerm)
 			);
 			view.getForumListView().setItems(filteredItems);
+			} catch (Exception e) {
+				System.err.println("Error during search: " + e.getMessage());
+				e.printStackTrace();
+			}
 		});
     }
     
