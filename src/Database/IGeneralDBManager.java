@@ -7,7 +7,6 @@ public interface IGeneralDBManager {
 	public int getNextForumPostId();
 	
 	public void initializeDB() throws SQLException;
-	public void createTables() throws SQLException;
 	
 	public boolean isDatabaseEmpty() throws SQLException;
 	

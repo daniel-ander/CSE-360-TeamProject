@@ -1,6 +1,7 @@
 package Database.Repositories;
 
 import Models.Answer;
+import Models.User;
 import Utils.Debug;
 
 import java.sql.Connection;
@@ -71,6 +72,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("questionId"),
 						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
+						rs.getString("authorName"),
 						rs.getString("body"),
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
@@ -99,12 +101,15 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("questionId"),
 						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
+						rs.getString("authorName"),
 						rs.getString("body"),
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0
 				);
+				
+				
 				allAnswersForQuestion.add(a);
 			}
 		}
@@ -124,6 +129,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("questionId"),
 						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
+						rs.getString("authorName"),
 						rs.getString("body"),
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
@@ -151,6 +157,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("questionId"),
 						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
+						rs.getString("authorName"),
 						rs.getString("body"),
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
@@ -176,6 +183,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("questionId"),
 						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
+						rs.getString("authorName"),
 						rs.getString("body"),
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),
@@ -202,6 +210,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("questionId"),
 						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
+						rs.getString("authorName"),
 						rs.getString("body"),
 						rs.getTimestamp("timestamp"),
 						rs.getInt("upvoteCount"),

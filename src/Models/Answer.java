@@ -10,6 +10,7 @@ public class Answer {
 	private boolean isCorrect;
 	private int questionId;
 	private int authorId;
+	private String authorName;
 	private Integer parentAnswerId; // -1 if it is not a reply to another answer
 	private Timestamp timestamp;
 	private boolean isDeleted;
@@ -18,7 +19,7 @@ public class Answer {
 	
 
 	// Constructor for creating a new answer (not yet in DB)
-	public Answer(int questionId, int authorId, String text) {
+	public Answer(int questionId, int authorId, String authorName, String text) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
@@ -26,6 +27,7 @@ public class Answer {
 		this.text = text;
 		this.questionId = questionId; // -1 represents that it is not assigned
 		this.authorId = authorId;
+		this.authorName = authorName;
 		this.isCorrect = false;
 		this.isDeleted = false;
 		this.upvoteCount = 0;
@@ -34,7 +36,19 @@ public class Answer {
 	}
 	
 	// Constructor for pulling from DB with all fields
-	public Answer(int id, int questionId, int parentAnswerId, int authorId, String body,Timestamp timestamp, int upvoteCount, boolean isCorrect, boolean isDeleted, int replyDepth) {
+	public Answer(
+			int id, 
+			int questionId, 
+			int parentAnswerId, 
+			int authorId, 
+			String authorName, 
+			String body,
+			Timestamp timestamp, 
+			int upvoteCount, 
+			boolean isCorrect, 
+			boolean isDeleted, 
+			int replyDepth
+	) {
 		if (body == null || body.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
@@ -43,6 +57,7 @@ public class Answer {
 		this.questionId = questionId; // -1 represents that it is not assigned
 		this.parentAnswerId = parentAnswerId; // -1 represents that it is not a reply to another answer
 		this.authorId = authorId;
+		this.authorName = authorName;
 		this.text = body;
 		this.timestamp = timestamp;
 		this.upvoteCount = upvoteCount;
@@ -64,6 +79,7 @@ public class Answer {
 	public boolean getIsDeleted() {return isDeleted;}
 	public int getUpvoteCount() {return upvoteCount;}
 	public String getText() {return text;}
+	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
 	public int getReplyDepth() {return replyDepth;}
 	
@@ -80,6 +96,7 @@ public class Answer {
 	public void setReplyDepth(int depth) { replyDepth = depth; }
 	public void setUserId(int newUserId) { authorId = newUserId; }
 	public void setId(int newId) { id = newId; }
+	public void setAuthorName(String name) { authorName = name; }
 	public void setText(String newText) {
 		if (newText == null || newText.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");

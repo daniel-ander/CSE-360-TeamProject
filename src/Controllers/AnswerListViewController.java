@@ -9,7 +9,6 @@ import UI.Elements.QuestionListView;
 import UI.Elements.AnswerListView;
 import Utils.Debug;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +85,7 @@ public class AnswerListViewController {
         		System.out.println("Answer text cannot be empty or placeholder.");
         		return;
         	}
-        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), text);
+        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), userSession.currentUser().getUserName(), text);
         	try {
         		answerService.addAnswer(a);
                 refreshAnswers();
@@ -124,7 +123,7 @@ public class AnswerListViewController {
 				System.out.println("Select an answer to reply to.");
 				return;
 			}
-			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), text);
+			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), userSession.currentUser().getUserName(), text);
 			reply.setParentAnswerId(selectedAnswer.getId());
 			try {
 				answerService.addAnswer(reply);

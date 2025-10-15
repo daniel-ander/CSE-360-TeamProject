@@ -4,6 +4,7 @@ import Controllers.QuestionDisplayViewModel;
 
 
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 
 
@@ -26,7 +27,14 @@ public class QuestionListView {
         forumListView = new ListView<QuestionDisplayViewModel>();
         
         //XXX: working on this, could break. trying to add cells to the UI 
-        forumListView.setCellFactory(_-> new QuestionCell());
+        forumListView.setCellFactory(_-> {
+        	QuestionCell questionCell = new QuestionCell();
+        	
+        	questionCell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                event.consume(); // Prevents selection highlight
+            });
+        	return questionCell;
+        });
         
         borderpane.setCenter(forumListView);
 

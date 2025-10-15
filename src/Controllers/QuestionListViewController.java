@@ -1,14 +1,18 @@
 package Controllers;
 
+import Models.Answer;
 import Models.Question;
 
 import Sessions.UserSession;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
+import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IPermissionService;
 import Database.Services.Interfaces.IQuestionService;
 
@@ -26,6 +30,7 @@ public class QuestionListViewController {
 	private final DBConnectionStore dBConnectionStore;
 	private final IGeneralDBManager generalDBManager;
 	private final IQuestionService questionService;
+	private final IAnswerService answerService;
 	private final IPermissionService permissionService;
     private final UserSession userSession;
     private final QuestionListView view;
@@ -40,6 +45,7 @@ public class QuestionListViewController {
         this.view = view;
         this.generalDBManager = dBConnectionStore.getGeneralDBManager();
         this.questionService = dBConnectionStore.getQuestionService();
+        this.answerService = dBConnectionStore.getAnswerService();
         this.permissionService = dBConnectionStore.getPermissionService();
         
         this.primaryStage = primaryStage;
@@ -74,8 +80,11 @@ public class QuestionListViewController {
             for (Question question : allQuestions) {
                 List<String> userPermissions = permissionService
                         .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), true);
+                
+                List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
+                calculateDepths(answers);
 
-                viewModels.add(new QuestionDisplayViewModel(question, userPermissions));
+                viewModels.add(new QuestionDisplayViewModel(question, userPermissions, answers));
             }
 
             // Set view model list to the ListView
@@ -108,6 +117,7 @@ public class QuestionListViewController {
         // Add question
         view.getAddQuestionButton().setOnAction(_ -> {
         	String text = view.getTextInputArea().getText();
+        	// TODO:- These should also be enforced upon the database call for security purposes
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Question text cannot be empty or placeholder.");
         		return;
@@ -182,6 +192,40 @@ public class QuestionListViewController {
 	}
     
 
-    
+    private void calculateDepths(List<Answer> answers) {
+        Map<Integer, Integer> depthMap = new HashMap<>();
+        Map<Integer, Answer> answerById = new HashMap<>();
+        for (Answer a : answers) {
+        	answerById.put(a.getId(), a);
+        	if (Debug.isEnabled) {
+        		System.out.println("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
+        	}
+        }
+
+        for (Answer answer : answers) {
+            int depth = 0;
+            int parentId = answer.getParentAnswerId();
+            if (Debug.isEnabled) {
+				System.out.println("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
+			}
+
+            while (parentId > 0 && depth < 10) { // Prevent infinite loops
+                depth++;
+                Integer knownDepth = depthMap.get(parentId);
+                if (knownDepth != null) {
+                    depth += knownDepth;
+                    break;
+                }
+                Answer parentAnswer = answerById.get(parentId);
+                if (parentAnswer == null) break;
+                parentId = parentAnswer.getParentAnswerId();
+            }
+            depthMap.put(answer.getId(), depth);
+            answer.setReplyDepth(depth);
+            if (Debug.isEnabled) {
+                System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
+            }
+        }
+    }
 
 }

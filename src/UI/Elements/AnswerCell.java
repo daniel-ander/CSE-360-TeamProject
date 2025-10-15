@@ -41,8 +41,6 @@ public class AnswerCell extends ListCell<Answer> {
         }
     }
 
-
-
 	private String formatMeta(Answer a) {
         StringBuilder sb = new StringBuilder();
         sb.append("ID ").append(a.getId())

@@ -140,4 +140,13 @@ public class AnswerService implements IAnswerService {
 		}
 	}
 
+	@Override
+	public List<Answer> getAnswersByQuestionID(int questionId) throws DataAccessException {
+		try {
+			return answerRepository.getAnswersByQuestionId(questionId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get answers with question id: " + questionId + " from database due to: " + e);
+		}
+	}
+
 }
