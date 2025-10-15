@@ -96,6 +96,7 @@ public class QuestionListViewController {
     	setEditQuestionButtonAction();
     	setViewQuestionButtonAction();
     	setShowDeletedQuestionsCheckboxAction();
+    	setSearchQuestionsButtonAction();
     }
     
     private void setShowDeletedQuestionsCheckboxAction() {
@@ -103,6 +104,27 @@ public class QuestionListViewController {
 			refresh();
 		});
 	}
+    
+    private void setSearchQuestionsButtonAction() {
+		view.getSearchButton().setOnAction(_ -> {
+			String searchTerm = view.getSearchQuestionsTextField().getText().toLowerCase();
+			if (searchTerm == null || searchTerm.trim().isEmpty()) {
+				refresh();
+				return;
+			}
+			try {
+			ObservableList<QuestionDisplayViewModel> currentItems = view.getForumListView().getItems();
+			ObservableList<QuestionDisplayViewModel> filteredItems = currentItems.filtered(qvm -> 
+				qvm.getQuestion().getTitle().toLowerCase().contains(searchTerm) || 
+				qvm.getQuestion().getText().toLowerCase().contains(searchTerm)
+			);
+			view.getForumListView().setItems(filteredItems);
+			} catch (Exception e) {
+				System.err.println("Error during search: " + e.getMessage());
+				e.printStackTrace();
+			}
+		});
+    }
     
     private void setAddQuestionButtonAction() {
         // Add question
@@ -126,6 +148,7 @@ public class QuestionListViewController {
         });
 	}
     
+
     private void setEditQuestionButtonAction() {
         // Edit question
         view.getEditQuestionButton().setOnAction(_ -> {
@@ -180,8 +203,6 @@ public class QuestionListViewController {
             }
         });
 	}
-    
 
-    
 
 }
