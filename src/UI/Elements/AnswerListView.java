@@ -20,6 +20,8 @@ public class AnswerListView {
     private final Button replyToAnswerButton = new Button("Reply to Answer");
     private final CheckBox showDeletedAnswersCheckbox = new CheckBox("Show Deleted Answers");
     private final TextArea textInputArea = new TextArea("Input text here...");
+    private final TextField searchAnswersTextField = new TextField();
+    private final Button SearchAnswersButton = new Button("Search");
     
 
     public AnswerListView() {
@@ -32,6 +34,7 @@ public class AnswerListView {
         //XXX: Working on a cell factory to make answers look better
         answerListView.setCellFactory(_ -> new AnswerCell());
 
+        searchAnswersTextField.setPromptText("Search answers...");
         
         root.setCenter(answerListView);
 
@@ -42,7 +45,9 @@ public class AnswerListView {
         		deleteAnswerButton, 
         		backButton,
         		replyToAnswerButton, 
-        		showDeletedAnswersCheckbox);
+        		showDeletedAnswersCheckbox, 
+        		searchAnswersTextField, 
+        		SearchAnswersButton);
         controls.getStyleClass().add("small-padding");
         
         textInputArea.setWrapText(true);
@@ -63,9 +68,13 @@ public class AnswerListView {
     public Button getBackButton() { return backButton; }
     public Button getResolveButton() { return resolveButton; }
     public Button getReplyToAnswerButton() { return replyToAnswerButton; }
+    public TextField getSearchAnswersTextField() { return searchAnswersTextField; }
     
     public TextArea getTextInputArea() { return textInputArea; }
 
 	public CheckBox getShowDeletedAnswersCheckbox() {return showDeletedAnswersCheckbox; }
-    
+
+	public ButtonBase getSearchAnswersButton() {return SearchAnswersButton;}
 }
+    
+
