@@ -5,7 +5,8 @@ Team Project for CSE360 - ASU
 ### Project Deliverables - Links to relevant deliverables  
 - [Team Project Report (Google Doc)](https://docs.google.com/document/d/1EsmSLK5tWXNMgdoVfmusR9ti-TLOBsUrhgj01S7Vnts/edit?tab=t.0)
 - Team Project Report - Current Phase Completed PDF Turned In on Canvas
-- All links to screencasts and standups links are contained in the above google document
+- Demo Screentest - This screencast documents demonstration of successful testing, as well as a walk through demo of the project. [Link!](https://www.youtube.com/watch?v=D3X49O8eujA) 
+- Technical ScreenCast - This screencast documents and explains the project's code. [LINK!(Youtube)](https://www.youtube.com/watch?v=CALeNFRFSqo)
 - Team Norms: Included in the above google document 
 
 - Project Source Code : ./src/
