@@ -76,6 +76,31 @@ public class AnswerListViewController {
     	}
     }
     
+    private void setSearchAnswersButtonAction() {
+    	view.getSearchAnswersButton().setOnAction(_ -> {
+    		String searchTerm = view.getSearchAnswersTextField().getText().toLowerCase();
+    		if (searchTerm == null || searchTerm.trim().isEmpty()) {
+				refreshAnswers();
+				return;
+			}
+			try {
+				List<Answer> searchResults = answerService.getAnswersBySearch(searchTerm);
+				
+				if (!view.getShowDeletedAnswersCheckbox().isSelected()) {
+				    searchResults.removeIf(Answer::getIsDeleted);
+				}
+				
+				calculateDepths(searchResults);
+				view.getAnswerList().setItems(
+						FXCollections.observableArrayList(searchResults));
+				if (Debug.isEnabled) System.out.println("Answers searched with term: " + searchTerm);
+			} catch (DataAccessException exception) {
+				System.err.println("Database error: " + exception.getMessage());
+				exception.printStackTrace();
+			}
+    	});
+    }
+    
     private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(_ -> {
@@ -236,6 +261,7 @@ public class AnswerListViewController {
     	setResolveButtonAction();
     	setReplyToAnswerButtonAction();
     	setShowDeletedAnswersCheckboxAction();
+    	setSearchAnswersButtonAction();
     }
     
     private void setInitialLayout() {
