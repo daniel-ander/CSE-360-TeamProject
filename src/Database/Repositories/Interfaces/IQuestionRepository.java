@@ -18,6 +18,6 @@ public interface IQuestionRepository {
 	public List<Question> getQuestionsFromUser(int userId) throws SQLException;
 	
 	public boolean insertQuestion(Question q) throws SQLException;
-	public boolean updateQuestion(int id, String newText) throws SQLException;
+	public boolean updateQuestion(int id, String newTitle, String newText) throws SQLException;
 	public boolean deleteQuestion(int id) throws SQLException;
 }

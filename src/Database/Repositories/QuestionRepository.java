@@ -214,15 +214,16 @@ public class QuestionRepository implements IQuestionRepository {
  	// ===================
 	
 	@Override
-	public boolean updateQuestion(int id, String newText) throws SQLException {
-		String updateQuestion = String.format("UPDATE %s SET body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ?", Question.tableName);
+	public boolean updateQuestion(int id, String newTitle, String newText) throws SQLException {
+		String updateQuestion = String.format("UPDATE %s SET title = ?, body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ?", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(updateQuestion)) {
-			pstmt.setString(1, newText);
-			pstmt.setInt(2, id);
+			pstmt.setString(1, newTitle);
+			pstmt.setString(2, newText);
+			pstmt.setInt(3, id);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected > 0) {
-				if (Debug.isEnabled) System.out.println("Question with ID " + id + " updated successfully.");
+				if (Debug.isEnabled) System.out.println("Question with ID " + id + " updated successfully to title: " + newTitle + " and body: " + newText);
 				return true;
 			} else {
 				if (Debug.isEnabled) System.out.println("No question found with ID " + id + " to update.");

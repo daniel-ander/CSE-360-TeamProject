@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
@@ -83,7 +84,7 @@ public class QuestionListViewController {
                 
                 List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
                 
-                List<List<String>> allAnswerUserPermissions = new ArrayList<>();
+                List<List<String>>  allAnswerUserPermissions = new ArrayList<>();
                 for(Answer answer : answers) {
                 	allAnswerUserPermissions.add(permissionService
                             .getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), false));
@@ -91,7 +92,19 @@ public class QuestionListViewController {
                 
                 calculateDepths(answers);
 
-                viewModels.add(new QuestionDisplayViewModel(question, userPermissions, answers, allAnswerUserPermissions, questionService, this));
+                viewModels.add(new QuestionDisplayViewModel(
+                		question, 
+                		userPermissions, 
+                		answers, 
+                		allAnswerUserPermissions, 
+                		userSession,
+                		questionService, 
+                		answerService, 
+                		this,
+                		questionService::deleteQuestion, 
+                		answerService::addAnswer,
+                		this::refresh
+                ));
             }
 
             // Set view model list to the ListView
@@ -184,6 +197,7 @@ public class QuestionListViewController {
 	}
     
     private void setDeleteQuestionButtonAction() {
+    	System.out.println("Super pressed");
 		// Delete question
     	view.getDeleteQuestionButton().setOnAction(_-> {
     		QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
