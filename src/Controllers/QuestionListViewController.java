@@ -1,6 +1,7 @@
 package Controllers;
 
 import Models.Answer;
+import Models.IPost;
 import Models.Question;
 
 import Sessions.UserSession;
@@ -70,45 +71,74 @@ public class QuestionListViewController {
                 allQuestions.removeIf(Question::getDeleted);
             }
 
-            List<QuestionDisplayViewModel> viewModels = new ArrayList<>();
-            List<Integer> questionIds = new ArrayList<>();
-            
-            for (Question question : allQuestions) {
-                questionIds.add(question.getId());
-            }
-            
+            List<PostDisplayViewModel> viewModels = new ArrayList<>();
+
             // TODO:- Inefficient. Figure out the other query
             for (Question question : allQuestions) {
-                List<String> userPermissions = permissionService
-                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), true);
+                List<String> userQuestionPermissions = permissionService
+                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
                 
                 List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
                 
-                List<List<String>>  allAnswerUserPermissions = new ArrayList<>();
+                // For the question cell
+                viewModels.add(new PostDisplayViewModel(
+                	    question,
+                	    userQuestionPermissions,
+                	    userSession,
+                	    questionService::deleteQuestion,
+                	    post -> {
+                	        try {
+                	            answerService.addAnswer((Answer)post);
+                	        } catch (Exception e) {
+                	            e.printStackTrace();
+                	        }
+                	    },
+                	    (id, newTitle, newBody) -> {
+                	        try {
+                	        	questionService.updateQuestion(id, newTitle, newBody);
+                	        } catch (Exception e) {
+                	            e.printStackTrace();
+                	        }
+                	    },
+                	    this::refresh
+                	));
+                
+                // TODO: - Put the indenting logic somewhere more appropriate
+                calculateDepths(answers); // For indenting purposes
+                
                 for(Answer answer : answers) {
-                	allAnswerUserPermissions.add(permissionService
-                            .getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), false));
+                	List<String> userAnswerPermissions = permissionService
+                            .getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
+                	
+                	// For the answer cell
+                    viewModels.add(new PostDisplayViewModel(
+                    		answer,
+                    		userAnswerPermissions, 
+                    		userSession,
+                    		answerService::deleteAnswer, 
+                    		post -> {
+                    	        try {
+                    	            answerService.addAnswer((Answer)post);
+                    	        } catch (Exception e) {
+                    	            e.printStackTrace();
+                    	        }
+                    	    },
+                    		(id, newBody, isCorrect) -> {
+                    	        try {
+                    	            answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
+                    	        } catch (Exception e) {
+                    	            e.printStackTrace();
+                    	        }
+                    	    },
+                    		this::refresh
+                    ));
+                    
                 }
                 
-                calculateDepths(answers);
-
-                viewModels.add(new QuestionDisplayViewModel(
-                		question, 
-                		userPermissions, 
-                		answers, 
-                		allAnswerUserPermissions, 
-                		userSession,
-                		questionService, 
-                		answerService, 
-                		this,
-                		questionService::deleteQuestion, 
-                		answerService::addAnswer,
-                		this::refresh
-                ));
             }
 
             // Set view model list to the ListView
-            ObservableList<QuestionDisplayViewModel> observableVMs =
+            ObservableList<PostDisplayViewModel> observableVMs =
                     FXCollections.observableArrayList(viewModels);
 
             view.getForumListView().setItems(observableVMs);
@@ -142,10 +172,10 @@ public class QuestionListViewController {
 				return;
 			}
 			try {
-			ObservableList<QuestionDisplayViewModel> currentItems = view.getForumListView().getItems();
-			ObservableList<QuestionDisplayViewModel> filteredItems = currentItems.filtered(qvm -> 
-				qvm.getQuestion().getTitle().toLowerCase().contains(searchTerm) || 
-				qvm.getQuestion().getText().toLowerCase().contains(searchTerm)
+			ObservableList<PostDisplayViewModel> currentItems = view.getForumListView().getItems();
+			ObservableList<PostDisplayViewModel> filteredItems = currentItems.filtered(vm -> 
+				vm.getPost().getTitleText().toLowerCase().contains(searchTerm) || 
+				vm.getPost().getBodyText().toLowerCase().contains(searchTerm)
 			);
 			view.getForumListView().setItems(filteredItems);
 			} catch (Exception e) {
@@ -182,10 +212,10 @@ public class QuestionListViewController {
     private void setEditQuestionButtonAction() {
         // Edit question
         view.getEditQuestionButton().setOnAction(_ -> {
-            QuestionDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
+            PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestionVM != null) {
                 try {
-                	questionService.deleteQuestion(selectedQuestionVM.getQuestion().getId());
+                	questionService.deleteQuestion(selectedQuestionVM.getPost().getId());
                     refresh();
                 } catch (DataAccessException dataAccessException) {
                 	// TODO:- Handle outcome if the question can't be deleted
@@ -200,10 +230,10 @@ public class QuestionListViewController {
     	System.out.println("Super pressed");
 		// Delete question
     	view.getDeleteQuestionButton().setOnAction(_-> {
-    		QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+    		PostDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
 			if (selectedQuestion != null) {
 				try {
-					questionService.deleteQuestion(selectedQuestion.getQuestion().getId());
+					questionService.deleteQuestion(selectedQuestion.getPost().getId());
 					refresh();
 				} catch (DataAccessException dataAccessException) {
 					
@@ -216,21 +246,21 @@ public class QuestionListViewController {
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(_ -> {
-        	QuestionDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
+        	PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
             
             if (selectedQuestionVM != null) {
                 AnswerListView detailView = new AnswerListView();
-                
+                     
                 new AnswerListViewController(
                 		dBConnectionStore,
                 		primaryStage, 
-                		selectedQuestionVM.getQuestion(),
+                		(Question)selectedQuestionVM.getPost(), // Hacky, but good for now
                 		userSession,
                 		detailView
                 );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
-                System.out.println("Viewing details for Question ID: " + selectedQuestionVM.getQuestion().getId());
+                System.out.println("Viewing details for Question ID: " + selectedQuestionVM.getPost().getId());
             }
         });
 	}

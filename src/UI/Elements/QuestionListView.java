@@ -1,6 +1,6 @@
 package UI.Elements;
 
-import Controllers.QuestionDisplayViewModel;
+import Controllers.PostDisplayViewModel;
 
 
 import javafx.scene.control.*;
@@ -12,7 +12,7 @@ public class QuestionListView {
 	
     private final BorderPane borderpane = new BorderPane();
     
-    private final ListView<QuestionDisplayViewModel> forumListView;
+    private final ListView<PostDisplayViewModel> forumListView;
     
     private final Button addQuestionButton = new Button("Add Question");
     private final Button editQuestionButton = new Button("Edit Question");
@@ -26,16 +26,11 @@ public class QuestionListView {
 
     public QuestionListView() {
         // ListView in center
-        forumListView = new ListView<QuestionDisplayViewModel>();
+        forumListView = new ListView<PostDisplayViewModel>();
         
         //XXX: working on this, could break. trying to add cells to the UI 
         forumListView.setCellFactory(_-> {
-        	QuestionCell questionCell = new QuestionCell();
-        	
-//        	questionCell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-//                event.consume(); // Prevents selection highlight
-//            });
-        	return questionCell;
+        	return new PostCell();
         });
         
         borderpane.setCenter(forumListView);
@@ -59,7 +54,7 @@ public class QuestionListView {
 
     public BorderPane getLayout() { return borderpane; }
     
-    public ListView<QuestionDisplayViewModel> getForumListView() { return forumListView; }
+    public ListView<PostDisplayViewModel> getForumListView() { return forumListView; }
     
     public Button getAddQuestionButton() { return addQuestionButton; }
     public Button getEditQuestionButton() { return editQuestionButton; }

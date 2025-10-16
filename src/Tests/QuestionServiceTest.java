@@ -66,7 +66,7 @@ public class QuestionServiceTest {
         Question result = questionService.getQuestionById(1);
 
         assertNotNull(result);
-        assertEquals("HelloTitle?", result.getTitle());
+        assertEquals("HelloTitle?", result.getTitleText());
         assertEquals("HelloText?", result.getText());
         assertEquals(-1, result.getId());
         verify(questionRepo, times(1)).getQuestionById(1);

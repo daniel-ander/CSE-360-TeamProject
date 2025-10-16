@@ -167,7 +167,7 @@ public class AnswerListViewController {
         view.getEditAnswerButton().setOnAction(_ -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
             if (sel != null) {
-                sel.setText("Edited: " + sel.getText());
+                sel.setText("Edited: " + sel.getBodyText());
                 refreshAnswers();
             }
         });
@@ -208,8 +208,8 @@ public class AnswerListViewController {
         // Mark question as resolved
         view.getResolveButton().setOnAction(_ -> {
 			  question.setResolved(true);
-			  view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText() + " (Resolved)");
-			  question.setText(question.getText() + " (Resolved)");
+			  view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getBodyText() + " (Resolved)");
+			  question.setText(question.getBodyText() + " (Resolved)");
 		  });
 		
 	  }
@@ -266,7 +266,7 @@ public class AnswerListViewController {
     
     private void setInitialLayout() {
     	// Show selected question at the top
-    	view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText());
+    	view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getBodyText());
     }
 
 

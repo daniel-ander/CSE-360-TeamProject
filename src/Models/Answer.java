@@ -2,7 +2,7 @@ package Models;
 
 import java.sql.Timestamp;
 
-public class Answer {
+public class Answer implements IPost {
 	public static String tableName = "answers";
 	
 	private int id; // -1 if answer isn't in the database yet
@@ -34,6 +34,24 @@ public class Answer {
 		this.parentAnswerId = null; // -1 represents that it is not a reply to another answer
 		this.replyDepth = 0;
 	}
+	
+	// Constructor for creating a new nested answer (not yet in DB)
+		public Answer(int questionId, int parentAnswerId, int authorId, String authorName, String text) {
+			if (text == null || text.strip().isEmpty()) {
+				throw new IllegalArgumentException("Text is empty");
+			}
+			this.id = -1; // -1 represents that it is not assigned
+			this.text = text;
+			this.questionId = questionId; // -1 represents that it is not assigned
+			this.parentAnswerId = parentAnswerId;
+			this.authorId = authorId;
+			this.authorName = authorName;
+			this.isCorrect = false;
+			this.isDeleted = false;
+			this.upvoteCount = 0;
+			this.parentAnswerId = null; // -1 represents that it is not a reply to another answer
+			this.replyDepth = 0;
+		}
 	
 	// Constructor for pulling from DB with all fields
 	public Answer(
@@ -78,7 +96,6 @@ public class Answer {
 	public Timestamp getTimestamp() {return timestamp;}
 	public boolean getIsDeleted() {return isDeleted;}
 	public int getUpvoteCount() {return upvoteCount;}
-	public String getText() {return text;}
 	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
 	public int getReplyDepth() {return replyDepth;}
@@ -112,4 +129,19 @@ public class Answer {
     public String toString() {
         return "A" + id + ": " + text + (isCorrect ? " (Correct)" : "");
     }
+
+	@Override
+	public String getBodyText() {
+		return text;
+	}
+
+	@Override
+	public String getTitleText() {
+		return null;
+	}
+
+	@Override
+	public Type getPostType() {
+		return Type.Answer;
+	}
 }

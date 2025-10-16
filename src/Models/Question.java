@@ -1,12 +1,13 @@
 package Models;
 
-public class Question {
+public class Question implements IPost {
 	public static String tableName = "questions";
 	
 	private int id; // -1 if question isn't in the database yet
 	private String text;
 	private String title;
 	private int authorId;
+	private String authorName;
 	private int upvoteCount;
 	private boolean isAnswered;
 	private boolean isResolved;
@@ -53,9 +54,8 @@ public class Question {
  	// ===================
 	
 	public int getId() {return id;}
-	public String getTitle() {return title;}
+
 	public int getAuthorId() {return authorId;}
-	public String getText() {return text;}
 	public boolean getAnsweredStatus() {return isAnswered;}
 	public boolean getResolvedStatus() {return isResolved;}
 	public boolean getDeleted() {return isDeleted;}
@@ -88,4 +88,23 @@ public class Question {
     public String toString() {
         return "Q" + id + ": " + text;
     }
+
+
+	@Override
+	public String getBodyText() {
+		// TODO Auto-generated method stub
+		return text;
+	}
+
+
+	@Override
+	public String getTitleText() {
+		return title;
+	}
+
+
+	@Override
+	public Type getPostType() {
+		return Type.Question;
+	}
 }

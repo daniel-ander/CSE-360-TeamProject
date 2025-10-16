@@ -13,7 +13,7 @@ public class QuestionTest {
         
         assertEquals(-1, q.getId()); // -1 since not yet in DB
         assertEquals(1, q.getAuthorId());
-        assertEquals("Title", q.getTitle());
+        assertEquals("Title", q.getTitleText());
         assertEquals("This is a question text", q.getText());
         assertFalse(q.getAnsweredStatus());
         assertFalse(q.getResolvedStatus());

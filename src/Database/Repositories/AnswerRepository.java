@@ -28,6 +28,7 @@ public class AnswerRepository implements IAnswerRepository {
  	// ===================
 
 	public boolean insertAnswer(Answer a) throws SQLException {
+		System.out.println("The id is: " + a.getQuestionId());
 	    String insertSQL = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)", Answer.tableName);
 	    try (Connection connection = generalDBManager.getConnection();
 	         PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -39,7 +40,7 @@ public class AnswerRepository implements IAnswerRepository {
 	            pstmt.setInt(2, a.getParentAnswerId());
 	        }
 	        pstmt.setInt(3, a.getAuthorId());
-	        pstmt.setString(4, a.getText());
+	        pstmt.setString(4, a.getBodyText());
 	        pstmt.executeUpdate();
 
 	        try (ResultSet keys = pstmt.getGeneratedKeys()) {

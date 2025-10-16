@@ -32,8 +32,8 @@ public class QuestionRepository implements IQuestionRepository {
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
 			pstmt.setInt(1, q.getAuthorId());
-			pstmt.setString(2,q.getTitle());
-			pstmt.setString(3,q.getText());
+			pstmt.setString(2,q.getTitleText());
+			pstmt.setString(3,q.getBodyText());
 			pstmt.setBoolean(4, q.getAnsweredStatus());
 			pstmt.setBoolean(5, q.getResolvedStatus());
 			pstmt.setBoolean(6, q.getDeleted());
