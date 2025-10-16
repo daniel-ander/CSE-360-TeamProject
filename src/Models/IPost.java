@@ -5,7 +5,7 @@ public interface IPost {
 		Question, Answer
 	}
 	
-	public int getId();
+	public Integer getId();
 	public String getBodyText();
 	public String getTitleText();
 	
