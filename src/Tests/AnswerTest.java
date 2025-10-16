@@ -10,17 +10,18 @@ public class AnswerTest {
 	// CREATE TESTS
     @Test
     public void Constructor__WithValidInputs_CreatesAnswer() {
-    	Answer a = new Answer(-1, 1, "This is an answer text");
+    	Answer a = new Answer(-1, 1, "Author", "This is an answer text");
     	
-    	assertEquals(-1, a.getId());
-    	assertEquals("This is an answer text", a.getText());
+    	assertNull(a.getId());
+    	assertEquals(-1, a.getQuestionId());
+    	assertEquals("This is an answer text", a.getBodyText());
     	assertFalse(a.isCorrect());
     }
 
     @Test
     public void Constructor_WithEmptyString_ThrowsException() {
         Exception testError = assertThrows(IllegalArgumentException.class,
-            () -> new Answer(2, 1, " "));
+            () -> new Answer(2, 1, "Author", " "));
         
         assertEquals("Text is empty", testError.getMessage());
     }
@@ -28,16 +29,16 @@ public class AnswerTest {
     // UPDATE TESTS
     @Test
     public void SetText_WithValidString_ChangesText() {
-    	Answer a = new Answer(1, 1, "Old answer");
+    	Answer a = new Answer(1, 1, "Author", "Old answer");
         
         a.setText("New answer");
         
-        assertEquals("New answer", a.getText());
+        assertEquals("New answer", a.getBodyText());
     }
 
     @Test
     public void SetText_WithEmptyString_ThrowsException() {
-    	Answer a = new Answer(1, 1, "Old answer");
+    	Answer a = new Answer(1, 1, "Author", "Old answer");
         
         Exception testError = assertThrows(IllegalArgumentException.class, 
     		() -> a.setText(" "));
