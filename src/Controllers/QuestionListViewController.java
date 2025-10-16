@@ -1,14 +1,20 @@
 package Controllers;
 
+import Models.Answer;
+import Models.IPost;
 import Models.Question;
 
 import Sessions.UserSession;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
+import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IPermissionService;
 import Database.Services.Interfaces.IQuestionService;
 
@@ -26,6 +32,7 @@ public class QuestionListViewController {
 	private final DBConnectionStore dBConnectionStore;
 	private final IGeneralDBManager generalDBManager;
 	private final IQuestionService questionService;
+	private final IAnswerService answerService;
 	private final IPermissionService permissionService;
     private final UserSession userSession;
     private final QuestionListView view;
@@ -40,6 +47,7 @@ public class QuestionListViewController {
         this.view = view;
         this.generalDBManager = dBConnectionStore.getGeneralDBManager();
         this.questionService = dBConnectionStore.getQuestionService();
+        this.answerService = dBConnectionStore.getAnswerService();
         this.permissionService = dBConnectionStore.getPermissionService();
         
         this.primaryStage = primaryStage;
@@ -55,7 +63,7 @@ public class QuestionListViewController {
     // 		 SETTERS 
  	// ===================
     
-    private void refresh() {
+    public void refresh() {
         try {
             List<Question> allQuestions = questionService.getAllQuestions();
 
@@ -63,23 +71,74 @@ public class QuestionListViewController {
                 allQuestions.removeIf(Question::getDeleted);
             }
 
-            List<QuestionDisplayViewModel> viewModels = new ArrayList<>();
-            List<Integer> questionIds = new ArrayList<>();
-            
-            for (Question question : allQuestions) {
-                questionIds.add(question.getId());
-            }
-            
+            List<PostDisplayViewModel> viewModels = new ArrayList<>();
+
             // TODO:- Inefficient. Figure out the other query
             for (Question question : allQuestions) {
-                List<String> userPermissions = permissionService
-                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), true);
-
-                viewModels.add(new QuestionDisplayViewModel(question, userPermissions));
+                List<String> userQuestionPermissions = permissionService
+                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
+                
+                List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
+                
+                // For the question cell
+                viewModels.add(new PostDisplayViewModel(
+                	    question,
+                	    userQuestionPermissions,
+                	    userSession,
+                	    questionService::deleteQuestion,
+                	    post -> {
+                	        try {
+                	            answerService.addAnswer((Answer)post);
+                	        } catch (Exception e) {
+                	            e.printStackTrace();
+                	        }
+                	    },
+                	    (id, newTitle, newBody) -> {
+                	        try {
+                	        	questionService.updateQuestion(id, newTitle, newBody);
+                	        } catch (Exception e) {
+                	            e.printStackTrace();
+                	        }
+                	    },
+                	    this::refresh
+                	));
+                
+                // TODO: - Put the indenting logic somewhere more appropriate
+                calculateDepths(answers); // For indenting purposes
+                
+                for(Answer answer : answers) {
+                	List<String> userAnswerPermissions = permissionService
+                            .getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
+                	
+                	// For the answer cell
+                    viewModels.add(new PostDisplayViewModel(
+                    		answer,
+                    		userAnswerPermissions, 
+                    		userSession,
+                    		answerService::deleteAnswer, 
+                    		post -> {
+                    	        try {
+                    	            answerService.addAnswer((Answer)post);
+                    	        } catch (Exception e) {
+                    	            e.printStackTrace();
+                    	        }
+                    	    },
+                    		(id, newBody, isCorrect) -> {
+                    	        try {
+                    	            answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
+                    	        } catch (Exception e) {
+                    	            e.printStackTrace();
+                    	        }
+                    	    },
+                    		this::refresh
+                    ));
+                    
+                }
+                
             }
 
             // Set view model list to the ListView
-            ObservableList<QuestionDisplayViewModel> observableVMs =
+            ObservableList<PostDisplayViewModel> observableVMs =
                     FXCollections.observableArrayList(viewModels);
 
             view.getForumListView().setItems(observableVMs);
@@ -113,10 +172,10 @@ public class QuestionListViewController {
 				return;
 			}
 			try {
-			ObservableList<QuestionDisplayViewModel> currentItems = view.getForumListView().getItems();
-			ObservableList<QuestionDisplayViewModel> filteredItems = currentItems.filtered(qvm -> 
-				qvm.getQuestion().getTitle().toLowerCase().contains(searchTerm) || 
-				qvm.getQuestion().getText().toLowerCase().contains(searchTerm)
+			ObservableList<PostDisplayViewModel> currentItems = view.getForumListView().getItems();
+			ObservableList<PostDisplayViewModel> filteredItems = currentItems.filtered(vm -> 
+				vm.getPost().getTitleText().toLowerCase().contains(searchTerm) || 
+				vm.getPost().getBodyText().toLowerCase().contains(searchTerm)
 			);
 			view.getForumListView().setItems(filteredItems);
 			} catch (Exception e) {
@@ -130,6 +189,7 @@ public class QuestionListViewController {
         // Add question
         view.getAddQuestionButton().setOnAction(_ -> {
         	String text = view.getTextInputArea().getText();
+        	// TODO:- These should also be enforced upon the database call for security purposes
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Question text cannot be empty or placeholder.");
         		return;
@@ -152,10 +212,10 @@ public class QuestionListViewController {
     private void setEditQuestionButtonAction() {
         // Edit question
         view.getEditQuestionButton().setOnAction(_ -> {
-            QuestionDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
+            PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
             if (selectedQuestionVM != null) {
                 try {
-                	questionService.deleteQuestion(selectedQuestionVM.getQuestion().getId());
+                	questionService.deleteQuestion(selectedQuestionVM.getPost().getId());
                     refresh();
                 } catch (DataAccessException dataAccessException) {
                 	// TODO:- Handle outcome if the question can't be deleted
@@ -167,12 +227,13 @@ public class QuestionListViewController {
 	}
     
     private void setDeleteQuestionButtonAction() {
+    	System.out.println("Super pressed");
 		// Delete question
     	view.getDeleteQuestionButton().setOnAction(_-> {
-    		QuestionDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
+    		PostDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();
 			if (selectedQuestion != null) {
 				try {
-					questionService.deleteQuestion(selectedQuestion.getQuestion().getId());
+					questionService.deleteQuestion(selectedQuestion.getPost().getId());
 					refresh();
 				} catch (DataAccessException dataAccessException) {
 					
@@ -185,24 +246,59 @@ public class QuestionListViewController {
     private void setViewQuestionButtonAction() {
         // View question → switch to detail page
         view.getViewQuestionButton().setOnAction(_ -> {
-        	QuestionDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
+        	PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
             
             if (selectedQuestionVM != null) {
                 AnswerListView detailView = new AnswerListView();
-                
+                     
                 new AnswerListViewController(
                 		dBConnectionStore,
                 		primaryStage, 
-                		selectedQuestionVM.getQuestion(),
+                		(Question)selectedQuestionVM.getPost(), // Hacky, but good for now
                 		userSession,
                 		detailView
                 );
 
                 primaryStage.getScene().setRoot(detailView.getLayout());
-                System.out.println("Viewing details for Question ID: " + selectedQuestionVM.getQuestion().getId());
+                System.out.println("Viewing details for Question ID: " + selectedQuestionVM.getPost().getId());
             }
         });
 	}
 
+    private void calculateDepths(List<Answer> answers) {
+        Map<Integer, Integer> depthMap = new HashMap<>();
+        Map<Integer, Answer> answerById = new HashMap<>();
+        for (Answer a : answers) {
+        	answerById.put(a.getId(), a);
+        	if (Debug.isEnabled) {
+        		System.out.println("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
+        	}
+        }
+
+        for (Answer answer : answers) {
+            int depth = 0;
+            int parentId = answer.getParentAnswerId();
+            if (Debug.isEnabled) {
+				System.out.println("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
+			}
+
+            while (parentId > 0 && depth < 10) { // Prevent infinite loops
+                depth++;
+                Integer knownDepth = depthMap.get(parentId);
+                if (knownDepth != null) {
+                    depth += knownDepth;
+                    break;
+                }
+                Answer parentAnswer = answerById.get(parentId);
+                if (parentAnswer == null) break;
+                parentId = parentAnswer.getParentAnswerId();
+            }
+            depthMap.put(answer.getId(), depth);
+            answer.setReplyDepth(depth);
+            if (Debug.isEnabled) {
+                System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
+            }
+        }
+    }
 
 }

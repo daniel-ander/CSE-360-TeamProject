@@ -9,7 +9,6 @@ import UI.Elements.QuestionListView;
 import UI.Elements.AnswerListView;
 import Utils.Debug;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +110,7 @@ public class AnswerListViewController {
         		System.out.println("Answer text cannot be empty or placeholder.");
         		return;
         	}
-        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), text);
+        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), userSession.currentUser().getUserName(), text);
         	try {
         		answerService.addAnswer(a);
                 refreshAnswers();
@@ -149,7 +148,7 @@ public class AnswerListViewController {
 				System.out.println("Select an answer to reply to.");
 				return;
 			}
-			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), text);
+			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), userSession.currentUser().getUserName(), text);
 			reply.setParentAnswerId(selectedAnswer.getId());
 			try {
 				answerService.addAnswer(reply);
@@ -168,7 +167,7 @@ public class AnswerListViewController {
         view.getEditAnswerButton().setOnAction(_ -> {
             Answer sel = view.getAnswerList().getSelectionModel().getSelectedItem();
             if (sel != null) {
-                sel.setText("Edited: " + sel.getText());
+                sel.setText("Edited: " + sel.getBodyText());
                 refreshAnswers();
             }
         });
@@ -209,8 +208,8 @@ public class AnswerListViewController {
         // Mark question as resolved
         view.getResolveButton().setOnAction(_ -> {
 			  question.setResolved(true);
-			  view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText() + " (Resolved)");
-			  question.setText(question.getText() + " (Resolved)");
+			  view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getBodyText() + " (Resolved)");
+			  question.setText(question.getBodyText() + " (Resolved)");
 		  });
 		
 	  }
@@ -267,7 +266,7 @@ public class AnswerListViewController {
     
     private void setInitialLayout() {
     	// Show selected question at the top
-    	view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getText());
+    	view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getBodyText());
     }
 
 

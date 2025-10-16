@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -229,7 +229,7 @@ public class PermissionRepository implements IPermissionRepository {
                     insertStmt.setInt(1, userId);
                     insertStmt.setInt(2, postId);
                     insertStmt.setString(3, permission);
-                    insertStmt.setBoolean(4, false); // insert false here to block
+                    insertStmt.setBoolean(4, false);
                     insertStmt.executeUpdate();
                     System.out.println("Added blocking exception for " + permission);
                 }
@@ -278,11 +278,10 @@ public class PermissionRepository implements IPermissionRepository {
 		
 		Map<String, List<String>> answerRolePermissions = new HashMap<>();
 
-		answerRolePermissions.put("admin", Arrays.asList("VIEW", "COMMENT", "DELETE", "UPVOTE"));
-		answerRolePermissions.put("instructor", Arrays.asList("VIEW", "COMMENT", "EDIT", "UPVOTE"));
-		answerRolePermissions.put("student", Arrays.asList("VIEW", "COMMENT", "UPVOTE"));
-		answerRolePermissions.put("staff", Arrays.asList("VIEW", "EDIT", "UPVOTE"));
-		answerRolePermissions.put("reviewer", Arrays.asList("VIEW", "COMMENT", "UPVOTE"));
+		for(User.Role role : User.Role.values()) {
+			answerRolePermissions.put(role.name(), DefaultRolePermissions.AnswerPermissions.getDefaultPermissionsForRole(role));
+		}
+
 
 		query = "MERGE INTO answer_permissions (role, permission) VALUES (?, ?)";
 

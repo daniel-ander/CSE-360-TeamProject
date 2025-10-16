@@ -30,6 +30,7 @@ public class QuestionServiceTest {
     @Test
     public void AddQuestion_WithValidQuestion_AddsSuccessfully() throws SQLException {
         Question q = new Question(1, "Title", "Text");
+//        q.setId(-1);
         when(questionRepo.insertQuestion(q)).thenReturn(true);
 
         boolean result = questionService.addQuestion(q);
@@ -37,19 +38,11 @@ public class QuestionServiceTest {
         assertTrue(result);
         verify(questionRepo, times(1)).insertQuestion(q);
     }
-    
-    @Test
-    public void AddQuestion_WhenDuplicateId_ThrowsDuplicateRecordIDException() throws Exception {
-        Question q = new Question(1, "Title", "Text");
-        when(questionRepo.getQuestionById(q.getId())).thenReturn(q);
-
-        assertThrows(DuplicateRecordIDException.class, () -> questionService.addQuestion(q));
-        verify(questionRepo, never()).insertQuestion(any());
-    }
 
     @Test
     public void AddQuestion_WhenSQLException_ThrowsDataAccessException() throws Exception {
         Question q = new Question(1, "Title", "Text");
+        q.setId(-1);
         when(questionRepo.getQuestionById(q.getId())).thenReturn(null);
         doThrow(new SQLException("DB Error")).when(questionRepo).insertQuestion(any());
 
@@ -66,9 +59,10 @@ public class QuestionServiceTest {
         Question result = questionService.getQuestionById(1);
 
         assertNotNull(result);
-        assertEquals("HelloTitle?", result.getTitle());
-        assertEquals("HelloText?", result.getText());
-        assertEquals(-1, result.getId());
+        assertNull(result.getId());
+        assertEquals(1, result.getAuthorId());
+        assertEquals("HelloTitle?", result.getTitleText());
+        assertEquals("HelloText?", result.getBodyText());
         verify(questionRepo, times(1)).getQuestionById(1);
     }
     
@@ -109,24 +103,24 @@ public class QuestionServiceTest {
     // UPDATE TESTS
     @Test
     public void UpdateQuestion_WithValidData_ReturnsTrue() throws SQLException {
-    	when(questionRepo.updateQuestion(1, "Updated Text")).thenReturn(true);
+    	when(questionRepo.updateQuestion(1, "Updated Title", "Updated Text")).thenReturn(true);
 
-        boolean result = questionService.updateQuestion(1, "Updated Text");
+        boolean result = questionService.updateQuestion(1, "Updated Title", "Updated Text");
         
         assertTrue(result);
-        verify(questionRepo, times(1)).updateQuestion(1, "Updated Text");
+        verify(questionRepo, times(1)).updateQuestion(1, "Updated Title", "Updated Text");
     }
 
     @Test
     public void UpdateQuestion_WithEmptyText_ThrowsIllegalArgumentException() throws SQLException {
-    	assertThrows(IllegalArgumentException.class, () -> questionService.updateQuestion(1,  " "));
-        verify(questionRepo, never()).updateQuestion(anyInt(), anyString());
+    	assertThrows(IllegalArgumentException.class, () -> questionService.updateQuestion(1, "Updated Title", " "));
+        verify(questionRepo, never()).updateQuestion(anyInt(), anyString(), anyString());
     }
     
     @Test
     public void UpdateQuestion_WhenSQLException_ThrowsDataAccessException() throws Exception {
-    	doThrow(new SQLException("Test DB Fail")).when(questionRepo).updateQuestion(anyInt(), anyString());
-    	assertThrows(DataAccessException.class, () -> questionService.updateQuestion(1,  "Test Text"));
+    	doThrow(new SQLException("Test DB Fail")).when(questionRepo).updateQuestion(anyInt(), anyString(),  anyString());
+    	assertThrows(DataAccessException.class, () -> questionService.updateQuestion(1, "Updated Title", "Test Text"));
     }
     
     // DELETE TESTS

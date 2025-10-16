@@ -29,7 +29,7 @@ public class AnswerCell extends ListCell<Answer> {
         if (empty || a == null) {
             setGraphic(null);
         } else {
-            textLabel.setText(a.getText());
+            textLabel.setText(a.getBodyText());
             metaLabel.setText(formatMeta(a));
 
             // Create wrapper so padding shifts the entire block
@@ -40,8 +40,6 @@ public class AnswerCell extends ListCell<Answer> {
             setGraphic(wrapper);
         }
     }
-
-
 
 	private String formatMeta(Answer a) {
         StringBuilder sb = new StringBuilder();

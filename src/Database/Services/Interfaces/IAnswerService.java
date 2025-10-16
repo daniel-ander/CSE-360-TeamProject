@@ -12,6 +12,7 @@ public interface IAnswerService {
 	public List<Answer> getAllAnswersForQuestion(int questionId) throws DataAccessException;
 	public List<Answer> getCorrectAnswers() throws DataAccessException;
 	public List<Answer> getAnswersBySearch(String searchString) throws DataAccessException;
+	public List<Answer> getAnswersByQuestionID(int questionId) throws DataAccessException;
 	
 	public Answer getAnswerById(int answerId) throws DataAccessException;
 	public boolean addAnswer(Answer a) throws DataAccessException;

@@ -132,8 +132,7 @@ public class UserRepository implements IUserRepository {
 	            String roleString = rs.getString("role");
 	            User.Role role = User.roleFromString(roleString);
 
-	            User user = new User(dbUserName, dbPassword, role);
-	            user.setId(id);
+	            User user = new User(id, dbUserName, dbPassword, role);
 	            return user;
 	        }
 	    }

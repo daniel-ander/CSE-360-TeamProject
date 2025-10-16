@@ -1,12 +1,13 @@
 package Models;
 
-public class Question {
+public class Question implements IPost {
 	public static String tableName = "questions";
 	
-	private int id; // -1 if question isn't in the database yet
+	private Integer id;
 	private String text;
 	private String title;
 	private int authorId;
+
 	private int upvoteCount;
 	private boolean isAnswered;
 	private boolean isResolved;
@@ -17,8 +18,14 @@ public class Question {
  * added getters: getAuthor, isAnswered, isResolved
  * added setters: setAnswered, setResolved
  * */
+	
+	// Non-DB constructor
+	public Question(int authorId, String title, String text) {
+		this(null, authorId, title, text, false, false, false, 0);
+	}
+		
 	// Constructor for when we have all the data (e.g., when retrieving from DB)
-	public Question(int id, int authorId, String title, String text, boolean answered, boolean resolved, boolean deleted, int upvoteCount) {
+	public Question(Integer id, int authorId, String title, String text, boolean answered, boolean resolved, boolean deleted, int upvoteCount) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
@@ -32,30 +39,13 @@ public class Question {
 		this.isDeleted = deleted;
 	}
 	
-	
-	public Question(int authorId, String title, String text) {
-		if (text == null || text.strip().isEmpty()) {
-			throw new IllegalArgumentException("Text is empty");
-		}
-		this.id = -1;
-		this.title = title;
-		this.text = text;
-		
-		this.authorId = authorId;
-		this.isAnswered = false;
-		this.isResolved = false;
-		this.isDeleted = false;
-
-	}
-	
 	// ===================
     // 		GETTERS
  	// ===================
 	
-	public int getId() {return id;}
-	public String getTitle() {return title;}
+	public Integer getId() {return id;}
+
 	public int getAuthorId() {return authorId;}
-	public String getText() {return text;}
 	public boolean getAnsweredStatus() {return isAnswered;}
 	public boolean getResolvedStatus() {return isResolved;}
 	public boolean getDeleted() {return isDeleted;}
@@ -88,4 +78,23 @@ public class Question {
     public String toString() {
         return "Q" + id + ": " + text;
     }
+
+
+	@Override
+	public String getBodyText() {
+		// TODO Auto-generated method stub
+		return text;
+	}
+
+
+	@Override
+	public String getTitleText() {
+		return title;
+	}
+
+
+	@Override
+	public Type getPostType() {
+		return Type.Question;
+	}
 }

@@ -28,12 +28,6 @@ public class QuestionService implements IQuestionService {
 	
 	@Override
 	public boolean addQuestion(Question q) throws DataAccessException, DuplicateRecordIDException {
-		boolean doesQuestionExist = (getQuestionById(q.getId()) != null);
-		
-		if (doesQuestionExist) {
-			throw new DuplicateRecordIDException("Question with this id already exists!");
-		}
-		
 		try {
 			questionRepository.insertQuestion(q);
 			if (Debug.isEnabled) System.out.println("Question added successfully.");
@@ -73,7 +67,7 @@ public class QuestionService implements IQuestionService {
  	// ===================
 	
 	@Override
-	public boolean updateQuestion(int id, String newText) throws DataAccessException, IllegalArgumentException {
+	public boolean updateQuestion(int id, String newTitle, String newText) throws DataAccessException, IllegalArgumentException {
 		// TODO: - May want to place some safeguards here before a question can be updated
 		// by checking if the user has permission to do so.
 		if (newText == null || newText.trim().isEmpty()) {
@@ -81,7 +75,7 @@ public class QuestionService implements IQuestionService {
 		}
 		
 		try {
-			return questionRepository.updateQuestion(id, newText);
+			return questionRepository.updateQuestion(id, newTitle, newText);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not update question by id :" + id + " from the database due to: " + e);
 		}

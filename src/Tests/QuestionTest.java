@@ -11,10 +11,10 @@ public class QuestionTest {
     public void Constructor__WithValidInputs_CreatesQuestion() {
         Question q = new Question(1, "Title", "This is a question text");
         
-        assertEquals(-1, q.getId()); // -1 since not yet in DB
+        assertNull(q.getId()); // null since not yet in DB
         assertEquals(1, q.getAuthorId());
-        assertEquals("Title", q.getTitle());
-        assertEquals("This is a question text", q.getText());
+        assertEquals("Title", q.getTitleText());
+        assertEquals("This is a question text", q.getBodyText());
         assertFalse(q.getAnsweredStatus());
         assertFalse(q.getResolvedStatus());
         assertFalse(q.getDeleted());
@@ -35,7 +35,7 @@ public class QuestionTest {
         
         q.setText("New question");
         
-        assertEquals("New question", q.getText());
+        assertEquals("New question", q.getBodyText());
     }
 
     @Test

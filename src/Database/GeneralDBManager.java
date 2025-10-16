@@ -55,15 +55,14 @@ public class GeneralDBManager implements IGeneralDBManager {
 		}
 	}
 
-	@Override
-	public void createTables() throws SQLException {
+	private void createTables() throws SQLException {
 		// TODO: - Invitation codes should probably have a foreign key to the user that
 		// created it and used it
 		// - or an entirely new table that tracks which user created which invitation
 		// code
 		
-		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRoles());
-		String questionPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions.getAllPermissions());
+		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRoles()); // ["admin", "staff", "student"]
+		String questionPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
 		String answerPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions.getAllPermissions());
 
 		String userTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
@@ -76,15 +75,15 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "userId INT, " + "title VARCHAR(255), " + "body TEXT, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "answered BOOLEAN DEFAULT FALSE, "
 				+ "resolved BOOLEAN DEFAULT FALSE, " + "isDeleted BOOLEAN DEFAULT FALSE, "
-				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES users(id))", questionTableName);
+				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES %s(id))", questionTableName, userTableName);
 
 		String forumAnswersTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
-				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "body TEXT, "
+				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "authorName TEXT, " + "body TEXT, "
 				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
-				+ "FOREIGN KEY (userId) REFERENCES users(id))", answerTableName, questionTableName, answerTableName);
+				+ "FOREIGN KEY (userId) REFERENCES %s(id))", answerTableName, questionTableName, answerTableName, userTableName);
 
 		String permissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ( " + "id SERIAL PRIMARY KEY, "
 				+ "name VARCHAR(20) UNIQUE NOT NULL)", permissionTableName);
@@ -166,47 +165,47 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "(5, 'Multilingual UI', 'How to implement i18n (internationalization) in JavaFX?', FALSE, FALSE, FALSE, 3),"
 				+ "(5, 'Dark mode toggle', 'Best approach for a dark/light theme switch in JavaFX?', FALSE, FALSE, FALSE, 7);", questionTableName);
 
-		String populateAnswersTable = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, body, isCorrect, upvoteCount) VALUES "
-				+ "(1, NULL, 1, 'Polymorphism allows methods to behave differently based on the object.', FALSE, 4),"
-				+ "(1, 1, 2, 'Great explanation! Could you give a code example?', FALSE, 2),"
-				+ "(2, NULL, 3, 'Use .equals() for content comparison, == for reference.', FALSE, 5),"
-				+ "(2, 3, 4, 'Thanks for clearing that up!', FALSE, 1),"
-				+ "(3, NULL, 2, 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, 3),"
-				+ "(4, NULL, 5, 'ExecutorService is a good way to manage threads.', FALSE, 2),"
-				+ "(4, 6, 1, 'Definitely agree, especially with fixed thread pool.', FALSE, 1),"
-				+ "(5, NULL, 2, 'Annotations can reduce boilerplate and improve readability.', FALSE, 0),"
-				+ "(6, NULL, 3, 'Use a SceneManager class to manage switching.', FALSE, 6),"
-				+ "(7, NULL, 1, 'The Java Memory Model explains visibility and ordering of threads.', FALSE, 3),"
-				+ "(8, NULL, 5, 'You can request GC, but you can’t force it.', FALSE, 2),"
-				+ "(9, NULL, 4, 'MVC fits well with JavaFX: model handles data, view is FXML.', FALSE, 3),"
-				+ "(10, NULL, 3, 'DAO separates database logic. It keeps code clean.', FALSE, 4),"
-				+ "(11, NULL, 2, 'NPE occurs when referencing an object that’s null.', FALSE, 5),"
-				+ "(12, NULL, 1, 'ObservableList notifies listeners when data changes.', FALSE, 2),"
-				+ "(13, NULL, 5, 'Use roles and guards to control admin-level actions.', FALSE, 4),"
-				+ "(14, NULL, 3, 'Use hashing and HTTPS to secure login.', FALSE, 3),"
-				+ "(15, NULL, 4, 'SQLite is lightweight, H2 has good tooling.', FALSE, 2),"
-				+ "(16, NULL, 1, 'Use Thread.setDefaultUncaughtExceptionHandler.', FALSE, 1),"
-				+ "(17, NULL, 2, 'Persist sessions using preferences API or local file.', FALSE, 3),"
-				+ "(18, NULL, 5, 'MVVM is better for testability, but more complex.', FALSE, 2),"
-				+ "(19, NULL, 1, 'Use ResourceBundle for i18n.', FALSE, 4),"
-				+ "(20, NULL, 3, 'Toggle stylesheets on button click for dark mode.', FALSE, 5),"
-				+ "(1, 2, 4, 'Example: Dog extends Animal and overrides speak().', FALSE, 1),"
-				+ "(2, 4, 1, 'Code: if(a.equals(b)) instead of if(a == b)', FALSE, 0),"
-				+ "(3, 5, 3, 'Iterating backwards also helps avoid issues.', FALSE, 2),"
-				+ "(4, 7, 5, 'CachedThreadPool can scale well.', FALSE, 1),"
-				+ "(5, 8, 2, '@Override and @FunctionalInterface are helpful ones.', FALSE, 2),"
-				+ "(6, 9, 4, 'Use FXMLLoader.load and setController manually if needed.', FALSE, 1),"
-				+ "(7, 10, 1, 'Volatile helps with visibility between threads.', FALSE, 0),"
-				+ "(8, 11, 3, 'GC runs on its own schedule. Avoid calling System.gc().', FALSE, 2),"
-				+ "(9, 12, 5, 'MVC: Controller acts as middle layer.', FALSE, 3),"
-				+ "(10, 13, 2, 'Simple DAO example: interface + JDBC implementation.', FALSE, 2),"
-				+ "(11, 14, 4, 'Always check for null before accessing objects.', FALSE, 2),"
-				+ "(12, 15, 1, 'ObservableList makes TableView updates automatic.', FALSE, 1),"
-				+ "(13, 16, 5, 'Admin can be assigned via roles at login.', FALSE, 4),"
-				+ "(14, 17, 2, 'Use BCrypt to hash passwords.', FALSE, 3),"
-				+ "(15, 18, 3, 'SQLite is good for fast prototyping.', FALSE, 2),"
-				+ "(16, 19, 4, 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, 2),"
-				+ "(17, 20, 1, 'Save tokens or use Java Preferences API.', FALSE, 3);", answerTableName);
+		String populateAnswersTable = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, authorName, body, isCorrect, upvoteCount) VALUES "
+				+ "(1, NULL, 1, 'student', 'Polymorphism allows methods to behave differently based on the object.', FALSE, 4),"
+				+ "(1, 1, 2, 'instructor', 'Great explanation! Could you give a code example?', FALSE, 2),"
+				+ "(2, NULL, 3, 'reviewer', 'Use .equals() for content comparison, == for reference.', FALSE, 5),"
+				+ "(2, 3, 4, 'admin1', 'Thanks for clearing that up!', FALSE, 1),"
+				+ "(3, NULL, 2, 'instructor', 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, 3),"
+				+ "(4, NULL, 5, 'staff', 'ExecutorService is a good way to manage threads.', FALSE, 2),"
+				+ "(4, 6, 1, 'student', 'Definitely agree, especially with fixed thread pool.', FALSE, 1),"
+				+ "(5, NULL, 2, 'instructor', 'Annotations can reduce boilerplate and improve readability.', FALSE, 0),"
+				+ "(6, NULL, 3, 'reviewer', 'Use a SceneManager class to manage switching.', FALSE, 6),"
+				+ "(7, NULL, 1, 'student', 'The Java Memory Model explains visibility and ordering of threads.', FALSE, 3),"
+				+ "(8, NULL, 5, 'staff', 'You can request GC, but you can’t force it.', FALSE, 2),"
+				+ "(9, NULL, 4, 'admin1', 'MVC fits well with JavaFX: model handles data, view is FXML.', FALSE, 3),"
+				+ "(10, NULL, 3, 'reviewer', 'DAO separates database logic. It keeps code clean.', FALSE, 4),"
+				+ "(11, NULL, 2, 'instructor', 'NPE occurs when referencing an object that’s null.', FALSE, 5),"
+				+ "(12, NULL, 1, 'student', 'ObservableList notifies listeners when data changes.', FALSE, 2),"
+				+ "(13, NULL, 5, 'staff', 'Use roles and guards to control admin-level actions.', FALSE, 4),"
+				+ "(14, NULL, 3, 'reviewer', 'Use hashing and HTTPS to secure login.', FALSE, 3),"
+				+ "(15, NULL, 4, 'admin1', 'SQLite is lightweight, H2 has good tooling.', FALSE, 2),"
+				+ "(16, NULL, 1, 'student', 'Use Thread.setDefaultUncaughtExceptionHandler.', FALSE, 1),"
+				+ "(17, NULL, 2, 'instructor', 'Persist sessions using preferences API or local file.', FALSE, 3),"
+				+ "(18, NULL, 5, 'staff', 'MVVM is better for testability, but more complex.', FALSE, 2),"
+				+ "(19, NULL, 1, 'student', 'Use ResourceBundle for i18n.', FALSE, 4),"
+				+ "(20, NULL, 3, 'reviewer', 'Toggle stylesheets on button click for dark mode.', FALSE, 5),"
+				+ "(1, 2, 4, 'admin1', 'Example: Dog extends Animal and overrides speak().', FALSE, 1),"
+				+ "(2, 4, 1, 'student', 'Code: if(a.equals(b)) instead of if(a == b)', FALSE, 0),"
+				+ "(3, 5, 3, 'reviewer', 'Iterating backwards also helps avoid issues.', FALSE, 2),"
+				+ "(4, 7, 5, 'staff', 'CachedThreadPool can scale well.', FALSE, 1),"
+				+ "(5, 8, 2, 'instructor', '@Override and @FunctionalInterface are helpful ones.', FALSE, 2),"
+				+ "(6, 9, 4, 'admin1', 'Use FXMLLoader.load and setController manually if needed.', FALSE, 1),"
+				+ "(7, 10, 1, 'student', 'Volatile helps with visibility between threads.', FALSE, 0),"
+				+ "(8, 11, 3, 'reviewer', 'GC runs on its own schedule. Avoid calling System.gc().', FALSE, 2),"
+				+ "(9, 12, 5, 'staff', 'MVC: Controller acts as middle layer.', FALSE, 3),"
+				+ "(10, 13, 2, 'instructor', 'Simple DAO example: interface + JDBC implementation.', FALSE, 2),"
+				+ "(11, 14, 4, 'admin1', 'Always check for null before accessing objects.', FALSE, 2),"
+				+ "(12, 15, 1, 'student', 'ObservableList makes TableView updates automatic.', FALSE, 1),"
+				+ "(13, 16, 5, 'staff', 'Admin can be assigned via roles at login.', FALSE, 4),"
+				+ "(14, 17, 2, 'instructor', 'Use BCrypt to hash passwords.', FALSE, 3),"
+				+ "(15, 18, 3, 'reviewer', 'SQLite is good for fast prototyping.', FALSE, 2),"
+				+ "(16, 19, 4, 'admin1', 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, 2),"
+				+ "(17, 20, 1, 'student', 'Save tokens or use Java Preferences API.', FALSE, 3);", answerTableName);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 

@@ -67,7 +67,10 @@ public class UserLoginPageController {
 
 	        try {
 	            // ✅ Pull the actual user from the DB
-	            User user = userService.getUserByNameAndPassword(userNameFieldText, passwordFieldText);
+	        	System.out.println(String.format("%s", userNameFieldText));
+	        	System.out.println(String.format("%s", passwordFieldText));
+
+	        	User user = userService.getUserByNameAndPassword(userNameFieldText, passwordFieldText);
 	            if (user == null) {
 	                view.setErrorLabelText("Invalid username or password.");
 	                return;
