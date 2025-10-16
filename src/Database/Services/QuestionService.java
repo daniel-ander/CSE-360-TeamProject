@@ -28,12 +28,6 @@ public class QuestionService implements IQuestionService {
 	
 	@Override
 	public boolean addQuestion(Question q) throws DataAccessException, DuplicateRecordIDException {
-		boolean doesQuestionExist = (getQuestionById(q.getId()) != null);
-		
-		if (doesQuestionExist) {
-			throw new DuplicateRecordIDException("Question with this id already exists!");
-		}
-		
 		try {
 			questionRepository.insertQuestion(q);
 			if (Debug.isEnabled) System.out.println("Question added successfully.");
