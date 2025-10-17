@@ -68,7 +68,7 @@ public class QuestionListViewController {
             List<Question> allQuestions = questionService.getAllQuestions();
 
             if (!view.getShowDeletedQuestionsCheckbox().isSelected()) {
-                allQuestions.removeIf(Question::getDeleted);
+                allQuestions.removeIf(Question::getIsDeleted);
             }
 
             List<PostDisplayViewModel> viewModels = new ArrayList<>();
@@ -78,14 +78,18 @@ public class QuestionListViewController {
                 List<String> userQuestionPermissions = permissionService
                         .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
                 
-                List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
-                
                 // For the question cell
                 viewModels.add(new PostDisplayViewModel(
                 	    question,
                 	    userQuestionPermissions,
                 	    userSession,
-                	    questionService::deleteQuestion,
+                	    id -> {
+                	        try {
+                	            questionService.deleteQuestion(id);
+                	        } catch (Exception e) {
+                	            e.printStackTrace();
+                	        }
+                	    },
                 	    post -> {
                 	        try {
                 	            answerService.addAnswer((Answer)post);
@@ -103,6 +107,8 @@ public class QuestionListViewController {
                 	    this::refresh
                 	));
                 
+                List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
+                
                 // TODO: - Put the indenting logic somewhere more appropriate
                 calculateDepths(answers); // For indenting purposes
                 
@@ -115,7 +121,13 @@ public class QuestionListViewController {
                     		answer,
                     		userAnswerPermissions, 
                     		userSession,
-                    		answerService::deleteAnswer, 
+                    		id -> {
+                    	        try {
+                    	            answerService.deleteAnswer(id);
+                    	        } catch (Exception e) {
+                    	            e.printStackTrace();
+                    	        }
+                    	    },
                     		post -> {
                     	        try {
                     	            answerService.addAnswer((Answer)post);

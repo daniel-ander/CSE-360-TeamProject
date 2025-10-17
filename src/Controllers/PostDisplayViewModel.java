@@ -8,6 +8,8 @@ import Models.IPost;
 import Models.Question;
 import Sessions.UserSession;
 import Utils.TriConsumer;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 public class PostDisplayViewModel {
     private IPost post;
@@ -15,7 +17,7 @@ public class PostDisplayViewModel {
   
     private final UserSession userSession;
     private boolean isEditingQuestion = false;
-    private boolean isCommenting = false;
+    private BooleanProperty isCommenting = new SimpleBooleanProperty(false);
     
     
     private final Consumer<Integer> deleteCallback;
@@ -53,7 +55,7 @@ public class PostDisplayViewModel {
     	return isEditingQuestion;
     }
     
-    public boolean getIsCommenting() {
+    public BooleanProperty getIsCommenting() {
     	return isCommenting;
     }
     
@@ -69,6 +71,10 @@ public class PostDisplayViewModel {
     	return post.getPostType() == IPost.Type.Question;
     }
     
+    public boolean getIsDeleted() {
+    	return post.getIsDeleted();
+    }
+    
     // ===================
     // 		 SETTERS 
  	// ===================
@@ -78,7 +84,7 @@ public class PostDisplayViewModel {
     }
     
     public void setIsCommenting(boolean isCommenting) {
-    	this.isCommenting = isCommenting;
+    	this.isCommenting = new SimpleBooleanProperty(isCommenting);
     }
     
     // ===================

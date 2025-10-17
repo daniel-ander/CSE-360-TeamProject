@@ -17,7 +17,7 @@ public class QuestionTest {
         assertEquals("This is a question text", q.getBodyText());
         assertFalse(q.getAnsweredStatus());
         assertFalse(q.getResolvedStatus());
-        assertFalse(q.getDeleted());
+        assertFalse(q.getIsDeleted());
     }
 
     @Test
