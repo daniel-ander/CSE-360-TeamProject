@@ -1,0 +1,100 @@
+package Models;
+
+public class Question implements IPost {
+	public static String tableName = "questions";
+	
+	private Integer id;
+	private String text;
+	private String title;
+	private int authorId;
+
+	private int upvoteCount;
+	private boolean isAnswered;
+	private boolean isResolved;
+	private boolean isDeleted;
+	
+/* Added class fields: author, isAnswered, isResolved, isDeleted
+ * added author to constructor
+ * added getters: getAuthor, isAnswered, isResolved
+ * added setters: setAnswered, setResolved
+ * */
+	
+	// Non-DB constructor
+	public Question(int authorId, String title, String text) {
+		this(null, authorId, title, text, false, false, false, 0);
+	}
+		
+	// Constructor for when we have all the data (e.g., when retrieving from DB)
+	public Question(Integer id, int authorId, String title, String text, boolean answered, boolean resolved, boolean deleted, int upvoteCount) {
+		if (text == null || text.strip().isEmpty()) {
+			throw new IllegalArgumentException("Text is empty");
+		}
+		this.id = id;
+		this.title = title;
+		this.text = text;
+		this.upvoteCount = upvoteCount;
+		this.authorId = authorId;
+		this.isAnswered = answered;
+		this.isResolved = resolved;
+		this.isDeleted = deleted;
+	}
+	
+	// ===================
+    // 		GETTERS
+ 	// ===================
+	
+	public Integer getId() {return id;}
+
+	public int getAuthorId() {return authorId;}
+	public boolean getAnsweredStatus() {return isAnswered;}
+	public boolean getResolvedStatus() {return isResolved;}
+	public boolean getDeleted() {return isDeleted;}
+	public int getUpvoteCount() {return upvoteCount;}
+	
+	
+	// ===================
+    // 		SETTERS
+ 	// ===================
+	public void setText(String newText) {
+		if (newText == null || newText.strip().isEmpty()) {
+			throw new IllegalArgumentException("Text is empty");
+		}
+		text = newText;
+	}
+	
+	public void setId(int newId) { this.id = newId; }
+	public void setResolved(boolean resolvedStatus) {isResolved = resolvedStatus;}
+	public void setAnswered(boolean answeredStatus) {isAnswered = answeredStatus;}
+	public void setDeleted(boolean deletedStatus) {isDeleted = deletedStatus;}
+	public void setTitle(String newTitle) { this.title = newTitle; }
+	public void setUpvoteCount(int newCount) { this.upvoteCount = newCount; }
+	
+	// ===================
+    // 		  UTILS 
+ 	// ===================
+	
+	// this lets the question print out correctly
+    @Override
+    public String toString() {
+        return "Q" + id + ": " + text;
+    }
+
+
+	@Override
+	public String getBodyText() {
+		// TODO Auto-generated method stub
+		return text;
+	}
+
+
+	@Override
+	public String getTitleText() {
+		return title;
+	}
+
+
+	@Override
+	public Type getPostType() {
+		return Type.Question;
+	}
+}

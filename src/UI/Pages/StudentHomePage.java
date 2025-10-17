@@ -1,6 +1,7 @@
 package UI.Pages;
 
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,16 +13,25 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 
-public class StudentHomePage {
+public class StudentHomePage implements IInitializable {
 	private final VBox layout = new VBox();
+	private final Scene scene = new Scene(layout, 800, 400);
 	private final Label userLabel = new Label(); // "Hello, " + currentUser + "!"
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
+	private final Button enterForumButton = new Button("Enter Forum");
+	
+	public StudentHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 		
-    // ===================
-   	// Getters
-   	// ===================
+	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public VBox getLayout() {
     	return layout;
@@ -38,29 +48,35 @@ public class StudentHomePage {
     public Label getDebugLabel() {
     	return debugLabel;
     }
+    public Button getEnterForumButton() {
+		return enterForumButton;
+	}
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     public void setUserLabel(String text) {
     	userLabel.setText("Hello, " + text + "!");
     }
     
     public void setInitialLayout(Stage primaryStage) {
-    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+    	layout.getStyleClass().add("layout");
     	// Label to display Hello user
-	    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-	    debugLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
-	    
-	    
+	    userLabel.getStyleClass().add("main-label");
+	   
 	    // Add all elements to layout
 
-	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
-	    Scene userScene = new Scene(layout, 800, 400);
+	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton, enterForumButton);
+	    
 	    // Set the scene to primary stage
-	    primaryStage.setScene(userScene);
+	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("Student Home Page");
 
+    }
+    
+    public void addDebugLabel() {
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
+    	layout.getChildren().add(debugLabel);
     }
 }

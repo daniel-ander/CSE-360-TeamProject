@@ -1,7 +1,11 @@
 package Controllers;
+
+import Database.*;
+
+import UI.Pages.SetupAccountPage;
 import UI.Pages.SetupLoginSelectionPage;
 import UI.Pages.UserLoginPage;
-import databasePart1.*;
+
 import javafx.stage.Stage;
 
 /**
@@ -11,13 +15,15 @@ import javafx.stage.Stage;
 public class SetupLoginSelectionPageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
-	private final Stage primaryStage;
-	private final SetupLoginSelectionPage view = new SetupLoginSelectionPage();
+	private final DBConnectionStore dBConnectionStore;
 	
-	public SetupLoginSelectionPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+	private final Stage primaryStage;
+	private final SetupLoginSelectionPage view;
+	
+	public SetupLoginSelectionPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupLoginSelectionPage view) {
+		this.dBConnectionStore = dBConnectionStore;
         this.primaryStage = primaryStage;
+        this.view = view;
         
         setInitialLayout();
         
@@ -27,18 +33,20 @@ public class SetupLoginSelectionPageController {
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setSetupButtonAction() {
-		view.getSetupButton().setOnAction(a -> {
-			new SetupAccountPageController(databaseHelper, primaryStage);
+		view.getSetupButton().setOnAction(_ -> {
+			new SetupAccountPageController(dBConnectionStore, primaryStage, new SetupAccountPage());
 		});
 	}
     
+    // TODO: -- Fix how user works
     private void setLoginButtonAction() {
-		view.getLoginButton().setOnAction(a -> {
-			new UserLoginPageController(databaseHelper, primaryStage);
+		view.getLoginButton().setOnAction(_ -> {
+			
+			new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});
 	}
     

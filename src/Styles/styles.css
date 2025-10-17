@@ -3,3 +3,101 @@
 	padding: 20;
 	-fx-padding: 20;
 }
+
+.main-label {
+	-fx-font-size: 16px; 
+	font-size: 16px;
+	-fx-font-weight: bold;
+	font-weight: bold;
+}
+
+.auxilary-label {
+	-fx-font-size: 12px; 
+	font-size: 12px;
+}
+
+.centered {
+	-fx-alignment: center;
+}
+
+.small-padding {
+	-fx-padding: 10;
+	padding: 10;
+}
+
+.debug-label, .info-label {
+	-fx-text-fill: blue;
+}
+
+.error-label {
+	-fx-text-fill: red;
+}
+
+.info-label-secondary {
+	-fx-text-fill: black;
+}
+
+/* Name subject to change based on future elements */
+.minor-label {
+	-fx-font-size: 14px;
+	-fx-border-color: gray;
+	border-color: gray;
+	-fx-padding: 10;
+	padding: 10;
+}
+
+/* Name is arbitrary */
+.invite-code-label {
+	-fx-font-size: 14px;
+	font-size: 14px;
+	-fx-font-style: italic;
+	font-style: italic;
+}
+
+.answer-cell {
+    -fx-spacing: 4;
+    -fx-padding: 8;
+}
+
+.answer-text {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-wrap-text: true;
+}
+
+.answer-meta {
+    -fx-font-family: "System";
+    -fx-font-size: 10px;
+    -fx-font-weight: normal;
+    -fx-text-fill: gray;
+}
+
+.question-cell {
+    -fx-padding: 8;
+    -fx-spacing: 4;
+}
+
+.question-title {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.question-body {
+    -fx-font-family: "System";
+    -fx-font-size: 12px;
+}
+
+.question-status {
+    -fx-font-family: "System";
+    -fx-font-size: 11px;
+    -fx-text-fill: gray;
+}
+
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -13,7 +14,7 @@ import javafx.stage.Stage;
  * The invitation code is displayed upon clicking a button.
  */
 
-public class InvitationPage {
+public class InvitationPage implements IInitializable {
 
 	/**
      * Displays the Invite Page in the provided primary stage.
@@ -26,7 +27,7 @@ public class InvitationPage {
 	private final Label userLabel = new Label("Invite ");						  // Label to display the title of the page
 	private final Button showCodeButton = new Button("Generate Invitation Code"); // Button to generate the invitation code
 	private final Label inviteCodeLabel = new Label("");						  // Label to display the generated invitation code
-	private final Scene inviteScene = new Scene(layout, 800, 400);
+	private final Scene scene = new Scene(layout, 800, 400);
 	
 	private final HBox roleBox = new HBox(20);
     private final CheckBox adminCheckBox = new CheckBox("Admin");
@@ -35,9 +36,16 @@ public class InvitationPage {
     private final CheckBox staffCheckBox = new CheckBox("Staff");
     private final CheckBox reviewerCheckBox = new CheckBox("Reviewer");
     
+    public InvitationPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
+    
     // ===================
-   	// Getters
-   	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public Button getShowCodeButton() {
     	return showCodeButton;
@@ -68,23 +76,22 @@ public class InvitationPage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     
     public void setInitialLayout(Stage primaryStage) {
-    	
-    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-    	userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-    	inviteCodeLabel.setStyle("-fx-font-size: 14px; -fx-font-style: italic;");
+    	layout.getStyleClass().add("layout");
+    	userLabel.getStyleClass().add("main-label");
+    	inviteCodeLabel.getStyleClass().add("invite-code-label");
     	
     	roleBox.getChildren().addAll(adminCheckBox, studentCheckBox, instructorCheckBox, staffCheckBox, reviewerCheckBox);
-    	roleBox.setStyle("-fx-alignment: center;");
+    	roleBox.getStyleClass().add("centered");
     	
     	layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel, roleBox);
     	
     	// Set the scene to primary stage
-	    primaryStage.setScene(inviteScene);
+	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("Invite Page");
     }
 }

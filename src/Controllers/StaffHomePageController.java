@@ -1,8 +1,17 @@
 package Controllers;
 
-import Models.User;
+import Database.*;
+
+import Exceptions.DBExceptions.DataAccessException;
+
+import Sessions.UserSession;
+
 import UI.Pages.StaffHomePage;
-import databasePart1.*;
+import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
+
+import Utils.Debug;
+
 import javafx.stage.Stage;
 
 /**
@@ -12,45 +21,61 @@ import javafx.stage.Stage;
 public class StaffHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
-	private final Stage primaryStage;
-	private final StaffHomePage view = new StaffHomePage();
-	private final String currentUser;
+	private final DBConnectionStore dBConnectionStore;
 	
-	public StaffHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
-        this.databaseHelper = databaseHelper;
+	private final Stage primaryStage;
+	private final StaffHomePage view;
+	private final UserSession userSession;
+	
+	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StaffHomePage view) {
+		this.dBConnectionStore = dBConnectionStore;
+        this.view = view;
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.userSession = userSession;
         
         setInitialLayout();
         
         setLogoutButtonAction();
         setChangeToRolesButtonAction();
+        
+        if(Debug.isEnabled) {
+        	setUpDebugEnvironment();
+        }
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
-	        UserLoginPageController loginPage = new UserLoginPageController(databaseHelper, primaryStage);
+	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
     }
     
     private void setChangeToRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
+    	view.getChangeRolesButton().setOnAction(_ -> {
+    		try {
+//		    	User.Role role = userService.getUserRole(userSession.getCurrentUserName());
+//		    	User user = new User(userSession.getCurrentUserName(), "", role); // Password can be blank if not needed
+		    	
+		    	// TODO: - SQL + Model + (UI Logic?)
+    		} catch (DataAccessException e) {
+	            System.err.println(e.getMessage());
+	            e.printStackTrace();
+	        }
 	    	// Return to welcome page
-	    	String role = databaseHelper.getUserRole(currentUser);
-	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
-
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	    });
     }
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	view.setUserLabel(currentUser);
+    	view.setUserLabel(userSession.getCurrentUserName());
+    }
+    
+    private final void setUpDebugEnvironment() {
+    	view.addDebugLabel();
     }
 }

@@ -1,8 +1,16 @@
 package Controllers;
-import Models.User;
+
+import Database.*;
+
+import Sessions.UserSession;
+
+import UI.Pages.ForumPage;
 import UI.Pages.StudentHomePage;
+import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
-import databasePart1.*;
+
 import javafx.stage.Stage;
 
 /**
@@ -12,48 +20,65 @@ import javafx.stage.Stage;
 public class StudentHomePageController {
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+
 	private final Stage primaryStage;
-	private final StudentHomePage view = new StudentHomePage();
-	private final String currentUser;
+	private final StudentHomePage view;
+	private final UserSession userSession;
 	
-	public StudentHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
-        this.databaseHelper = databaseHelper;
+	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StudentHomePage view) {
+		this.dBConnectionStore = dBConnectionStore;
+        this.view = view;
         this.primaryStage = primaryStage;
-        this.currentUser = currentUser;
+        this.userSession = userSession;
         
         setInitialLayout();
         
         setLogoutButtonAction();
         setChangeRolesButtonAction();
+        setEnterForumButtonAction();
+        
+        if(Debug.isEnabled) {
+        	setUpDebugEnvironment();
+    	}
     }
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setLogoutButtonAction() {
-    	view.getLogoutButton().setOnAction(a -> {
+    	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
-	        new UserLoginPageController(databaseHelper, primaryStage);
+    		userSession.setLoggedStatus(false);
+	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
     }
     
     private void setChangeRolesButtonAction() {
-    	view.getChangeRolesButton().setOnAction(a -> {
+    	view.getChangeRolesButton().setOnAction(_ -> {
+    		// TODO: -- Something weird happening here. Might need to make a DB call to update roles
 	    	// Return to welcome page
-	    	String role = databaseHelper.getUserRole(currentUser);
-	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+//	    	String roleString = userDBManager.getUserRole(userSession.getUsername());
+//	    	User.Role role = User.roleFromString(roleString);
+//	    	
+//	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 
 	    });
     }
+    private void setEnterForumButtonAction() {
+		view.getEnterForumButton().setOnAction(_ -> {
+	    	// Enter the forum page
+	    	new ForumPageController(dBConnectionStore, primaryStage, userSession, new ForumPage());
+	    });
+	}
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	
-    	if(Debug.isEnabled) {
-    		view.getLayout().getChildren().add(view.getDebugLabel());
-    	}
+    }
+    
+    private final void setUpDebugEnvironment() {
+    	view.addDebugLabel();
     }
 }

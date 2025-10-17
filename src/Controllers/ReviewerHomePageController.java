@@ -1,10 +1,14 @@
 package Controllers;
 
+import Database.*;
 
-import Models.User;
+import Sessions.UserSession;
+
 import UI.Pages.ReviewerHomePage;
+import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
-import databasePart1.*;
 import javafx.stage.Stage;
 
 /**
@@ -22,15 +26,17 @@ public class ReviewerHomePageController {
      */
 	
 	// Reference to the DatabaseHelper for database interactions
-	private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+	private final UserSession userSession;
+	
 	private final Stage primaryStage;
-	private final ReviewerHomePage view = new ReviewerHomePage();
-	private final String currentUser;
+	private final ReviewerHomePage view;
 		
-	public ReviewerHomePageController(DatabaseHelper databaseHelper, Stage primaryStage, String currentUser) {
-		this.databaseHelper = databaseHelper;
+	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, ReviewerHomePage view) {
+		this.dBConnectionStore = dBConnectionStore;
+		this.view = view;
 	    this.primaryStage = primaryStage;
-	    this.currentUser = currentUser;
+	    this.userSession = userSession;
 	        
 	    setInitialLayout();
 	    
@@ -42,23 +48,23 @@ public class ReviewerHomePageController {
         }
 	}
 	
-    // ===================
- 	// Setters
+	// ===================
+    // 		 SETTERS 
  	// ===================
 	
 	private void setLogoutButtonAction() {
-		view.getLogoutButton().setOnAction(a -> {
+		view.getLogoutButton().setOnAction(_ -> {
 			// Return to login page
-	        UserLoginPageController loginPage = new UserLoginPageController(databaseHelper, primaryStage);
+			// TODO: -- Need to empty UserSession
+	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});
 	}
 	
 	private void setChangeRolesButtonAction() {
-		view.getLogoutButton().setOnAction(a -> {
+		view.getChangeRolesButton().setOnAction(_ -> {
 			// Return to welcome page
-	    	String role = databaseHelper.getUserRole(currentUser);
-	    	User user = new User(currentUser, "", role); // Password can be blank if not needed
-	    	new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+			// TODO: -- Needs to be DB call here along with UI update
+	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 		});
 	}
     
@@ -67,6 +73,6 @@ public class ReviewerHomePageController {
     }
     
     private final void setUpDebugEnvironment() {
-    	view.getLayout().getChildren().add(view.getDebugLabel());
+    	view.addDebugLabel();
     }
 }

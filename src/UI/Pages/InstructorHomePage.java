@@ -1,6 +1,7 @@
 package UI.Pages;
 
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,18 +12,26 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 
-public class InstructorHomePage {
-
+public class InstructorHomePage implements IInitializable {
+	
 	private final VBox layout = new VBox();
+	private final Scene scene = new Scene(layout, 800, 400);
 
 	private final Label userLabel = new Label(); // "Hello, " + currentUser + "!"
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
+	
+	public InstructorHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
     
-    // ===================
-   	// Getters
-   	// ===================
+	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public Button getLogoutButton() {
     	return logoutButton;
@@ -41,23 +50,27 @@ public class InstructorHomePage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     public void setUserLabel(String text) {
     	userLabel.setText("Hello, " + text + "!");
     }
     
     public void setInitialLayout(Stage primaryStage) {
-    	layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-    	userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-    	debugLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
+    	layout.getStyleClass().add("layout");
+    	userLabel.getStyleClass().add("main-label");
     	
     	layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
-	    Scene userScene = new Scene(layout, 800, 400);
+	    
 	    // Set the scene to primary stage
-	    primaryStage.setScene(userScene);
+	    primaryStage.setScene(scene);
 	    primaryStage.setTitle("Instructor Home Page");
     	
+    }
+    
+    public void addDebugLabel() {
+    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
+    	layout.getChildren().add(debugLabel);
     }
 }

@@ -1,100 +1,140 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
+import Database.*;
+import Database.Services.Interfaces.IUserService;
 
-import Models.User;
-import UI.Elements.ResetPasswordPopup;
+import Exceptions.DBExceptions.DataAccessException;
+
+import Sessions.UserSession;
+
+import UI.Elements.ResetPasswordPopupView;
 import UI.Pages.UserLoginPage;
+import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-import databasePart1.*;
 
-/**
- * The UserLoginPage class provides a login interface for users to access their accounts.
- * It validates the user's credentials and navigates to the appropriate page upon successful login.
- */
 public class UserLoginPageController {
 	
-    private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+    private final IUserService userService;
+    
     private final Stage primaryStage;
-    private final UserLoginPage view = new UserLoginPage();
+    private final UserLoginPage view;
+    private final ResetPasswordPopupView resetPasswordPopupView = new ResetPasswordPopupView();
+    
+    private String userNameFieldText = "";
+    private String passwordFieldText = "";
 
-    public UserLoginPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+    public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.userService = dBConnectionStore.getUserService();
+        this.view = view;
         this.primaryStage = primaryStage;
         
         setInitialLayout();
-        
         setLoginButtonAction();
-        if(Debug.isEnabled) {
+        setSubmitButtonResetPasswordPopupAction();
+        
+        if (Debug.isEnabled) {
         	setDebugEnvironment();
         }
     }
-    
-    
+
     private void setLoginButtonAction() {
-    	view.getLoginButton().setOnAction(a -> {
-	        // --- Retrieve user inputs ---
-	        String userName = view.getUsernameField().getText();
-	        String password = view.getPasswordField().getText();
+    	view.getLoginButton().setOnAction(_ -> {
+	        userNameFieldText = view.getUsernameField().getText();
+	        passwordFieldText = view.getPasswordField().getText();
+	        
+	        boolean resetPasswordFlag = passwordFieldText.length() > 2 && passwordFieldText.startsWith("R_");
 
-	        // --- Flags ---
-	        boolean resetPasswordFlag = password.startsWith("R_") && password.length() > 2;
-
-	        // --- Username validation ---
-	        if (!UserNameRecognizer.checkForValidUserName(userName)) {
+	        // --- Validate username ---
+	        if (!UserNameRecognizer.checkForValidUserName(userNameFieldText)) {
 	        	view.setErrorLabelText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 	            return;
 	        }
 
-	        // --- Password validation ---
-	        if (!PasswordEvaluator.evaluatePassword(password)) {
+	        // --- Validate password ---
+	        if (!PasswordEvaluator.evaluatePassword(passwordFieldText)) {
 	            view.setErrorLabelText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
 	            return;
 	        }
 
-	        // --- Database check ---
 	        try {
-	            User user = new User(userName, password, "");
-	            new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+	            // ✅ Pull the actual user from the DB
+	        	System.out.println(String.format("%s", userNameFieldText));
+	        	System.out.println(String.format("%s", passwordFieldText));
 
-	            String role = databaseHelper.getUserRole(userName);
-	            if (role != null) {
-	                user.setRole(role);
-	                if (databaseHelper.login(user)) {
-	                	if (resetPasswordFlag) {
-	                	    ResetPasswordPopup resetPasswordPopup = new ResetPasswordPopup(databaseHelper);
-	                	    resetPasswordPopup.show(userName);
-	                	} else {
-	                		// TOCHANGE
-	                	    //welcomeLoginPage.show(primaryStage, user);
-	                	}
-	                } else {
-	                    view.setErrorLabelText("Error logging in");
-	                }
-	            } else {
-	            	view.setErrorLabelText("User account doesn't exist");
+	        	User user = userService.getUserByNameAndPassword(userNameFieldText, passwordFieldText);
+	            if (user == null) {
+	                view.setErrorLabelText("Invalid username or password.");
+	                return;
 	            }
-	        } catch (SQLException e) {
-	            System.err.println("Database error: " + e.getMessage());
+
+	            // ✅ Ensure we have the DB ID
+	            if (Debug.isEnabled) {
+	                System.out.println("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
+	            }
+
+	            // --- Initialize user session ---
+	            UserSession userSession = new UserSession(user);
+	            userSession.setLoggedStatus(true);
+
+	            // --- Handle reset or normal login flow ---
+	            if (resetPasswordFlag) {
+	                new ResetPasswordPopupView();
+	            } else {
+	                new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
+	            }
+
+	        } catch (DataAccessException e) {
+	            System.err.println("Database access error during login: " + e.getMessage());
 	            e.printStackTrace();
+	            view.setErrorLabelText("Database error. Please try again later.");
 	        }
 	    });
 	}
-    
-    private void setDebugEnvironment() {
-    	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
- 		view.getAdminInfoAutoFillButton().setOnAction(a -> {
- 			view.getUsernameField().setText("admin");
- 			view.getPasswordField().setText("Password1!");
- 		});
+
+    private void setSubmitButtonResetPasswordPopupAction() {
+    	resetPasswordPopupView.getSubmitButton().setOnAction(_ -> {
+    		userNameFieldText = view.getUsernameField().getText();
+    		passwordFieldText = view.getPasswordField().getText();
+	        
+            String newPass = resetPasswordPopupView.getPasswordPromptLabelText();
+            if (!PasswordEvaluator.evaluatePassword(newPass)) {
+            	resetPasswordPopupView.setFeedbackLabelText("Password issues: " + PasswordEvaluator.passwordErrorMessage);
+                return;
+            }
+            try {
+            	userService.updatePasswordForUser(userNameFieldText);
+                resetPasswordPopupView.setFeedbackLabelText("Password updated. Please log in again.");
+                resetPasswordPopupView.closeStage();
+            } catch (DataAccessException e) {
+            	resetPasswordPopupView.setFeedbackLabelText("Error updating password: " + e.getMessage());
+            }
+        });
     }
-    
+
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
 
+    private void setDebugEnvironment() {
+    	view.studentInfoAutoFillButton().setText("AutoFill Student Info (Debug)");
+    	view.studentInfoAutoFillButton().setOnAction(_ -> {
+    		view.getUsernameField().setText("student");
+    		view.getPasswordField().setText("Password1!");
+    	});
+
+    	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
+ 		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
+ 			view.getUsernameField().setText("admin");
+ 			view.getPasswordField().setText("Password1!");
+ 		});
+    }
 }

@@ -7,32 +7,42 @@ import java.sql.SQLException;
 import Controllers.FirstPageController;
 import Controllers.SetupLoginSelectionPageController;
 
-import databasePart1.DatabaseHelper;
+import Database.DBConnectionStore;
+import Database.GeneralDBManager;
+import Database.Services.PermissionService;
+import UI.Pages.FirstPage;
+import UI.Pages.SetupLoginSelectionPage;
 
 
 public class StartCSE360 extends Application {
 
-	private static final DatabaseHelper databaseHelper = new DatabaseHelper();
 	
 	public static void main( String[] args )
 	{
-		 launch(args);
+		launch(args);
 	}
 	
 	@Override
     public void start(Stage primaryStage) {
+		String databaseLocation = "database/FoundationDatabase";
+		
         try {
-            databaseHelper.connectToDatabase(); // Connect to the database
-            if (databaseHelper.isDatabaseEmpty()) {
-            	
-            	new FirstPageController(databaseHelper, primaryStage);
+        	DBConnectionStore sharedConnectionProvider = DBConnectionStore.createInstance();
+        	
+        	GeneralDBManager initializingConnectionManager = (GeneralDBManager)sharedConnectionProvider.getGeneralDBManager();
+        	PermissionService permissionService = (PermissionService)sharedConnectionProvider.getPermissionService();
+        	
+        	if(!initializingConnectionManager.doesDatabaseExist(databaseLocation)) {  
+            	initializingConnectionManager.initializeDB();
+            	permissionService.seedRolePermissions();  													
+        	
+            	new FirstPageController(sharedConnectionProvider, primaryStage, new FirstPage());
             } else {
-            	new SetupLoginSelectionPageController(databaseHelper, primaryStage);
-                
+            	new SetupLoginSelectionPageController(sharedConnectionProvider, primaryStage, new SetupLoginSelectionPage());
             }
         } catch (SQLException e) {
         	System.out.println(e.getMessage());
-        }
+        } 
     }
 	
 

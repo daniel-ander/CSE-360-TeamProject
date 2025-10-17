@@ -2,6 +2,7 @@ package UI.Pages;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -12,12 +13,12 @@ import javafx.stage.Stage;
 
 // This is the page that the first User to login will be sent to. 
 // 
-public class AdminSetupPage {
-	
+public class AdminSetupPage implements IInitializable {
+
 	// Input fields for userName and password
     // Label to display error messages
     private final Label errorLabel = new Label(); //creation of label, "blank" so its rendered early and nothing shifts around
-	private final Label pageExplain = new Label("This Account Will Be The Administrator Account");
+	private final Label pageExplainLabel = new Label("This Account Will Be The Administrator Account");
 	
     private final TextField userNameField = new TextField();
     
@@ -25,10 +26,20 @@ public class AdminSetupPage {
     
     private final Button setupButton = new Button("Setup");
     private final Button adminInfoAutoFillButton = new Button("Admin Login (TESTING)");
+    
+    private final VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplainLabel, adminInfoAutoFillButton);
+    private final Scene scene = new Scene(layout, 800, 400);
+    
+    public AdminSetupPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 
     
     // ===================
- 	// Getters
+    // 		 GETTERS 
  	// ===================
     
     public Button getSetupButton() {
@@ -48,7 +59,7 @@ public class AdminSetupPage {
     }
     
     // ===================
-    // Setters
+    // 		 SETTERS 
  	// ===================
     
     public void setUsername(String text) {
@@ -59,19 +70,19 @@ public class AdminSetupPage {
     	passwordField.setText(text);
     }
     
-    public void setInitialLayout(Stage primaryStage) {
-		// Set the scene to primary stage
-    	errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-    	pageExplain.setStyle("-fx-text-fill: black; -fx-font-size: 12px;");
+    public void setInitialLayout(Stage primaryStage) {	
+    	layout.getStyleClass().add("layout");
+    	errorLabel.getStyleClass().addAll("auxilary-label", "error-label");
+    	pageExplainLabel.getStyleClass().addAll("auxilary-label", "info-label-secondary");
+    	
     	userNameField.setPromptText("Enter Admin userName");
     	userNameField.setMaxWidth(250);
+    	
     	passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
     	
-    	VBox layout = new VBox(10, userNameField, passwordField, setupButton, errorLabel,pageExplain, adminInfoAutoFillButton);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         
-        primaryStage.setScene(new Scene(layout, 800, 400));
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Administrator Setup");
         primaryStage.show();
     }

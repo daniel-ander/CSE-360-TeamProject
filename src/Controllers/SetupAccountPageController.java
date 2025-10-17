@@ -1,14 +1,23 @@
 package Controllers;
 
-import javafx.stage.Stage;
-import java.sql.SQLException;
-
 import Models.User;
+
+import javafx.stage.Stage;
+
+import Database.*;
+import Database.Services.Interfaces.IInvitationService;
+import Database.Services.Interfaces.IUserService;
+
+import Exceptions.DBExceptions.DataAccessException;
+
+import Sessions.UserSession;
+
 import UI.Pages.SetupAccountPage;
+import UI.Pages.WelcomeLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-import databasePart1.*;
 
 /**
  * SetupAccountPage class handles the account setup process for new users.
@@ -16,14 +25,19 @@ import databasePart1.*;
  */
 public class SetupAccountPageController {
 
-    private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dBConnectionStore;
+    private final IUserService userService;
+    private final IInvitationService invitationService;
     private final Stage primaryStage;
-    private final SetupAccountPage view = new SetupAccountPage();
+    private final SetupAccountPage view;
     
     // DatabaseHelper to handle database operations.
-    public SetupAccountPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+    public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
+    	this.dBConnectionStore = dBConnectionStore;
+        this.userService = dBConnectionStore.getUserService();
+        this.invitationService = dBConnectionStore.getInvitationService();
         this.primaryStage = primaryStage;
+        this.view = view;
         
         setInitialLayout();
         
@@ -36,60 +50,94 @@ public class SetupAccountPageController {
      */
     
     // ===================
-  	// Setters
-  	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	
     	if(Debug.isEnabled) {
-    		databaseHelper.printInvitationCodesTable();
+    		try {
+    			invitationService.printInvitationCodesTable();
+    		} catch(DataAccessException e) {
+    			// TODO: - Handle the case where invitation codes table can't be printed
+    			System.err.println(e.getMessage());
+                e.printStackTrace();
+    		}
     	}
     }
     
     private void setSetupButtonAction() {
-    	view.getSetupButton().setOnAction(a -> {
+    	view.getSetupButton().setOnAction(_ -> {
+    		System.out.println("Button was pressed");
         	// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
             String code = view.getInvitationCodeField().getText();
             
-         // Validate userName and password using FSM classes
+            // Validate userName and password using FSM classes
             if (!UserNameRecognizer.checkForValidUserName(userName)) {
 			    view.setErrorMessage("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 			    return;
-			    }
+			}
+            
             if (!PasswordEvaluator.evaluatePassword(password)) {
             	view.setErrorMessage("Password issues: " + PasswordEvaluator.passwordErrorMessage);
 				return;
 			}
             
             try {
-            	// Check if the user already exists
-            	if(!databaseHelper.doesUserExist(userName)) {
-            		
-            		// Validate the invitation code
-            		if(databaseHelper.validateInvitationCode(code)) {
-            			
-            			// Create a new user and register them in the database
-		            	User user=new User(userName, password, "user");
-		                databaseHelper.register(user);
-		                
-		             // Navigate to the Welcome Login Page
-		                new WelcomeLoginPageController(databaseHelper, primaryStage, user);
+            	boolean didFindUser = false;
+            	
+            	try {
+            		didFindUser = userService.doesUserExistByName(userName);
+            	} catch (DataAccessException e) {
+            		// TODO: - Handle the case of not being able to check for user existence
+            		System.err.println(e.getMessage());
+                    e.printStackTrace();
+            	}
+            	
+            	if(!didFindUser) {
+            		boolean didValidateCode = false;
+            		try {
+            			didValidateCode = invitationService.validateInvitationCode(code);
+                	} catch (DataAccessException e) {
+                		// TODO: - Handle the case of not being able to validate invitation code
+                		System.err.println(e.getMessage());
+                        e.printStackTrace();
+                	}
+            		if(didValidateCode) {
+            			// Create and register new user
+            			User user = new User(userName, password, User.Role.student);
+            			userService.register(user);
+
+            			// Now reload the user so it has the correct ID
+            			User registeredUser = userService.getUserByNameAndPassword(userName, password);
+            			if (registeredUser == null) {
+            			    view.setErrorMessage("Error retrieving user from database after registration.");
+            			    return;
+            			}
+
+            			UserSession userSession = new UserSession(registeredUser);
+            			userSession.setLoggedStatus(true);
+
+            			// Navigate to WelcomeLoginPage
+            			new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
+
             		}
             		else {
             			view.setErrorMessage("Please enter a valid invitation code");
             		}
             	}
             	else {
-            		view.setErrorMessage("This useruserName is taken!!.. Please use another to setup an account");
+            		view.setErrorMessage("This user name is taken!!.. Please use another to setup an account");
             	}
             	
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the several potential DB call failures
+                System.err.println(e.getMessage());
                 e.printStackTrace();
-            }
+            } 
         });
 	}
 }

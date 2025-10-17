@@ -1,15 +1,20 @@
 package Controllers;
 
+import Models.User;
+
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
+import Database.*;
+import Database.Services.Interfaces.IUserService;
 
-import Models.User;
+import Exceptions.DBExceptions.DataAccessException;
+
 import UI.Pages.AdminSetupPage;
+import UI.Pages.UserLoginPage;
+
 import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
-import databasePart1.*;
 
 /**
  * The SetupAdmin class handles the setup process for creating an administrator account.
@@ -20,15 +25,16 @@ import databasePart1.*;
 // 
 public class AdminSetupPageController {
 	
-    private final DatabaseHelper databaseHelper;
+	private final DBConnectionStore dbConnectionStore;
+    private final IUserService userService;
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
-    public AdminSetupPageController(DatabaseHelper databaseHelper, Stage primaryStage) {
-        this.databaseHelper = databaseHelper;
+    public AdminSetupPageController(DBConnectionStore dbConnectionStore, Stage primaryStage,  AdminSetupPage view) {
+    	this.dbConnectionStore = dbConnectionStore;
+    	this.userService = dbConnectionStore.getUserService();
         this.primaryStage = primaryStage;
-        
-        view = new AdminSetupPage();
+        this.view = view;
         
         setInitialLayout();
         
@@ -40,7 +46,7 @@ public class AdminSetupPageController {
     }
     
     // ===================
-    // Setters
+    // 		 SETTERS 
  	// ===================
     
     private void setInitialLayout() {
@@ -48,7 +54,7 @@ public class AdminSetupPageController {
     }
     
     private void setSetupButtonAction() {
-		view.getSetupButton().setOnAction(a -> {
+		view.getSetupButton().setOnAction(_ -> {
 			// Retrieve user input
             String userName = view.getUserName();
             String password = view.getPassword();
@@ -65,14 +71,22 @@ public class AdminSetupPageController {
             
             try {
             	// Create a new User object with admin role and register in the database
-            	User user=new User(userName, password, "admin");
-                databaseHelper.register(user);
+            	User user=new User(userName, password, User.Role.admin);
+                userService.register(user);
+
+                User registeredUser = userService.getUserByNameAndPassword(userName, password);
+                if (registeredUser == null) {
+                    view.setErrorLabel("Error retrieving user from database after registration.");
+                    return;
+                }
+                
                 System.out.println("Administrator setup completed.");
                 
                 // Navigate to the Welcome Login Page
-                //new UserLoginPageController(databaseHelper, primaryStage);
-            } catch (SQLException e) {
-                System.err.println("Database error: " + e.getMessage());
+                new UserLoginPageController(dbConnectionStore, primaryStage, new UserLoginPage());
+            } catch (DataAccessException e) {
+            	// TODO: - Handle the case where user couldn't be registered
+                System.err.println(e.getMessage());
                 e.printStackTrace();
             }
 		});
@@ -80,7 +94,7 @@ public class AdminSetupPageController {
     
     private void setupDebugEnvironment() {
 		view.getAdminAutoFillButton().setText("AutoFill Admin Info (Debug)");
-		view.getAdminAutoFillButton().setOnAction(a -> {
+		view.getAdminAutoFillButton().setOnAction(_ -> {
 	    	view.setUsername("admin");
 	    	view.setPassword("Password1!");
 		});

@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -16,8 +17,9 @@ import javafx.stage.Stage;
  * - Adds "Invite" button for admins.
  * - Quit button closes DB + exits app.
  */
-public class WelcomeLoginPage {
+public class WelcomeLoginPage implements IInitializable {
 	private final VBox layout = new VBox(5);
+	private final Scene scene = new Scene(layout, 800, 400);
 	// Page title / greeting
     private final Label welcomeLabel = new Label("Welcome!!");
     private final Button continueButton = new Button("Continue to your Page");
@@ -28,10 +30,17 @@ public class WelcomeLoginPage {
      * @param primaryStage The main JavaFX stage.
      * @param user The logged-in user object.
      */
+    
+    public WelcomeLoginPage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
 
     // ===================
-   	// Getters
-   	// ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public VBox getLayout() {
     	return layout;
@@ -50,20 +59,18 @@ public class WelcomeLoginPage {
     }
     
     // ===================
-   	// Setters
-   	// ===================
+    // 		 SETTERS 
+ 	// ===================
     
-    public void setInitialLayout(Stage primaryStage) {
+    public void setInitialLayout(Stage primaryStage) {    	
     	// Base layout container
-        layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-        welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        layout.getStyleClass().add("layout");
+        welcomeLabel.getStyleClass().add("main-label");
         
-        // Assemble UI
         layout.getChildren().addAll(welcomeLabel, continueButton, quitButton);
-        Scene welcomeScene = new Scene(layout, 800, 400);
 
         // Show the scene
-        primaryStage.setScene(welcomeScene);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Welcome Page");
     }
 }

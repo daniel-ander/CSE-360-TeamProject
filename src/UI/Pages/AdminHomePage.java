@@ -2,6 +2,7 @@ package UI.Pages;
 
 import java.util.*;
 
+import UI.Interfaces.IInitializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Scene;
@@ -12,7 +13,7 @@ import javafx.stage.Stage;
  * displays a simple welcome message for the admin.
  */
 
-public class AdminHomePage {
+public class AdminHomePage implements IInitializable {
 	/**
 	 * Displays the admin page in the provided primary stage.
 	 * 
@@ -27,7 +28,7 @@ public class AdminHomePage {
 	private final CheckBox reviewerCheckBox = new CheckBox("Reviewer");
 
 	private final VBox layout = new VBox();
-	private final Scene adminScene = new Scene(layout, 800, 400);
+	private final Scene scene = new Scene(layout, 800, 400);
 	private final HBox roleBox = new HBox(20);
 	
 	// label to display the welcome message for the admin
@@ -46,9 +47,16 @@ public class AdminHomePage {
 	
 	private final ComboBox<String> userDropDown = new ComboBox<>();
 	
+	public AdminHomePage() {
+    	// import stylesheet
+    	scene.getStylesheets().add(
+    		getClass().getResource("/Styles/styles.css").toExternalForm()
+    	);
+    }
+	
 	// ===================
-	// Getters
-	// ===================
+    // 		 GETTERS 
+ 	// ===================
 	
 	public ComboBox<String> getUserDropdown() {
 		return userDropDown;
@@ -103,11 +111,11 @@ public class AdminHomePage {
 	}
 	
 	// ===================
-	// Setters
-	// ===================
+    // 		 SETTERS 
+ 	// ===================
 	
 	public void setTempPasswordInfoLabel(String text) {
-		tempPasswordInfoLabel.setText(text);;
+		tempPasswordInfoLabel.setText(text);
 	}
 	
 	public void setAdminCheckBox(boolean flag) {
@@ -134,33 +142,32 @@ public class AdminHomePage {
 		userDetailsLabel.setText(text);
 	}
 	
-	public void setInitialLayout(Stage primaryStage) {				
-		layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-		roleBox.setStyle(null);
-		adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-		
-		// Admins can't be un-admined by UI, so disable interaction
-        adminCheckBox.setDisable(true);
+	public void setInitialLayout(Stage primaryStage) {	
+		layout.getStyleClass().add("layout");
+		adminLabel.getStyleClass().add("main-label");
+		userDetailsLabel.getStyleClass().add("minor-label");
+        tempPasswordInfoLabel.getStyleClass().addAll("auxilary-label", "info-label");
         
-        userDetailsLabel.setStyle("-fx-border-color: gray; -fx-padding: 10; -fx-font-size: 14px;");
-        tempPasswordInfoLabel.setStyle("-fx-text-fill: blue; -fx-font-size: 12px;");
+        userDropDown.setPromptText("Select user");
+        
+		roleBox.setStyle(null);
+        adminCheckBox.setDisable(true); // Admins can't be un-admined by UI, so disable interaction
 		
-		addUserRoleDropdown();
+		setUserRoleDropdownLayout();
 		
 		layout.getChildren().addAll(adminLabel, roleBox, userDetailsLabel, deleteUserButton, setTempPasswordButton, tempPasswordInfoLabel);
 		
 		// Set the scene to primary stage
-		primaryStage.setScene(adminScene);
+		primaryStage.setScene(scene);
 		primaryStage.setTitle("Admin Page");
 	}
 	
 	public void setUserDropDownLayout(List<String> users) {
 		// Create drop down w/ all users names
-		userDropDown.setPromptText("Select user");
 		userDropDown.getItems().addAll(users);
 	}
 	
-	private void addUserRoleDropdown() {
+	private void setUserRoleDropdownLayout() {
 		roleBox.getChildren().addAll(
 	            userDropDown,
 	            new Label("Choose Role to add"),
