@@ -126,6 +126,7 @@ public class AnswerListViewController {
     
     private void setShowDeletedAnswersCheckboxAction() {
 		view.getShowDeletedAnswersCheckbox().setOnAction(_ -> {
+			
 			refreshAnswers();
 		});
 	}

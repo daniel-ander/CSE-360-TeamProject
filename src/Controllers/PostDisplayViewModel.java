@@ -18,6 +18,7 @@ public class PostDisplayViewModel {
     private final UserSession userSession;
     private boolean isEditingQuestion = false;
     private BooleanProperty isCommenting = new SimpleBooleanProperty(false);
+    private boolean isHidden = false;
     
     
     private final Consumer<Integer> deleteCallback;
@@ -75,6 +76,10 @@ public class PostDisplayViewModel {
     	return post.getIsDeleted();
     }
     
+    public boolean getIsHidden() {
+    	return isHidden;
+    }
+    
     // ===================
     // 		 SETTERS 
  	// ===================
@@ -85,6 +90,10 @@ public class PostDisplayViewModel {
     
     public void setIsCommenting(boolean isCommenting) {
     	this.isCommenting = new SimpleBooleanProperty(isCommenting);
+    }
+    
+    public void setIsHidden(boolean isHidden) {
+    	this.isHidden = isHidden;
     }
     
     // ===================

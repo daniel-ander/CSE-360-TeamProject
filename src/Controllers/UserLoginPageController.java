@@ -4,6 +4,9 @@ import Models.User;
 
 import javafx.stage.Stage;
 
+import static org.mockito.Mockito.lenient;
+
+import Config.PreLoader;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 
@@ -83,6 +86,7 @@ public class UserLoginPageController {
 
 	            // --- Initialize user session ---
 	            UserSession userSession = new UserSession(user);
+	            (new PreLoader(dBConnectionStore, userSession)).preload();
 	            userSession.setLoggedStatus(true);
 
 	            // --- Handle reset or normal login flow ---

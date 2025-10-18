@@ -84,6 +84,31 @@ public class QuestionRepository implements IQuestionRepository {
 	}
 	
 	@Override
+	public List<Question> getLimitedAmountOfQuestions(int amount) throws SQLException {
+		List<Question> questions = new ArrayList<>();
+		String getAllQuestions = String.format("SELECT * FROM %s LIMIT %s", Question.tableName, amount);
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
+				questions.add(q);
+			}
+		}
+		
+		return questions;
+	}
+	
+	@Override
 	public Question getQuestionById(int searchId) throws SQLException {
 		String getQuestionById = String.format("SELECT * FROM %s WHERE id = ?", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
@@ -253,4 +278,5 @@ public class QuestionRepository implements IQuestionRepository {
 		}
 		return false;
 	}
+
 }

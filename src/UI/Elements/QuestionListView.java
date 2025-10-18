@@ -1,8 +1,8 @@
 package UI.Elements;
 
 import Controllers.PostDisplayViewModel;
-
-
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -10,9 +10,10 @@ import javafx.scene.layout.*;
 
 public class QuestionListView {
 	
-    private final BorderPane borderpane = new BorderPane();
+    private final BorderPane borderPane = new BorderPane();
     
-    private final ListView<PostDisplayViewModel> forumListView;
+    private final ObservableList<PostDisplayViewModel> viewModels = FXCollections.observableArrayList();
+    private final ListView<PostDisplayViewModel> forumListView = new ListView<>(viewModels);
     
     private final Button addQuestionButton = new Button("Add Question");
     private final Button editQuestionButton = new Button("Edit Question");
@@ -25,15 +26,9 @@ public class QuestionListView {
 	private final Button searchQuestionsButton = new Button("Search");
 
     public QuestionListView() {
-        // ListView in center
-        forumListView = new ListView<PostDisplayViewModel>();
+        forumListView.setCellFactory(_ -> new PostCell());
         
-        //XXX: working on this, could break. trying to add cells to the UI 
-        forumListView.setCellFactory(_-> {
-        	return new PostCell();
-        });
-        
-        borderpane.setCenter(forumListView);
+        borderPane.setCenter(forumListView);
         
         searchQuestionsTextField.setPromptText("Search questions...");
 
@@ -48,11 +43,11 @@ public class QuestionListView {
         		returnButton, 
         		searchQuestionsTextField, 
         		searchQuestionsButton);
-        borderpane.setRight(controlBox);
-        borderpane.setBottom(textInputArea);
+        borderPane.setRight(controlBox);
+        borderPane.setBottom(textInputArea);
     }
 
-    public BorderPane getLayout() { return borderpane; }
+    public BorderPane getLayout() { return borderPane; }
     
     public ListView<PostDisplayViewModel> getForumListView() { return forumListView; }
     

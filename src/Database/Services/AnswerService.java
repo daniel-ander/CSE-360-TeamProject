@@ -26,13 +26,6 @@ public class AnswerService implements IAnswerService {
 	
 	@Override
 	public boolean addAnswer(Answer a) throws DataAccessException, DuplicateRecordIDException {
-		/*
-		boolean doesAnswerExist = (getAnswerById(a.getId()) != null);
-		
-		if (doesAnswerExist) {
-			throw new DuplicateRecordIDException("Answer with this id already exists!");
-		}
-		*/
 		try {
 			answerRepository.insertAnswer(a);
 			if (Debug.isEnabled) System.out.println("Answer added successfully.");

@@ -174,8 +174,14 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	                break;
 	        }
 	    }
-	    
-	    setGraphic(outerMostContainer);
+	    if(vm.getIsHidden()) {
+	    	setGraphic(null);
+	    	setPrefHeight(0);
+	    	setMinHeight(0);
+	    } else {
+	    	setPrefHeight(Region.USE_COMPUTED_SIZE);
+	    	setGraphic(outerMostContainer);
+	    }
 	}
 
 	private String formatStatus(Question q) {
