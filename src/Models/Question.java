@@ -48,7 +48,7 @@ public class Question implements IPost {
 	public int getAuthorId() {return authorId;}
 	public boolean getAnsweredStatus() {return isAnswered;}
 	public boolean getResolvedStatus() {return isResolved;}
-	public boolean getDeleted() {return isDeleted;}
+	public boolean getIsDeleted() {return isDeleted;}
 	public int getUpvoteCount() {return upvoteCount;}
 	
 	

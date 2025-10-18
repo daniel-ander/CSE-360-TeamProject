@@ -7,6 +7,7 @@ public interface IPost {
 	
 	public Integer getId();
 	public String getBodyText();
+	public boolean getIsDeleted();
 	public String getTitleText();
 	
 	public Type getPostType();

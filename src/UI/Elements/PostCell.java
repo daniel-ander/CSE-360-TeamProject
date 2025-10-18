@@ -4,10 +4,11 @@ import Controllers.PostDisplayViewModel;
 import Models.Answer;
 import Models.Question;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 
 public class PostCell extends ListCell<PostDisplayViewModel> {
@@ -26,6 +27,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final Label statusLabel = new Label();
 	private final Label permissionLabel = new Label(); // This is for illustrative purposes
 	private final HBox actionsContainer = new HBox();
+	
+	private StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
 	private final Button updateButton = new Button("Edit");
 
@@ -33,8 +36,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		titleLabel.setWrapText(true);
 		titleTextField.setVisible(false);
 		bodyTextField.setVisible(false);
-
-		StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
+		
 		titleStackPane.setAlignment(Pos.CENTER_LEFT);
 
 		StackPane bodyStackPane = new StackPane(bodyTextLabel, bodyTextField);
@@ -76,11 +78,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 	    newCommentTextField.setVisible(false);
 	    newCommentTextField.setManaged(false);
-	    newCommentTextField.clear();
 
+	    newCommentTextField.clear();
 
 	    if (vm.isQuestion()) {
 	        titleLabel.setText(vm.getPost().getTitleText());
+	        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
 	        statusLabel.setText(formatStatus((Question) vm.getPost()));
 
 	        titleLabel.setVisible(true);
@@ -94,13 +97,20 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	    	int leftPadding = (((Answer) vm.getPost()).getReplyDepth() + 1) * 40;
 	    	spacer.setPrefWidth(leftPadding);
 	        
+	    	layout.getChildren().remove(titleStackPane);
 	        titleLabel.setVisible(false);
 	        titleLabel.setManaged(false);
 
 	        statusLabel.setVisible(false);
 	        statusLabel.setManaged(false);
 	    }
-	    bodyTextLabel.setText(truncate(vm.getPost().getBodyText(), 150));
+	    
+	    if((vm.getIsDeleted())) {
+	    	System.out.println("Haha");
+    		bodyTextLabel.setText("This message was deleted");
+    	} else {
+    		bodyTextLabel.setText(Utils.StringUtils.truncate(vm.getPost().getBodyText(), 150));
+    	}
 
 	    for (String permission : vm.getPermissionList()) {
 	        switch (permission) {
@@ -112,15 +122,15 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	            case "COMMENT":
 	                Button commentBtn = new Button("Comment");
 	                commentBtn.setOnAction(_ -> {
-	                    if (!vm.getIsCommenting()) {
+	                    if (!vm.getIsCommenting().get()) {
 	                        vm.setIsCommenting(true);
 	                        newCommentTextField.setVisible(true);
 	                        newCommentTextField.setManaged(true);
 	                        commentBtn.setText("Post");
 	                    } else {
-	                        String text = newCommentTextField.getText().trim();
-	                        if (!text.isEmpty()) {
-	                            vm.addAnswer(null, text);
+	                        String newCommentText = newCommentTextField.getText().trim();
+	                        if (!newCommentText.isEmpty()) {
+	                            vm.addAnswer(null, newCommentText);
 	                            newCommentTextField.clear();
 	                            newCommentTextField.setVisible(false);
 	                            newCommentTextField.setManaged(false);
@@ -166,10 +176,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	    }
 	    
 	    setGraphic(outerMostContainer);
-	}
-
-	private String truncate(String text, int limit) {
-		return text.length() <= limit ? text : text.substring(0, limit) + "...";
 	}
 
 	private String formatStatus(Question q) {
