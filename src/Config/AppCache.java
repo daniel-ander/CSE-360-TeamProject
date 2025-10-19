@@ -12,6 +12,7 @@ public class AppCache {
     private static final AppCache instance = new AppCache();
 
     private final ObjectProperty<List<PostWithPermissions>> initialQuestionData = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<List<PostWithPermissions>> answerData = new SimpleObjectProperty<>(null);
     private final ObjectProperty<List<QuestionWithAnswersAndPermissions>> initialData = new SimpleObjectProperty<>(null);
     private final ObjectProperty<List<QuestionWithAnswersAndPermissions>> fullData = new SimpleObjectProperty<>(null);
 
@@ -24,6 +25,11 @@ public class AppCache {
     public void setInitialQuestionsData(List<PostWithPermissions> questions) {
     	this.initialQuestionData.set(questions);
     }
+    
+    // Answers for every question - in order
+    public void setAnswersData(List<PostWithPermissions> answers) {
+    	this.answerData.set(answers);
+    }
 
     public void setInitialDataProperty(List<QuestionWithAnswersAndPermissions> initialData) {
         this.initialData.set(initialData);
@@ -35,6 +41,10 @@ public class AppCache {
     
     public ObjectProperty<List<QuestionWithAnswersAndPermissions>> getInitialDataProperty() {
     	return initialData;
+    }
+    
+    public ObjectProperty<List<PostWithPermissions>> getAnswersDataProperty() {
+    	return answerData;
     }
     
     public ObjectProperty<List<QuestionWithAnswersAndPermissions>> getFullDataProperty() {

@@ -36,8 +36,9 @@ public class QuestionListViewController {
 	private final IQuestionService questionService;
 	private final IAnswerService answerService;
 	private final IPermissionService permissionService;
+	private final List<PostDisplayViewModel> questionViewModels = new ArrayList<>();
 	private ObservableList<PostDisplayViewModel> observableVMs;
-	private final List<PostDisplayViewModel> viewModels = new ArrayList<>();
+	private final Map<Integer, List<PostDisplayViewModel>> answerMap = new HashMap<>();
 	private final UserSession userSession;
 	private final QuestionListView view;
 	private final Stage primaryStage;
@@ -63,40 +64,70 @@ public class QuestionListViewController {
 	// ===================
 	// SETTERS
 	// ===================
+	
+	private void expand(int postIdToExpand) {
+	    if (!answerMap.containsKey(postIdToExpand))
+	        return;
+
+	    List<PostDisplayViewModel> answers = answerMap.get(postIdToExpand);
+
+	    // Find the index of the parent question
+	    for (int i = 0; i < observableVMs.size(); i++) {
+	        if (observableVMs.get(i).getPost().getId().equals(postIdToExpand)) {
+	            // Insert answers right after the question
+	        	int insertIndex = i + 1;
+	        	for (PostDisplayViewModel answerVm : answers) {
+	        	    boolean alreadyPresent = observableVMs.stream()
+	        	        .anyMatch(vm -> vm.getPost().getId().equals(answerVm.getPost().getId()));
+	        	    if (!alreadyPresent) {
+	        	        observableVMs.add(insertIndex, answerVm);
+	        	        insertIndex++; // Keep answers in correct order
+	        	    }
+	        	}
+
+	            break;
+	        }
+	    }
+	    
+	    
+	}
+
 
 	public void refresh() {
-		System.out.println("Loaded refresh");
 		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
-			System.out.println(questionsWithPermissions.size());
-			if (questionsWithPermissions != null) {
-				Platform.runLater(() -> {
-					for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
-						viewModels.add(new PostDisplayViewModel(questionWithPermissions.getPost(),
-								questionWithPermissions.getPermissions(), 
-								userSession, 
-								id -> {
-									try {
-										questionService.deleteQuestion(id);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}, post -> {
-									try {
-										answerService.addAnswer((Answer) post);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}, (id, newTitle, newBody) -> {
-									try {
-										questionService.updateQuestion(id, newTitle, newBody);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}, 
-								this::refresh)
-							);
-						
-						
+			if (questionsWithPermissions == null)
+				return;
+
+			Platform.runLater(() -> {
+				for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
+					// TODO: - Add button action to expand
+					questionViewModels.add(new PostDisplayViewModel(
+							questionWithPermissions.getPost(),
+							questionWithPermissions.getPermissions(), 
+							userSession, 
+							id -> {
+								try {
+									questionService.deleteQuestion(id);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}, post -> {
+								try {
+									answerService.addAnswer((Answer) post);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}, (id, newTitle, newBody) -> {
+								try {
+									questionService.updateQuestion(id, newTitle, newBody);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}, () -> {
+								this.expand(questionWithPermissions.getPost().getId());
+							},
+							this::refresh));
+
 //						
 //						for (PostWithPermissions answer : questionAndAnswers.getAnswers()) {
 //							viewModels.add(new PostDisplayViewModel(answer.getPost(),
@@ -124,74 +155,149 @@ public class QuestionListViewController {
 //									this::refresh)
 //								);
 //						}
-					}
-					
-					observableVMs = FXCollections.observableArrayList(viewModels);
-					view.getForumListView().setItems(observableVMs);
-				});
-			}
+				}
+
+				observableVMs = FXCollections.observableArrayList(questionViewModels);
+				// Display the questions
+				view.getForumListView().setItems(observableVMs);
+			});
+
 		});
-		
-		
+
 //		observableVMs.indexOf(viewModels);
 		
-		AppCache.getInstance().getInitialDataProperty().addListener((_, _, questionsWithAnswersAndPermissions) -> {	
-			
-			if (questionsWithAnswersAndPermissions != null) {
-				Platform.runLater(() -> {
-					int index = 0;
+		// Search observableVMs structure for question by ID
+		// Insert backwards into the slot where the ID is
+		
+
+		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
+			if (answersWithPermissions == null)
+				return;
+
+			Platform.runLater(() -> {
+				
+				int parentQuestionID = 0;
+				
+				for(PostWithPermissions answerWithPermissions : answersWithPermissions) {
+					parentQuestionID = ((Answer)answerWithPermissions.getPost()).getQuestionId();
+					break;
+				}
+				
+//				int insertIndex = 0;
+//				
+//				for(int i = 0; i < observableVMs.size(); i++) {
+//					if(observableVMs.get(i).getPost().getPostType() == IPost.Type.Question &&
+//							observableVMs.get(i).getPost().getId().equals(parentQuestionID)) {
+//						insertIndex = i + 1;
+//						break;
+//					}
+//				}
+				
+				List<PostDisplayViewModel> answerInserts = new ArrayList<>();
+				
+
+				for (PostWithPermissions answerWithPermissions : answersWithPermissions) {
+					PostDisplayViewModel vm = new PostDisplayViewModel(
+							answerWithPermissions.getPost(),
+							answerWithPermissions.getPermissions(), 
+							userSession, 
+							id -> {
+								try {
+									answerService.deleteAnswer(id);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}, post -> {
+								try {
+									answerService.addAnswer((Answer) post);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}, (id, newBody, isCorrect) -> {
+								try {
+									answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}, () -> {
+								this.expand(answerWithPermissions.getPost().getId());
+							},
+							this::refresh
+					);
+//					vm.setIsHidden(true);
+
+					boolean alreadyAdded = observableVMs.stream()
+							.anyMatch(v -> v.getPost().getId().equals(vm.getPost().getId()));
 					
-					for (QuestionWithAnswersAndPermissions questionWithAnswersAndPermissions : questionsWithAnswersAndPermissions) {
-						index += 1;
-						
+					
+					if (!alreadyAdded)
+						answerInserts.add(vm);
+					
+//					observableVMs.addAll(insertIndex, answerInserts);
+					
+					
+				}
+				
+				answerMap.put(parentQuestionID, answerInserts);
 
-						
-						List<PostDisplayViewModel> answerInserts = new ArrayList<>();
-						
-						
-						for (PostWithPermissions answerWithPermissions : questionWithAnswersAndPermissions.getAnswersWithPermissions()) {
-							PostDisplayViewModel vm = new PostDisplayViewModel(answerWithPermissions.getPost(),
-									answerWithPermissions.getPermissions(), 
-									userSession, 
-									id -> {
-										try {
-											answerService.deleteAnswer(id);
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-									}, post -> {
-										try {
-											answerService.addAnswer((Answer) post);
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-									}, (id, newBody, isCorrect) -> {
-										try {
-											answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-									}, 
-									this::refresh
-							);
-							//vm.setIsHidden(true);
-							System.out.println(vm.isQuestion());
-							boolean alreadyAdded = viewModels.stream()
-								    .anyMatch(v -> v.getPost().getId().equals(vm.getPost().getId()));
-							
-							if(!alreadyAdded)
-								answerInserts.add(vm);
-						}
-						
-						observableVMs.addAll(index, answerInserts);
-						
-						index += answerInserts.size();
-					}
-
-					view.getForumListView().setItems(observableVMs);
-				});
-			}
+//				view.getForumListView().setItems(observableVMs);
+			});
 		});
+
+//		AppCache.getInstance().getInitialDataProperty().addListener((_, _, questionsWithAnswersAndPermissions) -> {
+//			if (questionsWithAnswersAndPermissions == null)
+//				return;
+//			
+//			Platform.runLater(() -> {
+//				int index = 0;
+//
+//				for (QuestionWithAnswersAndPermissions questionWithAnswersAndPermissions : questionsWithAnswersAndPermissions) {
+//					index += 1;
+//
+//					List<PostDisplayViewModel> answerInserts = new ArrayList<>();
+//
+//					for (PostWithPermissions answerWithPermissions : questionWithAnswersAndPermissions
+//							.getAnswersWithPermissions()) {
+//						PostDisplayViewModel vm = new PostDisplayViewModel(answerWithPermissions.getPost(),
+//								answerWithPermissions.getPermissions(), userSession, id -> {
+//									try {
+//										answerService.deleteAnswer(id);
+//									} catch (Exception e) {
+//										e.printStackTrace();
+//									}
+//								}, post -> {
+//									try {
+//										answerService.addAnswer((Answer) post);
+//									} catch (Exception e) {
+//										e.printStackTrace();
+//									}
+//								}, (id, newBody, isCorrect) -> {
+//									try {
+//										answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
+//									} catch (Exception e) {
+//										e.printStackTrace();
+//									}
+//								}, this::refresh);
+//						// vm.setIsHidden(true);
+//						System.out.println(vm.isQuestion());
+//						boolean alreadyAdded = viewModels.stream()
+//								.anyMatch(v -> v.getPost().getId().equals(vm.getPost().getId()));
+//
+//						if (!alreadyAdded)
+//							answerInserts.add(vm);
+//					}
+//
+//					System.out.println("index is: " + index);
+//					System.out.println("size is: " + observableVMs.size());
+//					observableVMs.addAll(index, answerInserts);
+//
+//					index += answerInserts.size();
+//				}
+//
+//				view.getForumListView().setItems(observableVMs);
+//			});
+//
+//		});
 
 //		try {
 //			List<Question> allQuestions = questionService.getAllQuestions();

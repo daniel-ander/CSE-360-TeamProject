@@ -66,13 +66,11 @@ public class PreLoader {
     	ExecutorService executor = Executors.newSingleThreadExecutor();
     	
     	executor.submit(() -> {
-    		List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(20); // magic number for now
-    		Map<Integer, List<Answer>> answers = new HashMap<>();
-            Map<Integer, List<String>> permissions = new HashMap<>();
+    		List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(20);
             
             List<QuestionWithAnswersAndPermissions> questionsAndAnswersAndPermissions = new ArrayList<>();
             List<PostWithPermissions> questionsWithPermissions = new ArrayList<>();
-            List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
+            
             
             // Getting the first batch of pre-loaded questions
             for (Question question : initialDisplayQuestions) {
@@ -84,14 +82,16 @@ public class PreLoader {
             
             AppCache.getInstance().setInitialQuestionsData(questionsWithPermissions);
             
+            List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
+            
             // Filling out the first batch with answers
             for (Question question : initialDisplayQuestions) {
-                List<String> userQuestionPermissions = permissionService
-                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
+//                List<String> userQuestionPermissions = permissionService
+//                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
                 
                 answersWithPermissions = new ArrayList<>();
                 
-                answersWithPermissions.add(new PostWithPermissions(question, userQuestionPermissions));
+//                answersWithPermissions.add(new PostWithPermissions(question, userQuestionPermissions));
                 
                 
                 List<Answer> initialAnswers = answerService.getAnswersByQuestionID(question.getId());
@@ -99,15 +99,19 @@ public class PreLoader {
                 for(Answer answer : initialAnswers) {
                 	List<String> userAnswerPermissions = permissionService
                 			.getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
-                	
+                	System.out.println(answer.getBodyText());
                 	answersWithPermissions.add(new PostWithPermissions(answer, userAnswerPermissions));
+                	
                 }
                 
-                questionsAndAnswersAndPermissions.add(new QuestionWithAnswersAndPermissions(question, userQuestionPermissions, answersWithPermissions));
+                
+                AppCache.getInstance().setAnswersData(answersWithPermissions);
+                
+//                questionsAndAnswersAndPermissions.add(new QuestionWithAnswersAndPermissions(question, userQuestionPermissions, answersWithPermissions));
                 
             }
             
-            AppCache.getInstance().setInitialDataProperty(questionsAndAnswersAndPermissions);
+//            AppCache.getInstance().setInitialDataProperty(questionsAndAnswersAndPermissions);
             
             // Fetching all records
 //    		for (Question q : initialDisplayQuestions) {

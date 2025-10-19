@@ -17,6 +17,7 @@ public class PostDisplayViewModel {
   
     private final UserSession userSession;
     private boolean isEditingQuestion = false;
+    private boolean isExpanded = false;
     private BooleanProperty isCommenting = new SimpleBooleanProperty(false);
     private boolean isHidden = false;
     
@@ -25,6 +26,7 @@ public class PostDisplayViewModel {
     private final Consumer<IPost> addCallBack;
     private final TriConsumer<Integer, String, String> updateCallBack;
     private final Runnable refreshEntries;
+    private final Runnable expand;
     
 
     public PostDisplayViewModel(
@@ -34,6 +36,7 @@ public class PostDisplayViewModel {
     		Consumer<Integer> deleteCallBack,
     		Consumer<IPost> addCallBack,
     		TriConsumer<Integer, String, String> updateCallBack,
+    		Runnable expand,
     		Runnable refreshEntries
     	) {
         this.post = post;
@@ -42,6 +45,7 @@ public class PostDisplayViewModel {
         this.deleteCallback = deleteCallBack;
         this.addCallBack = addCallBack;
         this.updateCallBack = updateCallBack;
+        this.expand = expand;
         this.refreshEntries = refreshEntries;
     }
     
@@ -80,6 +84,10 @@ public class PostDisplayViewModel {
     	return isHidden;
     }
     
+    public boolean getIsExpanded() {
+    	return isExpanded;
+    }
+    
     // ===================
     // 		 SETTERS 
  	// ===================
@@ -96,6 +104,11 @@ public class PostDisplayViewModel {
     	this.isHidden = isHidden;
     }
     
+    // Displaying children elements
+    public void setIsExpanded(boolean isExpanded) {
+    	this.isExpanded = isExpanded;
+    }
+    
     // ===================
     // 		 CRUD 
  	// ===================
@@ -104,6 +117,10 @@ public class PostDisplayViewModel {
     	deleteCallback.accept(post.getId());
     	
     	refreshEntries.run();
+    }
+    
+    public void expand() {
+    	this.expand.run();
     }
     
     public void updatePost(String newTitle, String newBody) {

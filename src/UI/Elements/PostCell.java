@@ -31,6 +31,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
 	private final Button updateButton = new Button("Edit");
+	private final Button expandButton = new Button("Expand");
 
 	public PostCell() {
 		titleLabel.setWrapText(true);
@@ -72,6 +73,22 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	    if (empty || vm.getPost() == null) {
 	        setGraphic(null);
 	        return;
+	    }
+	    
+	    if(vm.getIsHidden()) {
+	    	setGraphic(null);
+	    	setManaged(false);
+	    	setPrefHeight(0);
+	    	setMinHeight(0);
+	    	setMaxHeight(0);
+//	    	outerMostContainer.getChildren().clear();
+	    	return;
+	    } else {
+	    	setManaged(true);
+	    	setPrefHeight(Region.USE_COMPUTED_SIZE);
+	    	setMinHeight(Region.USE_COMPUTED_SIZE);
+	    	setMaxHeight(Region.USE_COMPUTED_SIZE);
+	    	setGraphic(outerMostContainer);
 	    }
 
 	    actionsContainer.getChildren().clear();
@@ -174,14 +191,13 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	                break;
 	        }
 	    }
-	    if(vm.getIsHidden()) {
-	    	setGraphic(null);
-	    	setPrefHeight(0);
-	    	setMinHeight(0);
-	    } else {
-	    	setPrefHeight(Region.USE_COMPUTED_SIZE);
-	    	setGraphic(outerMostContainer);
-	    }
+	    
+	    expandButton.setOnMouseClicked(_ -> {
+	    	vm.expand();
+	    	vm.setIsExpanded(!vm.getIsExpanded());
+	    });
+	    
+        actionsContainer.getChildren().add(expandButton);
 	}
 
 	private String formatStatus(Question q) {
