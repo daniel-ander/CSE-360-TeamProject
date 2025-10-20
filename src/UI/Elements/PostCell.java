@@ -31,7 +31,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
 	private final Button updateButton = new Button("Edit");
-	private final Button expandButton = new Button("Expand");
+	private final Button toggleExpandButton = new Button("Expand");
 
 	public PostCell() {
 		titleLabel.setWrapText(true);
@@ -192,12 +192,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	        }
 	    }
 	    
-	    expandButton.setOnMouseClicked(_ -> {
-	    	vm.expand();
-	    	vm.setIsExpanded(!vm.getIsExpanded());
+	    toggleExpandButton.setOnMouseClicked(_ -> {
+	    	vm.toggleExpand();
+	    	toggleExpandButton.setText(vm.isExpanded() ? "Collapse" : "Expand");
 	    });
 	    
-        actionsContainer.getChildren().add(expandButton);
+        actionsContainer.getChildren().add(toggleExpandButton);
 	}
 
 	private String formatStatus(Question q) {

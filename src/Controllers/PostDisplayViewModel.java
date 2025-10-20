@@ -26,7 +26,7 @@ public class PostDisplayViewModel {
     private final Consumer<IPost> addCallBack;
     private final TriConsumer<Integer, String, String> updateCallBack;
     private final Runnable refreshEntries;
-    private final Runnable expand;
+    private final Runnable toggleExpand;
     
 
     public PostDisplayViewModel(
@@ -36,7 +36,7 @@ public class PostDisplayViewModel {
     		Consumer<Integer> deleteCallBack,
     		Consumer<IPost> addCallBack,
     		TriConsumer<Integer, String, String> updateCallBack,
-    		Runnable expand,
+    		Runnable toggleExpand,
     		Runnable refreshEntries
     	) {
         this.post = post;
@@ -45,7 +45,7 @@ public class PostDisplayViewModel {
         this.deleteCallback = deleteCallBack;
         this.addCallBack = addCallBack;
         this.updateCallBack = updateCallBack;
-        this.expand = expand;
+        this.toggleExpand = toggleExpand;
         this.refreshEntries = refreshEntries;
     }
     
@@ -84,7 +84,7 @@ public class PostDisplayViewModel {
     	return isHidden;
     }
     
-    public boolean getIsExpanded() {
+    public boolean isExpanded() {
     	return isExpanded;
     }
     
@@ -119,8 +119,9 @@ public class PostDisplayViewModel {
     	refreshEntries.run();
     }
     
-    public void expand() {
-    	this.expand.run();
+    public void toggleExpand() {
+    	setIsExpanded(!isExpanded());
+    	this.toggleExpand.run();
     }
     
     public void updatePost(String newTitle, String newBody) {
