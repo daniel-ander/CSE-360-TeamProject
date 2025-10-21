@@ -199,6 +199,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	    
         actionsContainer.getChildren().add(toggleExpandButton);
 	}
+	
+	public Button getToggleExpandButton() {
+		return toggleExpandButton;
+	}
 
 	private String formatStatus(Question q) {
 		var parts = new java.util.ArrayList<String>();

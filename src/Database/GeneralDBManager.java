@@ -167,7 +167,10 @@ public class GeneralDBManager implements IGeneralDBManager {
 
 		String populateAnswersTable = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, authorName, body, isCorrect, upvoteCount) VALUES "
 				+ "(1, NULL, 1, 'student', 'Polymorphism allows methods to behave differently based on the object.', FALSE, 4),"
+				+ "(1, NULL, 1, 'student', 'Polymorphism is very useful.', FALSE, 4),"
 				+ "(1, 1, 2, 'instructor', 'Great explanation! Could you give a code example?', FALSE, 2),"
+				+ "(1, 1, 2, 'instructor', 'Very nice!', FALSE, 2),"
+				+ "(1, 1, 3, 'reviewer', 'Interesting.', FALSE, 2),"
 				+ "(2, NULL, 3, 'reviewer', 'Use .equals() for content comparison, == for reference.', FALSE, 5),"
 				+ "(2, 3, 4, 'admin1', 'Thanks for clearing that up!', FALSE, 1),"
 				+ "(3, NULL, 2, 'instructor', 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, 3),"

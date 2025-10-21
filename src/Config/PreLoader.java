@@ -68,7 +68,6 @@ public class PreLoader {
     	executor.submit(() -> {
     		List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(20);
             
-            List<QuestionWithAnswersAndPermissions> questionsAndAnswersAndPermissions = new ArrayList<>();
             List<PostWithPermissions> questionsWithPermissions = new ArrayList<>();
             
             
@@ -86,53 +85,22 @@ public class PreLoader {
             
             // Filling out the first batch with answers
             for (Question question : initialDisplayQuestions) {
-//                List<String> userQuestionPermissions = permissionService
-//                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
-                
+
                 answersWithPermissions = new ArrayList<>();
-                
-//                answersWithPermissions.add(new PostWithPermissions(question, userQuestionPermissions));
-                
-                
+
                 List<Answer> initialAnswers = answerService.getAnswersByQuestionID(question.getId());
                 
                 for(Answer answer : initialAnswers) {
                 	List<String> userAnswerPermissions = permissionService
                 			.getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
-                	System.out.println(answer.getBodyText());
                 	answersWithPermissions.add(new PostWithPermissions(answer, userAnswerPermissions));
                 	
                 }
                 
-                
                 AppCache.getInstance().setAnswersData(answersWithPermissions);
-                
-//                questionsAndAnswersAndPermissions.add(new QuestionWithAnswersAndPermissions(question, userQuestionPermissions, answersWithPermissions));
-                
+                                
             }
             
-//            AppCache.getInstance().setInitialDataProperty(questionsAndAnswersAndPermissions);
-            
-            // Fetching all records
-//    		for (Question q : initialDisplayQuestions) {
-//    			answers.put(q.getId(), answerService.getAnswersByQuestionID(q.getId()));
-//    			permissions.put(q.getId(), permissionService.getEffectivePermissions(
-//                	userSession.getCurrentUserId(), q.getId(), IPost.Type.Question));
-//            }
-//    		
-//    		AppCache.getInstance().setInitialData(new PreloadedDataStore(initialDisplayQuestions, answers, permissions));
-//    		
-//    		List<Question> allQuestions = questionService.getAllQuestions();
-//    		answers = new HashMap<>();
-//            permissions = new HashMap<>();
-//            
-//    		for (Question q : initialDisplayQuestions) {
-//                answers.put(q.getId(), answerService.getAnswersByQuestionID(q.getId()));
-//                permissions.put(q.getId(), permissionService.getEffectivePermissions(
-//                	userSession.getCurrentUserId(), q.getId(), IPost.Type.Question));
-//            }
-//    		
-//    		AppCache.getInstance().setFullData(new PreloadedDataStore(allQuestions, answers, permissions));
     	});
     }
 }

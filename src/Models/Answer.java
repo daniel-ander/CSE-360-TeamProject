@@ -47,8 +47,8 @@ public class Answer implements IPost {
 		}
 		
 		this.id = id;
-		this.questionId = questionId; // -1 represents that it is not assigned
-		this.parentAnswerId = parentAnswerId; // -1 represents that it is not a reply to another answer
+		this.questionId = questionId; 
+		this.parentAnswerId = parentAnswerId; 
 		this.authorId = authorId;
 		this.authorName = authorName;
 		this.bodyText = bodyText;

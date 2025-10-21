@@ -100,7 +100,7 @@ public class AnswerRepository implements IAnswerRepository {
 				Answer a = new Answer(
 						rs.getInt("id"),
 						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
+						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
@@ -128,7 +128,7 @@ public class AnswerRepository implements IAnswerRepository {
 				Answer a = new Answer(
 						rs.getInt("id"),
 						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
+						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),

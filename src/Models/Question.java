@@ -82,7 +82,6 @@ public class Question implements IPost {
 
 	@Override
 	public String getBodyText() {
-		// TODO Auto-generated method stub
 		return text;
 	}
 
