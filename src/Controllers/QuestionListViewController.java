@@ -6,23 +6,21 @@ import Models.Question;
 
 import Sessions.UserSession;
 
+import Utils.KeyPairHolder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import Config.AppCache;
 import Database.DBConnectionStore;
-import Database.IGeneralDBManager;
 import Database.Services.Interfaces.IAnswerService;
-import Database.Services.Interfaces.IPermissionService;
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
-import DisplayModels.QuestionWithAnswersAndPermissions;
 import Exceptions.DBExceptions.DataAccessException;
 
 import UI.Elements.QuestionListView;
@@ -34,33 +32,22 @@ import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 public class QuestionListViewController {
-	private final DBConnectionStore dBConnectionStore;
-	private final IGeneralDBManager generalDBManager;
 	private final IQuestionService questionService;
 	private final IAnswerService answerService;
-	private final IPermissionService permissionService;
 	private final List<PostDisplayViewModel> questionViewModels = new ArrayList<>();
 	private ObservableList<PostDisplayViewModel> observableVMs;
-	private final Map<Integer, List<PostDisplayViewModel>> questionAnswersMap = new HashMap<>();
-	private final Map<Integer, List<PostDisplayViewModel>> parentAnswerMap = new HashMap<>();
-	private final Map<Integer, List<PostDisplayViewModel>> parentQuestionMap = new HashMap<>();
+	private final Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> postParentMap = new HashMap<>();
+//	private final Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> postParentMap = new HashMap<>();
 	private final UserSession userSession;
 	private final QuestionListView view;
-	private final Stage primaryStage;
-	Map<Integer, Set<Integer>> answers = new HashMap<>();
 
 	public QuestionListViewController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession,
 			QuestionListView view) {
 		this.view = view;
-		this.generalDBManager = dBConnectionStore.getGeneralDBManager();
 		this.questionService = dBConnectionStore.getQuestionService();
 		this.answerService = dBConnectionStore.getAnswerService();
-		this.permissionService = dBConnectionStore.getPermissionService();
 
-		this.primaryStage = primaryStage;
 		this.userSession = userSession;
-
-		this.dBConnectionStore = dBConnectionStore;
 
 		setUpActions();
 		// initializeListeners();
@@ -71,54 +58,93 @@ public class QuestionListViewController {
 	// SETTERS
 	// ===================
 
-	private void toggleExpand(int postIdToToggle, IPost.Type postType) {
+	private void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDs, IPost.Type postType) {
 		
+		if(postType == IPost.Type.Answer) {
+//			System.out.println("The keys are: " + questionAnswerIDs);
+//			System.out.println("The size is: " + parentAnswerMap.size());
+			for(Entry<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> key : postParentMap.entrySet()) {
+				System.out.println("Read Keys: " + key);
+			}
+//			System.out.println("The size of sub is: " + parentAnswerMap.get(questionAnswerIDs));
+		}
 		
-		PostDisplayViewModel vm = observableVMs.stream()
+		PostDisplayViewModel currentPostVM = observableVMs.stream()
 			    .filter(v -> v.getPost().getId().equals(postIdToToggle) && v.getPost().getPostType() == postType)
 			    .findFirst()
 			    .orElse(null);
 		
-		if(vm == null) return;
+		if(currentPostVM == null) return;
 		
-		Map<Integer, List<PostDisplayViewModel>> answers = vm.isQuestion() ? parentQuestionMap
-				: parentAnswerMap;
+		
+		Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> answers = currentPostVM.isQuestion() ? postParentMap
+				: postParentMap;
 
-		int postIndex = IntStream.range(0, observableVMs.size())
+		int currentPostIndex = IntStream.range(0, observableVMs.size())
 				.filter(i -> observableVMs.get(i).getPost().getId().equals(postIdToToggle)
-						&& (vm.isQuestion() ? observableVMs.get(i).isQuestion()
+						&& (currentPostVM.isQuestion() ? observableVMs.get(i).isQuestion()
 								: !observableVMs.get(i).isQuestion()))
 									.findFirst().orElse(-1);
 
 		boolean lookingForNextQuestion = true;
-		int indexPointer = postIndex + 1;
+		int indexPointer = currentPostIndex + 1;
 		int nextQuestionIndex = indexPointer;
 		
 		while(lookingForNextQuestion) {
+			// [Q1, A1, A2, --> END/NULL <--] OR [Q1, A1, A2, --> Q2 <--, A1]
 			if(observableVMs.get(indexPointer) == null || observableVMs.get(indexPointer).isQuestion()) {
 				nextQuestionIndex = indexPointer;
 				break;
 			}
-			
+
 			indexPointer++;
 		}
-		
-		System.out.println("current post index: " + postIndex);
+
+		System.out.println("current post index: " + currentPostIndex);
 		System.out.println("next question index: " + nextQuestionIndex);
-		
-		if (vm.isExpanded()) {
-			for (int i = answers.get(postIdToToggle).size() - 1; i >= 0; i--) {
-				observableVMs.add(postIndex + 1, answers.get(postIdToToggle).get(i));
+
+		if (currentPostVM.isExpanded()) {
+			for (int i = answers.get(questionAnswerIDs).size() - 1; i >= 0; i--) {
+				PostDisplayViewModel child = answers.get(questionAnswerIDs).get(i);
+
+				child.setDepthLevel(currentPostVM.getDepthLevel() + 1);
+
+				observableVMs.add(currentPostIndex + 1, child);
+				
+//				 If the leaf comment doesn't have any sub-comments
+				if (postParentMap.get(questionAnswerIDs) == null && !currentPostVM.isQuestion()) {
+					currentPostVM.setDoesHaveChildren(false);
+				}
+
 			}
 		} else {
 			int answerOffSetIndex = nextQuestionIndex - 1;
-			
-			if(!vm.isQuestion()) {
-				answerOffSetIndex = parentAnswerMap.get(postIdToToggle).size() + postIndex;
-			}
-			for (int i = answerOffSetIndex; i > postIndex; i--) {
-			    observableVMs.remove(i);
-			}
+
+		    if (!currentPostVM.isQuestion()) {
+		        answerOffSetIndex = postParentMap.get(questionAnswerIDs).size() + currentPostIndex;
+		    }
+
+		    List<PostDisplayViewModel> children = answers.get(questionAnswerIDs);
+		    if (children != null) {
+		        for (PostDisplayViewModel child : children) {
+		            child.setIsExpanded(false); 
+
+		            Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> subMap = child.isQuestion()
+		                    ? postParentMap
+		                    : postParentMap;
+
+		            List<PostDisplayViewModel> subChildren = subMap.get(questionAnswerIDs);
+		            if (subChildren != null) {
+		                for (PostDisplayViewModel subChild : subChildren) {
+		                    subChild.setIsExpanded(false);
+		                }
+		            }
+		        }
+		    }
+
+		    for (int i = answerOffSetIndex; i > currentPostIndex; i--) {
+		        observableVMs.remove(i);
+		    }
 
 		}
 	}
@@ -131,8 +157,10 @@ public class QuestionListViewController {
 			Platform.runLater(() -> {
 				for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
 					// TODO: - Add button action to expand
-					PostDisplayViewModel vm = new PostDisplayViewModel(questionWithPermissions.getPost(),
-							questionWithPermissions.getPermissions(), userSession, id -> {
+					PostDisplayViewModel vm = new PostDisplayViewModel(
+							questionWithPermissions.getPost(),
+							questionWithPermissions.getPermissions(), 
+							userSession, id -> {
 								try {
 									answerService.deleteAnswer(id);
 								} catch (Exception e) {
@@ -151,8 +179,14 @@ public class QuestionListViewController {
 									e.printStackTrace();
 								}
 							}, () -> {
-								this.toggleExpand(questionWithPermissions.getPost().getId(), IPost.Type.Question);
+								this.toggleExpand(
+										questionWithPermissions.getPost().getId(), 
+										new KeyPairHolder<Integer, Integer>(
+												questionWithPermissions.getPost().getId(), null), 
+										IPost.Type.Question
+								);
 							}, this::refresh);
+					vm.setDepthLevel(0);
 					
 					questionViewModels.add(vm);
 				}
@@ -167,16 +201,19 @@ public class QuestionListViewController {
 			if (answersWithPermissions == null)
 				return;
 
-			Platform.runLater(() -> {
+			Platform.runLater(() -> {  
 
 				for (PostWithPermissions answerWithPermissions : answersWithPermissions) {
-
+					
 					Integer parentAnswerId = ((Answer) answerWithPermissions.getPost()).getParentAnswerId();
+					int parentQuestionId = ((Answer) answerWithPermissions.getPost()).getQuestionId();
+					
+					KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId, parentAnswerId);
+					
 					boolean isChildOfAnswer = parentAnswerId != null;
-					Map<Integer, List<PostDisplayViewModel>> answerMap = isChildOfAnswer ? parentAnswerMap : parentQuestionMap;
-					Integer immediateParentId = parentAnswerId != null ? 
-							parentAnswerId : 
-								((Answer) answerWithPermissions.getPost()).getQuestionId();
+					Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> answerMap = 
+							isChildOfAnswer ? postParentMap : postParentMap;
+					
 					
 						PostDisplayViewModel vm = new PostDisplayViewModel(
 								answerWithPermissions.getPost(),
@@ -201,17 +238,19 @@ public class QuestionListViewController {
 										e.printStackTrace();
 									}
 								}, () -> {
-									this.toggleExpand(answerWithPermissions.getPost().getId(), IPost.Type.Answer);
+									this.toggleExpand(answerWithPermissions.getPost().getId(), keys, IPost.Type.Answer);
 								}, 
 								this::refresh
-						);
-
-						if (answerMap.containsKey(immediateParentId)) {
-							answerMap.get(immediateParentId).add(vm);
+						);						
+						
+						if (answerMap.containsKey(keys)) {
+							System.out.println("Added keys: " + keys);
+							answerMap.get(keys).add(vm);
 						} else {
+							System.out.println("Added keys: " + keys);
 							List<PostDisplayViewModel> newList = new ArrayList<>();
 							newList.add(vm);
-							answerMap.put(immediateParentId, newList);
+							answerMap.put(keys, newList);
 						}
 
 					}				
@@ -318,7 +357,7 @@ public class QuestionListViewController {
 	private void setViewQuestionButtonAction() {
 		// View question → switch to detail page
 		view.getViewQuestionButton().setOnAction(_ -> {
-			PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
+//			PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
 
 //			if (selectedQuestionVM != null) {
 //				AnswerListView detailView = new AnswerListView();
@@ -335,50 +374,5 @@ public class QuestionListViewController {
 //			}
 		});
 	}
-
-	private void calculateDepths(List<Answer> answers) {
-		Map<Integer, Integer> depthMap = new HashMap<>();
-		Map<Integer, Answer> answerById = new HashMap<>();
-		for (Answer a : answers) {
-			answerById.put(a.getId(), a);
-			if (Debug.isEnabled) {
-				System.out.println("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
-			}
-		}
-
-		for (Answer answer : answers) {
-			int depth = 0;
-			int parentId = answer.getParentAnswerId();
-			if (Debug.isEnabled) {
-				System.out.println("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
-			}
-
-			while (parentId > 0 && depth < 10) { // Prevent infinite loops
-				depth++;
-				Integer knownDepth = depthMap.get(parentId);
-				if (knownDepth != null) {
-					depth += knownDepth;
-					break;
-				}
-				Answer parentAnswer = answerById.get(parentId);
-				if (parentAnswer == null)
-					break;
-				parentId = parentAnswer.getParentAnswerId();
-			}
-			depthMap.put(answer.getId(), depth);
-			answer.setReplyDepth(depth);
-			if (Debug.isEnabled) {
-				System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
-			}
-		}
-	}
-
-//    private void initializeListeners() {
-//    	AppCache.getInstance().getInitialDataProperty().addListener((obs, newValue, oldValue) -> {
-//    		if(newValue != null) {
-//    			
-//    		}
-//    	});
-//    }
 
 }

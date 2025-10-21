@@ -3,7 +3,7 @@ package UI.Elements;
 import Controllers.PostDisplayViewModel;
 import Models.Answer;
 import Models.Question;
-
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -111,7 +111,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	        
 	        spacer.setPrefWidth(0);
 	    } else {
-	    	int leftPadding = (((Answer) vm.getPost()).getReplyDepth() + 1) * 40;
+	    	int leftPadding = vm.getDepthLevel() * 40;
 	    	spacer.setPrefWidth(leftPadding);
 	        
 	    	layout.getChildren().remove(titleStackPane);
@@ -192,9 +192,18 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	        }
 	    }
 	    
+	    toggleExpandButton.textProperty().bind(Bindings
+	    	    .when(vm.getExpandedProperty())
+	    	    .then("Collapse")
+	    	    .otherwise("Expand"));
+	    
+	    // TODO:- Figure this out
+//	    toggleExpandButton.visibleProperty().bind( 
+//	    	vm.getDoesHaveChildren()
+//	    );
+	    
 	    toggleExpandButton.setOnMouseClicked(_ -> {
 	    	vm.toggleExpand();
-	    	toggleExpandButton.setText(vm.isExpanded() ? "Collapse" : "Expand");
 	    });
 	    
         actionsContainer.getChildren().add(toggleExpandButton);

@@ -17,9 +17,11 @@ public class PostDisplayViewModel {
   
     private final UserSession userSession;
     private boolean isEditingQuestion = false;
-    private boolean isExpanded = false;
+    private BooleanProperty isExpanded = new SimpleBooleanProperty(false);
     private BooleanProperty isCommenting = new SimpleBooleanProperty(false);
+    private BooleanProperty doesHaveChildren = new SimpleBooleanProperty(true);
     private boolean isHidden = false;
+    private int depthLevel;
     
     
     private final Consumer<Integer> deleteCallback;
@@ -55,6 +57,10 @@ public class PostDisplayViewModel {
 
     public IPost getPost() { return post; }
     public List<String> getPermissionList() { return permissionList; }
+    
+    public int getDepthLevel() {
+    	return depthLevel;
+    }
 
     public boolean getIsEditingQuestion() {
     	return isEditingQuestion;
@@ -62,6 +68,10 @@ public class PostDisplayViewModel {
     
     public BooleanProperty getIsCommenting() {
     	return isCommenting;
+    }
+    
+    public BooleanProperty getDoesHaveChildren() {
+    	return doesHaveChildren;
     }
     
     public String getMainLabelText() {
@@ -85,12 +95,20 @@ public class PostDisplayViewModel {
     }
     
     public boolean isExpanded() {
-    	return isExpanded;
+    	return isExpanded.get();
     }
     
     // ===================
     // 		 SETTERS 
  	// ===================
+    
+    public void setDoesHaveChildren(boolean doesHaveChildren) {
+    	this.doesHaveChildren = new SimpleBooleanProperty(doesHaveChildren);
+    }
+    
+    public void setDepthLevel(int level) {
+    	this.depthLevel = level;
+    }
     
     public void setIsEditing(boolean isEditing) {
     	this.isEditingQuestion = isEditing;
@@ -106,7 +124,11 @@ public class PostDisplayViewModel {
     
     // Displaying children elements
     public void setIsExpanded(boolean isExpanded) {
-    	this.isExpanded = isExpanded;
+    	this.isExpanded.setValue(isExpanded);;
+    }
+    
+    public BooleanProperty getExpandedProperty() {
+        return isExpanded;
     }
     
     // ===================
