@@ -91,21 +91,16 @@ public class QuestionListViewController {
 									.findFirst().orElse(-1);
 
 		boolean lookingForNextQuestion = true;
-		int currentQuestionIndex = postIndex + 1;
-		int nextQuestionIndex = currentQuestionIndex;
+		int indexPointer = postIndex + 1;
+		int nextQuestionIndex = indexPointer;
 		
 		while(lookingForNextQuestion) {
-			if(observableVMs.get(currentQuestionIndex) == null) {
-				nextQuestionIndex = currentQuestionIndex;
+			if(observableVMs.get(indexPointer) == null || observableVMs.get(indexPointer).isQuestion()) {
+				nextQuestionIndex = indexPointer;
 				break;
 			}
 			
-			if(observableVMs.get(currentQuestionIndex).isQuestion()) {
-				nextQuestionIndex = currentQuestionIndex;
-				break;
-			}
-			
-			currentQuestionIndex++;
+			indexPointer++;
 		}
 		
 		System.out.println("current post index: " + postIndex);
@@ -116,7 +111,12 @@ public class QuestionListViewController {
 				observableVMs.add(postIndex + 1, answers.get(postIdToToggle).get(i));
 			}
 		} else {
-			for (int i = nextQuestionIndex - 1; i > postIndex; i--) {
+			int answerOffSetIndex = nextQuestionIndex - 1;
+			
+			if(!vm.isQuestion()) {
+				answerOffSetIndex = parentAnswerMap.get(postIdToToggle).size() + postIndex;
+			}
+			for (int i = answerOffSetIndex; i > postIndex; i--) {
 			    observableVMs.remove(i);
 			}
 
