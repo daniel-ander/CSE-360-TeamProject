@@ -102,7 +102,7 @@ public class Answer implements IPost {
 	// this lets the answer print out correctly
     @Override
     public String toString() {
-        return "A" + id + ": " + bodyText + (isCorrect ? " (Correct)" : "");
+        return "A" + id + ": " + bodyText + (isCorrect ? " (Correct)" : "") + "Answer Parent id: " + this.parentAnswerId;
     }
 
 	@Override

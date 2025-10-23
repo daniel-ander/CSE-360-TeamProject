@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+
 import java.util.stream.IntStream;
 
 import Config.AppCache;
@@ -58,41 +58,51 @@ public class QuestionListViewController {
 	// SETTERS
 	// ===================
 
-	private void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDs, IPost.Type postType) {
+	private void toggleExpand(int postIdToToggle, int parentQuestionId, Integer parentAnswerId, KeyPairHolder<Integer, Integer> questionAnswerIDs,
+			IPost.Type postType) {
+
+//		if(postType == IPost.Type.Answer) {
+		////			System.out.println("The keys are: " + questionAnswerIDs);
+////			System.out.println("The size is: " + parentAnswerMap.size());
+//			for(Entry<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> key : postParentMap.entrySet()) {
+//				System.out.println("Read Keys: " + key);
+//			}
+		////			System.out.println("The size of sub is: " + parentAnswerMap.get(questionAnswerIDs));
+//		}
 		
-		if(postType == IPost.Type.Answer) {
-//			System.out.println("The keys are: " + questionAnswerIDs);
-//			System.out.println("The size is: " + parentAnswerMap.size());
-			for(Entry<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> key : postParentMap.entrySet()) {
-				System.out.println("Read Keys: " + key);
-			}
-//			System.out.println("The size of sub is: " + parentAnswerMap.get(questionAnswerIDs));
-		}
+//		System.out.println("The post id to toggle is: " + postIdToToggle);
+//		System.out.println("The parent question id to toggle is: " + parentQuestionId);
+//		System.out.println("The parent answer id to toggle is: " + parentAnswerId);
 		
+//		for(KeyPairHolder<Integer, Integer> q : postParentMap.keySet()) {
+//			System.out.println("For the keys" + q);
+//			for(PostDisplayViewModel v : postParentMap.get(q)) {
+//				System.out.println("The body is: " + v.getPost().getBodyText());
+//			}
+//		}
+
 		PostDisplayViewModel currentPostVM = observableVMs.stream()
-			    .filter(v -> v.getPost().getId().equals(postIdToToggle) && v.getPost().getPostType() == postType)
-			    .findFirst()
-			    .orElse(null);
-		
-		if(currentPostVM == null) return;
-		
-		
-		Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> answers = currentPostVM.isQuestion() ? postParentMap
-				: postParentMap;
+				.filter(v -> v.getPost().getId().equals(postIdToToggle) && v.getPost().getPostType() == postType)
+				.findFirst().orElse(null);
+
+		if (currentPostVM == null)
+			return;
 
 		int currentPostIndex = IntStream.range(0, observableVMs.size())
 				.filter(i -> observableVMs.get(i).getPost().getId().equals(postIdToToggle)
 						&& (currentPostVM.isQuestion() ? observableVMs.get(i).isQuestion()
 								: !observableVMs.get(i).isQuestion()))
-									.findFirst().orElse(-1);
+				.findFirst().orElse(-1);
+
+//		System.out.println("Current post index: " + currentPostIndex);
 
 		boolean lookingForNextQuestion = true;
 		int indexPointer = currentPostIndex + 1;
 		int nextQuestionIndex = indexPointer;
-		
-		while(lookingForNextQuestion) {
-			// [Q1, A1, A2, --> END/NULL <--] OR [Q1, A1, A2, --> Q2 <--, A1]
-			if(observableVMs.get(indexPointer) == null || observableVMs.get(indexPointer).isQuestion()) {
+
+		while (lookingForNextQuestion) {
+			// [Q1, A1, A2, --> END/NULL <--] OR [Current Question --> Q1, A1, A2, --> Q2 <--, A1]
+			if (observableVMs.get(indexPointer) == null || observableVMs.get(indexPointer).isQuestion()) {
 				nextQuestionIndex = indexPointer;
 				break;
 			}
@@ -100,18 +110,21 @@ public class QuestionListViewController {
 			indexPointer++;
 		}
 
-		System.out.println("current post index: " + currentPostIndex);
-		System.out.println("next question index: " + nextQuestionIndex);
+//		System.out.println(nextQuestionIndex);
 
 		if (currentPostVM.isExpanded()) {
-			for (int i = answers.get(questionAnswerIDs).size() - 1; i >= 0; i--) {
-				PostDisplayViewModel child = answers.get(questionAnswerIDs).get(i);
+//			System.out.println("Number of children: " + postParentMap.get(questionAnswerIDs).size());
+//			System.out.println("The final IDs is: " + questionAnswerIDs);
 
+			for (int i = postParentMap.get(questionAnswerIDs).size() - 1; i >= 0; i--) {
+				PostDisplayViewModel child = postParentMap.get(questionAnswerIDs).get(i);
+//				System.out.println(
+//						"Keys in toggle: " + questionAnswerIDs + "Body in toggle: " + child.getPost().getBodyText());
 				child.setDepthLevel(currentPostVM.getDepthLevel() + 1);
 
 				observableVMs.add(currentPostIndex + 1, child);
-				
-//				 If the leaf comment doesn't have any sub-comments
+
+				// If the leaf comment doesn't have any sub-comments
 				if (postParentMap.get(questionAnswerIDs) == null && !currentPostVM.isQuestion()) {
 					currentPostVM.setDoesHaveChildren(false);
 				}
@@ -120,36 +133,114 @@ public class QuestionListViewController {
 		} else {
 			int answerOffSetIndex = nextQuestionIndex - 1;
 
-		    if (!currentPostVM.isQuestion()) {
-		        answerOffSetIndex = postParentMap.get(questionAnswerIDs).size() + currentPostIndex;
-		    }
+			if (!currentPostVM.isQuestion()) {
+				answerOffSetIndex = postParentMap.get(questionAnswerIDs).size() + currentPostIndex;
+			}
 
-		    List<PostDisplayViewModel> children = answers.get(questionAnswerIDs);
-		    if (children != null) {
-		        for (PostDisplayViewModel child : children) {
-		            child.setIsExpanded(false); 
+			List<PostDisplayViewModel> children = postParentMap.get(questionAnswerIDs);
+			if (children != null) {
+				for (PostDisplayViewModel child : children) {
+					child.setIsExpanded(false);
 
-		            Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> subMap = child.isQuestion()
-		                    ? postParentMap
-		                    : postParentMap;
+					Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> subMap = child.isQuestion()
+							? postParentMap
+							: postParentMap;
 
-		            List<PostDisplayViewModel> subChildren = subMap.get(questionAnswerIDs);
-		            if (subChildren != null) {
-		                for (PostDisplayViewModel subChild : subChildren) {
-		                    subChild.setIsExpanded(false);
-		                }
-		            }
-		        }
-		    }
+					List<PostDisplayViewModel> subChildren = subMap.get(questionAnswerIDs);
+					if (subChildren != null) {
+						for (PostDisplayViewModel subChild : subChildren) {
+							subChild.setIsExpanded(false);
+						}
+					}
+				}
+			}
 
-		    for (int i = answerOffSetIndex; i > currentPostIndex; i--) {
-		        observableVMs.remove(i);
-		    }
+			for (int i = answerOffSetIndex; i > currentPostIndex; i--) {
+				observableVMs.remove(i);
+			}
 
 		}
 	}
 
 	public void refresh() {
+		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
+			if (answersWithPermissions == null)
+				return;
+
+			Platform.runLater(() -> {  
+
+				for (PostWithPermissions answerWithPermissions : answersWithPermissions) {
+					
+					Answer answer = (Answer) answerWithPermissions.getPost();
+					System.out.println("The answer is:" + answer);
+					final Integer parentAnswerId = answer.getParentAnswerId();
+					int parentQuestionId = answer.getQuestionId();
+
+//					System.out.println("Answer ID: " + answer.getId());
+//					System.out.println("Parent Question ID: " + parentQuestionId);
+//					System.out.println("Parent Answer ID: " + parentAnswerId);  // ← Is this null?
+//					System.out.println("Blah");
+//					if(parentAnswerId != null && parentAnswerId == 1) {
+//						System.out.println(answerWithPermissions.getPost().getBodyText());
+//					}
+					
+					final KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId, parentAnswerId);
+//					System.out.println("The parent answer ID is: " + parentAnswerId);
+//					System.out.println("They keys are: " + keys);
+//					Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> postPMap = new HashMap<>();
+						PostDisplayViewModel vm = new PostDisplayViewModel(
+								answerWithPermissions.getPost(),
+								answerWithPermissions.getPermissions(), 
+								userSession, 
+								id -> {
+									try {
+										answerService.deleteAnswer(id);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}, post -> {
+									try {
+										answerService.addAnswer((Answer) post);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}, (id, newBody, isCorrect) -> {
+									try {
+										answerService.updateAnswer(id, newBody, isCorrect.equals("yes"));
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}, () -> {
+//									System.out.println("_____________________");
+//									System.out.println("Keys again: " + keys + "\nHash code: " + keys.hashCode() + "\nDoes contain key: " +postParentMap.containsKey(keys) + "\nKeySet: " + postParentMap.keySet());
+//									System.out.println("_____________________");
+									KeyPairHolder<Integer, Integer> holder = new KeyPairHolder<Integer, Integer>(parentQuestionId, answerWithPermissions.getPost().getId());
+//									System.out.println("Holder is" + holder);
+									this.toggleExpand(
+											answerWithPermissions.getPost().getId(), 
+											parentQuestionId,
+											parentAnswerId,
+											holder, 
+											IPost.Type.Answer
+									);
+								}, 
+								this::refresh
+						);						
+						
+						if (postParentMap.containsKey(keys)) {
+//							System.out.println("Keys: " + keys + " Body: " + vm.getPost().getBodyText());
+							postParentMap.get(keys).add(vm);
+						} else {
+//							System.out.println("Keys: " + keys + " Body: " + vm.getPost().getBodyText());
+							List<PostDisplayViewModel> newList = new ArrayList<>();
+							newList.add(vm);
+							postParentMap.put(keys, newList);
+						}
+
+					}				
+			});
+		});
+		
 		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
 			if (questionsWithPermissions == null)
 				return;
@@ -174,15 +265,19 @@ public class QuestionListViewController {
 								}
 							}, (id, newBody, isCorrect) -> {
 								try {
-									answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
+									answerService.updateAnswer(id, newBody, isCorrect.equals("yes"));
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}, () -> {
 								this.toggleExpand(
 										questionWithPermissions.getPost().getId(), 
+										questionWithPermissions.getPost().getId(),
+										null,
 										new KeyPairHolder<Integer, Integer>(
-												questionWithPermissions.getPost().getId(), null), 
+												questionWithPermissions.getPost().getId(), 
+												null
+										), 
 										IPost.Type.Question
 								);
 							}, this::refresh);
@@ -195,66 +290,6 @@ public class QuestionListViewController {
 				view.getForumListView().setItems(observableVMs);
 			});
 
-		});
-
-		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
-			if (answersWithPermissions == null)
-				return;
-
-			Platform.runLater(() -> {  
-
-				for (PostWithPermissions answerWithPermissions : answersWithPermissions) {
-					
-					Integer parentAnswerId = ((Answer) answerWithPermissions.getPost()).getParentAnswerId();
-					int parentQuestionId = ((Answer) answerWithPermissions.getPost()).getQuestionId();
-					
-					KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId, parentAnswerId);
-					
-					boolean isChildOfAnswer = parentAnswerId != null;
-					Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> answerMap = 
-							isChildOfAnswer ? postParentMap : postParentMap;
-					
-					
-						PostDisplayViewModel vm = new PostDisplayViewModel(
-								answerWithPermissions.getPost(),
-								answerWithPermissions.getPermissions(), 
-								userSession, 
-								id -> {
-									try {
-										answerService.deleteAnswer(id);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}, post -> {
-									try {
-										answerService.addAnswer((Answer) post);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}, (id, newBody, isCorrect) -> {
-									try {
-										answerService.updateAnswer(id, newBody, isCorrect.equals("yes") ? true : false);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}, () -> {
-									this.toggleExpand(answerWithPermissions.getPost().getId(), keys, IPost.Type.Answer);
-								}, 
-								this::refresh
-						);						
-						
-						if (answerMap.containsKey(keys)) {
-							System.out.println("Added keys: " + keys);
-							answerMap.get(keys).add(vm);
-						} else {
-							System.out.println("Added keys: " + keys);
-							List<PostDisplayViewModel> newList = new ArrayList<>();
-							newList.add(vm);
-							answerMap.put(keys, newList);
-						}
-
-					}				
-			});
 		});
 
 	}

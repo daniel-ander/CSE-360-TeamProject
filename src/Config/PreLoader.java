@@ -7,13 +7,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Controllers.PostDisplayViewModel;
 import Database.DBConnectionStore;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IPermissionService;
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
-import DisplayModels.QuestionWithAnswersAndPermissions;
+
 import Exceptions.DBExceptions.DataAccessException;
 import Models.Answer;
 import Models.IPost;
@@ -85,7 +84,6 @@ public class PreLoader {
             
             // Filling out the first batch with answers
             for (Question question : initialDisplayQuestions) {
-
                 answersWithPermissions = new ArrayList<>();
 
                 List<Answer> initialAnswers = answerService.getAnswersByQuestionID(question.getId());

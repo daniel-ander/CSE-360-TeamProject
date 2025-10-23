@@ -173,6 +173,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "(1, 1, 3, 'reviewer', 'Interesting.', FALSE, 2),"
 				+ "(2, NULL, 3, 'reviewer', 'Use .equals() for content comparison, == for reference.', FALSE, 5),"
 				+ "(2, 3, 4, 'admin1', 'Thanks for clearing that up!', FALSE, 1),"
+				+ "(2, 6, 4, 'admin1', 'Second one!', FALSE, 1),"
 				+ "(3, NULL, 2, 'instructor', 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, 3),"
 				+ "(4, NULL, 5, 'staff', 'ExecutorService is a good way to manage threads.', FALSE, 2),"
 				+ "(4, 6, 1, 'student', 'Definitely agree, especially with fixed thread pool.', FALSE, 1),"
