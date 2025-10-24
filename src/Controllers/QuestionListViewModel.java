@@ -44,30 +44,14 @@ public class QuestionListViewModel {
 	public void populateQuestions(List<PostWithPermissions> questionsWithPermissions) {
 		for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
 			// TODO: - Add button action to expand
-			PostDisplayViewModel vm = new PostDisplayViewModel(questionWithPermissions.getPost(),
-					questionWithPermissions.getPermissions(), userSession, id -> {
-						try {
-							answerService.deleteAnswer(id);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}, post -> {
-						try {
-							answerService.addAnswer((Answer) post);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}, (id, newBody, isCorrect) -> {
-						try {
-							answerService.updateAnswer(id, newBody, isCorrect.equals("yes"));
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}, () -> {
-						this.toggleExpand(questionWithPermissions.getPost().getId(),
-								new KeyPairHolder<Integer, Integer>(questionWithPermissions.getPost().getId(), null),
-								IPost.Type.Question);
-					});
+			PostDisplayViewModel vm = buildPost(
+					questionWithPermissions.getPost(),
+					questionWithPermissions.getPermissions(),
+					questionWithPermissions.getPost().getId(),
+					null,
+					IPost.Type.Question
+			);
+
 			vm.setDepthLevel(0);
 
 			visiblePosts.add(vm);
@@ -84,31 +68,13 @@ public class QuestionListViewModel {
 			final KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId,
 					parentAnswerId);
 
-			PostDisplayViewModel vm = new PostDisplayViewModel(answerWithPermissions.getPost(),
-					answerWithPermissions.getPermissions(), userSession, id -> {
-						try {
-							answerService.deleteAnswer(id);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}, post -> {
-						try {
-							answerService.addAnswer((Answer) post);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}, (id, newBody, isCorrect) -> {
-						try {
-							answerService.updateAnswer(id, newBody, isCorrect.equals("yes"));
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}, () -> {
-						KeyPairHolder<Integer, Integer> holder = new KeyPairHolder<Integer, Integer>(parentQuestionId,
-								answerWithPermissions.getPost().getId());
-						
-						this.toggleExpand(answerWithPermissions.getPost().getId(), holder, IPost.Type.Answer);
-					});
+			PostDisplayViewModel vm = buildPost(
+					answerWithPermissions.getPost(),
+					answerWithPermissions.getPermissions(),
+					parentQuestionId,
+					answerWithPermissions.getPost().getId(),
+					IPost.Type.Answer
+			);
 
 			if (postParentMap.containsKey(keys)) {
 				postParentMap.get(keys).add(vm);
@@ -132,85 +98,137 @@ public class QuestionListViewModel {
 	public void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDs,
 			IPost.Type postType) {
 
-		PostDisplayViewModel currentPostVM = visiblePosts.stream()
-				.filter(v -> v.getPost().getId().equals(postIdToToggle) && v.getPost().getPostType() == postType)
-				.findFirst().orElse(null);
+		PostDisplayViewModel currentPostVM = getVisiblePostByID(postIdToToggle, postType);
 
 		if (currentPostVM == null)
 			return;
-
-		int currentPostIndex = IntStream.range(0, visiblePosts.size()).filter(i -> visiblePosts.get(i).getPost().getId()
+	
+		int currentPostIndex = getIndexOfVisiblePost(postIdToToggle, currentPostVM);
+		int nextQuestionIndex = findNextQuestionIndex(currentPostIndex);
+		
+		if (currentPostVM.isExpanded()) {
+	        expandChildren(currentPostVM, currentPostIndex, questionAnswerIDs);
+	    } else {
+	        collapseChildren(currentPostVM, currentPostIndex, nextQuestionIndex, questionAnswerIDs);
+	    }
+	}
+	
+	// ===================
+    // 		HELPERS 
+ 	// ===================
+	
+	private PostDisplayViewModel getVisiblePostByID(int postIdToToggle, IPost.Type postType) {
+		return visiblePosts.stream()
+				.filter(v -> v.getPost().getId().equals(postIdToToggle) && v.getPost().getPostType() == postType)
+				.findFirst().orElse(null);
+	}
+	
+	// [Q1, -->A1<--, A2, Q2] -- currentPostIndex 1 in this case 
+	private int getIndexOfVisiblePost(int postIdToToggle, PostDisplayViewModel selectedPostVM) {
+		return IntStream.range(0, visiblePosts.size()).filter(i -> visiblePosts.get(i).getPost().getId()
 				.equals(postIdToToggle)
-				&& (currentPostVM.isQuestion() ? visiblePosts.get(i).isQuestion() : !visiblePosts.get(i).isQuestion()))
+				&& (selectedPostVM.isQuestion() ? visiblePosts.get(i).isQuestion() : !visiblePosts.get(i).isQuestion()))
 				.findFirst().orElse(-1);
+	}
+	
+	private int findNextQuestionIndex(int currentIndex) {
+	    for (int i = currentIndex + 1; i < visiblePosts.size(); i++) {
+	        if (visiblePosts.get(i).isQuestion()) {
+	            return i;
+	        }
+	    }
+	    return visiblePosts.size();
+	}
+	
+	private void expandChildren(PostDisplayViewModel parent, int parentIndex, KeyPairHolder<Integer, Integer> keys) {
+	    List<PostDisplayViewModel> children = postParentMap.get(keys);
+	    if (children == null) return;
 
-		boolean lookingForNextQuestion = true;
-		int indexPointer = currentPostIndex + 1;
-		int nextQuestionIndex = indexPointer;
+	    for (int i = children.size() - 1; i >= 0; i--) {
+	        PostDisplayViewModel child = children.get(i);
+	        child.setDepthLevel(parent.getDepthLevel() + 1);
+	        visiblePosts.add(parentIndex + 1, child);
 
-		while (lookingForNextQuestion) {
-			// [Q1, A1, A2, --> END/NULL <--] OR [Current Question --> Q1, A1, A2, --> Q2
-			// <--, A1]
-			if (visiblePosts.get(indexPointer) == null || visiblePosts.get(indexPointer).isQuestion()) {
-				nextQuestionIndex = indexPointer;
-				break;
-			}
+	        KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(
+	                ((Answer) child.getPost()).getQuestionId(),
+	                child.getPost().getId()
+	        );
+	        
+	        // If child answer doesn't have any sub-answers
+	        if (postParentMap.get(childKeys) == null) {
+	            child.setDoesHaveChildren(false);
+	        }
+	    }
+	}
+	
+	
 
-			indexPointer++;
+	private void collapseChildren(PostDisplayViewModel currentPostVM, int currentPostIndex, int nextQuestionIndex,
+	                              KeyPairHolder<Integer, Integer> keys) {
+		int offsetToNextQuestion = nextQuestionIndex - 1;
+
+		if (!currentPostVM.isQuestion()) {
+			// [Q1, -->A1<--, A2, -->Q2<--] <-- Distance between answer and next question
+			offsetToNextQuestion = postParentMap.get(keys).size() + currentPostIndex;
 		}
 
-		if (currentPostVM.isExpanded()) {
-			for (int i = postParentMap.get(questionAnswerIDs).size() - 1; i >= 0; i--) {
-				PostDisplayViewModel child = postParentMap.get(questionAnswerIDs).get(i);
-				
-				child.setDepthLevel(currentPostVM.getDepthLevel() + 1);
+		List<PostDisplayViewModel> children = postParentMap.get(keys);
+		if (children != null) {
+			for (PostDisplayViewModel child : children) {
+				child.setIsExpanded(false);
 
-				visiblePosts.add(currentPostIndex + 1, child);
-				
-				int questionId = ((Answer)child.getPost()).getQuestionId();
-				int answerId = child.getPost().getId();
-				
-				KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(questionId, answerId);
-				
-				// If the leaf comment doesn't have any sub-comments
-				if (postParentMap.get(keys) == null) {
-					System.out.println("Keys are: " + keys);
-					child.setDoesHaveChildren(false);
-				}
+				Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> subMap = child.isQuestion()
+						? postParentMap
+						: postParentMap;
 
-			}
-		} else {
-			// [-->Q1<--, A1, A2, -->Q2<--] <-- Distance between the two questions
-			int offsetToNextQuestion = nextQuestionIndex - 1;
-
-			if (!currentPostVM.isQuestion()) {
-				// [Q1, -->A1<--, A2, -->Q2<--] <-- Distance between answer and next question
-				offsetToNextQuestion = postParentMap.get(questionAnswerIDs).size() + currentPostIndex;
-			}
-
-			List<PostDisplayViewModel> children = postParentMap.get(questionAnswerIDs);
-			if (children != null) {
-				for (PostDisplayViewModel child : children) {
-					child.setIsExpanded(false);
-
-					Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> subMap = child.isQuestion()
-							? postParentMap
-							: postParentMap;
-
-					List<PostDisplayViewModel> subChildren = subMap.get(questionAnswerIDs);
-					if (subChildren != null) {
-						for (PostDisplayViewModel subChild : subChildren) {
-							subChild.setIsExpanded(false);
-						}
+				List<PostDisplayViewModel> subChildren = subMap.get(keys);
+				if (subChildren != null) {
+					for (PostDisplayViewModel subChild : subChildren) {
+						subChild.setIsExpanded(false);
 					}
 				}
 			}
-
-			for (int i = offsetToNextQuestion; i > currentPostIndex; i--) {
-				visiblePosts.remove(i);
-			}
-
 		}
 
+		for (int i = offsetToNextQuestion; i > currentPostIndex; i--) {
+			visiblePosts.remove(i);
+		}
+	}
+	
+	private PostDisplayViewModel buildPost(
+			IPost post, 
+			List<String> permissions, 
+			int questionKeyID, 
+			Integer answerKeyID, 
+			IPost.Type postType
+	) {
+		return new PostDisplayViewModel(
+				post,
+				permissions, 
+				userSession, 
+				id -> {
+					try {
+						answerService.deleteAnswer(id);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}, newPost -> {
+					try {
+						answerService.addAnswer((Answer) newPost);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}, (id, newBody, isCorrect) -> {
+					try {
+						answerService.updateAnswer(id, newBody, isCorrect.equals("yes"));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}, () -> {
+					KeyPairHolder<Integer, Integer> questionAnswerKeyPair = new KeyPairHolder<Integer, Integer>(questionKeyID,
+							answerKeyID);
+					
+					this.toggleExpand(post.getId(), questionAnswerKeyPair, postType);
+				});
 	}
 }
