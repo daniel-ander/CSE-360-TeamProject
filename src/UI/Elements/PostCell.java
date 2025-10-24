@@ -202,11 +202,14 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 //	    	vm.getDoesHaveChildren()
 //	    );
 	    
+	    toggleExpandButton.visibleProperty().bind(vm.getDoesHaveChildren());
+	    toggleExpandButton.managedProperty().bind(vm.getDoesHaveChildren());
+	    
 	    toggleExpandButton.setOnMouseClicked(_ -> {
 	    	vm.toggleExpand();
 	    });
-	    
-        actionsContainer.getChildren().add(toggleExpandButton);
+
+	    actionsContainer.getChildren().add(toggleExpandButton);
 	}
 	
 	public Button getToggleExpandButton() {

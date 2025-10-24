@@ -71,7 +71,11 @@ public class ForumPageController {
         
         QuestionListView questionListView = view.getForumListView();
         new QuestionListViewController(
-            dBConnectionStore, primaryStage, userSession, questionListView
+            dBConnectionStore, 
+            primaryStage, 
+            userSession, 
+            new QuestionListViewModel(dBConnectionStore.getQuestionService(), dBConnectionStore.getAnswerService(), userSession), 
+            questionListView
         );
 
         // Place the list view in the center of the page layout

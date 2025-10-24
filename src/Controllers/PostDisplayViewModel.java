@@ -27,7 +27,6 @@ public class PostDisplayViewModel {
     private final Consumer<Integer> deleteCallback;
     private final Consumer<IPost> addCallBack;
     private final TriConsumer<Integer, String, String> updateCallBack;
-    private final Runnable refreshEntries;
     private final Runnable toggleExpand;
     
 
@@ -38,8 +37,7 @@ public class PostDisplayViewModel {
     		Consumer<Integer> deleteCallBack,
     		Consumer<IPost> addCallBack,
     		TriConsumer<Integer, String, String> updateCallBack,
-    		Runnable toggleExpand,
-    		Runnable refreshEntries
+    		Runnable toggleExpand
     	) {
         this.post = post;
         this.permissionList = permissionList;
@@ -48,7 +46,6 @@ public class PostDisplayViewModel {
         this.addCallBack = addCallBack;
         this.updateCallBack = updateCallBack;
         this.toggleExpand = toggleExpand;
-        this.refreshEntries = refreshEntries;
     }
     
     // ===================
@@ -103,7 +100,7 @@ public class PostDisplayViewModel {
  	// ===================
     
     public void setDoesHaveChildren(boolean doesHaveChildren) {
-    	this.doesHaveChildren = new SimpleBooleanProperty(doesHaveChildren);
+    	this.doesHaveChildren.set(doesHaveChildren);
     }
     
     public void setDepthLevel(int level) {
@@ -124,7 +121,7 @@ public class PostDisplayViewModel {
     
     // Displaying children elements
     public void setIsExpanded(boolean isExpanded) {
-    	this.isExpanded.setValue(isExpanded);;
+    	this.isExpanded.setValue(isExpanded);
     }
     
     public BooleanProperty getExpandedProperty() {
@@ -137,8 +134,6 @@ public class PostDisplayViewModel {
     
     public void deletePost() {
     	deleteCallback.accept(post.getId());
-    	
-    	refreshEntries.run();
     }
     
     public void toggleExpand() {
@@ -153,8 +148,6 @@ public class PostDisplayViewModel {
     		// A bit hacky, but I didn't see a better option here
     		updateCallBack.accept(post.getId(), newBody, ((Answer)post).isCorrect() ? "yes" : "no");
     	}
-    	
-    	refreshEntries.run();
     }
     
     public void addAnswer(String newTitleText, String newBodyText) {
@@ -166,7 +159,5 @@ public class PostDisplayViewModel {
     	}
     	
     	addCallBack.accept(newAnswer);
-    	
-    	refreshEntries.run();
     }
 }

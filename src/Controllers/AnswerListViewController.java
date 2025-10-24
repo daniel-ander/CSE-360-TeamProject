@@ -197,7 +197,13 @@ public class AnswerListViewController {
         view.getBackButton().setOnAction(_ -> {
             QuestionListView forumView = new QuestionListView();
 
-            new QuestionListViewController(dbConnectionStore, primaryStage, userSession, forumView);
+            new QuestionListViewController(
+            		dbConnectionStore, 
+            		primaryStage, 
+            		userSession, 
+            		new QuestionListViewModel(dbConnectionStore.getQuestionService(), answerService, userSession), 
+            		forumView
+            );
 
             Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
             primaryStage.setScene(forumScene);
