@@ -44,7 +44,7 @@ public class QuestionListViewModel {
 	public void populateQuestions(List<PostWithPermissions> questionsWithPermissions) {
 		for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
 			// TODO: - Add button action to expand
-			PostDisplayViewModel vm = buildPost(
+			PostDisplayViewModel vm = buildAnswer(
 					questionWithPermissions.getPost(),
 					questionWithPermissions.getPermissions(),
 					questionWithPermissions.getPost().getId(),
@@ -68,7 +68,7 @@ public class QuestionListViewModel {
 			final KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId,
 					parentAnswerId);
 
-			PostDisplayViewModel vm = buildPost(
+			PostDisplayViewModel vm = buildAnswer(
 					answerWithPermissions.getPost(),
 					answerWithPermissions.getPermissions(),
 					parentQuestionId,
@@ -176,13 +176,6 @@ public class QuestionListViewModel {
 		if (children != null) {
 			for (PostDisplayViewModel child : children) {
 				child.setIsExpanded(false);
-
-				List<PostDisplayViewModel> subChildren = postParentMap.get(keys);
-				if (subChildren != null) {
-					for (PostDisplayViewModel subChild : subChildren) {
-						subChild.setIsExpanded(false);
-					}
-				}
 			}
 		}
 
@@ -191,7 +184,7 @@ public class QuestionListViewModel {
 		}
 	}
 	
-	private PostDisplayViewModel buildPost(
+	private PostDisplayViewModel buildAnswer(
 			IPost post, 
 			List<String> permissions, 
 			int questionKeyID, 
