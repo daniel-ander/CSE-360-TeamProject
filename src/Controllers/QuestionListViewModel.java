@@ -1,9 +1,11 @@
 package Controllers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import Database.Services.Interfaces.IAnswerService;
@@ -13,6 +15,7 @@ import Models.Answer;
 import Models.IPost;
 import Sessions.UserSession;
 import Utils.KeyPairHolder;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -44,13 +47,9 @@ public class QuestionListViewModel {
 	public void populateQuestions(List<PostWithPermissions> questionsWithPermissions) {
 		for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
 			// TODO: - Add button action to expand
-			PostDisplayViewModel vm = buildAnswer(
-					questionWithPermissions.getPost(),
-					questionWithPermissions.getPermissions(),
-					questionWithPermissions.getPost().getId(),
-					null,
-					IPost.Type.Question
-			);
+			PostDisplayViewModel vm = buildPost(questionWithPermissions.getPost(),
+					questionWithPermissions.getPermissions(), questionWithPermissions.getPost().getId(), null,
+					IPost.Type.Question);
 
 			vm.setDepthLevel(0);
 
@@ -68,19 +67,16 @@ public class QuestionListViewModel {
 			final KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId,
 					parentAnswerId);
 
-			PostDisplayViewModel vm = buildAnswer(
-					answerWithPermissions.getPost(),
-					answerWithPermissions.getPermissions(),
-					parentQuestionId,
-					answerWithPermissions.getPost().getId(),
-					IPost.Type.Answer
-			);
+			PostDisplayViewModel newAnswerVM = buildPost(answerWithPermissions.getPost(),
+					answerWithPermissions.getPermissions(), parentQuestionId, answerWithPermissions.getPost().getId(),
+					IPost.Type.Answer);
 
 			if (postParentMap.containsKey(keys)) {
-				postParentMap.get(keys).add(vm);
+				postParentMap.get(keys).add(newAnswerVM);
 			} else {
+				// If no record under the keys exists, we initialize a new list and insert it
 				List<PostDisplayViewModel> newList = new ArrayList<>();
-				newList.add(vm);
+				newList.add(newAnswerVM);
 				postParentMap.put(keys, newList);
 			}
 
@@ -95,84 +91,118 @@ public class QuestionListViewModel {
 		// build postParentMap and relationships
 	}
 
-	public void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDs,
+	public void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair,
 			IPost.Type postType) {
 
-		PostDisplayViewModel currentPostVM = getVisiblePostByID(postIdToToggle, postType);
+		PostDisplayViewModel selectedPostVM = getVisiblePostByID(postIdToToggle, postType);
 
-		if (currentPostVM == null)
+		if (selectedPostVM == null)
 			return;
-	
-		int currentPostIndex = getIndexOfVisiblePost(postIdToToggle, currentPostVM);
-		int nextQuestionIndex = findNextQuestionIndex(currentPostIndex);
-		
-		if (currentPostVM.isExpanded()) {
-	        expandChildren(currentPostVM, currentPostIndex, questionAnswerIDs);
-	    } else {
-	        collapseChildren(currentPostVM, currentPostIndex, nextQuestionIndex, questionAnswerIDs);
-	    }
+
+		int selectedPostIndex = getIndexOfVisiblePost(postIdToToggle, selectedPostVM);
+		int nextQuestionIndex = findNextQuestionIndex(selectedPostIndex);
+
+		if (selectedPostVM.isExpanded()) {
+			expandChildren(selectedPostVM, selectedPostIndex, questionAnswerIDKeyPair);
+		} else {
+			collapseChildren(selectedPostVM, selectedPostIndex, nextQuestionIndex, questionAnswerIDKeyPair);
+		}
+	}
+
+	public void addPost(Answer answerToAdd, IPost.Type postType) {
+		int questionId = answerToAdd.getQuestionId();
+		Integer parentAnswerId = answerToAdd.getParentAnswerId();
+		IPost.Type parentType = (parentAnswerId == null) ? IPost.Type.Question : IPost.Type.Answer;
+
+		List<String> permissions = List.of("COMMENT", "DELETE", "EDIT");
+
+		PostDisplayViewModel newPostVM = buildPost(answerToAdd, permissions, questionId, parentAnswerId,
+				IPost.Type.Answer);
+
+		int parentId = Objects.requireNonNullElse(parentAnswerId, questionId);
+		PostDisplayViewModel parentVM = getVisiblePostByID(parentId, parentType);
+		Integer parentIndex = (parentVM != null) ? getIndexOfVisiblePost(parentId, parentVM) : null;
+
+		newPostVM.setDepthLevel(parentVM.getDepthLevel() + 1);
+		parentVM.setDoesHaveChildren(true);
+
+		final KeyPairHolder<Integer, Integer> relationKey = new KeyPairHolder<>(questionId, parentAnswerId);
+		postParentMap.computeIfAbsent(relationKey, _ -> new ArrayList<>()).add(newPostVM);
+
+		if (parentVM != null) {
+			final KeyPairHolder<Integer, Integer> parentKey = new KeyPairHolder<>(questionId, parentAnswerId);
+			parentVM.setIsExpanded(true);
+			expandChildren(parentVM, parentIndex, parentKey);
+		} 
+	}
+
+	public void updateQuestion(int questionIdToUpdate, String labelText, String contentText) {
+		PostDisplayViewModel selectedPostVM = getVisiblePostByID(questionIdToUpdate, IPost.Type.Question);
+		selectedPostVM.setLabelTextProperty(labelText);
 	}
 	
+	public void updateAnswer(int answerIdToUpdate, String contentText, boolean isCorrect) {
+		PostDisplayViewModel selectedPostVM = getVisiblePostByID(answerIdToUpdate, IPost.Type.Answer);
+	}
+
 	// ===================
-    // 		HELPERS 
- 	// ===================
-	
+	// HELPERS
+	// ===================
+
 	private PostDisplayViewModel getVisiblePostByID(int postIdToToggle, IPost.Type postType) {
 		return visiblePosts.stream()
 				.filter(v -> v.getPost().getId().equals(postIdToToggle) && v.getPost().getPostType() == postType)
 				.findFirst().orElse(null);
 	}
-	
-	// [Q1, -->A1<--, A2, Q2] -- currentPostIndex 1 in this case 
+
+	// [Q1, -->A1<--, A2, Q2] -- currentPostIndex 1 in this case
 	private int getIndexOfVisiblePost(int postIdToToggle, PostDisplayViewModel selectedPostVM) {
 		return IntStream.range(0, visiblePosts.size()).filter(i -> visiblePosts.get(i).getPost().getId()
 				.equals(postIdToToggle)
 				&& (selectedPostVM.isQuestion() ? visiblePosts.get(i).isQuestion() : !visiblePosts.get(i).isQuestion()))
 				.findFirst().orElse(-1);
 	}
-	
+
 	private int findNextQuestionIndex(int currentIndex) {
-	    for (int i = currentIndex + 1; i < visiblePosts.size(); i++) {
-	        if (visiblePosts.get(i).isQuestion()) {
-	            return i;
-	        }
-	    }
-	    return visiblePosts.size();
+		for (int i = currentIndex + 1; i < visiblePosts.size(); i++) {
+			if (visiblePosts.get(i).isQuestion()) {
+				return i;
+			}
+		}
+		return visiblePosts.size();
 	}
-	
-	private void expandChildren(PostDisplayViewModel parent, int parentIndex, KeyPairHolder<Integer, Integer> keys) {
-	    List<PostDisplayViewModel> children = postParentMap.get(keys);
-	    if (children == null) return;
 
-	    for (int i = children.size() - 1; i >= 0; i--) {
-	        PostDisplayViewModel child = children.get(i);
-	        child.setDepthLevel(parent.getDepthLevel() + 1);
-	        visiblePosts.add(parentIndex + 1, child);
+	private void expandChildren(PostDisplayViewModel parentPost, int parentIndex,
+			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
+		List<PostDisplayViewModel> children = postParentMap.get(questionAnswerIDKeyPair);
+		if (children == null)
+			return;
 
-	        KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(
-	                ((Answer) child.getPost()).getQuestionId(),
-	                child.getPost().getId()
-	        );
-	        
-	        // If child answer doesn't have any sub-answers
-	        if (postParentMap.get(childKeys) == null) {
-	            child.setDoesHaveChildren(false);
-	        }
-	    }
+		for (int i = children.size() - 1; i >= 0; i--) {
+			PostDisplayViewModel child = children.get(i);
+			child.setDepthLevel(parentPost.getDepthLevel() + 1);
+			visiblePosts.add(parentIndex + 1, child);
+
+			KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(((Answer) child.getPost()).getQuestionId(),
+					child.getPost().getId());
+
+			// If child answer doesn't have any sub-answers
+			if (postParentMap.get(childKeys) == null) {
+				child.setDoesHaveChildren(false);
+			}
+		}
 	}
-	
-	
 
 	private void collapseChildren(PostDisplayViewModel currentPostVM, int currentPostIndex, int nextQuestionIndex,
-	                              KeyPairHolder<Integer, Integer> keys) {
+			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
 		int offsetToNextQuestion = nextQuestionIndex - 1;
 
 		if (!currentPostVM.isQuestion()) {
 			// [Q1, -->A1<--, A2, -->Q2<--] <-- Distance between answer and next question
-			offsetToNextQuestion = postParentMap.get(keys).size() + currentPostIndex;
+			offsetToNextQuestion = postParentMap.get(questionAnswerIDKeyPair).size() + currentPostIndex;
 		}
 
-		List<PostDisplayViewModel> children = postParentMap.get(keys);
+		List<PostDisplayViewModel> children = postParentMap.get(questionAnswerIDKeyPair);
 		if (children != null) {
 			for (PostDisplayViewModel child : children) {
 				child.setIsExpanded(false);
@@ -183,41 +213,44 @@ public class QuestionListViewModel {
 			visiblePosts.remove(i);
 		}
 	}
-	
-	private PostDisplayViewModel buildAnswer(
-			IPost post, 
-			List<String> permissions, 
-			int questionKeyID, 
-			Integer answerKeyID, 
-			IPost.Type postType
-	) {
-		return new PostDisplayViewModel(
-				post,
-				permissions, 
-				userSession, 
-				id -> {
-					try {
-						answerService.deleteAnswer(id);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}, newPost -> {
-					try {
-						answerService.addAnswer((Answer) newPost);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}, (id, newBody, isCorrect) -> {
-					try {
-						answerService.updateAnswer(id, newBody, isCorrect.equals("yes"));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}, () -> {
-					KeyPairHolder<Integer, Integer> questionAnswerKeyPair = new KeyPairHolder<Integer, Integer>(questionKeyID,
-							answerKeyID);
-					
-					this.toggleExpand(post.getId(), questionAnswerKeyPair, postType);
-				});
+
+	private PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
+			IPost.Type postType) {
+		return new PostDisplayViewModel(post, permissions, userSession, postId -> {
+			try {
+				if (postType == IPost.Type.Question) {
+					questionService.deleteQuestion(postId);
+				} else {
+					answerService.deleteAnswer(postId);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}, newPost -> {
+			try {
+				Answer postToAdd = (Answer) newPost;
+				answerService.addAnswer(postToAdd);
+				addPost(postToAdd, postType);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}, (id, mainText, secondaryText) -> {
+			try {
+				if (postType == IPost.Type.Question) {
+					questionService.updateQuestion(id, mainText, secondaryText);
+					updateQuestion(id, mainText, secondaryText);
+				} else {
+					answerService.updateAnswer(id, mainText, secondaryText.equals("yes"));
+					updateAnswer(id, mainText, secondaryText.equals("yes"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}, () -> {
+			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair = new KeyPairHolder<Integer, Integer>(questionKeyID,
+					answerKeyID);
+
+			this.toggleExpand(post.getId(), questionAnswerIDKeyPair, postType);
+		});
 	}
 }

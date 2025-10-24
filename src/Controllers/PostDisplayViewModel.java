@@ -8,8 +8,11 @@ import Models.IPost;
 import Models.Question;
 import Sessions.UserSession;
 import Utils.TriConsumer;
+
+import javafx.beans.property.StringProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 public class PostDisplayViewModel {
     private IPost post;
@@ -17,9 +20,11 @@ public class PostDisplayViewModel {
   
     private final UserSession userSession;
     private boolean isEditingQuestion = false;
-    private BooleanProperty isExpanded = new SimpleBooleanProperty(false);
-    private BooleanProperty isCommenting = new SimpleBooleanProperty(false);
-    private BooleanProperty doesHaveChildren = new SimpleBooleanProperty(true);
+    private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
+    private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
+    private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
+    
+    private StringProperty labelTextProperty = new SimpleStringProperty();
     private boolean isHidden = false;
     private int depthLevel;
     
@@ -64,11 +69,11 @@ public class PostDisplayViewModel {
     }
     
     public BooleanProperty getIsCommenting() {
-    	return isCommenting;
+    	return isCommentingProperty;
     }
     
     public BooleanProperty getDoesHaveChildren() {
-    	return doesHaveChildren;
+    	return doesHaveChildrenProperty;
     }
     
     public String getMainLabelText() {
@@ -77,6 +82,10 @@ public class PostDisplayViewModel {
     	} catch (ClassCastException e) {
     		return null;
     	}
+    }
+    
+    public StringProperty getLabelTextProperty() {
+    	return labelTextProperty;
     }
     
     public boolean isQuestion() {
@@ -92,7 +101,7 @@ public class PostDisplayViewModel {
     }
     
     public boolean isExpanded() {
-    	return isExpanded.get();
+    	return isExpandedProperty.get();
     }
     
     // ===================
@@ -100,7 +109,7 @@ public class PostDisplayViewModel {
  	// ===================
     
     public void setDoesHaveChildren(boolean doesHaveChildren) {
-    	this.doesHaveChildren.set(doesHaveChildren);
+    	this.doesHaveChildrenProperty.set(doesHaveChildren);
     }
     
     public void setDepthLevel(int level) {
@@ -112,7 +121,7 @@ public class PostDisplayViewModel {
     }
     
     public void setIsCommenting(boolean isCommenting) {
-    	this.isCommenting = new SimpleBooleanProperty(isCommenting);
+    	this.isCommentingProperty = new SimpleBooleanProperty(isCommenting);
     }
     
     public void setIsHidden(boolean isHidden) {
@@ -121,11 +130,15 @@ public class PostDisplayViewModel {
     
     // Displaying children elements
     public void setIsExpanded(boolean isExpanded) {
-    	this.isExpanded.setValue(isExpanded);
+    	this.isExpandedProperty.setValue(isExpanded);
+    }
+    
+    public void setLabelTextProperty(String newLabelText) {
+    	labelTextProperty.set(newLabelText);;
     }
     
     public BooleanProperty getExpandedProperty() {
-        return isExpanded;
+        return isExpandedProperty;
     }
     
     // ===================

@@ -90,6 +90,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	    	setMaxHeight(Region.USE_COMPUTED_SIZE);
 	    	setGraphic(outerMostContainer);
 	    }
+	    
+	    titleTextField.textProperty().bindBidirectional(vm.getLabelTextProperty());
 
 	    actionsContainer.getChildren().clear();
 
@@ -168,7 +170,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 	                    if (nowEditing) {
 	                        updateButton.setText("Commit Edit");
-	                        titleTextField.setText(vm.getPost().getTitleText());
+	                        titleTextField.setText(vm.getMainLabelText());
+
 	                        bodyTextField.setText(vm.getPost().getBodyText());
 	                        titleLabel.setVisible(false);
 	                        titleTextField.setVisible(true);
