@@ -177,11 +177,7 @@ public class QuestionListViewModel {
 			for (PostDisplayViewModel child : children) {
 				child.setIsExpanded(false);
 
-				Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> subMap = child.isQuestion()
-						? postParentMap
-						: postParentMap;
-
-				List<PostDisplayViewModel> subChildren = subMap.get(keys);
+				List<PostDisplayViewModel> subChildren = postParentMap.get(keys);
 				if (subChildren != null) {
 					for (PostDisplayViewModel subChild : subChildren) {
 						subChild.setIsExpanded(false);
