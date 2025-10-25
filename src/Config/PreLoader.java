@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import Controllers.PostDisplayViewModel;
 import Database.DBConnectionStore;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IPermissionService;
@@ -18,6 +19,7 @@ import Models.Answer;
 import Models.IPost;
 import Models.Question;
 import Sessions.UserSession;
+import Utils.KeyPairHolder;
 
 public class PreLoader {
 
@@ -93,10 +95,10 @@ public class PreLoader {
                 			.getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
                 	answersWithPermissions.add(new PostWithPermissions(answer, userAnswerPermissions));
                 	
+                	
                 }
                 
-                AppCache.getInstance().setAnswersData(answersWithPermissions);
-                                
+                AppCache.getInstance().setAnswersData(answersWithPermissions);         
             }
             
     	});

@@ -16,7 +16,7 @@ import Config.AppCache;
 import Database.DBConnectionStore;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IQuestionService;
-
+import DisplayModels.PostWithPermissions;
 import Exceptions.DBExceptions.DataAccessException;
 
 import UI.Elements.QuestionListView;
@@ -55,28 +55,64 @@ public class QuestionListViewController {
 	// ===================
 	// SETTERS
 	// ===================
-
-
+	
 	public void initializeListeners() {
-		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
-			if (answersWithPermissions == null)
-				return;
-
-			Platform.runLater(() -> {  
-				viewModel.populateAnswers(answersWithPermissions);			
-			});
-		});
+		System.out.println("Hey");
+		List<PostWithPermissions> initialQuestions = new ArrayList<>();
+		
+		if(AppCache.getInstance().areInitialQuestionsLoaded()) {
+			System.out.println("All loaded");
+			initialQuestions.addAll(AppCache.getInstance().getInitialQuestionData().get());
+			
+			viewModel.populateQuestions(initialQuestions);
+			view.getForumListView().setItems(viewModel.getVisiblePosts());
+		}
+		
+		if(AppCache.getInstance().areInitialAnswersLoaded()) {
+			System.out.println("All loaded");
+			viewModel.populateAnswers(AppCache.getInstance().getAllInitialAnswersDataProperty().get());
+		}
 		
 		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
 			if (questionsWithPermissions == null)
 				return;
 
 			Platform.runLater(() -> {
-				viewModel.populateQuestions(questionsWithPermissions);
+				// If something has changed since the last cached run
+				if(!initialQuestions.equals(questionsWithPermissions)) {
+					viewModel.populateQuestions(questionsWithPermissions);
+				}
 
 				view.getForumListView().setItems(viewModel.getVisiblePosts());
 			});
 
+		});
+		
+		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
+			if (answersWithPermissions == null)
+				return;
+
+			Platform.runLater(() -> { 
+				List<PostWithPermissions> newAnswers = new ArrayList<>();
+				for(PostWithPermissions answerWithPermissions : answersWithPermissions) {
+					boolean exists = AppCache.getInstance()
+						    .getAllInitialAnswersDataProperty()
+						    .get()
+						    .stream()
+						    .anyMatch(a -> a.getPost().getId() == answerWithPermissions.getPost().getId());
+
+						if (!exists) {
+						    continue;
+						} else {
+							// If does exist, check every property and replace if necessary
+						}
+					
+					newAnswers.add(answerWithPermissions);
+				}
+				
+				AppCache.getInstance().setAnswersData(newAnswers);
+				viewModel.populateAnswers(newAnswers);
+			});
 		});
 
 	}
