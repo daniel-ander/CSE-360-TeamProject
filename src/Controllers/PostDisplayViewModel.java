@@ -21,13 +21,15 @@ public class PostDisplayViewModel {
     private List<String> permissionList; // fetched from a service in the controller
   
     private final UserSession userSession;
-    private boolean isEditingQuestion = false;
+    private final BooleanProperty isEditingPost = new SimpleBooleanProperty(false);
     private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
     private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
+    private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
     private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
     private ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
     
     private StringProperty labelTextProperty = new SimpleStringProperty();
+    private StringProperty bodyTextProperty = new SimpleStringProperty();
     private boolean isHidden = false;
     private int depthLevel;
     
@@ -58,6 +60,8 @@ public class PostDisplayViewModel {
         this.addCallBack = addCallBack;
         this.updateCallBack = updateCallBack;
         this.toggleExpand = toggleExpand;
+        
+        bodyTextProperty.set(post.getBodyText());
     }
     
     // ===================
@@ -71,16 +75,16 @@ public class PostDisplayViewModel {
     	return depthLevel;
     }
 
-    public boolean getIsEditingQuestion() {
-    	return isEditingQuestion;
+    public BooleanProperty getIsEditingPostProperty() {
+    	return isEditingPost;
     }
     
     public FilterType getFilterType() {
     	return filterProperty.get();
     }
     
-    public boolean getIsCommenting() {
-    	return isCommentingProperty.get();
+    public BooleanProperty getIsCommentingProperty() {
+    	return isCommentingProperty;
     }
     
     public BooleanProperty getDoesHaveChildren() {
@@ -97,6 +101,10 @@ public class PostDisplayViewModel {
     
     public StringProperty getLabelTextProperty() {
     	return labelTextProperty;
+    }
+    
+    public StringProperty getBodyTextProperty() {
+    	return bodyTextProperty;
     }
     
     public boolean isQuestion() {
@@ -132,11 +140,11 @@ public class PostDisplayViewModel {
     }
     
     public void setIsEditing(boolean isEditing) {
-    	this.isEditingQuestion = isEditing;
+    	this.isEditingPost.set(isEditing);
     }
     
-    public void setIsCommenting(boolean isCommenting) {
-    	this.isCommentingProperty = new SimpleBooleanProperty(isCommenting);
+    public void setIsCommentingProperty(boolean isCommenting) {
+    	this.isCommentingProperty.set(isCommenting);;
     }
     
     public void setIsHidden(boolean isHidden) {
@@ -150,6 +158,10 @@ public class PostDisplayViewModel {
     
     public void setLabelTextProperty(String newLabelText) {
     	labelTextProperty.set(newLabelText);;
+    }
+    
+    public void setBodyTextProperty(String newBodyText) {
+    	bodyTextProperty.set(newBodyText);
     }
     
     public BooleanProperty getExpandedProperty() {

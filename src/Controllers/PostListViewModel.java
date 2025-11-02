@@ -106,7 +106,7 @@ public class PostListViewModel {
 		}
 	}
 
-	public void addPostToVisibleList(Answer answerToAdd, IPost.Type postType) {
+	public void addPostToVisibleList(Answer answerToAdd, boolean isInConstructionMode, IPost.Type postType) {
 		int questionId = answerToAdd.getQuestionId();
 		Integer parentAnswerId = answerToAdd.getParentAnswerId();
 		IPost.Type parentType = (parentAnswerId == null) ? IPost.Type.Question : IPost.Type.Answer;
@@ -119,6 +119,8 @@ public class PostListViewModel {
 
 		PostDisplayViewModel newPostVM = buildPost(answerToAdd, permissions, questionId, parentAnswerId,
 				IPost.Type.Answer);
+		
+//		newPostVM.setIsInConstructionProperty(isInConstructionMode);
 
 		int parentId = Objects.requireNonNullElse(parentAnswerId, questionId);
 		PostDisplayViewModel parentVM = getVisiblePostByID(parentId, parentType);
@@ -186,15 +188,23 @@ public class PostListViewModel {
 		
 		switch(parentPost.getFilterType()) {
 		case TIME:
-			children.sort(Comparator.comparing(child -> child.getPost().getCreatedTimestamp()));
-			// To have the newest ones at the top
-			children = children.reversed();
+			children.sort(
+				    Comparator.comparing(
+				        child -> child.getPost().getCreatedTimestamp(),
+				        Comparator.nullsFirst(Comparator.naturalOrder())
+				    )
+				);
 		default:
 			break;
 		}
+		
+		visiblePosts.removeAll(children);
 
 		for (int i = children.size() - 1; i >= 0; i--) {
 			PostDisplayViewModel child = children.get(i);
+			
+//			if(visiblePosts.contains(child)) continue;
+			
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
 			visiblePosts.add(visibleParentPostIndex + 1, child);
 
@@ -231,7 +241,7 @@ public class PostListViewModel {
 
 	private PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
 			IPost.Type postType) {
-		return new PostDisplayViewModel(
+		PostDisplayViewModel vm =  new PostDisplayViewModel(
 				post, 
 				permissions, 
 				userSession, 
@@ -247,12 +257,11 @@ public class PostListViewModel {
 					}
 				}, newPost -> {
 					try {
-						Answer postToAdd = (Answer) newPost;
+						Answer answerToAdd = (Answer) newPost;
 						
 						// The DB return includes fields like time stamps
-						Answer addedAnswer = answerService.addAnswer(postToAdd);
-						System.out.println("timestamp: " + addedAnswer.getCreatedTimestamp());
-						addPostToVisibleList(addedAnswer, postType);
+						Answer addedAnswer = answerService.addAnswer(answerToAdd);
+						addPostToVisibleList(addedAnswer, false, postType);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -274,5 +283,19 @@ public class PostListViewModel {
 
 					this.toggleExpand(post.getId(), questionAnswerIDKeyPair, postType);
 				});
-		}
+			
+//		vm.getIsCommentingProperty().addListener((_, _, isCommenting) -> {
+//			if(isCommenting) {
+//				int questionId = postType == IPost.Type.Question ? post.getId() : ((Answer)post).getQuestionId();
+//				Integer parentAnswerId = postType == IPost.Type.Question ? null : post.getId();
+//				
+//				Answer newAnswer = new Answer(questionId, parentAnswerId, userSession.getCurrentUserId(), userSession.getCurrentUserName(), "Default");
+//				addPostToVisibleList(newAnswer, true, IPost.Type.Answer);
+//			} else {
+//				
+//			}
+//		});
+		
+		return vm;
+	}
 }
