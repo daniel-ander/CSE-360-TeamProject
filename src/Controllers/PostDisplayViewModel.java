@@ -62,6 +62,11 @@ public class PostDisplayViewModel {
         this.toggleExpand = toggleExpand;
         
         bodyTextProperty.set(post.getBodyText());
+        
+        if (isQuestion()) {
+            labelTextProperty.set(((Question) post).getTitleText());
+        }
+        
     }
     
     // ===================

@@ -34,6 +34,16 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
     public PostCell() {
         // Setup wrapping and alignment
+    	bodyTextField.setWrapText(true);
+    	bodyTextField.setPrefRowCount(1); // start as one line
+
+    	bodyTextField.textProperty().addListener((obs, oldText, newText) -> {
+    	    Text text = new Text(newText);
+    	    text.setFont(bodyTextField.getFont());
+    	    double height = text.getLayoutBounds().getHeight() + 20; // add padding
+    	    bodyTextField.setPrefHeight(height);
+    	});
+    	
         bodyText.setFont(bodyTextField.getFont());
         bodyText.wrappingWidthProperty().bind(bodyTextField.widthProperty().subtract(20));
         bodyTextField.setWrapText(true);
@@ -72,7 +82,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     protected void updateItem(PostDisplayViewModel vm, boolean empty) {
         super.updateItem(vm, empty);
 
-        // --- Clean up old bindings and state ---
+        // Clean up old bindings and state
         if (currentVm != null) {
             try { titleLabel.textProperty().unbind(); } catch (Exception ignored) {}
             try { bodyText.textProperty().unbind(); } catch (Exception ignored) {}
@@ -83,17 +93,16 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         titleLabel.setText("");
         bodyText.setText("");
 
-        // --- Handle empty cells ---
         if (empty || vm == null || vm.getPost() == null) {
             setGraphic(null);
             currentVm = null;
             return;
         }
 
-        // --- Assign current ViewModel ---
+        // Assign current ViewModel
         currentVm = vm;
 
-        // --- Load text values manually ---
+        // Load text values manually
         String title = vm.getLabelTextProperty().get();
         String body = vm.getBodyTextProperty().get();
 
@@ -113,13 +122,13 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         titleLabel.setText(title);
         bodyText.setText(body);
 
-        // --- Manage visibility for edit vs view mode ---
+        // Manage visibility for edit vs view mode
         titleLabel.visibleProperty().bind(vm.getIsEditingPostProperty().not());
         titleTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
         bodyText.visibleProperty().bind(vm.getIsEditingPostProperty().not());
         bodyTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
 
-        // --- Handle edit commit/update ---
+        // Handle edit commit/update
         vm.getIsEditingPostProperty().addListener((obs, wasEditing, isEditing) -> {
             if (isEditing) {
                 // Load fresh values from VM when entering edit mode
@@ -135,12 +144,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             }
         });
 
-        // --- Comment field visibility ---
+        // Comment field visibility
         newCommentTextField.visibleProperty().bind(vm.getIsCommentingProperty());
         newCommentTextField.managedProperty().bind(vm.getIsCommentingProperty());
         newCommentTextField.clear();
 
-        // --- Configure layout depending on post type ---
+        // Configure layout depending on post type
         if (vm.isQuestion()) {
             titleStackPane.setVisible(true);
             titleStackPane.setManaged(true);
@@ -155,7 +164,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             spacer.setPrefWidth(vm.getDepthLevel() * 40);
         }
 
-        // --- Deleted posts handling ---
+        // Deleted posts handling
         if (vm.getIsDeleted()) {
             bodyText.setText("This message was deleted");
             bodyTextField.setText("This message was deleted");
@@ -165,7 +174,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             bodyTextField.setText(truncated);
         }
 
-        // --- Build actions (buttons) ---
+        // Build actions
         actionsContainer.getChildren().clear();
 
         for (String permission : vm.getPermissionList()) {
@@ -213,7 +222,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             }
         }
 
-        // --- Expand / Collapse button ---
+        // Expand / Collapse button
         toggleExpandButton.textProperty().bind(
                 Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand")
         );
@@ -222,12 +231,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         toggleExpandButton.setOnAction(_ -> vm.toggleExpand());
         actionsContainer.getChildren().add(toggleExpandButton);
 
-        // --- Finally, set the cell graphic ---
+        // Finally, set the cell graphic
         setGraphic(outerMostContainer);
     }
-
-
-
 
     public Button getToggleExpandButton() {
         return toggleExpandButton;
