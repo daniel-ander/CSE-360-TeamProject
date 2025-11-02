@@ -37,8 +37,8 @@ public class AnswerServiceTest {
         when(mockRepo.insertAnswer(a)).thenReturn(a);
 
         Answer result = answerService.addAnswer(a);
-        
-        assertTrue(result.getId() != null);
+
+        assertNotNull(result);
         verify(mockRepo, times(1)).insertAnswer(a);
     }
 

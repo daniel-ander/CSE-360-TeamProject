@@ -1,8 +1,7 @@
 package UI.Elements;
 
 import Controllers.PostDisplayViewModel;
-import Models.Answer;
-import Models.Question;
+
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -224,26 +223,17 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
         // Expand / Collapse button
         toggleExpandButton.textProperty().bind(
-                Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand")
+        		Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand")
         );
         toggleExpandButton.visibleProperty().bind(vm.getDoesHaveChildren());
         toggleExpandButton.managedProperty().bind(vm.getDoesHaveChildren());
         toggleExpandButton.setOnAction(_ -> vm.toggleExpand());
         actionsContainer.getChildren().add(toggleExpandButton);
 
-        // Finally, set the cell graphic
         setGraphic(outerMostContainer);
     }
 
     public Button getToggleExpandButton() {
         return toggleExpandButton;
-    }
-
-    private String formatStatus(Question q) {
-        var parts = new java.util.ArrayList<String>();
-        if (q.getAnsweredStatus()) parts.add("Answered");
-        if (q.getResolvedStatus()) parts.add("Resolved");
-        parts.add("Upvotes: " + q.getUpvoteCount());
-        return String.join(" • ", parts);
     }
 }
