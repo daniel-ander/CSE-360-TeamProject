@@ -74,7 +74,7 @@ public class ForumPageController {
             dBConnectionStore, 
             primaryStage, 
             userSession, 
-            new QuestionListViewModel(dBConnectionStore.getQuestionService(), dBConnectionStore.getAnswerService(), userSession), 
+            new PostListViewModel(dBConnectionStore.getQuestionService(), dBConnectionStore.getAnswerService(), userSession), 
             questionListView
         );
 

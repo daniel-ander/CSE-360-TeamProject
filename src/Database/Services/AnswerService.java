@@ -25,14 +25,14 @@ public class AnswerService implements IAnswerService {
  	// ===================
 	
 	@Override
-	public boolean addAnswer(Answer a) throws DataAccessException, DuplicateRecordIDException {
+	public Answer addAnswer(Answer a) throws DataAccessException, DuplicateRecordIDException {
 		try {
-			answerRepository.insertAnswer(a);
+			Answer createdAnswer = answerRepository.insertAnswer(a);
 			if (Debug.isEnabled) System.out.println("Answer added successfully.");
+			return createdAnswer;
 		} catch (SQLException e) {
 			throw new DataAccessException("Failed to add answer to database due to: " + e);
 		}
-		return true;
 	}
 	
 	// ===================

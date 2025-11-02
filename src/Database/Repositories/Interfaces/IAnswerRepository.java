@@ -13,7 +13,7 @@ public interface IAnswerRepository {
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException;
     public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException;
 	
-	public boolean insertAnswer(Answer a) throws SQLException;
+	public Answer insertAnswer(Answer a) throws SQLException;
 	
 	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException;
 	public boolean deleteAnswerById(int id) throws SQLException;

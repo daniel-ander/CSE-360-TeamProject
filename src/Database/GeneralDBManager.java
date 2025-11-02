@@ -73,13 +73,15 @@ public class GeneralDBManager implements IGeneralDBManager {
 
 		String forumQuestionsTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
 				+ "userId INT, " + "title VARCHAR(255), " + "body TEXT, "
+				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "answered BOOLEAN DEFAULT FALSE, "
 				+ "resolved BOOLEAN DEFAULT FALSE, " + "isDeleted BOOLEAN DEFAULT FALSE, "
 				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES %s(id))", questionTableName, userTableName);
 
 		String forumAnswersTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
 				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "authorName TEXT, " + "body TEXT, "
-				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "

@@ -13,6 +13,7 @@ import javafx.scene.text.FontWeight;
 
 public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final HBox outerMostContainer = new HBox();
+	private PostDisplayViewModel currentVm;
 	private final Region spacer = new Region();
 	private final VBox layout = new VBox();
 
@@ -75,6 +76,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	        return;
 	    }
 	    
+	    titleTextField.textProperty().unbindBidirectional(vm.getLabelTextProperty());
+	    
 	    if(vm.getIsHidden()) {
 	    	setGraphic(null);
 	    	setManaged(false);
@@ -101,31 +104,21 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	    newCommentTextField.clear();
 
 	    if (vm.isQuestion()) {
+	        titleStackPane.setVisible(true);
+	        titleStackPane.setManaged(true);
 	        titleLabel.setText(vm.getPost().getTitleText());
-	        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-	        statusLabel.setText(formatStatus((Question) vm.getPost()));
-
-	        titleLabel.setVisible(true);
-	        titleLabel.setManaged(true);
-
 	        statusLabel.setVisible(true);
 	        statusLabel.setManaged(true);
-	        
 	        spacer.setPrefWidth(0);
 	    } else {
-	    	int leftPadding = vm.getDepthLevel() * 40;
-	    	spacer.setPrefWidth(leftPadding);
-	        
-	    	layout.getChildren().remove(titleStackPane);
-	        titleLabel.setVisible(false);
-	        titleLabel.setManaged(false);
-
+	        titleStackPane.setVisible(false);
+	        titleStackPane.setManaged(false);
 	        statusLabel.setVisible(false);
 	        statusLabel.setManaged(false);
+	        spacer.setPrefWidth(vm.getDepthLevel() * 40);
 	    }
 	    
 	    if((vm.getIsDeleted())) {
-	    	System.out.println("Haha");
     		bodyTextLabel.setText("This message was deleted");
     	} else {
     		bodyTextLabel.setText(Utils.StringUtils.truncate(vm.getPost().getBodyText(), 150));
@@ -141,7 +134,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	            case "COMMENT":
 	                Button commentBtn = new Button("Comment");
 	                commentBtn.setOnAction(_ -> {
-	                    if (!vm.getIsCommenting().get()) {
+	                    if (!vm.getIsCommenting()) {
 	                        vm.setIsCommenting(true);
 	                        newCommentTextField.setVisible(true);
 	                        newCommentTextField.setManaged(true);

@@ -12,7 +12,8 @@ public class Answer implements IPost {
 	private Integer authorId;
 	private String authorName;
 	private Integer parentAnswerId;
-	private Timestamp timestamp;
+	private Timestamp createdTimestamp;
+	private Timestamp lastUpdatedTimestamp;
 	private boolean isDeleted;
 	private Integer upvoteCount;
 	private int replyDepth;
@@ -25,7 +26,7 @@ public class Answer implements IPost {
 	
 	// Constructor for creating a new nested answer (not yet in DB)
 	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText) {
-		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, false, false, 0);
+		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, false, 0);
 	}
 	
 	// Constructor for pulling from DB with all fields
@@ -36,7 +37,8 @@ public class Answer implements IPost {
 			Integer authorId, 
 			String authorName, 
 			String bodyText,
-			Timestamp timestamp, 
+			Timestamp createdTimestamp,
+			Timestamp lastUpdatedTimestamp, 
 			Integer upvoteCount, 
 			boolean isCorrect, 
 			boolean isDeleted, 
@@ -52,7 +54,8 @@ public class Answer implements IPost {
 		this.authorId = authorId;
 		this.authorName = authorName;
 		this.bodyText = bodyText;
-		this.timestamp = timestamp;
+		this.createdTimestamp = createdTimestamp;
+		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
 		this.upvoteCount = upvoteCount;
 		this.replyDepth = replyDepth;
 		
@@ -68,7 +71,8 @@ public class Answer implements IPost {
 	public Integer getAuthorId() {return authorId;}
 	public Integer getQuestionId() {return questionId;}
 	public Integer getParentAnswerId() {return parentAnswerId;}
-	public Timestamp getTimestamp() {return timestamp;}
+	public Timestamp getCreatedTimestamp() {return createdTimestamp;}
+	public Timestamp getLastUpdatedTimestamp() {return lastUpdatedTimestamp;}
 	public boolean getIsDeleted() {return isDeleted;}
 	public Integer getUpvoteCount() {return upvoteCount;}
 	public String getAuthorName() {return authorName;}
@@ -84,7 +88,8 @@ public class Answer implements IPost {
 	public void setIsDeleted(boolean deleted) { isDeleted = deleted;}
 	public void setUpvoteCount(int newCount) { upvoteCount = newCount;}
 	public void setParentAnswerId(int givenId) {parentAnswerId = givenId;}
-	public void setTimestamp(Timestamp newTimestamp) { timestamp = newTimestamp; }
+	public void setCreatedTimestamp(Timestamp newTimestamp) { createdTimestamp = newTimestamp; }
+	public void setLastUpdatedTimestamp(Timestamp newTimestamp) { lastUpdatedTimestamp = newTimestamp; }
 	public void setReplyDepth(int depth) { replyDepth = depth; }
 	public void setUserId(int newUserId) { authorId = newUserId; }
 	public void setId(int newId) { id = newId; }

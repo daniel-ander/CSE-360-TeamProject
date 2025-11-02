@@ -83,9 +83,11 @@ public class PreLoader {
             AppCache.getInstance().setInitialQuestionsData(questionsWithPermissions);
             
             List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
+            System.out.println("This here: " + initialDisplayQuestions.size());
             
             // Filling out the first batch with answers
             for (Question question : initialDisplayQuestions) {
+            	System.out.println("Printed");
                 answersWithPermissions = new ArrayList<>();
 
                 List<Answer> initialAnswers = answerService.getAnswersByQuestionID(question.getId());
@@ -94,7 +96,6 @@ public class PreLoader {
                 	List<String> userAnswerPermissions = permissionService
                 			.getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
                 	answersWithPermissions.add(new PostWithPermissions(answer, userAnswerPermissions));
-                	
                 	
                 }
                 

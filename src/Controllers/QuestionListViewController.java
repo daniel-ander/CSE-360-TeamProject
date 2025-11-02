@@ -4,17 +4,13 @@ import Models.Question;
 
 import Sessions.UserSession;
 
-import Utils.KeyPairHolder;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import java.util.List;
-import java.util.Map;
 
 import Config.AppCache;
 import Database.DBConnectionStore;
-import Database.Services.Interfaces.IAnswerService;
+
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
 import Exceptions.DBExceptions.DataAccessException;
@@ -29,7 +25,7 @@ import javafx.stage.Stage;
 
 public class QuestionListViewController {
 	private final IQuestionService questionService;
-	private final QuestionListViewModel viewModel;
+	private final PostListViewModel viewModel;
 
 	private final UserSession userSession;
 	private final QuestionListView view;
@@ -38,7 +34,7 @@ public class QuestionListViewController {
 			DBConnectionStore dBConnectionStore, 
 			Stage primaryStage, 
 			UserSession userSession, 
-			QuestionListViewModel viewModel,
+			PostListViewModel viewModel,
 			QuestionListView view
 	) {
 		this.view = view;
@@ -48,7 +44,6 @@ public class QuestionListViewController {
 		this.userSession = userSession;
 
 		setUpActions();
-		// initializeListeners();
 		initializeListeners();
 	}
 
@@ -57,11 +52,9 @@ public class QuestionListViewController {
 	// ===================
 	
 	public void initializeListeners() {
-		System.out.println("Hey");
 		List<PostWithPermissions> initialQuestions = new ArrayList<>();
 		
 		if(AppCache.getInstance().areInitialQuestionsLoaded()) {
-			System.out.println("All loaded");
 			initialQuestions.addAll(AppCache.getInstance().getInitialQuestionData().get());
 			
 			viewModel.populateQuestions(initialQuestions);
@@ -69,7 +62,6 @@ public class QuestionListViewController {
 		}
 		
 		if(AppCache.getInstance().areInitialAnswersLoaded()) {
-			System.out.println("All loaded");
 			viewModel.populateAnswers(AppCache.getInstance().getAllInitialAnswersDataProperty().get());
 		}
 		
@@ -114,6 +106,37 @@ public class QuestionListViewController {
 				viewModel.populateAnswers(newAnswers);
 			});
 		});
+//List<PostWithPermissions> initialQuestions = new ArrayList<>();
+//		
+//		if(AppCache.getInstance().areInitialQuestionsLoaded()) {
+//			initialQuestions.addAll(AppCache.getInstance().getInitialQuestionData().get());
+//			
+//			viewModel.populateQuestions(initialQuestions);
+//			view.getForumListView().setItems(viewModel.getVisiblePosts());
+//		}
+//		
+//		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
+//			if (questionsWithPermissions == null)
+//				return;
+//
+//			Platform.runLater(() -> {
+//				if(initialQuestions != questionsWithPermissions) {
+//					viewModel.populateQuestions(questionsWithPermissions);
+//				}
+//
+//				view.getForumListView().setItems(viewModel.getVisiblePosts());
+//			});
+//
+//		});
+//		
+//		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
+//			if (answersWithPermissions == null)
+//				return;
+//
+//			Platform.runLater(() -> {  
+//				viewModel.populateAnswers(answersWithPermissions);			
+//			});
+//		});
 
 	}
 
@@ -195,7 +218,6 @@ public class QuestionListViewController {
 	}
 
 	private void setDeleteQuestionButtonAction() {
-		System.out.println("Super pressed");
 		// Delete question
 		view.getDeleteQuestionButton().setOnAction(_ -> {
 			PostDisplayViewModel selectedQuestion = view.getForumListView().getSelectionModel().getSelectedItem();

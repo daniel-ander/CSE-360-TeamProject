@@ -1,25 +1,27 @@
 package Controllers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import Config.DefaultRolePermissions;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
+
 import Sessions.UserSession;
 import Utils.KeyPairHolder;
-import javafx.application.Platform;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class QuestionListViewModel {
+public class PostListViewModel {
 
 	private final ObservableList<PostDisplayViewModel> visiblePosts = FXCollections.observableArrayList();
 	private final Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> postParentMap = new HashMap<>();
@@ -28,7 +30,7 @@ public class QuestionListViewModel {
 	private final IAnswerService answerService;
 	private final UserSession userSession;
 
-	public QuestionListViewModel(IQuestionService questionService, IAnswerService answerService,
+	public PostListViewModel(IQuestionService questionService, IAnswerService answerService,
 			UserSession userSession) {
 		this.questionService = questionService;
 		this.answerService = answerService;
@@ -36,12 +38,7 @@ public class QuestionListViewModel {
 	}
 
 	public void refreshQuestions(List<PostWithPermissions> questions) {
-//        visiblePosts.clear();
-//        for (PostWithPermissions q : questions) {
-//            var vm = new PostDisplayViewModel(...);
-//            vm.setDepthLevel(0);
-//            visiblePosts.add(vm);
-//        }
+
 	}
 
 	public void populateQuestions(List<PostWithPermissions> questionsWithPermissions) {
@@ -62,7 +59,7 @@ public class QuestionListViewModel {
 			Answer answer = (Answer) answerWithPermissions.getPost();
 
 			int parentQuestionId = answer.getQuestionId();
-			final Integer parentAnswerId = answer.getParentAnswerId();
+			Integer parentAnswerId = answer.getParentAnswerId();
 
 			final KeyPairHolder<Integer, Integer> keys = new KeyPairHolder<Integer, Integer>(parentQuestionId,
 					parentAnswerId);
@@ -99,29 +96,33 @@ public class QuestionListViewModel {
 		if (selectedPostVM == null)
 			return;
 
-		int selectedPostIndex = getIndexOfVisiblePost(postIdToToggle, selectedPostVM);
+		int selectedPostIndex = getIndexOfVisiblePost(postIdToToggle, selectedPostVM.isQuestion());
 		int nextQuestionIndex = findNextQuestionIndex(selectedPostIndex);
 
-		if (selectedPostVM.isExpanded()) {
+		if (selectedPostVM.isExpandButtonPressed()) {
 			expandChildren(selectedPostVM, selectedPostIndex, questionAnswerIDKeyPair);
 		} else {
 			collapseChildren(selectedPostVM, selectedPostIndex, nextQuestionIndex, questionAnswerIDKeyPair);
 		}
 	}
 
-	public void addPost(Answer answerToAdd, IPost.Type postType) {
+	public void addPostToVisibleList(Answer answerToAdd, IPost.Type postType) {
 		int questionId = answerToAdd.getQuestionId();
 		Integer parentAnswerId = answerToAdd.getParentAnswerId();
 		IPost.Type parentType = (parentAnswerId == null) ? IPost.Type.Question : IPost.Type.Answer;
 
-		List<String> permissions = List.of("COMMENT", "DELETE", "EDIT");
+		List<String> permissions = List.of(
+				DefaultRolePermissions.AnswerPermissions.COMMENT.name(), 
+				DefaultRolePermissions.AnswerPermissions.DELETE.name(), 
+				DefaultRolePermissions.AnswerPermissions.EDIT.name()
+		);
 
 		PostDisplayViewModel newPostVM = buildPost(answerToAdd, permissions, questionId, parentAnswerId,
 				IPost.Type.Answer);
 
 		int parentId = Objects.requireNonNullElse(parentAnswerId, questionId);
 		PostDisplayViewModel parentVM = getVisiblePostByID(parentId, parentType);
-		Integer parentIndex = (parentVM != null) ? getIndexOfVisiblePost(parentId, parentVM) : null;
+		Integer parentIndex = (parentVM != null) ? getIndexOfVisiblePost(parentId, parentVM.isQuestion()) : null;
 
 		newPostVM.setDepthLevel(parentVM.getDepthLevel() + 1);
 		parentVM.setDoesHaveChildren(true);
@@ -156,10 +157,10 @@ public class QuestionListViewModel {
 	}
 
 	// [Q1, -->A1<--, A2, Q2] -- currentPostIndex 1 in this case
-	private int getIndexOfVisiblePost(int postIdToToggle, PostDisplayViewModel selectedPostVM) {
+	private int getIndexOfVisiblePost(int postIdToToggle, boolean isQuestion) {
 		return IntStream.range(0, visiblePosts.size()).filter(i -> visiblePosts.get(i).getPost().getId()
 				.equals(postIdToToggle)
-				&& (selectedPostVM.isQuestion() ? visiblePosts.get(i).isQuestion() : !visiblePosts.get(i).isQuestion()))
+				&& (isQuestion ? visiblePosts.get(i).isQuestion() : !visiblePosts.get(i).isQuestion()))
 				.findFirst().orElse(-1);
 	}
 
@@ -169,19 +170,33 @@ public class QuestionListViewModel {
 				return i;
 			}
 		}
+
 		return visiblePosts.size();
 	}
 
-	private void expandChildren(PostDisplayViewModel parentPost, int parentIndex,
-			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
+	private void expandChildren(
+			PostDisplayViewModel parentPost, 
+			int visibleParentPostIndex,
+			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair
+	) {
 		List<PostDisplayViewModel> children = postParentMap.get(questionAnswerIDKeyPair);
+		
 		if (children == null)
 			return;
+		
+		switch(parentPost.getFilterType()) {
+		case TIME:
+			children.sort(Comparator.comparing(child -> child.getPost().getCreatedTimestamp()));
+			// To have the newest ones at the top
+			children = children.reversed();
+		default:
+			break;
+		}
 
 		for (int i = children.size() - 1; i >= 0; i--) {
 			PostDisplayViewModel child = children.get(i);
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
-			visiblePosts.add(parentIndex + 1, child);
+			visiblePosts.add(visibleParentPostIndex + 1, child);
 
 			KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(((Answer) child.getPost()).getQuestionId(),
 					child.getPost().getId());
@@ -216,41 +231,48 @@ public class QuestionListViewModel {
 
 	private PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
 			IPost.Type postType) {
-		return new PostDisplayViewModel(post, permissions, userSession, postId -> {
-			try {
-				if (postType == IPost.Type.Question) {
-					questionService.deleteQuestion(postId);
-				} else {
-					answerService.deleteAnswer(postId);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}, newPost -> {
-			try {
-				Answer postToAdd = (Answer) newPost;
-				answerService.addAnswer(postToAdd);
-				addPost(postToAdd, postType);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}, (id, mainText, secondaryText) -> {
-			try {
-				if (postType == IPost.Type.Question) {
-					questionService.updateQuestion(id, mainText, secondaryText);
-					updateQuestion(id, mainText, secondaryText);
-				} else {
-					answerService.updateAnswer(id, mainText, secondaryText.equals("yes"));
-					updateAnswer(id, mainText, secondaryText.equals("yes"));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}, () -> {
-			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair = new KeyPairHolder<Integer, Integer>(questionKeyID,
-					answerKeyID);
+		return new PostDisplayViewModel(
+				post, 
+				permissions, 
+				userSession, 
+				postId -> {
+					try {
+						if (postType == IPost.Type.Question) {
+							questionService.deleteQuestion(postId);
+						} else {
+							answerService.deleteAnswer(postId);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}, newPost -> {
+					try {
+						Answer postToAdd = (Answer) newPost;
+						
+						// The DB return includes fields like time stamps
+						Answer addedAnswer = answerService.addAnswer(postToAdd);
+						System.out.println("timestamp: " + addedAnswer.getCreatedTimestamp());
+						addPostToVisibleList(addedAnswer, postType);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}, (id, mainText, secondaryText) -> {
+					try {
+						if (postType == IPost.Type.Question) {
+							questionService.updateQuestion(id, mainText, secondaryText);
+							updateQuestion(id, mainText, secondaryText);
+						} else {
+							answerService.updateAnswer(id, mainText, secondaryText.equals("yes"));
+							updateAnswer(id, mainText, secondaryText.equals("yes"));
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}, () -> {
+					KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair = new KeyPairHolder<Integer, Integer>(questionKeyID,
+							answerKeyID);
 
-			this.toggleExpand(post.getId(), questionAnswerIDKeyPair, postType);
-		});
-	}
+					this.toggleExpand(post.getId(), questionAnswerIDKeyPair, postType);
+				});
+		}
 }

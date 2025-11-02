@@ -1,14 +1,10 @@
 package Config;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import Controllers.PostDisplayViewModel;
 import DisplayModels.PostWithPermissions;
 import DisplayModels.QuestionWithAnswersAndPermissions;
-import Models.Question;
-import Utils.KeyPairHolder;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -29,6 +25,10 @@ public class AppCache {
         return instance;
     }
     
+    // ===================
+    // 		 SETTERS 
+ 	// ===================
+    
     public void setInitialQuestionsData(List<PostWithPermissions> questions) {
     	this.initialQuestionDataProperty.set(questions);
     }
@@ -36,7 +36,12 @@ public class AppCache {
     // Answers for every question - in order
     public void setAnswersData(List<PostWithPermissions> answers) {
     	this.answerDataProperty.set(answers);
-    	this.allInitialAnswersDataProperty.get().addAll(answers);
+    	
+    	if(allInitialAnswersDataProperty.get() == null) {
+    		this.allInitialAnswersDataProperty.set(answers);
+    	} else {
+    		this.allInitialAnswersDataProperty.get().addAll(answers);
+    	}
     }
 
     public void setInitialDataProperty(List<QuestionWithAnswersAndPermissions> initialData) {
@@ -46,6 +51,10 @@ public class AppCache {
     public void setFullData(List<QuestionWithAnswersAndPermissions> fullData) {
         this.fullDataProperty.set(fullData);
     }
+    
+    // ===================
+    // 		 GETTERS 
+ 	// ===================
     
     public ObjectProperty<List<QuestionWithAnswersAndPermissions>> getInitialDataProperty() {
     	return initialDataProperty;
@@ -67,7 +76,12 @@ public class AppCache {
     	return initialQuestionDataProperty;
     }
     
+    // ===================
+    // 		 HELPERS 
+ 	// ===================
+    
     public boolean areInitialAnswersLoaded() {
+//    	System.out.println("Size is: " + allInitialAnswersDataProperty.get().size());
     	return allInitialAnswersDataProperty.get() != null;
     }
     

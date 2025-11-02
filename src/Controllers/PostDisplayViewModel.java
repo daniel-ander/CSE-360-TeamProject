@@ -11,7 +11,9 @@ import Utils.TriConsumer;
 
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class PostDisplayViewModel {
@@ -23,6 +25,7 @@ public class PostDisplayViewModel {
     private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
     private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
     private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
+    private ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
     
     private StringProperty labelTextProperty = new SimpleStringProperty();
     private boolean isHidden = false;
@@ -33,6 +36,10 @@ public class PostDisplayViewModel {
     private final Consumer<IPost> addCallBack;
     private final TriConsumer<Integer, String, String> updateCallBack;
     private final Runnable toggleExpand;
+    
+    public enum FilterType {
+    	TIME
+    }
     
 
     public PostDisplayViewModel(
@@ -68,8 +75,12 @@ public class PostDisplayViewModel {
     	return isEditingQuestion;
     }
     
-    public BooleanProperty getIsCommenting() {
-    	return isCommentingProperty;
+    public FilterType getFilterType() {
+    	return filterProperty.get();
+    }
+    
+    public boolean getIsCommenting() {
+    	return isCommentingProperty.get();
     }
     
     public BooleanProperty getDoesHaveChildren() {
@@ -100,7 +111,7 @@ public class PostDisplayViewModel {
     	return isHidden;
     }
     
-    public boolean isExpanded() {
+    public boolean isExpandButtonPressed() {
     	return isExpandedProperty.get();
     }
     
@@ -110,6 +121,10 @@ public class PostDisplayViewModel {
     
     public void setDoesHaveChildren(boolean doesHaveChildren) {
     	this.doesHaveChildrenProperty.set(doesHaveChildren);
+    }
+    
+    public void setFilterType(FilterType newFilterType) {
+    	this.filterProperty.set(newFilterType);
     }
     
     public void setDepthLevel(int level) {
@@ -150,7 +165,7 @@ public class PostDisplayViewModel {
     }
     
     public void toggleExpand() {
-    	setIsExpanded(!isExpanded());
+    	setIsExpanded(!isExpandButtonPressed());
     	this.toggleExpand.run();
     }
     
@@ -166,9 +181,20 @@ public class PostDisplayViewModel {
     public void addAnswer(String newTitleText, String newBodyText) {
     	Answer newAnswer;
     	if(isQuestion()) {
-    		newAnswer = new Answer(post.getId(), userSession.getCurrentUserId(), userSession.getCurrentUserName(), newBodyText);
+    		newAnswer = new Answer(
+    				post.getId(), 
+    				userSession.getCurrentUserId(), 
+    				userSession.getCurrentUserName(), 
+    				newBodyText
+    		);
     	} else {
-    		newAnswer = new Answer(((Answer)post).getQuestionId(), post.getId(), userSession.getCurrentUserId(), userSession.getCurrentUserName(), newBodyText);
+    		newAnswer = new Answer(
+    				((Answer)post).getQuestionId(), 
+    				post.getId(), 
+    				userSession.getCurrentUserId(), 
+    				userSession.getCurrentUserName(), 
+    				newBodyText
+    		);
     	}
     	
     	addCallBack.accept(newAnswer);

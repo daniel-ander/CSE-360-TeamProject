@@ -201,7 +201,7 @@ public class AnswerListViewController {
             		dbConnectionStore, 
             		primaryStage, 
             		userSession, 
-            		new QuestionListViewModel(dbConnectionStore.getQuestionService(), answerService, userSession), 
+            		new PostListViewModel(dbConnectionStore.getQuestionService(), answerService, userSession), 
             		forumView
             );
 

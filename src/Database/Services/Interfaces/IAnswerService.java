@@ -2,7 +2,6 @@ package Database.Services.Interfaces;
 
 import Models.Answer;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import Exceptions.DBExceptions.DataAccessException;
@@ -15,7 +14,7 @@ public interface IAnswerService {
 	public List<Answer> getAnswersByQuestionID(int questionId) throws DataAccessException;
 	
 	public Answer getAnswerById(int answerId) throws DataAccessException;
-	public boolean addAnswer(Answer a) throws DataAccessException;
+	public Answer addAnswer(Answer a) throws DataAccessException;
 	
 	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws DataAccessException;
 	public boolean deleteAnswer(int id) throws DataAccessException;
