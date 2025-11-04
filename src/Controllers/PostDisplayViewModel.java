@@ -36,7 +36,7 @@ public class PostDisplayViewModel {
     private final Consumer<Integer> deleteCallback;
     private final Consumer<IPost> addCallBack;
     private final TriConsumer<Integer, String, String> updateCallBack;
-    private final Runnable toggleExpand;
+    private final Runnable toggleExpandCallback;
     
     public enum FilterType {
     	TIME
@@ -50,7 +50,7 @@ public class PostDisplayViewModel {
     		Consumer<Integer> deleteCallBack,
     		Consumer<IPost> addCallBack,
     		TriConsumer<Integer, String, String> updateCallBack,
-    		Runnable toggleExpand
+    		Runnable toggleExpandCallback
     	) {
         this.post = post;
         this.permissionList = permissionList;
@@ -58,7 +58,7 @@ public class PostDisplayViewModel {
         this.deleteCallback = deleteCallBack;
         this.addCallBack = addCallBack;
         this.updateCallBack = updateCallBack;
-        this.toggleExpand = toggleExpand;
+        this.toggleExpandCallback = toggleExpandCallback;
         
         bodyTextProperty.set(post.getBodyText());
         
@@ -183,7 +183,7 @@ public class PostDisplayViewModel {
     
     public void toggleExpand() {
     	setIsExpanded(!isExpandButtonPressed());
-    	this.toggleExpand.run();
+    	this.toggleExpandCallback.run();
     }
     
     public void updatePost(String newTitle, String newBody) {
