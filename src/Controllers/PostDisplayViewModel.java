@@ -21,7 +21,7 @@ public class PostDisplayViewModel {
     private List<String> permissionList; // fetched from a service in the controller
   
     private final UserSession userSession;
-    private final BooleanProperty isEditingPost = new SimpleBooleanProperty(false);
+    private final BooleanProperty isEditingPostProperty = new SimpleBooleanProperty(false);
     private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
     private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
     private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
@@ -81,7 +81,7 @@ public class PostDisplayViewModel {
     }
 
     public BooleanProperty getIsEditingPostProperty() {
-    	return isEditingPost;
+    	return isEditingPostProperty;
     }
     
     public FilterType getFilterType() {
@@ -144,8 +144,8 @@ public class PostDisplayViewModel {
     	this.depthLevel = level;
     }
     
-    public void setIsEditing(boolean isEditing) {
-    	this.isEditingPost.set(isEditing);
+    public void setIsEditingProperty(boolean isEditing) {
+    	this.isEditingPostProperty.set(isEditing);
     }
     
     public void setIsCommentingProperty(boolean isCommenting) {

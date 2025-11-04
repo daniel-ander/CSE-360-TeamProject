@@ -81,6 +81,7 @@ public class QuestionListViewController {
 		});
 		
 		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
+			System.out.println("Blah");
 			if (answersWithPermissions == null)
 				return;
 
