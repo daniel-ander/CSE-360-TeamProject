@@ -54,25 +54,13 @@ public class PreLoader {
 		executor.submit(() -> {
 			List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(20);
 
-			fetchQuestions(executor, initialDisplayQuestions);
-			
-			List<Question> remainingQuestions = new ArrayList<>(initialDisplayQuestions);
-			
-			for (Question q : initialDisplayQuestions) {
-	            if (AnswerPreloadPriority.isPriority(q.getId())) {
-	                fetchAnswersForQuestion(q, executor);
-	                remainingQuestions.remove(q);
-	            }
-	        }
-
-	        for (Question q : remainingQuestions) {
-	            fetchAnswersForQuestion(q, executor);
-	        }
+			fetchQuestions(initialDisplayQuestions, executor);
+			fetchAnswers(initialDisplayQuestions, executor);
 
 		});
 	}
 
-	private void fetchQuestions(ExecutorService executor, List<Question> initialDisplayQuestions) {
+	private void fetchQuestions(List<Question> initialDisplayQuestions, ExecutorService executor) {
 		executor.submit(() -> {
 
 			List<PostWithPermissions> questionsWithPermissions = new ArrayList<>();
@@ -88,19 +76,35 @@ public class PreLoader {
 			AppCache.getInstance().setInitialQuestionsData(questionsWithPermissions);
 		});
 	}
-	
-	private void fetchAnswersForQuestion(Question question, ExecutorService executor) {
-	    executor.submit(() -> {
-	        List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
-	        List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
-	        for (Answer a : answers) {
-	            List<String> permissions = permissionService.getEffectivePermissions(
-	                    userSession.getCurrentUserId(), a.getId(), IPost.Type.Answer
-	            );
-	            answersWithPermissions.add(new PostWithPermissions(a, permissions));
-	        }
 
-	        AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);
-	    });
+	private void fetchAnswers(List<Question> questions, ExecutorService executor) {
+		executor.submit(() -> {
+			List<Question> remainingQuestions = new ArrayList<>(questions);
+
+			for (Question question : questions) {
+				if (AnswerPreloadPriority.isPriority(question.getId())) {
+					fetchAnswersForQuestion(question, executor);
+					remainingQuestions.remove(question);
+				}
+			}
+
+			for (Question question : remainingQuestions) {
+				fetchAnswersForQuestion(question, executor);
+			}
+		});
+	}
+
+	private void fetchAnswersForQuestion(Question question, ExecutorService executor) {
+		executor.submit(() -> {
+			List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
+			List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
+			for (Answer a : answers) {
+				List<String> permissions = permissionService.getEffectivePermissions(userSession.getCurrentUserId(),
+						a.getId(), IPost.Type.Answer);
+				answersWithPermissions.add(new PostWithPermissions(a, permissions));
+			}
+
+			AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);
+		});
 	}
 }
