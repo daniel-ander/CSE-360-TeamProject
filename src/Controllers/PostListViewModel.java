@@ -171,7 +171,7 @@ public class PostListViewModel {
 		PostDisplayViewModel selectedPostVM = getVisiblePostByID(answerIdToUpdate, IPost.Type.Answer);
 	}
 	
-	// returns first and last visible question ids [-->Q1<--, A1, A2, Q2, A1, -->Q3<--, A1, A2]
+	// get questions that are visible to the user [-->Q1<--, A1, A2, -->Q2<--, A1, -->Q3<--, A1, A2]
 	public List<Integer> getVisibleQuestionIDs(int[] postsRange) {
 		List<Integer> visibleQuestionIDs = new ArrayList<>();
 		
