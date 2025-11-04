@@ -3,13 +3,13 @@ package Controllers;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import Config.DefaultRolePermissions;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
 import Sessions.UserSession;
+import Utils.DefaultRolePermissions;
 import Utils.KeyPairHolder;
 
 import javafx.collections.FXCollections;

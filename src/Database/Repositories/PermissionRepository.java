@@ -1,8 +1,7 @@
 package Database.Repositories;
 
-import Config.DefaultRolePermissions;
-
 import Models.User;
+import Utils.DefaultRolePermissions;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -81,7 +81,6 @@ public class AppCache {
  	// ===================
     
     public boolean areInitialAnswersLoaded() {
-//    	System.out.println("Size is: " + allInitialAnswersDataProperty.get().size());
     	return allInitialAnswersDataProperty.get() != null;
     }
     

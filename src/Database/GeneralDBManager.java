@@ -3,13 +3,12 @@ package Database;
 import java.io.File;
 import java.sql.*;
 
-import Config.DefaultRolePermissions;
 import Models.Answer;
 import Models.Invitation;
 import Models.Permission;
 import Models.Question;
 import Models.User;
-
+import Utils.DefaultRolePermissions;
 import Utils.StringUtils;
 
 
