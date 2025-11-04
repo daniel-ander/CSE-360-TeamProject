@@ -30,9 +30,8 @@ public class PostDisplayViewModel {
     
     private StringProperty labelTextProperty = new SimpleStringProperty();
     private StringProperty bodyTextProperty = new SimpleStringProperty();
-    private boolean isHidden = false;
+
     private int depthLevel;
-    
     
     private final Consumer<Integer> deleteCallback;
     private final Consumer<IPost> addCallBack;
@@ -96,6 +95,10 @@ public class PostDisplayViewModel {
     	return doesHaveChildrenProperty;
     }
     
+    public BooleanProperty getIsDeletedProperty() {
+    	return isDeletedProperty;
+    }
+    
     public String getMainLabelText() {
     	try {
     		return ((Question)post).getTitleText();
@@ -118,10 +121,6 @@ public class PostDisplayViewModel {
     
     public boolean getIsDeleted() {
     	return post.getIsDeleted();
-    }
-    
-    public boolean getIsHidden() {
-    	return isHidden;
     }
     
     public boolean isExpandButtonPressed() {
@@ -152,8 +151,8 @@ public class PostDisplayViewModel {
     	this.isCommentingProperty.set(isCommenting);;
     }
     
-    public void setIsHidden(boolean isHidden) {
-    	this.isHidden = isHidden;
+    public void setIsDeletedProperty(boolean isDeleted) {
+    	this.isDeletedProperty.set(isDeleted);
     }
     
     // Displaying children elements
@@ -178,6 +177,7 @@ public class PostDisplayViewModel {
  	// ===================
     
     public void deletePost() {
+    	setIsDeletedProperty(!getIsDeletedProperty().get());
     	deleteCallback.accept(post.getId());
     }
     

@@ -81,6 +81,8 @@ public class PreLoader {
 		executor.submit(() -> {
 			List<Question> remainingQuestions = new ArrayList<>(questions);
 
+			// We make sure that the questions for which the answers are loaded
+			// are loaded based on which questions the user sees
 			for (Question question : questions) {
 				if (AnswerPreloadPriority.isPriority(question.getId())) {
 					fetchAnswersForQuestion(question, executor);

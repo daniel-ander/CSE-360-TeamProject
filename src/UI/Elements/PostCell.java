@@ -26,13 +26,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final TextArea newCommentTextField = new TextArea();
 
 	private final Label statusLabel = new Label();
-	private final Label permissionLabel = new Label(); // optional illustrative
+	private final Label permissionLabel = new Label();
 	private final HBox actionsContainer = new HBox();
 
 	private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
-
-	private final Button updateButton = new Button("Edit");
-	private final Button toggleExpandButton = new Button("Expand");
 
 	public PostCell() {
 		setInitialProperties();
@@ -120,7 +117,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 			spacer.setPrefWidth(vm.getDepthLevel() * 40);
 		}
 
-		// Deleted posts handling
+		// Get deleted status from database and display body text accordingly
 		if (vm.getIsDeleted()) {
 			bodyText.setText("This message was deleted");
 			bodyTextField.setText("This message was deleted");
@@ -138,17 +135,25 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		for (String permission : vm.getPermissionList()) {
 			switch (permission) {
 			case "DELETE":
-				Button deleteBtn = new Button("Delete");
-				deleteBtn.setOnAction(_ -> vm.deletePost());
-				actionsContainer.getChildren().add(deleteBtn);
+				Button deleteButton = new Button("Delete");
+				deleteButton.setOnAction(_ -> {
+					vm.deletePost();
+					
+					if(vm.getIsDeletedProperty().get()) {
+						bodyText.setText("This message was deleted");
+						bodyTextField.setText("This message was deleted");
+					}
+				});
+				
+				actionsContainer.getChildren().add(deleteButton);
 				break;
 
 			case "COMMENT":
-				Button commentBtn = new Button("Comment");
-				commentBtn.textProperty()
+				Button commentButton = new Button("Comment");
+				commentButton.textProperty()
 						.bind(Bindings.when(vm.getIsCommentingProperty()).then("Post").otherwise("Comment"));
 				
-				commentBtn.setOnAction(_ -> {
+				commentButton.setOnAction(_ -> {
 					if (!vm.getIsCommentingProperty().get()) {
 						vm.setIsCommentingProperty(true);
 					} else {
@@ -162,10 +167,11 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 						}
 					}
 				});
-				actionsContainer.getChildren().add(commentBtn);
+				actionsContainer.getChildren().add(commentButton);
 				break;
 
 			case "EDIT":
+				Button updateButton = new Button("Edit");
 				updateButton.textProperty()
 						.bind(Bindings.when(vm.getIsEditingPostProperty()).then("Commit Edit").otherwise("Edit"));
 				
@@ -184,6 +190,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		}
 
 		// Expand / Collapse button
+		Button toggleExpandButton = new Button("Expand");
+		
 		toggleExpandButton.textProperty()
 				.bind(Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand"));
 		toggleExpandButton.visibleProperty().bind(vm.getDoesHaveChildren());
@@ -262,6 +270,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		// Manage visibility for edit vs view mode
 		titleLabel.visibleProperty().bind(vm.getIsEditingPostProperty().not());
 		titleTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
+		
 		bodyText.visibleProperty().bind(vm.getIsEditingPostProperty().not());
 		bodyTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
 	}
