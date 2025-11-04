@@ -88,7 +88,7 @@ public class QuestionListView {
 		return new int[] { firstCell.getIndex(), lastCell.getIndex() };
 	}
 
-	public void setGetVisiblePostsCallback(Consumer<int[]> callback) {
+	public void setGetVisibleQuestionIDsCallback(Consumer<int[]> callback) {
 		this.getVisibleQuestionsCallback = callback;
 	}
 

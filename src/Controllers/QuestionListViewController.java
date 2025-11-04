@@ -46,8 +46,10 @@ public class QuestionListViewController {
 		setUpActions();
 		initializeListeners();
 		
-		view.setGetVisiblePostsCallback(visiblePostsIndexRange -> {
+		view.setGetVisibleQuestionIDsCallback(visiblePostsIndexRange -> {
 			List<Integer> visibleQuestionIDs = viewModel.getVisibleQuestionIDs(visiblePostsIndexRange);
+			if(visibleQuestionIDs == null)
+				return;
 			
 			AnswerPreloadPriority.resetPriorityList();
 			

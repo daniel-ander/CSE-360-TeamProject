@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Controllers.PostDisplayViewModel;
 import Database.DBConnectionStore;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IPermissionService;
@@ -19,75 +18,89 @@ import Models.Answer;
 import Models.IPost;
 import Models.Question;
 import Sessions.UserSession;
-import Utils.KeyPairHolder;
+import Utils.AnswerPreloadPriority;
 
 public class PreLoader {
 
-    private final IQuestionService questionService;
-    private final IAnswerService answerService;
-    private final IPermissionService permissionService;
-    private final UserSession userSession;
+	private final IQuestionService questionService;
+	private final IAnswerService answerService;
+	private final IPermissionService permissionService;
+	private final UserSession userSession;
 
-    public PreLoader(DBConnectionStore dBConnectionStore, UserSession userSession) {
-        this.questionService = dBConnectionStore.getQuestionService();
-        this.answerService = dBConnectionStore.getAnswerService();
-        this.permissionService = dBConnectionStore.getPermissionService();
-        this.userSession = userSession;
-    }
-    
+	public PreLoader(DBConnectionStore dBConnectionStore, UserSession userSession) {
+		this.questionService = dBConnectionStore.getQuestionService();
+		this.answerService = dBConnectionStore.getAnswerService();
+		this.permissionService = dBConnectionStore.getPermissionService();
+		this.userSession = userSession;
+	}
 
-    public PreloadedDataStore preloadAll() throws DataAccessException {
-        List<Question> questions = questionService.getAllQuestions();
-        Map<Integer, List<Answer>> answers = new HashMap<>();
-        Map<Integer, List<String>> permissions = new HashMap<>();
+	public PreloadedDataStore preloadAll() throws DataAccessException {
+		List<Question> questions = questionService.getAllQuestions();
+		Map<Integer, List<Answer>> answers = new HashMap<>();
+		Map<Integer, List<String>> permissions = new HashMap<>();
 
-        for (Question q : questions) {
-            answers.put(q.getId(), answerService.getAnswersByQuestionID(q.getId()));
-            permissions.put(q.getId(), permissionService.getEffectivePermissions(
-            	userSession.getCurrentUserId(), q.getId(), IPost.Type.Question));
-        }
+		for (Question q : questions) {
+			answers.put(q.getId(), answerService.getAnswersByQuestionID(q.getId()));
+			permissions.put(q.getId(), permissionService.getEffectivePermissions(userSession.getCurrentUserId(),
+					q.getId(), IPost.Type.Question));
+		}
 
-        return new PreloadedDataStore(questions, answers, permissions);
-    }
-    
-    public void preload() {
-    	ExecutorService executor = Executors.newSingleThreadExecutor();
-    	
-    	executor.submit(() -> {
-    		List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(20);
-            
-            List<PostWithPermissions> questionsWithPermissions = new ArrayList<>();
-            
-            
-            // Getting the first batch of pre-loaded questions
-            for (Question question : initialDisplayQuestions) {
-                List<String> userQuestionPermissions = permissionService
-                        .getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
-                
-                questionsWithPermissions.add(new PostWithPermissions(question, userQuestionPermissions));
-            }
-            
-            AppCache.getInstance().setInitialQuestionsData(questionsWithPermissions);
-            
-            List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
-            
-            // Filling out the first batch with answers
-            for (Question question : initialDisplayQuestions) {
-            	System.out.println("Printed");
-                answersWithPermissions = new ArrayList<>();
+		return new PreloadedDataStore(questions, answers, permissions);
+	}
 
-                List<Answer> initialAnswers = answerService.getAnswersByQuestionID(question.getId());
-                
-                for(Answer answer : initialAnswers) {
-                	List<String> userAnswerPermissions = permissionService
-                			.getEffectivePermissions(userSession.getCurrentUserId(), answer.getId(), IPost.Type.Answer);
-                	answersWithPermissions.add(new PostWithPermissions(answer, userAnswerPermissions));
-                	
-                }
-                
-                AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);         
-            }
-            
-    	});
-    }
+	public void preload() {
+		ExecutorService executor = Executors.newFixedThreadPool(4);
+
+		executor.submit(() -> {
+			List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(20);
+
+			fetchQuestions(executor, initialDisplayQuestions);
+			
+			List<Question> remainingQuestions = new ArrayList<>(initialDisplayQuestions);
+			
+			for (Question q : initialDisplayQuestions) {
+	            if (AnswerPreloadPriority.isPriority(q.getId())) {
+	                fetchAnswersForQuestion(q, executor);
+	                remainingQuestions.remove(q);
+	            }
+	        }
+
+	        for (Question q : remainingQuestions) {
+	            fetchAnswersForQuestion(q, executor);
+	        }
+
+		});
+	}
+
+	private void fetchQuestions(ExecutorService executor, List<Question> initialDisplayQuestions) {
+		executor.submit(() -> {
+
+			List<PostWithPermissions> questionsWithPermissions = new ArrayList<>();
+
+			// Getting the first batch of pre-loaded questions
+			for (Question question : initialDisplayQuestions) {
+				List<String> userQuestionPermissions = permissionService
+						.getEffectivePermissions(userSession.getCurrentUserId(), question.getId(), IPost.Type.Question);
+
+				questionsWithPermissions.add(new PostWithPermissions(question, userQuestionPermissions));
+			}
+
+			AppCache.getInstance().setInitialQuestionsData(questionsWithPermissions);
+		});
+	}
+	
+	private void fetchAnswersForQuestion(Question question, ExecutorService executor) {
+	    executor.submit(() -> {
+	        List<Answer> answers = answerService.getAnswersByQuestionID(question.getId());
+	        List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
+	        for (Answer a : answers) {
+	            List<String> permissions = permissionService.getEffectivePermissions(
+	                    userSession.getCurrentUserId(), a.getId(), IPost.Type.Answer
+	            );
+	            answersWithPermissions.add(new PostWithPermissions(a, permissions));
+	        }
+
+	        AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);
+	    });
+	}
 }
