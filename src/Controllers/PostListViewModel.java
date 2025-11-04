@@ -69,7 +69,7 @@ public class PostListViewModel {
 	}
 
 	// Populates answers and builds the parent-child relationship map
-	public void populateAnswers(List<PostWithPermissions> answersWithPermissions) {
+	public void addToAnswerPool(List<PostWithPermissions> answersWithPermissions) {
 		for (PostWithPermissions answerWithPermissions : answersWithPermissions) {
 			Answer answer = (Answer) answerWithPermissions.getPost();
 
@@ -148,7 +148,7 @@ public class PostListViewModel {
 		newPostVM.setDepthLevel(parentVM.getDepthLevel() + 1);
 		parentVM.setDoesHaveChildren(true);
 
-		// Register new answer under parent
+		// Register new answer under parent, but does 
 		final KeyPairHolder<Integer, Integer> relationKey = new KeyPairHolder<>(questionId, parentAnswerId);
 		postParentMap.computeIfAbsent(relationKey, _ -> new ArrayList<>()).add(newPostVM);
 
@@ -169,6 +169,24 @@ public class PostListViewModel {
 	// Update answer content (to be implemented)
 	public void updateAnswer(int answerIdToUpdate, String contentText, boolean isCorrect) {
 		PostDisplayViewModel selectedPostVM = getVisiblePostByID(answerIdToUpdate, IPost.Type.Answer);
+	}
+	
+	// returns first and last visible question ids [-->Q1<--, A1, A2, Q2, A1, -->Q3<--, A1, A2]
+	public List<Integer> getVisibleQuestionIDs(int[] postsRange) {
+		List<Integer> visibleQuestionIDs = new ArrayList<>();
+		
+		for(int i = postsRange[0]; i <= postsRange[1]; i++) {
+			if(visiblePosts.get(i).isQuestion()) {
+				visibleQuestionIDs.add(visiblePosts.get(i).getPost().getId());
+			}
+		}
+		
+		// if only answers are currently visible 
+		// [(Q1<-- Out of frame), (A1, A2, A3, A4, A5) <-- Visible, (Q2<-- Out of frame)]
+		if(visibleQuestionIDs.size() == 0)
+			return null;
+		
+		return visibleQuestionIDs;
 	}
 
 	// ==============================

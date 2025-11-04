@@ -147,6 +147,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 				Button commentBtn = new Button("Comment");
 				commentBtn.textProperty()
 						.bind(Bindings.when(vm.getIsCommentingProperty()).then("Post").otherwise("Comment"));
+				
 				commentBtn.setOnAction(_ -> {
 					if (!vm.getIsCommentingProperty().get()) {
 						vm.setIsCommentingProperty(true);
@@ -167,6 +168,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 			case "EDIT":
 				updateButton.textProperty()
 						.bind(Bindings.when(vm.getIsEditingPostProperty()).then("Commit Edit").otherwise("Edit"));
+				
 				updateButton.setOnAction(_ -> {
 					if (vm.getIsEditingPostProperty().get()) {
 						// Commit manually, then exit edit mode
@@ -190,12 +192,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		actionsContainer.getChildren().add(toggleExpandButton);
 	}
 
-	public Button getToggleExpandButton() {
-		return toggleExpandButton;
-	}
-
-	// Keeping track of the listener to add and remove it to adhere to cell reuse
-	// logic
+	// Keeping track of the listener to add and remove it to adhere to cell reuse logic
 	private final ChangeListener<Boolean> editingListener = (_, _, isEditing) -> {
 		if (currentVm == null)
 			return;

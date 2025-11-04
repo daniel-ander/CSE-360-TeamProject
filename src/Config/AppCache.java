@@ -34,7 +34,7 @@ public class AppCache {
     }
     
     // Answers for every question - in order
-    public void setAnswersData(List<PostWithPermissions> answers) {
+    public void setAnswersDataProperty(List<PostWithPermissions> answers) {
     	this.answerDataProperty.set(answers);
     	
     	if(allInitialAnswersDataProperty.get() == null) {

@@ -16,7 +16,7 @@ import DisplayModels.PostWithPermissions;
 import Exceptions.DBExceptions.DataAccessException;
 
 import UI.Elements.QuestionListView;
-
+import Utils.AnswerPreloadPriority;
 import Utils.Debug;
 import javafx.application.Platform;
 
@@ -45,6 +45,17 @@ public class QuestionListViewController {
 
 		setUpActions();
 		initializeListeners();
+		
+		view.setGetVisiblePostsCallback(visiblePostsIndexRange -> {
+			List<Integer> visibleQuestionIDs = viewModel.getVisibleQuestionIDs(visiblePostsIndexRange);
+			
+			AnswerPreloadPriority.resetPriorityList();
+			
+			for(int visibleQuestionID : visibleQuestionIDs) {
+				AnswerPreloadPriority.addPriorityQuestion(visibleQuestionID);
+			}
+		});
+		
 	}
 
 	// ===================
@@ -62,7 +73,7 @@ public class QuestionListViewController {
 		}
 		
 		if(AppCache.getInstance().areInitialAnswersLoaded()) {
-			viewModel.populateAnswers(AppCache.getInstance().getAllInitialAnswersDataProperty().get());
+			viewModel.addToAnswerPool(AppCache.getInstance().getAllInitialAnswersDataProperty().get());
 		}
 		
 		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
@@ -81,7 +92,6 @@ public class QuestionListViewController {
 		});
 		
 		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
-			System.out.println("Blah");
 			if (answersWithPermissions == null)
 				return;
 
@@ -103,41 +113,10 @@ public class QuestionListViewController {
 					newAnswers.add(answerWithPermissions);
 				}
 				
-				AppCache.getInstance().setAnswersData(newAnswers);
-				viewModel.populateAnswers(newAnswers);
+				AppCache.getInstance().setAnswersDataProperty(newAnswers);
+				viewModel.addToAnswerPool(newAnswers);
 			});
 		});
-//List<PostWithPermissions> initialQuestions = new ArrayList<>();
-//		
-//		if(AppCache.getInstance().areInitialQuestionsLoaded()) {
-//			initialQuestions.addAll(AppCache.getInstance().getInitialQuestionData().get());
-//			
-//			viewModel.populateQuestions(initialQuestions);
-//			view.getForumListView().setItems(viewModel.getVisiblePosts());
-//		}
-//		
-//		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
-//			if (questionsWithPermissions == null)
-//				return;
-//
-//			Platform.runLater(() -> {
-//				if(initialQuestions != questionsWithPermissions) {
-//					viewModel.populateQuestions(questionsWithPermissions);
-//				}
-//
-//				view.getForumListView().setItems(viewModel.getVisiblePosts());
-//			});
-//
-//		});
-//		
-//		AppCache.getInstance().getAnswersDataProperty().addListener((_, _, answersWithPermissions) -> {
-//			if (answersWithPermissions == null)
-//				return;
-//
-//			Platform.runLater(() -> {  
-//				viewModel.populateAnswers(answersWithPermissions);			
-//			});
-//		});
 
 	}
 
@@ -238,21 +217,6 @@ public class QuestionListViewController {
 	private void setViewQuestionButtonAction() {
 		// View question → switch to detail page
 		view.getViewQuestionButton().setOnAction(_ -> {
-//			PostDisplayViewModel selectedQuestionVM = view.getForumListView().getSelectionModel().getSelectedItem();
-
-//			if (selectedQuestionVM != null) {
-//				AnswerListView detailView = new AnswerListView();
-//
-//				new AnswerListViewController(dBConnectionStore, primaryStage, (Question) selectedQuestionVM.getPost(), // Hacky,
-//																														// but
-//																														// good
-//																														// for
-//																														// now
-//						userSession, detailView);
-//
-//				primaryStage.getScene().setRoot(detailView.getLayout());
-//				System.out.println("Viewing details for Question ID: " + selectedQuestionVM.getPost().getId());
-//			}
 		});
 	}
 

@@ -35,19 +35,6 @@ public class PreLoader {
         this.userSession = userSession;
     }
     
-//    public PreloadedDataStore preloadFirst(int amount) {
-//        List<Question> questions = questionService.getAllQuestions();
-//        Map<Integer, List<Answer>> answers = new HashMap<>();
-//        Map<Integer, List<String>> permissions = new HashMap<>();
-//
-//        for (Question q : questions) {
-//            answers.put(q.getId(), answerService.getAnswersByQuestionID(q.getId()));
-//            permissions.put(q.getId(), permissionService.getEffectivePermissions(
-//            	userSession.getCurrentUserId(), q.getId(), IPost.Type.Question));
-//        }
-//
-//        return new PreloadedDataStore(questions, answers, permissions);
-//    }
 
     public PreloadedDataStore preloadAll() throws DataAccessException {
         List<Question> questions = questionService.getAllQuestions();
@@ -83,7 +70,6 @@ public class PreLoader {
             AppCache.getInstance().setInitialQuestionsData(questionsWithPermissions);
             
             List<PostWithPermissions> answersWithPermissions = new ArrayList<>();
-            System.out.println("This here: " + initialDisplayQuestions.size());
             
             // Filling out the first batch with answers
             for (Question question : initialDisplayQuestions) {
@@ -99,7 +85,7 @@ public class PreLoader {
                 	
                 }
                 
-                AppCache.getInstance().setAnswersData(answersWithPermissions);         
+                AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);         
             }
             
     	});
