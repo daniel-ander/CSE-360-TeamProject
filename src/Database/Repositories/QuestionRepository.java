@@ -88,7 +88,7 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getLimitedAmountOfQuestions(int amount) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getAllQuestions = String.format("SELECT * FROM %s LIMIT %s", Question.tableName, amount);
+		String getAllQuestions = String.format("SELECT * FROM %s ORDER BY created DESC LIMIT %s", Question.tableName, amount);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
 			ResultSet rs = pstmt.executeQuery();

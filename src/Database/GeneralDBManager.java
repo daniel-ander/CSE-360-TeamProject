@@ -8,7 +8,7 @@ import Models.Invitation;
 import Models.Permission;
 import Models.Question;
 import Models.User;
-import Utils.DefaultRolePermissions;
+import Utils.RolePermissions;
 import Utils.StringUtils;
 
 
@@ -61,8 +61,8 @@ public class GeneralDBManager implements IGeneralDBManager {
 		// code
 		
 		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRoles()); // ["admin", "staff", "student"]
-		String questionPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
-		String answerPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions.getAllPermissions());
+		String questionPermissionSQL = StringUtils.listToSQLString(RolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
+		String answerPermissionSQL = StringUtils.listToSQLString(RolePermissions.AnswerPermissions.getAllPermissions());
 
 		String userTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, " + "password VARCHAR(255), " + "role VARCHAR(225))", userTableName);

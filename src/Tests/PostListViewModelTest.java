@@ -13,8 +13,8 @@ import javafx.collections.ObservableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import Controllers.PostDisplayViewModel;
-import Controllers.PostListViewModel;
+import Controllers.ForumPage.PostDisplayViewModel;
+import Controllers.ForumPage.PostListViewModel;
 
 import java.util.List;
 
@@ -86,7 +86,7 @@ public class PostListViewModelTest {
         newAnswer.setId(10);
 
         // Act
-        viewModel.addPostToVisibleList(newAnswer, false, IPost.Type.Answer);
+        viewModel.addAnswerToVisibleList(newAnswer);
 
         // Assert
         ObservableList<PostDisplayViewModel> visible = viewModel.getVisiblePosts();

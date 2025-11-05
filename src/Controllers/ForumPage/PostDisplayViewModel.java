@@ -1,4 +1,4 @@
-package Controllers;
+package Controllers.ForumPage;
 
 import java.util.List;
 import java.util.function.Consumer;

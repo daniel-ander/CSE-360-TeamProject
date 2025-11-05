@@ -1,7 +1,6 @@
 package UI.Elements;
 
-import Controllers.PostDisplayViewModel;
-
+import Controllers.ForumPage.PostDisplayViewModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
