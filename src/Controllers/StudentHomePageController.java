@@ -67,10 +67,37 @@ public class StudentHomePageController {
 
 	    });
     }
+    
+//   Initialize the embedded list view + view model
+//  questionListView = view.getForumListView();
+//  postListViewModel = new PostListViewModel(
+//          dBConnectionStore.getQuestionService(),
+//          dBConnectionStore.getAnswerService(),
+//          userSession
+//  );
+    
+    
+//    DBConnectionStore dBConnectionStore,
+//    Stage primaryStage,
+//    UserSession userSession,
+//    ForumPage view,
+//    PostListViewModel postListViewModel,
+//    QuestionListView questionListView
+    
+    
     private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(_ -> {
 	    	// Enter the forum page
-	    	new ForumPageController(dBConnectionStore, primaryStage, userSession, new ForumPage());
+	    	new ForumPageController(
+	    			dBConnectionStore, 
+	    			primaryStage, 
+	    			userSession, 
+	    			new ForumPage(),
+	    			new PostListViewModel(
+	    			          dBConnectionStore.getQuestionService(),
+	    			          dBConnectionStore.getAnswerService(),
+	    			          userSession)
+	    	);
 	    });
 	}
     

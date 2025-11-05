@@ -5,7 +5,7 @@ import Models.Question;
 
 import Sessions.UserSession;
 
-import UI.Elements.QuestionListView;
+
 import UI.Elements.AnswerListView;
 import Utils.Debug;
 
@@ -21,11 +21,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class AnswerListViewController {
-    private final DBConnectionStore dbConnectionStore;
+
 	private final AnswerListView view;
     private final Question question;
     private final IAnswerService answerService;
-    private final Stage primaryStage;
+
     private final UserSession userSession;
 
     public AnswerListViewController(
@@ -35,10 +35,8 @@ public class AnswerListViewController {
             UserSession userSession,
             AnswerListView view
     ) {
-        this.dbConnectionStore = dBConnectionStore;
         this.answerService = dBConnectionStore.getAnswerService();
         
-        this.primaryStage = primaryStage;
 		this.view = view;
         this.question = question;
 
@@ -195,19 +193,19 @@ public class AnswerListViewController {
     private void setBackButtonAction() {
         // Back to ForumListView (new scene, same as other buttons)
         view.getBackButton().setOnAction(_ -> {
-            QuestionListView forumView = new QuestionListView();
-
-            new QuestionListViewController(
-            		dbConnectionStore, 
-            		primaryStage, 
-            		userSession, 
-            		new PostListViewModel(dbConnectionStore.getQuestionService(), answerService, userSession), 
-            		forumView
-            );
-
-            Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
-            primaryStage.setScene(forumScene);
-            primaryStage.setTitle("Forum Page");
+//            QuestionListView forumView = new QuestionListView();
+//
+//            new QuestionListViewController(
+//            		dbConnectionStore, 
+//            		primaryStage, 
+//            		userSession, 
+//            		new PostListViewModel(dbConnectionStore.getQuestionService(), answerService, userSession), 
+//            		forumView
+//            );
+//
+//            Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
+//            primaryStage.setScene(forumScene);
+//            primaryStage.setTitle("Forum Page");
         });
     }
   
