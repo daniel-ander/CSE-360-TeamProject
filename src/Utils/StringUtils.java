@@ -10,4 +10,8 @@ public class StringUtils {
 				.map(p -> "'" + p + "'") // wrap each element in single quotes
 				.collect(Collectors.joining(", "));
 	}
+	
+	public static String truncate(String text, int limit) {
+		return text.length() <= limit ? text : text.substring(0, limit) + "...";
+	}
 }

@@ -3,13 +3,12 @@ package Database;
 import java.io.File;
 import java.sql.*;
 
-import Config.DefaultRolePermissions;
 import Models.Answer;
 import Models.Invitation;
 import Models.Permission;
 import Models.Question;
 import Models.User;
-
+import Utils.RolePermissions;
 import Utils.StringUtils;
 
 
@@ -62,8 +61,8 @@ public class GeneralDBManager implements IGeneralDBManager {
 		// code
 		
 		String userRolesSQL = StringUtils.listToSQLString(User.Role.getAllRoles()); // ["admin", "staff", "student"]
-		String questionPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
-		String answerPermissionSQL = StringUtils.listToSQLString(DefaultRolePermissions.AnswerPermissions.getAllPermissions());
+		String questionPermissionSQL = StringUtils.listToSQLString(RolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
+		String answerPermissionSQL = StringUtils.listToSQLString(RolePermissions.AnswerPermissions.getAllPermissions());
 
 		String userTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, " + "password VARCHAR(255), " + "role VARCHAR(225))", userTableName);
@@ -73,13 +72,15 @@ public class GeneralDBManager implements IGeneralDBManager {
 
 		String forumQuestionsTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
 				+ "userId INT, " + "title VARCHAR(255), " + "body TEXT, "
+				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "answered BOOLEAN DEFAULT FALSE, "
 				+ "resolved BOOLEAN DEFAULT FALSE, " + "isDeleted BOOLEAN DEFAULT FALSE, "
 				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES %s(id))", questionTableName, userTableName);
 
 		String forumAnswersTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
 				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "authorName TEXT, " + "body TEXT, "
-				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
@@ -167,9 +168,13 @@ public class GeneralDBManager implements IGeneralDBManager {
 
 		String populateAnswersTable = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, authorName, body, isCorrect, upvoteCount) VALUES "
 				+ "(1, NULL, 1, 'student', 'Polymorphism allows methods to behave differently based on the object.', FALSE, 4),"
+				+ "(1, NULL, 1, 'student', 'Polymorphism is very useful.', FALSE, 4),"
 				+ "(1, 1, 2, 'instructor', 'Great explanation! Could you give a code example?', FALSE, 2),"
+				+ "(1, 1, 2, 'instructor', 'Very nice!', FALSE, 2),"
+				+ "(1, 1, 3, 'reviewer', 'Interesting.', FALSE, 2),"
 				+ "(2, NULL, 3, 'reviewer', 'Use .equals() for content comparison, == for reference.', FALSE, 5),"
 				+ "(2, 3, 4, 'admin1', 'Thanks for clearing that up!', FALSE, 1),"
+				+ "(2, 6, 4, 'admin1', 'Second one!', FALSE, 1),"
 				+ "(3, NULL, 2, 'instructor', 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, 3),"
 				+ "(4, NULL, 5, 'staff', 'ExecutorService is a good way to manage threads.', FALSE, 2),"
 				+ "(4, 6, 1, 'student', 'Definitely agree, especially with fixed thread pool.', FALSE, 1),"

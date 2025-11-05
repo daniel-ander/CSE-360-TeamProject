@@ -36,7 +36,7 @@ public class QuestionRepository implements IQuestionRepository {
 			pstmt.setString(3,q.getBodyText());
 			pstmt.setBoolean(4, q.getAnsweredStatus());
 			pstmt.setBoolean(5, q.getResolvedStatus());
-			pstmt.setBoolean(6, q.getDeleted());
+			pstmt.setBoolean(6, q.getIsDeleted());
 			pstmt.setInt(7, q.getUpvoteCount());
 			pstmt.executeUpdate();
 			
@@ -71,6 +71,8 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getInt("userId"),
 						rs.getString("title"),
 						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
 						rs.getBoolean("isDeleted"),
@@ -81,6 +83,33 @@ public class QuestionRepository implements IQuestionRepository {
 		}
 		
 		return allQuestions;
+	}
+	
+	@Override
+	public List<Question> getLimitedAmountOfQuestions(int amount) throws SQLException {
+		List<Question> questions = new ArrayList<>();
+		String getAllQuestions = String.format("SELECT * FROM %s ORDER BY created DESC LIMIT %s", Question.tableName, amount);
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Question q = new Question(
+						rs.getInt("id"),
+						rs.getInt("userId"),
+						rs.getString("title"),
+						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
+						rs.getBoolean("answered"), 
+						rs.getBoolean("resolved"),
+						rs.getBoolean("isDeleted"),
+						rs.getInt("upvoteCount")
+				);
+				questions.add(q);
+			}
+		}
+		
+		return questions;
 	}
 	
 	@Override
@@ -96,6 +125,8 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getInt("userId"),
 						rs.getString("title"),
 						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
 						rs.getBoolean("isDeleted"),
@@ -120,6 +151,8 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getInt("userId"),
 						rs.getString("title"),
 						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
 						rs.getBoolean("isDeleted"),
@@ -144,6 +177,8 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getInt("userId"),
 						rs.getString("title"),
 						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
 						rs.getBoolean("isDeleted"),
@@ -173,6 +208,8 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getInt("userId"),
 						rs.getString("title"),
 						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
 						rs.getBoolean("isDeleted"),
@@ -198,6 +235,8 @@ public class QuestionRepository implements IQuestionRepository {
 						rs.getInt("userId"),
 						rs.getString("title"),
 						rs.getString("body"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getBoolean("answered"), 
 						rs.getBoolean("resolved"),
 						rs.getBoolean("isDeleted"),
@@ -253,4 +292,5 @@ public class QuestionRepository implements IQuestionRepository {
 		}
 		return false;
 	}
+
 }

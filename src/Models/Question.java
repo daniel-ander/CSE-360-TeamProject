@@ -1,5 +1,7 @@
 package Models;
 
+import java.sql.Timestamp;
+
 public class Question implements IPost {
 	public static String tableName = "questions";
 	
@@ -7,6 +9,9 @@ public class Question implements IPost {
 	private String text;
 	private String title;
 	private int authorId;
+	
+	private Timestamp createdTimestamp;
+	private Timestamp lastUpdatedTimestamp;
 
 	private int upvoteCount;
 	private boolean isAnswered;
@@ -21,17 +26,30 @@ public class Question implements IPost {
 	
 	// Non-DB constructor
 	public Question(int authorId, String title, String text) {
-		this(null, authorId, title, text, false, false, false, 0);
+		this(null, authorId, title, text, null, null, false, false, false, 0);
 	}
 		
 	// Constructor for when we have all the data (e.g., when retrieving from DB)
-	public Question(Integer id, int authorId, String title, String text, boolean answered, boolean resolved, boolean deleted, int upvoteCount) {
+	public Question(
+			Integer id, 
+			int authorId, 
+			String title, 
+			String text, 
+			Timestamp createdTimestamp,
+			Timestamp lastUpdatedTimestamp, 
+			boolean answered, 
+			boolean resolved, 
+			boolean deleted, 
+			int upvoteCount
+	) {
 		if (text == null || text.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
 		this.id = id;
 		this.title = title;
 		this.text = text;
+		this.createdTimestamp = createdTimestamp;
+		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
 		this.upvoteCount = upvoteCount;
 		this.authorId = authorId;
 		this.isAnswered = answered;
@@ -48,8 +66,35 @@ public class Question implements IPost {
 	public int getAuthorId() {return authorId;}
 	public boolean getAnsweredStatus() {return isAnswered;}
 	public boolean getResolvedStatus() {return isResolved;}
-	public boolean getDeleted() {return isDeleted;}
+	public boolean getIsDeleted() {return isDeleted;}
 	public int getUpvoteCount() {return upvoteCount;}
+	
+	@Override
+	public String getBodyText() {
+		return text;
+	}
+
+
+	@Override
+	public String getTitleText() {
+		return title;
+	}
+
+
+	@Override
+	public Type getPostType() {
+		return Type.Question;
+	}
+
+	@Override
+	public Timestamp getCreatedTimestamp() {
+		return createdTimestamp;
+	}
+	
+	@Override
+	public Timestamp getLastUpdatedTimestamp() {
+		return lastUpdatedTimestamp;
+	}
 	
 	
 	// ===================
@@ -79,22 +124,4 @@ public class Question implements IPost {
         return "Q" + id + ": " + text;
     }
 
-
-	@Override
-	public String getBodyText() {
-		// TODO Auto-generated method stub
-		return text;
-	}
-
-
-	@Override
-	public String getTitleText() {
-		return title;
-	}
-
-
-	@Override
-	public Type getPostType() {
-		return Type.Question;
-	}
 }

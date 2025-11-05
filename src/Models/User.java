@@ -3,7 +3,7 @@ package Models;
 import java.util.Arrays;
 import java.util.List;
 
-import Config.DefaultRolePermissions.QuestionPermissions;
+import Utils.RolePermissions.QuestionPermissions;
 
 /**
  * The User class represents a user entity in the system.

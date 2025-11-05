@@ -54,6 +54,17 @@ public class QuestionService implements IQuestionService {
 	}
 	
 	@Override
+	public List<Question> getLimitedAmountOfQuestions(int amount) {
+		try {			
+			if (Debug.isEnabled) System.out.println("Questions fetched successfully.");
+			return questionRepository.getLimitedAmountOfQuestions(amount);
+
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get all questions from the database due to: " + e);
+		}
+	}
+	
+	@Override
 	public Question getQuestionById(int targetId) throws DataAccessException {
 		try {
 			return questionRepository.getQuestionById(targetId);

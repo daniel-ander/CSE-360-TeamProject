@@ -8,6 +8,7 @@ import Models.Question;
 public interface IQuestionRepository {
 	
 	public List<Question> getAllQuestions() throws SQLException;
+	public List<Question> getLimitedAmountOfQuestions(int amount) throws SQLException;
 	
 	public Question getQuestionById(int searchId) throws SQLException;
 	

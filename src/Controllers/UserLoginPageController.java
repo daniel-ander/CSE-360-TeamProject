@@ -4,6 +4,7 @@ import Models.User;
 
 import javafx.stage.Stage;
 
+import Config.PreLoader;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 
@@ -66,7 +67,7 @@ public class UserLoginPageController {
 	        }
 
 	        try {
-	            // ✅ Pull the actual user from the DB
+	            // Pull the actual user from the DB
 	        	System.out.println(String.format("%s", userNameFieldText));
 	        	System.out.println(String.format("%s", passwordFieldText));
 
@@ -76,13 +77,14 @@ public class UserLoginPageController {
 	                return;
 	            }
 
-	            // ✅ Ensure we have the DB ID
+	            // Ensure we have the DB ID
 	            if (Debug.isEnabled) {
 	                System.out.println("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
 	            }
 
 	            // --- Initialize user session ---
 	            UserSession userSession = new UserSession(user);
+	            (new PreLoader(dBConnectionStore, userSession)).preload();
 	            userSession.setLoggedStatus(true);
 
 	            // --- Handle reset or normal login flow ---

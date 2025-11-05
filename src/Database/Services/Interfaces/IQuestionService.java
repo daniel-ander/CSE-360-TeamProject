@@ -9,6 +9,7 @@ import Exceptions.DBExceptions.DataAccessException;
 public interface IQuestionService {
 	
 	public List<Question> getAllQuestions();
+	public List<Question> getLimitedAmountOfQuestions(int amount);
 	
 	public Question getQuestionById(int targetId) throws DataAccessException;
 	

@@ -1,8 +1,7 @@
 package Database.Repositories;
 
-import Config.DefaultRolePermissions;
-
 import Models.User;
+import Utils.RolePermissions;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -256,7 +255,7 @@ public class PermissionRepository implements IPermissionRepository {
 		Map<String, List<String>> questionRolePermissions = new HashMap<>();
 		
 		for(User.Role role : User.Role.values()) {
-			questionRolePermissions.put(role.name(), DefaultRolePermissions.QuestionPermissions.getDefaultPermissionsForRole(role));
+			questionRolePermissions.put(role.name(), RolePermissions.QuestionPermissions.getDefaultPermissionsForRole(role));
 		}
 
 		String query = "MERGE INTO question_permissions (role, permission) VALUES (?, ?)";
@@ -279,7 +278,7 @@ public class PermissionRepository implements IPermissionRepository {
 		Map<String, List<String>> answerRolePermissions = new HashMap<>();
 
 		for(User.Role role : User.Role.values()) {
-			answerRolePermissions.put(role.name(), DefaultRolePermissions.AnswerPermissions.getDefaultPermissionsForRole(role));
+			answerRolePermissions.put(role.name(), RolePermissions.AnswerPermissions.getDefaultPermissionsForRole(role));
 		}
 
 

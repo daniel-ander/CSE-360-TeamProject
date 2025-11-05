@@ -1,11 +1,11 @@
-package Config;
+package Utils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import Models.User;
 
-public class DefaultRolePermissions {
+public class RolePermissions {
 	// NOTE:- The reason there is one for question and answer each is for clarity
 	// and for the reason that the permissions are likely to diverge
 	public static enum QuestionPermissions {
