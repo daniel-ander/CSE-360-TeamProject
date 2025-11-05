@@ -121,7 +121,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 			bodyText.setText("This message was deleted");
 			bodyTextField.setText("This message was deleted");
 		} else {
-			String truncated = Utils.StringUtils.truncate(vm.getPost().getBodyText(), 150);
 			bodyText.setText(vm.getPost().getBodyText());
 			bodyTextField.setText(vm.getPost().getBodyText());
 		}
@@ -189,7 +188,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		}
 
 		// Expand / Collapse button
-		Button toggleExpandButton = new Button("Expand");
+		Button toggleExpandButton = new Button();
 		
 		toggleExpandButton.textProperty()
 				.bind(Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand"));

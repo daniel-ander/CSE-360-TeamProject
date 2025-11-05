@@ -4,8 +4,6 @@ import Models.User;
 
 import javafx.stage.Stage;
 
-import static org.mockito.Mockito.lenient;
-
 import Config.PreLoader;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
@@ -69,7 +67,7 @@ public class UserLoginPageController {
 	        }
 
 	        try {
-	            // ✅ Pull the actual user from the DB
+	            // Pull the actual user from the DB
 	        	System.out.println(String.format("%s", userNameFieldText));
 	        	System.out.println(String.format("%s", passwordFieldText));
 
@@ -79,7 +77,7 @@ public class UserLoginPageController {
 	                return;
 	            }
 
-	            // ✅ Ensure we have the DB ID
+	            // Ensure we have the DB ID
 	            if (Debug.isEnabled) {
 	                System.out.println("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
 	            }

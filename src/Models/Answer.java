@@ -67,17 +67,26 @@ public class Answer implements IPost {
 	// ===================
     // 		 GETTERS 
  	// ===================
+	@Override
 	public Integer getId() {return id;}
 	public Integer getAuthorId() {return authorId;}
 	public Integer getQuestionId() {return questionId;}
 	public Integer getParentAnswerId() {return parentAnswerId;}
+	@Override
 	public Timestamp getCreatedTimestamp() {return createdTimestamp;}
+	@Override
 	public Timestamp getLastUpdatedTimestamp() {return lastUpdatedTimestamp;}
 	public boolean getIsDeleted() {return isDeleted;}
 	public Integer getUpvoteCount() {return upvoteCount;}
 	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
 	public int getReplyDepth() {return replyDepth;}
+	@Override
+	public String getBodyText() { return bodyText;}
+	@Override
+	public String getTitleText() {return null;}
+	@Override
+	public Type getPostType() {return Type.Answer;}
 	
 	// ===================
     // 		 SETTERS 
@@ -107,21 +116,10 @@ public class Answer implements IPost {
 	// this lets the answer print out correctly
     @Override
     public String toString() {
-        return "A" + id + ": " + bodyText + (isCorrect ? " (Correct)" : "") + "Answer Parent id: " + this.parentAnswerId;
+    	 return "Answer{id=" + id +
+                 ", bodyText='" + bodyText + '\'' +
+                 ", isCorrect=" + isCorrect +
+                 ", parentAnswerId=" + parentAnswerId +
+                 '}';
     }
-
-	@Override
-	public String getBodyText() {
-		return bodyText;
-	}
-
-	@Override
-	public String getTitleText() {
-		return null;
-	}
-
-	@Override
-	public Type getPostType() {
-		return Type.Answer;
-	}
 }

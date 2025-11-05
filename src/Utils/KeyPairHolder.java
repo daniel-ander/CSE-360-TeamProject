@@ -3,10 +3,10 @@ package Utils;
 import java.util.Objects;
 
 /**
- * PairKeyHolder simply holds the key pairs meant to be used
+ * KeyPairHolder simply holds the key pairs meant to be used
  * as keys. map[key] = 0 vs map[(key1, key2) = 0]
- * In the case of questions and answers, the id's of both must 
- * be taken into account for proper mapping.
+ * In the case of questions and answers, the ids of both the
+ * question and answer must be taken into account for proper mapping.
  */
 public class KeyPairHolder<K1, K2> {
 	private final K1 key1;

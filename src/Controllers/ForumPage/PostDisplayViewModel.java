@@ -148,7 +148,7 @@ public class PostDisplayViewModel {
     }
     
     public void setIsCommentingProperty(boolean isCommenting) {
-    	this.isCommentingProperty.set(isCommenting);;
+    	this.isCommentingProperty.set(isCommenting);
     }
     
     public void setIsDeletedProperty(boolean isDeleted) {
@@ -161,7 +161,7 @@ public class PostDisplayViewModel {
     }
     
     public void setLabelTextProperty(String newLabelText) {
-    	labelTextProperty.set(newLabelText);;
+    	labelTextProperty.set(newLabelText);
     }
     
     public void setBodyTextProperty(String newBodyText) {

@@ -93,7 +93,7 @@ public class Question implements IPost {
 	
 	@Override
 	public Timestamp getLastUpdatedTimestamp() {
-		return null;
+		return lastUpdatedTimestamp;
 	}
 	
 	

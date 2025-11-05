@@ -19,6 +19,6 @@ public class AnswerPreloadPriority {
     }
     
     public static void resetPriorityList() {
-    	priorityQuestionIds.clear();;
+    	priorityQuestionIds.clear();
     }
 }

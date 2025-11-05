@@ -9,7 +9,7 @@ import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
-import Models.Question;
+
 import Sessions.UserSession;
 import Utils.RolePermissions;
 import Utils.KeyPairHolder;
@@ -25,7 +25,7 @@ public class PostListViewModel {
 
 	// Observable list of currently visible posts (questions + answers)
 	private final ObservableList<PostDisplayViewModel> visiblePosts = FXCollections.observableArrayList();
-	private List<PostDisplayViewModel> allPostsStore = new ArrayList<>(visiblePosts); // Stores pre-filter posts for
+	private final List<PostDisplayViewModel> allPostsStore = new ArrayList<>(visiblePosts); // Stores pre-filter posts for
 																						// resetting
 
 	// Maps parent posts (questionId + parentAnswerId) to their child answers
@@ -61,12 +61,6 @@ public class PostListViewModel {
 				.collect(Collectors.toList());
 
 		visiblePosts.setAll(filtered);
-	}
-
-	/**
-	 * Refreshes questions from the given list (to be implemented later)
-	 */
-	public void refreshQuestions(List<PostWithPermissions> questions) {
 	}
 
 	/**
@@ -122,10 +116,6 @@ public class PostListViewModel {
 	 */
 	public ObservableList<PostDisplayViewModel> getVisiblePosts() {
 		return visiblePosts;
-	}
-
-	// Refreshes answers (placeholder)
-	public void refreshAnswers(List<PostWithPermissions> answers) {
 	}
 
 	/**
@@ -186,18 +176,6 @@ public class PostListViewModel {
 		}
 	}
 
-	/**
-	 * Update question content (in both UI and data)
-	 */
-	public void updateQuestion(int questionIdToUpdate, String labelText, String contentText) {
-		PostDisplayViewModel selectedPostVM = getVisiblePostByID(questionIdToUpdate, IPost.Type.Question);
-		selectedPostVM.setLabelTextProperty(labelText);
-	}
-
-	// Update answer content (to be implemented)
-	public void updateAnswer(int answerIdToUpdate, String contentText, boolean isCorrect) {
-		PostDisplayViewModel selectedPostVM = getVisiblePostByID(answerIdToUpdate, IPost.Type.Answer);
-	}
 
 	// get questions that are visible to the user [-->Q1<--, A1, A2, -->Q2<--, A1,
 	// -->Q3<--, A1, A2]
@@ -350,12 +328,9 @@ public class PostListViewModel {
 				(id, mainText, secondaryText) -> {
 					try {
 						if (postType == IPost.Type.Question) {
-							System.out.println("The new body is: " + secondaryText);
 							questionService.updateQuestion(id, mainText, secondaryText);
-							updateQuestion(id, mainText, secondaryText);
 						} else {
 							answerService.updateAnswer(id, mainText, secondaryText.equals("yes"));
-							updateAnswer(id, mainText, secondaryText.equals("yes"));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
