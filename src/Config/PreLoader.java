@@ -27,6 +27,7 @@ public class PreLoader {
 	private final UserSession userSession;
 	
 	private int questionToPreload = 20;
+	ExecutorService executor = Executors.newFixedThreadPool(4);
 
 	public PreLoader(DBConnectionStore dBConnectionStore, UserSession userSession) {
 		this.questionService = dBConnectionStore.getQuestionService();
@@ -36,7 +37,6 @@ public class PreLoader {
 	}
 
 	public void preload() {
-		ExecutorService executor = Executors.newFixedThreadPool(4);
 
 		executor.submit(() -> {
 			List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(questionToPreload);
@@ -80,6 +80,8 @@ public class PreLoader {
 			for (Question question : remainingQuestions) {
 				cacheAnswersForQuestion(question, executor);
 			}
+			
+			executor.shutdown();
 		});
 	}
 
