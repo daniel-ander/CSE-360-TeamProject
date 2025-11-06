@@ -62,6 +62,15 @@ public class QuestionService implements IQuestionService {
 		}
 	}
 	
+	@Override
+	public List<Question> getQuestionsFromUser(int userId) throws DataAccessException {
+		try {
+			return questionRepository.getQuestionsFromUser(userId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get questions from user id: " + userId + " due to: " + e);
+		}
+	}
+	
 	// ===================
     // 		 UPDATE 
  	// ===================
