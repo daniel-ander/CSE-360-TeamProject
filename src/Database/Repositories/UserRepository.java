@@ -14,6 +14,10 @@ import java.sql.Statement;
 import java.sql.Connection;
 
 import Models.User;
+import Models.Answer;
+import Models.Question;
+
+import java.util.Locale;
 
 public class UserRepository implements IUserRepository {
 	
@@ -96,7 +100,8 @@ public class UserRepository implements IUserRepository {
 	        ResultSet rs = pstmt.executeQuery();
 	        
 	        if (rs.next()) {
-	            return rs.getString("role"); // Return the role if user exists
+	            String role = rs.getString("role");
+	            if (role != null) return role.trim();
 	        }
 	    } 
 	    return null; // If no user exists or an error occurs
@@ -110,7 +115,8 @@ public class UserRepository implements IUserRepository {
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        ResultSet rs = pstmt.executeQuery();
 	        while (rs.next()) {
-	        	usernames.add((rs.getString("userName")));
+	         userNameAdd:
+	         	usernames.add((rs.getString("userName")));
 	        }
 	    }
 		return usernames;
@@ -165,7 +171,9 @@ public class UserRepository implements IUserRepository {
 	    String query = String.format("UPDATE %s SET role = ? WHERE userName = ?", User.tableName);
 	    try (Connection connection = generalDBManager.getConnection(); 
 				PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, roleString);
+	        // Normalize role string to lowercase for consistent storage and easier LIKE searches
+	        String normalized = roleString == null ? null : roleString.trim().toLowerCase(Locale.ROOT);
+	        pstmt.setString(1, normalized);
 	        pstmt.setString(2, userName);
 	        pstmt.executeUpdate();
 	    }
@@ -189,13 +197,56 @@ public class UserRepository implements IUserRepository {
 
 	@Override
 	public boolean deleteUser(String targetUser) throws SQLException {
-	    String query = String.format("DELETE FROM %s WHERE userName = ?", User.tableName);
-	    try (Connection connection = generalDBManager.getConnection(); 
-	         PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, targetUser);
-	        pstmt.executeUpdate();
-	        return true;
-	    }
+		// Delete user with cascade of dependent data to avoid FK constraint violations
+		int userId = getUserIdByName(targetUser);
+		if (userId == -1) return false;
+
+		try (Connection connection = generalDBManager.getConnection()) {
+			connection.setAutoCommit(false);
+			try (PreparedStatement delReviewerReq = connection.prepareStatement("DELETE FROM reviewer_requests WHERE student_id = ? OR instructor_id = ?");
+			     PreparedStatement delUserQuestionPerm = connection.prepareStatement("DELETE FROM user_question_permissions WHERE user_id = ?");
+			     PreparedStatement delUserAnswerPerm = connection.prepareStatement("DELETE FROM user_answer_permissions WHERE user_id = ?");
+			     PreparedStatement delAnswersByUser = connection.prepareStatement("DELETE FROM " + Answer.tableName + " WHERE userId = ?");
+			     PreparedStatement delAnswersToUserQuestions = connection.prepareStatement("DELETE FROM " + Answer.tableName + " WHERE questionId IN (SELECT id FROM " + Question.tableName + " WHERE userId = ?)");
+			     PreparedStatement delQuestions = connection.prepareStatement("DELETE FROM " + Question.tableName + " WHERE userId = ?");
+			     PreparedStatement delUser = connection.prepareStatement("DELETE FROM " + User.tableName + " WHERE userName = ?")) {
+
+				// reviewer requests
+				delReviewerReq.setInt(1, userId);
+				delReviewerReq.setInt(2, userId);
+				delReviewerReq.executeUpdate();
+
+				// user-specific permissions
+				delUserQuestionPerm.setInt(1, userId);
+				delUserQuestionPerm.executeUpdate();
+				delUserAnswerPerm.setInt(1, userId);
+				delUserAnswerPerm.executeUpdate();
+
+				// answers authored by user
+				delAnswersByUser.setInt(1, userId);
+				delAnswersByUser.executeUpdate();
+
+				// answers to questions authored by user
+				delAnswersToUserQuestions.setInt(1, userId);
+				delAnswersToUserQuestions.executeUpdate();
+
+				// questions authored by user
+				delQuestions.setInt(1, userId);
+				delQuestions.executeUpdate();
+
+				// finally delete the user
+				delUser.setString(1, targetUser);
+				delUser.executeUpdate();
+
+				connection.commit();
+				return true;
+			} catch (SQLException ex) {
+				connection.rollback();
+				throw ex;
+			} finally {
+				connection.setAutoCommit(true);
+			}
+		}
 	}
 	
 	// ===================
@@ -226,7 +277,41 @@ public class UserRepository implements IUserRepository {
 
 	@Override
 	public User getUserByName(String userName) throws SQLException {
-		// TODO Auto-generated method stub
+		String query = String.format("SELECT * FROM %s WHERE userName = ?", User.tableName);
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, userName);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				int id = rs.getInt("id");
+				String dbUserName = rs.getString("userName");
+				String dbPassword = rs.getString("password");
+				String roleString = rs.getString("role");
+				User.Role role = User.roleFromString(roleString);
+
+				return new User(id, dbUserName, dbPassword, role);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public User getUserById(int id) throws SQLException {
+		String query = String.format("SELECT * FROM %s WHERE id = ?", User.tableName);
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, id);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				int userId = rs.getInt("id");
+				String dbUserName = rs.getString("userName");
+				String dbPassword = rs.getString("password");
+				String roleString = rs.getString("role");
+				User.Role role = User.roleFromString(roleString);
+
+				return new User(userId, dbUserName, dbPassword, role);
+			}
+		}
 		return null;
 	}
 
