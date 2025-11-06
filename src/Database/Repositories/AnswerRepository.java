@@ -1,7 +1,7 @@
 package Database.Repositories;
 
 import Models.Answer;
-import Models.User;
+
 import Utils.Debug;
 
 import java.sql.Connection;
@@ -27,27 +27,53 @@ public class AnswerRepository implements IAnswerRepository {
     // 		 CREATE 
  	// ===================
 
-	public boolean insertAnswer(Answer a) throws SQLException {
-		System.out.println("The id is: " + a.getQuestionId());
-	    String insertSQL = String.format("INSERT INTO %s (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)", Answer.tableName);
+	@Override
+	public Answer insertAnswer(Answer a) throws SQLException {
+	    String insertSQL = String.format(
+	        "INSERT INTO %s (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)",
+	        Answer.tableName
+	    );
+
 	    try (Connection connection = generalDBManager.getConnection();
 	         PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
 
 	        pstmt.setInt(1, a.getQuestionId());
-	        if (a.getParentAnswerId() == null) {
+	        if (a.getParentAnswerId() == null)
 	            pstmt.setNull(2, java.sql.Types.INTEGER);
-	        } else {
+	        else
 	            pstmt.setInt(2, a.getParentAnswerId());
-	        }
+
 	        pstmt.setInt(3, a.getAuthorId());
 	        pstmt.setString(4, a.getBodyText());
 	        pstmt.executeUpdate();
 
 	        try (ResultSet keys = pstmt.getGeneratedKeys()) {
-	            if (keys.next()) a.setId(keys.getInt(1));
+	            if (keys.next())
+	                a.setId(keys.getInt(1));
+	        }
+
+	        // Fetch the full row from the database
+	        String selectSQL = String.format(
+	            "SELECT id, questionId, parentAnswerId, userId, authorName, body, isCorrect, created, lastUpdated, isDeleted, upvoteCount " +
+	            "FROM %s WHERE id = ?",
+	            Answer.tableName
+	        );
+
+	        try (PreparedStatement selectStmt = connection.prepareStatement(selectSQL)) {
+	            selectStmt.setInt(1, a.getId());
+	            try (ResultSet rs = selectStmt.executeQuery()) {
+	                if (rs.next()) {
+	                    a.setCreatedTimestamp(rs.getTimestamp("created"));
+	                    a.setLastUpdatedTimestamp(rs.getTimestamp("lastUpdated"));
+	                    a.setIsCorrect(rs.getBoolean("isCorrect"));
+	                    a.setIsDeleted(rs.getBoolean("isDeleted"));
+	                    a.setUpvoteCount(rs.getInt("upvoteCount"));
+	                }
+	            }
 	        }
 	    }
-	    return true;
+
+	    return a;
 	}
 
 	
@@ -75,7 +101,8 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
-						rs.getTimestamp("timestamp"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0
@@ -100,11 +127,12 @@ public class AnswerRepository implements IAnswerRepository {
 				Answer a = new Answer(
 						rs.getInt("id"),
 						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
+						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
-						rs.getTimestamp("timestamp"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0
@@ -128,11 +156,12 @@ public class AnswerRepository implements IAnswerRepository {
 				Answer a = new Answer(
 						rs.getInt("id"),
 						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
+						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
-						rs.getTimestamp("timestamp"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0
@@ -160,7 +189,8 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
-						rs.getTimestamp("timestamp"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0
@@ -186,7 +216,8 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
-						rs.getTimestamp("timestamp"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0
@@ -213,7 +244,8 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
-						rs.getTimestamp("timestamp"),
+						rs.getTimestamp("created"),
+						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
 						rs.getBoolean("isDeleted"), 0

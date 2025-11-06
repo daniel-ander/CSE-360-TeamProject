@@ -83,7 +83,7 @@ public class QuestionServiceTest {
     @Test
     public void GetAllQuestions_ReturnsList() throws Exception {
         List<Question> sampleList = new ArrayList<>();
-        sampleList.add(new Question(1, 1, "T", "B", false, false, false, 0));
+        sampleList.add(new Question(1, 1, "T", "B", null, null, false, false, false, 0));
         when(questionRepo.getAllQuestions()).thenReturn(sampleList);
 
         List<Question> result = questionService.getAllQuestions();
