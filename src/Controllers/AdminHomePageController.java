@@ -43,12 +43,11 @@ public class AdminHomePageController {
 		setSetTempPasswordButtonAction();
 		setOnUserDropdownAction();
 		setUserDeleteButtonAction();
-		setSaveRolesButtonAction();
 	}
 	
 	// ===================
     // 		 SETTERS 
- 	// ===================
+  	// ===================
 	
 	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
@@ -67,30 +66,37 @@ public class AdminHomePageController {
 	private void setUpdateRolesButtonAction() {
 		view.getSaveRolesButton().setOnAction(_ -> {
 			selectedDropdownUser = view.getUserDropdown().getValue();
-			if (selectedDropdownUser == null) {
-				return;
-			}
-			List<User.Role> roles = new ArrayList<>();
-			if (view.isAdminCheckBoxSelected())
-				roles.add(User.Role.admin);
-			if (view.isStudentCheckBoxSelected())
-				roles.add(User.Role.student);
-			if (view.isInstructorCheckBoxSelected())
-				roles.add(User.Role.instructor);
-			if (view.isStaffCheckBoxSelected())
-				roles.add(User.Role.staff);
-			if (view.isReviewerCheckBoxSelected())
-				roles.add(User.Role.reviewer);
+			if (selectedDropdownUser == null) return;
 
-			// TODO :- Need to figure out what we're doing with roles
+			// Build new role list from checkboxes
+			List<String> roles = new ArrayList<>();
+			if (view.isAdminCheckBoxSelected()) roles.add("admin");
+			if (view.isStudentCheckBoxSelected()) roles.add("student");
+			if (view.isInstructorCheckBoxSelected()) roles.add("instructor");
+			if (view.isStaffCheckBoxSelected()) roles.add("staff");
+			if (view.isReviewerCheckBoxSelected()) roles.add("reviewer");
+
+			String roleStr = String.join(",", roles);
+			view.setUserDetailsLabel(
+				"User: " + selectedDropdownUser + "\n" +
+				"Roles: " + (roleStr.isEmpty() ? "None" : roleStr) + "\n" +
+				"Other info: (e.g., last login, email, etc.)"
+			);
+
 			try {
-				userService.updateUserRole(selectedDropdownUser, User.Role.admin);
-				System.out.println("Updates Roles for " + selectedDropdownUser + ": " + roles);
+				userService.updateUserRoles(selectedDropdownUser, roleStr);
+				System.out.println("Updated Roles for " + selectedDropdownUser + ": " + roleStr);
+				userService.printUsersTable();
+				// Refresh dropdown and keep the same selection so UI reflects saved roles
+				try {
+					users = userService.getAllUsernames();
+					view.setUserDropDownLayout(users);
+					view.getUserDropdown().setValue(selectedDropdownUser);
+				} catch (DataAccessException ignore) { /* non-fatal UI refresh failure */ }
 			} catch (DataAccessException e) {
-				// TODO: - Handle the case if user role can't be updated
 				System.err.println(e.getMessage());
-	            e.printStackTrace();
-	        }
+				e.printStackTrace();
+			}
 		});
 	}
 	
@@ -122,12 +128,13 @@ public class AdminHomePageController {
             String selectedUserName = view.getUserDropdown().getValue();
             if (selectedUserName == null) return;
             
-            User.Role role;
             int userId;
+            String roleStr;
             
             try {
-            	role = userService.getUserRole(selectedUserName);
-            	userId = userService.getUserIdByName(selectedUserName);
+				// Use the raw roles string so multiple roles are preserved and shown in UI
+				roleStr = userService.getUserRolesString(selectedUserName);
+				userId = userService.getUserIdByName(selectedUserName);
             } catch (DataAccessException e) {
             	// TODO: - Handle the case if user role can't be fetched
             	System.err.println(e.getMessage());
@@ -143,30 +150,24 @@ public class AdminHomePageController {
             view.setStaffCheckBox(false);
             view.setReviewerCheckBox(false);
 
-            // NOTE :- Again, it seems like only one role should be available
-//            if (roleStr != null && !roleStr.isEmpty()) {
-//                Set<String> roles = new HashSet<>();
-//                for (String r : roleStr.split(",")) {
-//                    roles.add(r.trim().toLowerCase(Locale.ROOT));
-//                }
-//                if (roles.contains("admin")) view.setAdminCheckBox(true);
-//                if (roles.contains("student")) view.setStudentCheckBox(true);
-//                if (roles.contains("instructor")) view.setInstructorCheckBox(true);
-//                if (roles.contains("staff")) view.setStaffCheckBox(true);
-//                if (roles.contains("reviewer")) view.setReviewerCheckBox(true);
-//            }
-            
-            if (role.name().equals("admin")) view.setAdminCheckBox(true);
-            if (role.name().equals("student")) view.setStudentCheckBox(true);
-            if (role.name().equals("instructor")) view.setInstructorCheckBox(true);
-            if (role.name().equals("staff")) view.setStaffCheckBox(true);
-            if (role.name().equals("reviewer")) view.setReviewerCheckBox(true);
+            // If roleStr can contain multiple roles separated by commas, handle that
+            if (roleStr != null && !roleStr.trim().isEmpty()) {
+                Set<String> roles = new HashSet<>();
+                for (String r : roleStr.split(",")) {
+                    roles.add(r.trim().toLowerCase(Locale.ROOT));
+                }
+                if (roles.contains("admin")) view.setAdminCheckBox(true);
+                if (roles.contains("student")) view.setStudentCheckBox(true);
+                if (roles.contains("instructor")) view.setInstructorCheckBox(true);
+                if (roles.contains("staff")) view.setStaffCheckBox(true);
+                if (roles.contains("reviewer")) view.setReviewerCheckBox(true);
+            }
 
             // Update details section
             view.setUserDetailsLabel(
                 "User: " + selectedUserName + "\n" +
                 "User ID: " + userId + "\n" +
-                "Roles: " + role.name() + "\n" +
+                "Roles: " + (roleStr == null || roleStr.trim().isEmpty() ? "None" : roleStr) + "\n" +
                 "Other info: (e.g., last login, email, etc.)"
             );
         });
@@ -212,45 +213,11 @@ public class AdminHomePageController {
 	                    view.getErrorAlert().showAndWait();
 	                }
             	} catch (DataAccessException e) {
-            		// TODO: - Handle the case if user names can't be fetched
-            		System.err.println(e.getMessage());
-    	            e.printStackTrace();
-    	        }
+					// TODO: - Handle the case if user names can't be fetched
+					System.err.println(e.getMessage());
+				    e.printStackTrace();
+			    }
             }
         });
-	}
-	
-	private void setSaveRolesButtonAction() {
-
-        String selectedUserName = view.getUserDropdown().getValue();
-        if (selectedUserName == null) return;
-
-        // Build new role list from checkboxes
-        List<String> roles = new ArrayList<>();
-        if (view.isAdminCheckBoxSelected()) roles.add("admin");
-        if (view.isStudentCheckBoxSelected()) roles.add("student");
-        if (view.isInstructorCheckBoxSelected()) roles.add("instructor");
-        if (view.isStaffCheckBoxSelected()) roles.add("staff");
-        if (view.isReviewerCheckBoxSelected()) roles.add("reviewer");
-
-        // Update details view
-        String roleStr = String.join(",", roles);
-        view.setUserDetailsLabel(
-            "User: " + selectedUserName + "\n" +
-            "Roles: " + (roleStr.isEmpty() ? "None" : roleStr) + "\n" +
-            "Other info: (e.g., last login, email, etc.)"
-        );
-
-        // Save roles in database
-        try {
-	        userService.updateUserRole(selectedUserName, User.Role.admin);
-	        System.out.println("Updated Roles for " + selectedUserName + ": " + roles);
-	        userService.printUsersTable();
-        } catch (DataAccessException e) {
-        	// TODO: - Handle the case if user role couldn't be updated or user table printed
-        	System.err.println(e.getMessage());
-            e.printStackTrace();
-        }
-    
 	}
 }
