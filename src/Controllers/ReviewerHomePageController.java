@@ -1,9 +1,13 @@
 package Controllers;
 
+import Controllers.ForumPage.ForumHeaderViewModel;
+import Controllers.ForumPage.ForumPageController;
+import Controllers.ForumPage.PostListViewModel;
+import Controllers.ForumPage.QuestionPaneViewModel;
 import Database.*;
-
+import Database.Services.Interfaces.IQuestionService;
 import Sessions.UserSession;
-
+import UI.Pages.ForumPage;
 import UI.Pages.ReviewerHomePage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
@@ -28,21 +32,38 @@ public class ReviewerHomePageController {
 	// Reference to the DatabaseHelper for database interactions
 	private final DBConnectionStore dBConnectionStore;
 	private final UserSession userSession;
-	
+	private final IQuestionService questionService;
 	private final Stage primaryStage;
 	private final ReviewerHomePage view;
+	
+	private final PostListViewModel postListViewModel;
+	private final ForumHeaderViewModel reviewerHeaderViewModel;
+	private final QuestionPaneViewModel questionPaneViewModel;
+	
 		
-	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, ReviewerHomePage view) {
+	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, ReviewerHomePage view, 
+			PostListViewModel postListViewModel, ForumHeaderViewModel reviewerHeaderViewModel, QuestionPaneViewModel questionPaneViewModel) {
 		this.dBConnectionStore = dBConnectionStore;
+		this.questionService = dBConnectionStore.getQuestionService();
+		this.primaryStage = primaryStage;
+		this.userSession = userSession;
 		this.view = view;
-	    this.primaryStage = primaryStage;
-	    this.userSession = userSession;
+		this.postListViewModel = postListViewModel;
+		this.reviewerHeaderViewModel = reviewerHeaderViewModel;
+		this.questionPaneViewModel = questionPaneViewModel;
+	    
 	        
 	    setInitialLayout();
-	    
+	    setEnterForumButtonAction();
 	    setLogoutButtonAction();
 	    setChangeRolesButtonAction();
+	    setEnterMessagesPageButtonAction();
 	    
+		reviewerHeaderViewModel.getSearchButtonPressedProperty().addListener((_, _, isTriggered) -> {
+			if (isTriggered) {
+				postListViewModel.filterVisibleQuestionsByText(reviewerHeaderViewModel.getSearchFieldText());
+			}
+		});	    
 	    if(Debug.isEnabled) {
         	setUpDebugEnvironment();
         }
@@ -67,12 +88,41 @@ public class ReviewerHomePageController {
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 		});
 	}
+	private void setEnterForumButtonAction() {
+		view.getEnterForumButton().setOnAction(_ -> {
+			// Enter the forum page
+			PostListViewModel postListViewModel = new PostListViewModel(
+					dBConnectionStore.getQuestionService(), 
+					dBConnectionStore.getAnswerService(),
+					userSession
+			);
+			
+			ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
+			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
+			
+			new ForumPageController(
+					dBConnectionStore, 
+					primaryStage, 
+					userSession, 
+					new ForumPage(forumHeaderViewModel, questionPaneViewModel),
+					postListViewModel,
+					forumHeaderViewModel,
+					questionPaneViewModel
+			);
+		});
+	}
+	
+	private void setEnterMessagesPageButtonAction() {
+		view.getMessagesPageButton().setOnAction(_ -> {
+			// Enter the messages page
+		});
+	}
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
     
     private final void setUpDebugEnvironment() {
-    	view.addDebugLabel();
+    	//view.addDebugLabel();
     }
 }

@@ -172,6 +172,8 @@ public class ForumPage implements IInitializable {
     public Button getLogoutButton() { return logoutButton; }
 
     public Button getChangeRolesButton() { return changeRolesButton; }
+    
+    
 
     public ListView<PostDisplayViewModel> getForumListView() { return forumListView; }
 

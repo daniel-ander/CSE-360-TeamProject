@@ -9,6 +9,9 @@ import javafx.application.Platform;
 
 import java.util.ArrayList;
 
+import Controllers.ForumPage.ForumHeaderViewModel;
+import Controllers.ForumPage.PostListViewModel;
+import Controllers.ForumPage.QuestionPaneViewModel;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 
@@ -139,7 +142,14 @@ public class WelcomeLoginPageController {
                 new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage());
                 break;
             case "reviewer":
-                new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage());
+    			PostListViewModel postListViewModel = new PostListViewModel(
+    					dBConnectionStore.getQuestionService(), 
+    					dBConnectionStore.getAnswerService(),
+    					userSession
+    			);
+            	ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
+    			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
+                new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage(forumHeaderViewModel, questionPaneViewModel), postListViewModel, forumHeaderViewModel, questionPaneViewModel);
                 break;
             case "user":
             	// TODO: - Fix Roles

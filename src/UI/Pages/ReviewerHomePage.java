@@ -1,40 +1,131 @@
 package UI.Pages;
 
+import UI.Elements.PostCell;
 import UI.Interfaces.IInitializable;
-
-import javafx.scene.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.skin.ListViewSkin;
+import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
+import java.util.function.Consumer;
+
+import Controllers.ForumPage.ForumHeaderViewModel;
+import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.ForumPage.PostDisplayViewModel;
 /**
  * This page displays a simple welcome message for the user.
  */
 
 public class ReviewerHomePage implements IInitializable {
-	private final VBox layout = new VBox();
-	private final Scene scene = new Scene(layout, 800, 400);
+
+	private final BorderPane root = new BorderPane();
+	
 	private final Label userLabel = new Label();
-	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
+	private final Button enterMessagesButton = new Button("Messages Page");
+	private final Button enterForumButton = new Button("Enter Forum");
+    private final TextField searchQuestionsTextField = new TextField();
+    private final Button filterQuestionsButton = new Button("Search");
 	
-	public ReviewerHomePage() {
-    	// import stylesheet
-    	scene.getStylesheets().add(
-    		getClass().getResource("/Styles/styles.css").toExternalForm()
-    	);
+	private final ObservableList<PostDisplayViewModel> viewModels = FXCollections.observableArrayList();
+	private final ListView<PostDisplayViewModel> reviewerListView = new ListView<>(viewModels);
+	
+	private final ForumHeaderViewModel reviewerHeaderViewModel;
+	private final QuestionPaneViewModel questionPaneViewModel;
+	
+	private Consumer<int[]> getVisibleQuestionsCallback;
+	
+	// ===================
+	// INITIALIZATION
+	// ===================
+	
+	public ReviewerHomePage(ForumHeaderViewModel reviewerHeaderViewModel, QuestionPaneViewModel questionPaneViewModel) {
+		this.reviewerHeaderViewModel = reviewerHeaderViewModel;
+		this.questionPaneViewModel = questionPaneViewModel;
+		bindViewModelProperties();
+		
+		filterQuestionsButton.setOnMouseClicked(_ -> reviewerHeaderViewModel.triggerPostsFilter());
+		
+		searchQuestionsTextField.setOnKeyPressed(e -> {
+			if(e.getCode() == KeyCode.ENTER) {
+				reviewerHeaderViewModel.triggerPostsFilter(); 
+			}
+		});
+		
     }
+    public void setInitialLayout(Stage primaryStage) {
+    	Region spacer = new Region();
+    	HBox header = new HBox();
+    	HBox.setHgrow(spacer, Priority.ALWAYS);
+    	
+    	header.getChildren().addAll(logoutButton, changeRolesButton, enterMessagesButton, enterForumButton, spacer);
+		header.setStyle("-fx-padding: 10; -fx-alignment: center-left;");
+		root.setTop(header);
+    	
+		reviewerListView.setCellFactory(_ -> new PostCell());
+		
+		searchQuestionsTextField.setPromptText("Filter questions...");
+    	
+		BorderPane centerPane = new BorderPane();
+		centerPane.setCenter(reviewerListView);
+    	
+		root.setCenter(centerPane);
+		
+		Scene scene = new Scene(root, 800, 400);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Reviewer Home Page");
+		primaryStage.show();
+		
+		setupScrollVisibilityCallback();
+    	
+    }
+    
+    private void setupScrollVisibilityCallback() {
+        reviewerListView.skinProperty().addListener((_, _, newSkin) -> {
+            if (newSkin == null) return;
+
+            Platform.runLater(() -> {
+                ScrollBar verticalBar = (ScrollBar) reviewerListView.lookup(".scroll-bar:vertical");
+                if (verticalBar == null) return;
+
+                verticalBar.valueProperty().addListener((_, _, _) -> {
+                    int[] visibleIndices = getVisibleIndices();
+                    if (visibleIndices == null || getVisibleQuestionsCallback == null) return;
+                    getVisibleQuestionsCallback.accept(visibleIndices);
+                });
+            });
+        });
+    }
+    private int[] getVisibleIndices() {
+        if (!(reviewerListView.getSkin() instanceof ListViewSkin<?> skin)) return null;
+        if (skin.getChildren().isEmpty()) return null;
+
+        VirtualFlow<?> flow = (VirtualFlow<?>) skin.getChildren().get(0);
+        if (flow == null) return null;
+
+        IndexedCell<?> first = flow.getFirstVisibleCell();
+        IndexedCell<?> last = flow.getLastVisibleCell();
+        if (first == null || last == null) return null;
+
+        return new int[]{first.getIndex(), last.getIndex()};
+    }
+	
+	
+	
 	
 	// ===================
     // 		 GETTERS 
  	// ===================
 	
-	public VBox getLayout() {
-		return layout;
-	}
-    
+
     public Button getLogoutButton() {
     	return logoutButton;
     }
@@ -43,31 +134,31 @@ public class ReviewerHomePage implements IInitializable {
     	return changeRolesButton;
     }
     
-    public Label getDebugLabel() {
-    	return debugLabel;
+    public Button getEnterForumButton() {
+    	return enterForumButton;
     }
+    
+    public Button getMessagesPageButton() {
+		return enterMessagesButton;
+	}
+    
+    public ListView<PostDisplayViewModel> getReviewerListView() {
+		return reviewerListView;
+	}
     
     // ===================
     // 		 SETTERS 
  	// ===================
     
-    public void setUserLabel(String text) {
-    	userLabel.setText("Hello, " + text + "!");
+    public void setUserLabel(String username) {
+        userLabel.setText("Hello, " + username + "!");
     }
-    
-    public void setInitialLayout(Stage primaryStage) {
-    	layout.getStyleClass().add("layout");
-    	userLabel.getStyleClass().add("main-label");
 
-	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
-	  
-	    // Set the scene to primary stage
-	    primaryStage.setScene(scene);
-	    primaryStage.setTitle("Reviewer Home Page");
+    public void setGetVisibleQuestionIDsCallback(Consumer<int[]> callback) {
+        this.getVisibleQuestionsCallback = callback;
     }
     
-    public void addDebugLabel() {
-    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");	
-    	layout.getChildren().add(debugLabel);
+    private void bindViewModelProperties() {
+    	searchQuestionsTextField.textProperty().bindBidirectional(reviewerHeaderViewModel.getSearchFieldTextProperty());
     }
 }

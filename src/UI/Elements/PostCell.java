@@ -40,7 +40,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		setStyles();
 
 		bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
-		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, statusLabel, actionsContainer);
+		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, newReviewTextField, statusLabel, actionsContainer);
 		outerMostContainer.getChildren().addAll(spacer, layout);
 
 		setGraphic(outerMostContainer);
@@ -104,6 +104,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		bodyText.setText(body);
 
 		newCommentTextField.clear();
+		newReviewTextField.clear();
 
 		// Configure layout depending on post type
 		if (vm.isQuestion()) {
@@ -184,7 +185,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 					} else {
 						String newReviewText = newReviewTextField.getText().trim();
 						if (!newReviewText.isEmpty()) {
-							//vm.addReview(null, newReviewText);
+							vm.addAnswer(null, newReviewText);
 							newReviewTextField.clear();
 							vm.setIsReviewingProperty(false);
 						} else {
@@ -283,6 +284,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		newCommentTextField.setVisible(false);
 		newCommentTextField.setManaged(false);
+		
+		newReviewTextField.setVisible(false);
+		newReviewTextField.setManaged(false);
 
 		layout.setFillWidth(true);
 		layout.setMaxWidth(Double.MAX_VALUE);
@@ -294,6 +298,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		// Comment field visibility
 		newCommentTextField.visibleProperty().bind(vm.getIsCommentingProperty());
 		newCommentTextField.managedProperty().bind(vm.getIsCommentingProperty());
+		
+		// Review field visibility
+		newReviewTextField.visibleProperty().bind(vm.getIsReviewingProperty());
+		newReviewTextField.managedProperty().bind(vm.getIsReviewingProperty());
 
 		// Manage visibility for edit vs view mode
 		titleLabel.visibleProperty().bind(vm.getIsEditingPostProperty().not());

@@ -9,7 +9,7 @@ public class RolePermissions {
 	// NOTE:- The reason there is one for question and answer each is for clarity
 	// and for the reason that the permissions are likely to diverge
 	public static enum QuestionPermissions {
-		VIEW, COMMENT, DELETE, APPROVE, UPVOTE, EDIT;
+		VIEW, COMMENT, DELETE, APPROVE, UPVOTE, EDIT, REVIEW;
 		
 		public static List<String> getAllPermissions() {
 			return Arrays.stream(QuestionPermissions.values())
@@ -20,11 +20,13 @@ public class RolePermissions {
 		public static List<String> getDefaultPermissionsForRole(User.Role role) {
 			switch (role) {
 			case admin:
-				return List.of(VIEW.name(), COMMENT.name(), DELETE.name(), APPROVE.name(), EDIT.name(), UPVOTE.name());
+				return List.of(VIEW.name(), COMMENT.name(), DELETE.name(), APPROVE.name(), EDIT.name(), UPVOTE.name(), REVIEW.name());
 			case student:
 				return List.of(VIEW.name(), COMMENT.name(), UPVOTE.name());
 			case instructor:
 				return List.of(VIEW.name(), COMMENT.name(), EDIT.name(), APPROVE.name(), UPVOTE.name());
+			case reviewer:
+				return List.of(VIEW.name(), COMMENT.name(), REVIEW.name());
 			case staff:
 				return List.of(VIEW.name(), COMMENT.name(), UPVOTE.name(), EDIT.name());
 			default:
@@ -34,7 +36,7 @@ public class RolePermissions {
 	}
 	
 	public static enum AnswerPermissions {
-		VIEW, COMMENT, DELETE, APPROVE, UPVOTE, EDIT;
+		VIEW, COMMENT, DELETE, APPROVE, UPVOTE, EDIT, REVIEW;
 		
 		public static List<String> getAllPermissions() {
 			return Arrays.stream(AnswerPermissions.values())
@@ -50,6 +52,8 @@ public class RolePermissions {
 				return List.of(VIEW.name(), COMMENT.name(), UPVOTE.name());
 			case instructor:
 				return List.of(VIEW.name(), COMMENT.name(), EDIT.name(), APPROVE.name(), UPVOTE.name());
+			case reviewer:
+				return List.of(VIEW.name(), COMMENT.name(), REVIEW.name());
 			case staff:
 				return List.of(VIEW.name(), COMMENT.name(), UPVOTE.name(), EDIT.name());
 			default:
