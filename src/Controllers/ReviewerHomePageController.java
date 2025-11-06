@@ -8,6 +8,7 @@ import Database.*;
 import Database.Services.Interfaces.IQuestionService;
 import Sessions.UserSession;
 import UI.Pages.ForumPage;
+import UI.Pages.MessagesPage;
 import UI.Pages.ReviewerHomePage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
@@ -113,8 +114,26 @@ public class ReviewerHomePageController {
 	}
 	
 	private void setEnterMessagesPageButtonAction() {
-		view.getMessagesPageButton().setOnAction(_ -> {
+		view.getEnterMessagesPageButton().setOnAction(_ -> {
 			// Enter the messages page
+			PostListViewModel postListViewModel = new PostListViewModel(
+					dBConnectionStore.getQuestionService(), 
+					dBConnectionStore.getAnswerService(),
+					userSession
+			);
+			
+			ForumHeaderViewModel messagesHeaderViewModel = new ForumHeaderViewModel(); 
+			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
+			
+			new MessagesPageController(
+					dBConnectionStore, 
+					primaryStage, 
+					userSession, 
+					new MessagesPage(messagesHeaderViewModel, questionPaneViewModel),
+					postListViewModel,
+					messagesHeaderViewModel,
+					questionPaneViewModel
+			);
 		});
 	}
     

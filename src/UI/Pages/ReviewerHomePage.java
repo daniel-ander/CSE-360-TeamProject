@@ -138,7 +138,7 @@ public class ReviewerHomePage implements IInitializable {
     	return enterForumButton;
     }
     
-    public Button getMessagesPageButton() {
+    public Button getEnterMessagesPageButton() {
 		return enterMessagesButton;
 	}
     
