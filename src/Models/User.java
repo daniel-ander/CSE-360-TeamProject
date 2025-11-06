@@ -65,18 +65,23 @@ public class User {
     
     public void setId(int newId) { this.id = newId; }
     
-    public static Role roleFromString(String value) {    	
+    public static Role roleFromString(String value) {
 
-    	for(Role role : Role.values()) {
-    		if(role.name().equalsIgnoreCase(value))
-    			return role;
-    	}
-    	
-    	// NOTE/BUG: - This may cause an error if more than one role is selected.
-    	// We need to decide on how we'll handle the roles, but a check box is
-    	// not appropriate when only a single role can be had.
-    	
-    	throw new IllegalArgumentException("Invalid role: " + value);
+        if (value == null) {
+            throw new IllegalArgumentException("Invalid role: null");
+        }
+
+        // Support comma-separated role strings (e.g. "student,reviewer"). Use the first valid role found.
+        String[] tokens = value.split(",");
+        for (String token : tokens) {
+            String trimmed = token.trim();
+            for (Role role : Role.values()) {
+                if (role.name().equalsIgnoreCase(trimmed))
+                    return role;
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid role: " + value);
     }
     
     public void changeRole(Role newRole) {
