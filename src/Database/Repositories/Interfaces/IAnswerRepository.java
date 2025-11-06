@@ -9,6 +9,7 @@ public interface IAnswerRepository {
 	
 	public List<Answer> getAll() throws SQLException;
 	public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException;
+	public List<Answer> getAnswersByUser(int userId) throws SQLException;
 	public List<Answer> getCorrectAnswers() throws SQLException;
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException;
     public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException;
