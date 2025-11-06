@@ -75,3 +75,4 @@ public class ReviewerHomePageController {
     private final void setUpDebugEnvironment() {
     	view.addDebugLabel();
     }
+}
