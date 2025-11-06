@@ -4,6 +4,7 @@ import Models.User;
 
 import Database.*;
 import Database.Services.Interfaces.IUserService;
+import Database.Services.RequestService;
 
 import Exceptions.DBExceptions.DataAccessException;
 
@@ -12,10 +13,17 @@ import Sessions.UserSession;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
+import UI.Pages.InstructorRequestsPage;
 
 import Utils.Debug;
 
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * FirstPage class represents the initial screen for the first user.
@@ -41,6 +49,7 @@ public class InstructorHomePageController {
         
         setLogoutButtonAction();
         setChangeRolesButtonAction();
+        setManageRequestsButtonAction();
         
         if(Debug.isEnabled) {
         	setUpDebugEnvironment();
@@ -49,7 +58,7 @@ public class InstructorHomePageController {
 	
 	// ===================
     // 		 SETTERS 
- 	// ===================
+  	// ===================
     
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(_ -> {
@@ -60,21 +69,46 @@ public class InstructorHomePageController {
     
     private void setChangeRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(_ -> {
-    		
-    		try {
-    			User.Role role = userService.getUserRole(userSession.getCurrentUserName());
-    			// TODO: -- Change role in DB 
-    		} catch (DataAccessException e) {
-	            System.err.println(e.getMessage());
-	            e.printStackTrace();
-	        }
-	    	
-	    	// Return to welcome page
-	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
-
+			// instructor view + process pending reviewer requests
+			RequestService requestService = new RequestService(dBConnectionStore);
+			try { // fetch pending requests
+				List<String> pending = requestService.getPendingRequests();
+				if (pending == null || pending.isEmpty()) {
+					Alert info = new Alert(Alert.AlertType.INFORMATION, "No pending reviewer requests.");
+					info.showAndWait();
+					return;
+				} // select from pending
+				ChoiceDialog<String> dialog = new ChoiceDialog<>(pending.get(0), pending);
+				dialog.setTitle("Pending Reviewer Requests");
+				dialog.setHeaderText("Select a student request to process");
+				Optional<String> selected = dialog.showAndWait();
+				if (selected.isPresent()) { // confirm granting reviewer role
+					String student = selected.get(); // selected student username
+					Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Grant reviewer role to '" + student + "'?", ButtonType.YES, ButtonType.NO);
+					Optional<ButtonType> resp = confirm.showAndWait();
+					if (resp.isPresent() && resp.get() == ButtonType.YES) {
+						boolean ok = requestService.grantReviewerRole(student);
+						Alert res = new Alert(ok ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR, ok ? "Reviewer role granted." : "Failed to grant reviewer role.");
+						res.showAndWait();
+					}
+				}
+			} catch (Exception e) {
+				Alert err = new Alert(Alert.AlertType.ERROR, "Error processing requests: " + e.getMessage());
+				err.showAndWait();
+			}
 	    });
 	}
-    
+
+    // manage requests button action
+    private void setManageRequestsButtonAction() {
+        view.getManageRequestsButton().setOnAction(_ -> {
+            // instructor requests management page
+            InstructorRequestsPage requestsPage = new InstructorRequestsPage();
+            InstructorRequestsPageController controller = new InstructorRequestsPageController(dBConnectionStore, primaryStage, userSession, requestsPage);
+            controller.show();
+        });
+    }
+
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	view.setUserLabel(userSession.getCurrentUserName());
