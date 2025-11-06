@@ -1,6 +1,5 @@
 package UI.Pages;
 
-
 import UI.Interfaces.IInitializable;
 import javafx.scene.*;
 import javafx.scene.control.Button;
@@ -21,6 +20,7 @@ public class InstructorHomePage implements IInitializable {
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
+	private final Button manageRequestsButton = new Button("Manage Reviewer Requests");
 	
 	public InstructorHomePage() {
     	// import stylesheet
@@ -31,7 +31,7 @@ public class InstructorHomePage implements IInitializable {
     
 	// ===================
     // 		 GETTERS 
- 	// ===================
+  	// ===================
     
     public Button getLogoutButton() {
     	return logoutButton;
@@ -39,6 +39,10 @@ public class InstructorHomePage implements IInitializable {
     
     public Button getChangeRolesButton() {
     	return changeRolesButton;
+    }
+
+    public Button getManageRequestsButton() {
+        return manageRequestsButton;
     }
     
     public Label getDebugLabel() {
@@ -51,7 +55,7 @@ public class InstructorHomePage implements IInitializable {
     
     // ===================
     // 		 SETTERS 
- 	// ===================
+    // ===================
     
     public void setUserLabel(String text) {
     	userLabel.setText("Hello, " + text + "!");
@@ -61,11 +65,11 @@ public class InstructorHomePage implements IInitializable {
     	layout.getStyleClass().add("layout");
     	userLabel.getStyleClass().add("main-label");
     	
-    	layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton);
-	    
-	    // Set the scene to primary stage
-	    primaryStage.setScene(scene);
-	    primaryStage.setTitle("Instructor Home Page");
+    	layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton, manageRequestsButton);
+    	
+    	// Set the scene to primary stage
+    	primaryStage.setScene(scene);
+    	primaryStage.setTitle("Instructor Home Page");
     	
     }
     
