@@ -90,7 +90,7 @@ public class AnswerRepository implements IAnswerRepository {
 	public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException {
 		List<Answer> allAnswersForQuestion = new ArrayList<>();
 		//TODO: we might need this to check parentId depending on how we want to display answers
-		//		for now we will just get all answers for a question
+		//	for now we will just get all answers for a question
 		String getAllAnswersForQuestion = String.format("SELECT * FROM %s WHERE questionId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestion)){
@@ -278,6 +278,33 @@ public class AnswerRepository implements IAnswerRepository {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public List<Answer> getAnswersByUser(int userId) throws SQLException {
+		List<Answer> answersByUser = new ArrayList<>();
+		String sql = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(sql)){
+			pstmt.setInt(1, userId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+						rs.getInt("id"),
+						rs.getInt("questionId"),
+						rs.getInt("parentAnswerId"),
+						rs.getInt("userId"),
+						rs.getString("authorName"),
+						rs.getString("body"),
+						rs.getTimestamp("timestamp"),
+						rs.getInt("upvoteCount"),
+						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isDeleted"), 0
+				);
+				answersByUser.add(a);
+			}
+		}
+		return answersByUser;
 	}
 
 }
