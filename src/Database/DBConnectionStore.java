@@ -7,7 +7,7 @@ import Database.Repositories.InvitationRepository;
 import Database.Repositories.QuestionRepository;
 import Database.Repositories.UserRepository;
 import Database.Repositories.PermissionRepository;
-import Database.Repositories.Interfaces.IInvitationRepository;
+import Database.Repositories.ReviewerRequestRepository;
 import Database.Repositories.Interfaces.*;
 import Database.Services.Interfaces.*;
 import Database.Services.*;
@@ -73,8 +73,20 @@ public class DBConnectionStore {
 	public static DBConnectionStore createInstance() throws SQLException {
 		IGeneralDBManager dbHelper = new GeneralDBManager();
 		
+		// Ensure DB schema/tables and seed data exist before creating repositories
+		try {
+			// Only initialize DB if the file does not already exist to avoid duplicate seeding
+			if (!((GeneralDBManager)dbHelper).doesDatabaseExist("database/FoundationDatabase")) {
+				dbHelper.initializeDB();
+			}
+		} catch (SQLException e) {
+			System.err.println("Error initializing database: " + e.getMessage());
+			throw e;
+		}
+		
 		IUserRepository userRepository = new UserRepository(dbHelper);
-		IUserService userService = new UserService(userRepository);
+		IReviewerRequestRepository reviewerRequestRepository = new ReviewerRequestRepository(dbHelper);
+		IUserService userService = new UserService(userRepository, reviewerRequestRepository);
 		
 		IInvitationRepository invitationRepository = new InvitationRepository(dbHelper);
 		IInvitationService invitationService = new InvitationService(invitationRepository);
