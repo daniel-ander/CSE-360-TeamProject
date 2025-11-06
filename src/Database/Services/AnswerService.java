@@ -149,4 +149,13 @@ public class AnswerService implements IAnswerService {
 		}
 	}
 
+	@Override
+	public List<Answer> getAnswersByUser(int userId) throws DataAccessException {
+		try {
+			return answerRepository.getAnswersByUser(userId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Failed to get answers by user id: " + userId + " from database due to: " + e);
+		}
+	}
+
 }
