@@ -86,7 +86,6 @@ public class UserLoginPageController {
 	            // --- Initialize user session ---
 	            UserSession userSession = new UserSession(user);
 	            PreLoader.getInstance(dBConnectionStore, userSession).preload();
-//	            (new PreLoader(dBConnectionStore, userSession)).preload();
 	            userSession.setLoggedStatus(true);
 
 	            // --- Handle reset or normal login flow ---
