@@ -17,6 +17,7 @@ public class UserLoginPage implements IInitializable {
     private final Button loginButton = new Button("Login");
     private final Button adminInfoAutoFillButton = new Button();
     private final Button studentInfoAutoFillButton = new Button();
+    private final Button reviewerInfoAutoFillButton = new Button();
     private final VBox layout = new VBox(10);
     private final Scene scene = new Scene(layout, 800, 400);
     
@@ -38,6 +39,11 @@ public class UserLoginPage implements IInitializable {
     public Button studentInfoAutoFillButton() {
 		return studentInfoAutoFillButton;
 	}
+    
+    public Button getReviewerInfoAutoFillButton() {
+		return reviewerInfoAutoFillButton;
+	}
+    
     public Button getLoginButton() {
     	return loginButton;
     }
@@ -74,7 +80,7 @@ public class UserLoginPage implements IInitializable {
         
         // Label to display error messages
         
-        layout.getChildren().addAll(userNameField, passwordField, loginButton, errorLabel, adminInfoAutoFillButton, studentInfoAutoFillButton);
+        layout.getChildren().addAll(userNameField, passwordField, loginButton, errorLabel, adminInfoAutoFillButton, studentInfoAutoFillButton, reviewerInfoAutoFillButton);
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("User Login");

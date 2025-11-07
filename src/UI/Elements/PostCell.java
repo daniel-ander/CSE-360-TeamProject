@@ -1,5 +1,7 @@
 package UI.Elements;
 
+import org.mockito.Mockito;
+
 import Controllers.ForumPage.PostDisplayViewModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -23,6 +25,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final TextArea bodyTextField = new TextArea();
 
 	private final TextArea newCommentTextField = new TextArea();
+	
+	private final TextArea newReviewTextField = new TextArea();
 
 	private final Label statusLabel = new Label();
 	private final Label permissionLabel = new Label();
@@ -36,7 +40,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		setStyles();
 
 		bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
-		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, statusLabel, actionsContainer);
+		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, newReviewTextField, statusLabel, actionsContainer);
 		outerMostContainer.getChildren().addAll(spacer, layout);
 
 		setGraphic(outerMostContainer);
@@ -100,6 +104,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		bodyText.setText(body);
 
 		newCommentTextField.clear();
+		newReviewTextField.clear();
 
 		// Configure layout depending on post type
 		if (vm.isQuestion()) {
@@ -168,6 +173,31 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 				actionsContainer.getChildren().add(commentButton);
 				break;
 
+				
+			case "REVIEW":
+				Button reviewButton = new Button("Review");
+				reviewButton.textProperty()
+						.bind(Bindings.when(vm.getIsReviewingProperty()).then("Post Review").otherwise("Review"));
+				reviewButton.setOnAction(_ -> {
+					if (!vm.getIsReviewingProperty().get()) {
+						// Commit review
+						vm.setIsReviewingProperty(true);
+					} else {
+						String newReviewText = newReviewTextField.getText().trim();
+						if (!newReviewText.isEmpty()) {
+							vm.addAnswer(null, newReviewText);
+							newReviewTextField.clear();
+							vm.setIsReviewingProperty(false);
+						} else {
+							System.out.println("Review is empty!");
+						}
+					}
+					
+					
+				});
+				actionsContainer.getChildren().add(reviewButton);
+				break;
+				
 			case "EDIT":
 				Button updateButton = new Button("Edit");
 				updateButton.textProperty()
@@ -184,6 +214,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 				});
 				actionsContainer.getChildren().add(updateButton);
 				break;
+
 			}
 		}
 
@@ -253,6 +284,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		newCommentTextField.setVisible(false);
 		newCommentTextField.setManaged(false);
+		
+		newReviewTextField.setVisible(false);
+		newReviewTextField.setManaged(false);
 
 		layout.setFillWidth(true);
 		layout.setMaxWidth(Double.MAX_VALUE);
@@ -264,6 +298,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		// Comment field visibility
 		newCommentTextField.visibleProperty().bind(vm.getIsCommentingProperty());
 		newCommentTextField.managedProperty().bind(vm.getIsCommentingProperty());
+		
+		// Review field visibility
+		newReviewTextField.visibleProperty().bind(vm.getIsReviewingProperty());
+		newReviewTextField.managedProperty().bind(vm.getIsReviewingProperty());
 
 		// Manage visibility for edit vs view mode
 		titleLabel.visibleProperty().bind(vm.getIsEditingPostProperty().not());

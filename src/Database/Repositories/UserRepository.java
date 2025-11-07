@@ -153,6 +153,22 @@ public class UserRepository implements IUserRepository {
 	    }
 		return -1; // If no user exists or an error occurs
 	}
+	
+	@Override
+	public List<String> getUsersSortedByRecentInteraction(String userName) throws SQLException {
+	    List<String> usersByInteraction = new ArrayList<>();
+	    //TODO: update the query to get users sorted by recent interaction
+	    String query = String.format("", User.tableName);
+	    try (Connection connection = generalDBManager.getConnection();
+	    		PreparedStatement pstmt = connection.prepareStatement(query)){
+	    	ResultSet rs = pstmt.executeQuery();
+	    	while (rs.next()) {
+	    		usersByInteraction.add((rs.getString("userName")));
+	    	}
+	    }
+	    
+	    return usersByInteraction;
+	}
 
 
 	

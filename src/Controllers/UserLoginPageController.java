@@ -59,7 +59,8 @@ public class UserLoginPageController {
 	        	view.setErrorLabelText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 	            return;
 	        }
-
+	        
+	        
 	        // --- Validate password ---
 	        if (!PasswordEvaluator.evaluatePassword(passwordFieldText)) {
 	            view.setErrorLabelText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
@@ -136,6 +137,12 @@ public class UserLoginPageController {
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
  		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
  			view.getUsernameField().setText("admin");
+ 			view.getPasswordField().setText("Password1!");
+ 		});
+ 		
+ 		view.getReviewerInfoAutoFillButton().setText("AutoFill Reviewer Info (Debug)");
+ 		view.getReviewerInfoAutoFillButton().setOnAction(_ -> {
+ 			view.getUsernameField().setText("reviewer");
  			view.getPasswordField().setText("Password1!");
  		});
     }

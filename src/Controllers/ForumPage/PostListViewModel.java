@@ -264,7 +264,9 @@ public class PostListViewModel {
 			}
 		}
 	}
-
+	
+	
+	
 	/**
 	 * Collapses (hides) all children of the given post.
 	 */

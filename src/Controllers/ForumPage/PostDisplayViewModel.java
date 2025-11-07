@@ -26,6 +26,7 @@ public class PostDisplayViewModel {
     private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
     private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
     private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
+    private BooleanProperty isReviewingProperty = new SimpleBooleanProperty(false);
     private ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
     
     private StringProperty labelTextProperty = new SimpleStringProperty();
@@ -82,6 +83,10 @@ public class PostDisplayViewModel {
     public BooleanProperty getIsEditingPostProperty() {
     	return isEditingPostProperty;
     }
+    
+    public BooleanProperty getIsReviewingProperty() {
+		return isReviewingProperty;
+	}
     
     public FilterType getFilterType() {
     	return filterProperty.get();
@@ -145,6 +150,10 @@ public class PostDisplayViewModel {
     
     public void setIsEditingProperty(boolean isEditing) {
     	this.isEditingPostProperty.set(isEditing);
+    }
+    
+    public void setIsReviewingProperty(boolean isReviewing) {
+		this.isReviewingProperty.set(isReviewing);
     }
     
     public void setIsCommentingProperty(boolean isCommenting) {
