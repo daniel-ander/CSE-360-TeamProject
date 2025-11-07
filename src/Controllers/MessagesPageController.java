@@ -1,11 +1,17 @@
 package Controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
 import Database.*;
+import Database.Services.UserService;
+import Database.Services.Interfaces.IUserService;
 import Database.Services.Interfaces.IQuestionService;
+import Exceptions.DBExceptions.DataAccessException;
 import Sessions.UserSession;
 import UI.Pages.ForumPage;
 import UI.Pages.MessagesPage;
@@ -40,6 +46,7 @@ public class MessagesPageController {
 	private final PostListViewModel messageListViewModel;
 	private final ForumHeaderViewModel messagesHeaderViewModel;
 	private final QuestionPaneViewModel questionPaneViewModel;
+	private final IUserService userService;
 	
 		
 	public MessagesPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, MessagesPage view, 
@@ -47,6 +54,7 @@ public class MessagesPageController {
 		this.dBConnectionStore = dBConnectionStore;
 		this.questionService = dBConnectionStore.getQuestionService();
 		this.primaryStage = primaryStage;
+		this.userService = dBConnectionStore.getUserService();
 		this.userSession = userSession;
 		this.view = view;
 		this.messageListViewModel = postListViewModel;
@@ -115,9 +123,34 @@ public class MessagesPageController {
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
+    	
+    	initializeMessageListListeners();
+    	setMessageListActions();
+    	List<String> usersByInteraction = new ArrayList<>();
+		try {
+			usersByInteraction = userService.getUsersSortedByRecentInteraction(userSession.getCurrentUserName());
+		} catch (DataAccessException e) {
+			// TODO: - Handle the case if user names can't be fetched
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+        }
+    	
+    	
+    	
+    	
     }
     
-    private final void setUpDebugEnvironment() {
+    private void setMessageListActions() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initializeMessageListListeners() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private final void setUpDebugEnvironment() {
     	//view.addDebugLabel();
     }
 }

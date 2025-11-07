@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
+import Models.User;
 import Controllers.ForumPage.PostDisplayViewModel;
 /**
  * This page displays a simple welcome message for the user.
@@ -74,6 +75,11 @@ public class MessagesPage implements IInitializable {
 		messagesListView.setCellFactory(_ -> new PostCell());
 		
 		searchMessagesTextField.setPromptText("Filter questions...");
+		
+		ListView<User> userListView = new ListView<>();
+		userListView.setPrefWidth(200);
+		root.setLeft(userListView);
+		
     	
 		BorderPane centerPane = new BorderPane();
 		centerPane.setCenter(messagesListView);

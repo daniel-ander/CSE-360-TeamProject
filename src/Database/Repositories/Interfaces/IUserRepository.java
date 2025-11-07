@@ -25,4 +25,6 @@ public interface IUserRepository {
 	public String updatePasswordForUser(String userName, String newPassword) throws SQLException;
 
 	public int getUserIdByName(String userName) throws SQLException;
+
+	List<String> getUsersSortedByRecentInteraction(String userName) throws SQLException;
 }

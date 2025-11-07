@@ -85,6 +85,15 @@ public class UserService implements IUserService {
 		}
 	}
 	
+	public List<String> getUsersSortedByRecentInteraction(String userName) throws DataAccessException {
+		try {
+			return userRepository.getUsersSortedByRecentInteraction(userName);
+			
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get users sorted by recent interaction due to: " + e);
+		}
+	}
+	
 	// ===================
     // 		 UPDATE 
  	// ===================
@@ -131,6 +140,8 @@ public class UserService implements IUserService {
 			throw new DataAccessException("Could not get user names due to: " + e);
 		}
 	}
+	
+	
 	
 	
 	
