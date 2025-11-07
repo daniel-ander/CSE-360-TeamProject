@@ -66,7 +66,7 @@ public class AnswerListViewController {
     		calculateDepths(allAnswers);
     		view.getAnswerList().setItems(
     				FXCollections.observableArrayList(allAnswers));
-    		if (Debug.isEnabled) System.out.println("Answers refreshed.");
+    		Debug.write("Answers refreshed.");
     	} catch (DataAccessException exception) {
     		// TODO: - Deal with answer not being able to be fetched
     		System.err.println("Database error: " + exception.getMessage());
@@ -91,7 +91,7 @@ public class AnswerListViewController {
 				calculateDepths(searchResults);
 				view.getAnswerList().setItems(
 						FXCollections.observableArrayList(searchResults));
-				if (Debug.isEnabled) System.out.println("Answers searched with term: " + searchTerm);
+				Debug.write("Answers searched with term: " + searchTerm);
 			} catch (DataAccessException exception) {
 				System.err.println("Database error: " + exception.getMessage());
 				exception.printStackTrace();
@@ -102,7 +102,7 @@ public class AnswerListViewController {
     private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(_ -> {
-        	if (Debug.isEnabled) System.out.println("Add Answer button clicked.");
+        	Debug.write("Add Answer button clicked.");
         	String text = view.getTextInputArea().getText();
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Answer text cannot be empty or placeholder.");
@@ -112,7 +112,7 @@ public class AnswerListViewController {
         	try {
         		answerService.addAnswer(a);
                 refreshAnswers();
-                if (Debug.isEnabled) System.out.println("Added answer: " + text);
+                Debug.write("Added answer: " + text);
         	} catch (DataAccessException dataAccessException) {
         		// TODO: - Deal with answer not being able to be added
                 System.err.println("Database error: " + dataAccessException.getMessage());
@@ -136,7 +136,7 @@ public class AnswerListViewController {
     private void setReplyToAnswerButtonAction() {
     	// Reply to an answer
     	view.getReplyToAnswerButton().setOnAction(_-> {
-    		if (Debug.isEnabled) System.out.println("Reply to Answer button clicked.");
+    		Debug.write("Reply to Answer button clicked.");
     		String text = view.getTextInputArea().getText();
     		if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
 				System.out.println("Answer text cannot be empty or placeholder.");
@@ -152,7 +152,7 @@ public class AnswerListViewController {
 			try {
 				answerService.addAnswer(reply);
 				refreshAnswers();
-				if (Debug.isEnabled) System.out.println("Added reply Id#" + reply.getId() + "with parentAnswerId#" + reply.getParentAnswerId() + ": " + text);
+				Debug.write("Added reply Id#" + reply.getId() + "with parentAnswerId#" + reply.getParentAnswerId() + ": " + text);
 				
 			} catch (DataAccessException dataAccessException) {
 				
@@ -224,17 +224,13 @@ public class AnswerListViewController {
         Map<Integer, Answer> answerById = new HashMap<>();
         for (Answer a : answers) {
         	answerById.put(a.getId(), a);
-        	if (Debug.isEnabled) {
-        		System.out.println("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
-        	}
+        	Debug.write("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
         }
 
         for (Answer answer : answers) {
             int depth = 0;
             int parentId = answer.getParentAnswerId();
-            if (Debug.isEnabled) {
-				System.out.println("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
-			}
+            Debug.write("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
 
             while (parentId > 0 && depth < 10) { // Prevent infinite loops
                 depth++;
@@ -249,9 +245,7 @@ public class AnswerListViewController {
             }
             depthMap.put(answer.getId(), depth);
             answer.setReplyDepth(depth);
-            if (Debug.isEnabled) {
-                System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
-            }
+            System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
         }
     }
 

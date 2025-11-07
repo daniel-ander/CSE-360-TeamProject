@@ -79,9 +79,7 @@ public class UserLoginPageController {
 	            }
 
 	            // Ensure we have the DB ID
-	            if (Debug.isEnabled) {
-	                System.out.println("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
-	            }
+	            Debug.write("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
 
 	            // --- Initialize user session ---
 	            UserSession userSession = new UserSession(user);

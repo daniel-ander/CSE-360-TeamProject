@@ -271,7 +271,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(3, id);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected == 0) {
-				if (Debug.isEnabled) System.out.println("No answer found with ID: " + id + " to update.");
+				Debug.write("No answer found with ID: " + id + " to update.");
 				return false; // No answer found to update
 			}
 		}
@@ -290,7 +290,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, id);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected == 0) {
-				if (Debug.isEnabled) System.out.println("No answer found with ID: " + id + " to delete.");
+				Debug.write("No answer found with ID: " + id + " to delete.");
 				return false; // No answer found to delete
 			}
 		}
@@ -305,7 +305,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, questionId);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected == 0) {
-				if (Debug.isEnabled) System.out.println("No answers found for question ID: " + questionId + " to delete.");
+				Debug.write("No answers found for question ID: " + questionId + " to delete.");
 				return false; // No answers found to delete
 			}
 		}
