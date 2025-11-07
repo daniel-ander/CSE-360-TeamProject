@@ -118,6 +118,16 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
 					answerTableName, answerPermissionSQL);
+		
+		// reviewer requests table for students requesting reviewer role
+		String reviewerRequestsTableQuery = "CREATE TABLE IF NOT EXISTS reviewer_requests ("
+				+ "request_id IDENTITY PRIMARY KEY, "
+				+ "student_id INT, "
+				+ "instructor_id INT, "
+				+ "status VARCHAR(20) DEFAULT 'PENDING', "
+				+ "request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+				+ "FOREIGN KEY (student_id) REFERENCES " + userTableName + "(id), "
+				+ "FOREIGN KEY (instructor_id) REFERENCES " + userTableName + "(id))";
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -130,6 +140,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(questionPermissionTableQuery);
 			stmt.execute(userQuestionPermissionTableQuery);
 			stmt.execute(userAnswerPermissionTableQuery);
+			stmt.execute(reviewerRequestsTableQuery);
 		}
 
 	}
