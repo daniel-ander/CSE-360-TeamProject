@@ -127,6 +127,11 @@ public class MessagesPageController {
     	initializeMessageListListeners();
     	setMessageListActions();
     	List<String> usersByInteraction = new ArrayList<>();
+    	
+    	boolean done = false;
+    	if (!done) {
+			return;
+		}
 		try {
 			usersByInteraction = userService.getUsersSortedByRecentInteraction(userSession.getCurrentUserName());
 		} catch (DataAccessException e) {
@@ -134,8 +139,6 @@ public class MessagesPageController {
             System.err.println(e.getMessage());
             e.printStackTrace();
         }
-    	
-    	
     	
     	
     }
