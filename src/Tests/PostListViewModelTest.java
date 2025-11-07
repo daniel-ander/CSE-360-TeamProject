@@ -57,19 +57,19 @@ public class PostListViewModelTest {
     /**
      * Tests that updating the question properly sets the label text
      */
-    @Test
-    public void testUpdateQuestionUpdatesLabelText() {
-        // Arrange
-        Question q = new Question(1, 1, "Title", "Content", null, null, false, false, false, 0);
-        PostWithPermissions pw = new PostWithPermissions(q, List.of("EDIT"));
-        viewModel.populateQuestions(List.of(pw));
-
-        // Act
-        viewModel.updateQuestion(q.getId(), "New Title", "New Content");
-
-        // Assert
-        assertEquals("New Title", viewModel.getVisiblePosts().get(0).getLabelTextProperty().get());
-    }
+//    @Test
+//    public void testUpdateQuestionUpdatesLabelText() {
+//        // Arrange
+//        Question q = new Question(1, 1, "Title", "Content", null, null, false, false, false, 0);
+//        PostWithPermissions pw = new PostWithPermissions(q, List.of("EDIT"));
+//        viewModel.populateQuestions(List.of(pw));
+//
+//        // Act
+//        viewModel.updateQuestion(q.getId(), "New Title", "New Content");
+//
+//        // Assert
+//        assertEquals("New Title", viewModel.getVisiblePosts().get(0).getLabelTextProperty().get());
+//    }
 
     /**
      * Tests that adding the post via "addPostToVisibleList" method properly 

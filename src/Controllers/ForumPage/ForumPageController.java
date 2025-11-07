@@ -162,7 +162,6 @@ public class ForumPageController {
 					if (exists)
 						newAnswers.add(answer);
 				}
-				AppCache.getInstance().setAnswersDataProperty(newAnswers);
 				postListViewModel.addToAnswerPool(newAnswers);
 			});
 		});

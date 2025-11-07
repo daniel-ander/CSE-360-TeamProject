@@ -251,6 +251,7 @@ public class PostListViewModel {
 
 		// Insert each child below the parent in reverse order (so order is preserved)
 		for (int i = children.size() - 1; i >= 0; i--) {
+			System.out.println("Added");
 			PostDisplayViewModel child = children.get(i);
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
 			visiblePosts.add(visibleParentPostIndex + 1, child);
