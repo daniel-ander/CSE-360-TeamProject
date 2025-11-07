@@ -35,7 +35,6 @@ public class AppCache {
     
     // Answers for every question - in order
     public void setAnswersDataProperty(List<PostWithPermissions> answers) {
-    	System.out.println("Done");
         this.answerDataProperty.set(answers);
 
         var current = allInitialAnswersDataProperty.get();

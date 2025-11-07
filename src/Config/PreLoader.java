@@ -115,7 +115,6 @@ public class PreLoader {
 						a.getId(), IPost.Type.Answer);
 				answersWithPermissions.add(new PostWithPermissions(a, permissions));
 			}
-			System.out.println("Blah");
 			AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);
 		});
 	}
