@@ -105,6 +105,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isReview"),
 						rs.getBoolean("isDeleted"), 0
 				);
 				allAnswers.add(a);
@@ -127,7 +128,7 @@ public class AnswerRepository implements IAnswerRepository {
 				Answer a = new Answer(
 						rs.getInt("id"),
 						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
+						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
@@ -135,9 +136,9 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isReview"),
 						rs.getBoolean("isDeleted"), 0
 				);
-				
 				
 				allAnswersForQuestion.add(a);
 			}
@@ -156,7 +157,7 @@ public class AnswerRepository implements IAnswerRepository {
 				Answer a = new Answer(
 						rs.getInt("id"),
 						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
+						rs.getInt("parentAnswerId"),
 						rs.getInt("userId"),
 						rs.getString("authorName"),
 						rs.getString("body"),
@@ -164,6 +165,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isReview"),
 						rs.getBoolean("isDeleted"), 0
 				);
 				repliesToAnswerById.add(a);
@@ -193,6 +195,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isReview"),
 						rs.getBoolean("isDeleted"), 0
 				);
 				return a;
@@ -220,6 +223,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isReview"),
 						rs.getBoolean("isDeleted"), 0
 				);
 				correctAnswers.add(a);
@@ -248,6 +252,7 @@ public class AnswerRepository implements IAnswerRepository {
 						rs.getTimestamp("lastUpdated"),
 						rs.getInt("upvoteCount"),
 						rs.getBoolean("isCorrect"),
+						rs.getBoolean("isReview"),
 						rs.getBoolean("isDeleted"), 0
 				);
 				answersBySearch.add(a);

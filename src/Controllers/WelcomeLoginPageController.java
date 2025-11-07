@@ -147,7 +147,7 @@ public class WelcomeLoginPageController {
     					dBConnectionStore.getAnswerService(),
     					userSession
     			);
-            	ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
+            	ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(userSession); 
     			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
                 new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage(forumHeaderViewModel, questionPaneViewModel), postListViewModel, forumHeaderViewModel, questionPaneViewModel);
                 break;

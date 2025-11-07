@@ -1,17 +1,21 @@
 package Controllers.ForumPage;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import Models.User;
+import Sessions.UserSession;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ForumHeaderViewModel {
 	
-	private StringProperty searchFieldTextProperty = new SimpleStringProperty();
-	private BooleanProperty searchButtonPressedProperty = new SimpleBooleanProperty();
+	private final UserSession userSession;
 	
-	public ForumHeaderViewModel() {
-		
+	private final StringProperty searchFieldTextProperty = new SimpleStringProperty();
+	private final BooleanProperty searchButtonPressedProperty = new SimpleBooleanProperty();
+	
+	public ForumHeaderViewModel(UserSession userSession) {
+		this.userSession = userSession;
 	}
 	
 	// ===================
@@ -28,6 +32,10 @@ public class ForumHeaderViewModel {
 	
 	public String getSearchFieldText() {
 		return searchFieldTextProperty.get();
+	}
+	
+	public boolean isReviewer() {
+		return userSession.getCurrentUserRole() == User.Role.reviewer;
 	}
 	
 	// ===================

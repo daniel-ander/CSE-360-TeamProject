@@ -98,7 +98,7 @@ public class ReviewerHomePageController {
 					userSession
 			);
 			
-			ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
+			ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(userSession); 
 			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
 			
 			new ForumPageController(
@@ -122,7 +122,7 @@ public class ReviewerHomePageController {
 					userSession
 			);
 			
-			ForumHeaderViewModel messagesHeaderViewModel = new ForumHeaderViewModel(); 
+			ForumHeaderViewModel messagesHeaderViewModel = new ForumHeaderViewModel(userSession); 
 			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
 			
 			new MessagesPageController(
