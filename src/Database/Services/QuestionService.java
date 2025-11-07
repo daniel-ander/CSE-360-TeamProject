@@ -106,5 +106,15 @@ public class QuestionService implements IQuestionService {
 			throw new DataAccessException("Could not delete question by id :" + id + " from the database due to: " + e);
 		}
 	}
+
+	// Implement missing method required by IQuestionService
+	@Override
+	public List<Question> getQuestionsFromUser(int userId) throws DataAccessException {
+		try {
+			return questionRepository.getQuestionsFromUser(userId);
+		} catch (SQLException e) {
+			throw new DataAccessException("Could not get questions for user id: " + userId + " due to: " + e);
+		}
+	}
 	
 }
