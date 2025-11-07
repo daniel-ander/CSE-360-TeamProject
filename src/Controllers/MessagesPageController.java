@@ -7,6 +7,7 @@ import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.Messages.RecentUsersListViewModel;
 import Database.*;
 import Database.Services.UserService;
 import Database.Services.Interfaces.IUserService;
@@ -20,6 +21,9 @@ import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
 /**
@@ -47,6 +51,7 @@ public class MessagesPageController {
 	private final ForumHeaderViewModel messagesHeaderViewModel;
 	private final QuestionPaneViewModel questionPaneViewModel;
 	private final IUserService userService;
+	private final ListView<RecentUsersListViewModel> recentUsersListView = new ListView<>();
 	
 		
 	public MessagesPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, MessagesPage view, 
@@ -121,27 +126,22 @@ public class MessagesPageController {
 	}
 	
     
-    private void setInitialLayout() {
-    	view.setInitialLayout(primaryStage);
-    	
-    	initializeMessageListListeners();
-    	setMessageListActions();
-    	List<String> usersByInteraction = new ArrayList<>();
-    	
-    	boolean done = false;
-    	if (!done) {
-			return;
-		}
-		try {
-			usersByInteraction = userService.getUsersSortedByRecentInteraction(userSession.getCurrentUserName());
-		} catch (DataAccessException e) {
-			// TODO: - Handle the case if user names can't be fetched
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-        }
-    	
-    	
-    }
+	// java
+	private void setInitialLayout() {
+	    view.setInitialLayout(primaryStage);
+
+	    initializeMessageListListeners();
+	    setMessageListActions();
+
+	    ObservableList<RecentUsersListViewModel> users = FXCollections.observableArrayList(
+	            new RecentUsersListViewModel(1, "Alice", "See you soon!", "10:32 AM", 0),
+	            new RecentUsersListViewModel(2, "Bob", "Got your message", "9:47 AM", 2)
+	    );
+
+	    // Populate the ListView that's actually shown in the UI
+	    view.getMessagesListView().setItems(users);
+
+	}
     
     private void setMessageListActions() {
 		// TODO Auto-generated method stub
