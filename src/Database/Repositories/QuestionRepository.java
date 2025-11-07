@@ -43,7 +43,7 @@ public class QuestionRepository implements IQuestionRepository {
 			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					int questionId = generatedKeys.getInt(1);
-					if (Debug.isEnabled) System.out.println("Inserted question ID: " + questionId);
+					Debug.write("Inserted question ID: " + questionId);
 					q.setId(questionId);
 				} else {
 					throw new SQLException("Inserting question failed, no ID obtained.");
@@ -262,10 +262,10 @@ public class QuestionRepository implements IQuestionRepository {
 			pstmt.setInt(3, id);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected > 0) {
-				if (Debug.isEnabled) System.out.println("Question with ID " + id + " updated successfully to title: " + newTitle + " and body: " + newText);
+				Debug.write("Question with ID " + id + " updated successfully to title: " + newTitle + " and body: " + newText);
 				return true;
 			} else {
-				if (Debug.isEnabled) System.out.println("No question found with ID " + id + " to update.");
+				Debug.write("No question found with ID " + id + " to update.");
 			}
 		}
 		return false;
@@ -284,10 +284,10 @@ public class QuestionRepository implements IQuestionRepository {
 			pstmt.setInt(1, id);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected > 0) {
-				if (Debug.isEnabled) System.out.println("Question with ID " + id + " marked as deleted.");
+				Debug.write("Question with ID " + id + " marked as deleted.");
 				return true;
 			} else {
-				if (Debug.isEnabled) System.out.println("No question found with ID " + id + " to delete.");
+				Debug.write("No question found with ID " + id + " to delete.");
 			}
 		}
 		return false;

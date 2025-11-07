@@ -95,7 +95,7 @@ public class UserNameRecognizer {
 		userNameRecognizerInput = input;	// Save a copy of the input
 		running = true;						// Start the loop
 		nextState = -1;						// There is no next state
-		if (Debug.isEnabled) System.out.println("\nCurrent Final Input  Next  Date\nState   State Char  State  Size");
+		Debug.write("\nCurrent Final Input  Next  Date\nState   State Char  State  Size");
 		
 		// This is the place where semantic actions for a transition to the initial state occur
 		

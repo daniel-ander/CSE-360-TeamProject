@@ -35,13 +35,17 @@ public class AppCache {
     
     // Answers for every question - in order
     public void setAnswersDataProperty(List<PostWithPermissions> answers) {
-    	this.answerDataProperty.set(answers);
-    	
-    	if(allInitialAnswersDataProperty.get() == null) {
-    		this.allInitialAnswersDataProperty.set(answers);
-    	} else {
-    		this.allInitialAnswersDataProperty.get().addAll(answers);
-    	}
+        this.answerDataProperty.set(answers);
+
+        var current = allInitialAnswersDataProperty.get();
+        if (current == null) {
+            this.allInitialAnswersDataProperty.set(List.copyOf(answers));
+        } else {
+            // merge safely by creating a new combined list
+            var merged = new java.util.ArrayList<>(current);
+            merged.addAll(answers);
+            this.allInitialAnswersDataProperty.set(List.copyOf(merged));
+        }
     }
 
     public void setInitialDataProperty(List<QuestionWithAnswersAndPermissions> initialData) {
@@ -94,5 +98,15 @@ public class AppCache {
 
     public boolean isFullyLoaded() {
         return fullDataProperty.get() != null;
+    }
+    
+    public void clearAllCache() {
+    	 initialQuestionDataProperty.set(null);
+    	 answerDataProperty.set(null);
+    	    
+    	 allInitialAnswersDataProperty.set(null);
+    	    
+    	 initialDataProperty.set(null);
+    	 fullDataProperty.set(null);
     }
 }

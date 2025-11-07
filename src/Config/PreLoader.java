@@ -20,6 +20,22 @@ import Sessions.UserSession;
 import Utils.AnswerPreloadPriority;
 
 public class PreLoader {
+	
+	public static PreLoader instance;
+	
+	public static synchronized PreLoader getInstance(DBConnectionStore dBConnectionStore, UserSession userSession) {
+        if (instance == null) {
+            instance = new PreLoader(dBConnectionStore, userSession);
+        }
+        return instance;
+    }
+
+    public static PreLoader getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("PreLoader not initialized. Call getInstance(DBConnectionStore, UserSession) first.");
+        }
+        return instance;
+    }
 
 	private final IQuestionService questionService;
 	private final IAnswerService answerService;
@@ -29,7 +45,7 @@ public class PreLoader {
 	private int questionToPreload = 20;
 	ExecutorService executor = Executors.newFixedThreadPool(4);
 
-	public PreLoader(DBConnectionStore dBConnectionStore, UserSession userSession) {
+	private PreLoader(DBConnectionStore dBConnectionStore, UserSession userSession) {
 		this.questionService = dBConnectionStore.getQuestionService();
 		this.answerService = dBConnectionStore.getAnswerService();
 		this.permissionService = dBConnectionStore.getPermissionService();
@@ -37,7 +53,12 @@ public class PreLoader {
 	}
 
 	public void preload() {
-
+		AppCache.getInstance().clearAllCache();
+		
+		if (executor.isShutdown() || executor.isTerminated()) {
+	        executor = Executors.newFixedThreadPool(4);
+	    }
+		
 		executor.submit(() -> {
 			List<Question> initialDisplayQuestions = questionService.getLimitedAmountOfQuestions(questionToPreload);
 
@@ -94,7 +115,6 @@ public class PreLoader {
 						a.getId(), IPost.Type.Answer);
 				answersWithPermissions.add(new PostWithPermissions(a, permissions));
 			}
-
 			AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);
 		});
 	}
