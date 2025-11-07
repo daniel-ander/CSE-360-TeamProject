@@ -42,7 +42,7 @@ public class WelcomeLoginPageController {
     ArrayList<String> roles = new ArrayList<String>();
 
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
-    	this.dBConnectionStore = dBConnectionStore;
+     this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
         this.userSession = userSession;
         
@@ -56,35 +56,32 @@ public class WelcomeLoginPageController {
         setContinueButtonAction();
         setQuitButtonAction();
     }
-    
+
     // ===================
     // 		 SETTERS 
- 	// ===================
+    // ===================
     
     private void setContinueButtonAction() {
-    	// 🎯 Continue button → routes user into their page
+     
         view.getContinueButton().setOnAction(_ -> {
-//            if (roles.isEmpty()) {
-//                System.out.println("No roles found for user: " + user.getUserName());
-//                return;
-//            }
-//            System.out.println("No page mapped for role: " + roles.size());
-//            if (roles.size() == 1) {
-//                // ✅ CASE 1: Only one role → jump straight in
-                navigateToPage(primaryStage, userSession.currentUser().getRole(), user.getUserName());
-//            } else {
-//                // ✅ CASE 2: Multiple roles → ask which to use
-//                ChoiceDialog<String> dialog = new ChoiceDialog<>(roles.get(0), roles);
-//                dialog.setTitle("Select Role");
-//                dialog.setHeaderText("You have multiple roles");
-//                dialog.setContentText("Choose the role to continue with:");
-//
-//                dialog.showAndWait().ifPresent(selectedRole -> {
-//                    navigateToPage(primaryStage, selectedRole, user.getUserName());
-//                });
-//            }
+            if (roles.isEmpty()) {
+                System.out.println("No roles found for user: " + user.getUserName());
+                return;
+            }
+            if (roles.size() == 1) {
+                navigateToPage(primaryStage, roles.get(0), user.getUserName());
+            } else {
+                javafx.scene.control.ChoiceDialog<String> dialog = new javafx.scene.control.ChoiceDialog<>(roles.get(0), roles);
+                dialog.setTitle("Select Role");
+                dialog.setHeaderText("You have multiple roles");
+                dialog.setContentText("Choose the role to continue with:");
+
+                dialog.showAndWait().ifPresent(selectedRole -> {
+                    navigateToPage(primaryStage, selectedRole, user.getUserName());
+                });
+            }
         });
-	}
+ 	}
     
     private void setQuitButtonAction() {
     	view.getQuitButton().setOnAction(_ -> {
@@ -105,17 +102,30 @@ public class WelcomeLoginPageController {
     }
     
     private void assignRoles(User user) {
-    	try {
-    		User.Role role = userService.getUserRole(user.getUserName());
-    		
-    		if(role == User.Role.admin) {
-    	    	setInviteButtonAction();
-    	    }
-    	} catch(DataAccessException e) {
-    		System.err.println(e.getMessage());
-            e.printStackTrace();
-    	}
-    }
+     try {
+         String roleStr = userService.getUserRolesString(user.getUserName());
+         roles.clear();
+         if (roleStr == null || roleStr.trim().isEmpty()) {
+             // fallback to single role lookup
+             try {
+                 User.Role role = userService.getUserRole(user.getUserName());
+                 if (role != null) roles.add(role.name());
+             } catch (DataAccessException ignore) {}
+         } else {
+             for (String r : roleStr.split(",")) {
+                 String v = r.trim();
+                 if (!v.isEmpty()) roles.add(v);
+             }
+         }
+         
+         if (roles.contains("admin")) {
+             setInviteButtonAction();
+         }
+     } catch(DataAccessException e) {
+         System.err.println(e.getMessage());
+             e.printStackTrace();
+     }
+ }
     
     /**
      * 🔀 Central branching method:
@@ -126,11 +136,10 @@ public class WelcomeLoginPageController {
      * 2. Add checkbox in AdminHomePage if needed.
      * 3. Add a case here → launch NewRoleHomePage.
      */
-    private void navigateToPage(Stage stage, User.Role role, String username) {
-        switch (role.name()) {
+    private void navigateToPage(Stage stage, String roleName, String username) {
+        switch (roleName) {
             case "admin":
-                //new AdminHomePageController(databaseHelper, username).show(stage);
-            	new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
+                new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
                 break;
             case "student":
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
@@ -142,29 +151,25 @@ public class WelcomeLoginPageController {
                 new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage());
                 break;
             case "reviewer":
-    			PostListViewModel postListViewModel = new PostListViewModel(
-    					dBConnectionStore.getQuestionService(), 
-    					dBConnectionStore.getAnswerService(),
-    					userSession
-    			);
-            	ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
-    			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
+                PostListViewModel postListViewModel = new PostListViewModel(
+                        dBConnectionStore.getQuestionService(), 
+                        dBConnectionStore.getAnswerService(),
+                        userSession
+                );
+                Controllers.ForumPage.ForumHeaderViewModel forumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(); 
+                Controllers.ForumPage.QuestionPaneViewModel questionPaneViewModel = new Controllers.ForumPage.QuestionPaneViewModel();
                 new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage(forumHeaderViewModel, questionPaneViewModel), postListViewModel, forumHeaderViewModel, questionPaneViewModel);
                 break;
             case "user":
-            	// TODO: - Fix Roles
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
-            // Add more roles here as needed, following the same pattern.
-                
-            
-            // since this isnt dynamic youll have to update other places too
             default:
-                // 👀 Fallback if role has no page mapped yet
-                System.out.println("No page mapped for role: " + role);
+                System.out.println("No page mapped for role: " + roleName);
                 break;
         }
     }
+
+}
 
 }
 
