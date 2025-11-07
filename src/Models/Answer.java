@@ -22,12 +22,12 @@ public class Answer implements IPost {
 
 	// Constructor for creating a new answer (not yet in DB)
 	public Answer(int questionId, int authorId, String authorName, String bodyText) {
-		this(questionId, null, authorId, authorName, bodyText);
+		this(questionId, null, authorId, authorName, bodyText, false);
 	}
 	
 	// Constructor for creating a new nested answer (not yet in DB)
-	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText) {
-		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, false, false, 0);
+	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText, boolean isReview) {
+		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, isReview, false, 0);
 	}
 	
 	// Constructor for pulling from DB with all fields
@@ -89,7 +89,12 @@ public class Answer implements IPost {
 	@Override
 	public String getTitleText() {return null;}
 	@Override
-	public Type getPostType() {return Type.Answer;}
+	public Type getPostType() {
+		if(isReview) 
+			return Type.Review;
+		else
+			return Type.Answer;
+	}
 	
 	// ===================
     // 		 SETTERS 

@@ -65,6 +65,16 @@ public class ForumPage implements IInitializable {
     		forumHeaderViewModel.setSeeReviewsButtonPressedProperty(!forumHeaderViewModel.getSeeReviewsButtonPressedProperty().get());
     	});
     	
+    	forumHeaderViewModel.getSeeReviewsButtonPressedProperty().addListener((_, _, isPressed) -> {
+    		if(isPressed) {
+    			seeMyReviewsButton.setText("See All Posts");
+    			seeMyReviewsButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+    		} else {
+    			seeMyReviewsButton.setText("See My Reviews");
+    			seeMyReviewsButton.setStyle("");
+    		}
+    	});
+    	
     	addQuestionButton.setOnAction(_ -> showAddQuestionDialog());
     }
     

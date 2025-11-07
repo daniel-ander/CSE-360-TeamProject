@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public interface IPost {
 	enum Type {
-		Question, Answer
+		Question, Answer, Review
 	}
 	
 	public Integer getId();

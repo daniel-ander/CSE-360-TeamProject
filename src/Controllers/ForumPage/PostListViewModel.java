@@ -22,14 +22,27 @@ public class PostListViewModel {
 	// ==============================
 	// DATA STRUCTURES
 	// ==============================
+	
+	public enum FilterMode {
+		NONE,
+		REVIEW
+	}
+	
+	public void setFilterMode(FilterMode mode) {
+		currentFilterMode = mode;
+	}
+	
+	private FilterMode currentFilterMode = FilterMode.NONE;
 
 	// Observable list of currently visible posts (questions + answers)
-	private final ObservableList<PostDisplayViewModel> visiblePosts = FXCollections.observableArrayList();
-	private final List<PostDisplayViewModel> allPostsStore = new ArrayList<>(visiblePosts); // Stores pre-filter posts for
-																						// resetting
+	private ObservableList<PostDisplayViewModel> visiblePosts = FXCollections.observableArrayList();
+	private final List<PostDisplayViewModel> allQuestionsStore = new ArrayList<>(visiblePosts); // Stores pre-filter
+																								// posts for
+	// resetting
 
 	// Maps parent posts (questionId + parentAnswerId) to their child answers
 	private final Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> postParentMap = new HashMap<>();
+	private final Map<KeyPairHolder<Integer, Integer>, List<PostDisplayViewModel>> reviewPostParentMap = new HashMap<>();
 
 	// External dependencies
 	private final IQuestionService questionService;
@@ -55,7 +68,7 @@ public class PostListViewModel {
 	 */
 	public void filterVisibleQuestionsByText(String text) {
 		String term = text.toLowerCase();
-		List<PostDisplayViewModel> filtered = allPostsStore.stream()
+		List<PostDisplayViewModel> filtered = allQuestionsStore.stream()
 				.filter(vm -> vm.getPost().getTitleText().toLowerCase().contains(term)
 						|| vm.getPost().getBodyText().toLowerCase().contains(term))
 				.collect(Collectors.toList());
@@ -64,9 +77,49 @@ public class PostListViewModel {
 	}
 
 	/**
+	 * Filters visible posts by ones that contain a review by the current user who
+	 * is a reviewer
+	 */
+	public void filterVisibleQuestionsByReview() {
+		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {
+			for (PostDisplayViewModel answerVM : postVMs) {
+				if (((Answer) answerVM.getPost()).isReview()) {
+					PostDisplayViewModel reviewVM = answerVM;
+					populateReviewMap(parentQuestionAnswerIDKey, reviewVM);
+				}
+			}
+		});
+		
+		List<PostWithPermissions> reviewsWithPermissions = new ArrayList<>();
+		reviewPostParentMap.forEach((_, reviewVMs) -> {
+			for(PostDisplayViewModel vm : reviewVMs) {
+				reviewsWithPermissions.add(new PostWithPermissions(vm.getPost(), vm.getPermissionList()));
+			}
+		});
+		
+		populateQuestions(reviewsWithPermissions);
+		// TODO: - Need to also get the direct parent of the reivew to show for context
+//		expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
+//				KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair)
+	}
+
+	private void populateReviewMap(KeyPairHolder<Integer, Integer> parentQuestionAnswerIDKey, PostDisplayViewModel answerVM) {
+		if (reviewPostParentMap.containsKey(parentQuestionAnswerIDKey)) {
+			List<PostDisplayViewModel> reviewList = reviewPostParentMap.get(parentQuestionAnswerIDKey);
+			reviewList.add(answerVM);
+			reviewPostParentMap.replace(parentQuestionAnswerIDKey, reviewList);
+		} else {
+			List<PostDisplayViewModel> newReviewList = new ArrayList<>(Arrays.asList(answerVM));
+			reviewPostParentMap.put(parentQuestionAnswerIDKey, newReviewList);
+		}
+	}
+
+	/**
 	 * Populates the visible posts with questions
 	 */
 	public void populateQuestions(List<PostWithPermissions> questionsWithPermissions) {
+		visiblePosts = FXCollections.observableArrayList();
+		
 		for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
 			addQuestionToVisibleList(questionWithPermissions, false);
 		}
@@ -78,12 +131,23 @@ public class PostListViewModel {
 				questionWithPermissions.getPost().getId(), null, IPost.Type.Question);
 
 		vm.setDepthLevel(0); // Top-level (no indentation)
-		if(toTopOfStack) {
+		
+		if (toTopOfStack) {
 			visiblePosts.add(0, vm); // Add to the visible post list
-			allPostsStore.add(0, vm);
+			for(PostDisplayViewModel question : allQuestionsStore) {
+				if(question.getPost().getId() == vm.getPost().getId()) {
+					return;
+				}
+			}
+			allQuestionsStore.add(0, vm);
 		} else {
 			visiblePosts.add(vm); // Add to the visible post list
-			allPostsStore.add(vm);
+			for(PostDisplayViewModel question : allQuestionsStore) {
+				if(question.getPost().getId() == vm.getPost().getId()) {
+					return;
+				}
+			}
+			allQuestionsStore.add(vm);
 		}
 	}
 
@@ -149,8 +213,7 @@ public class PostListViewModel {
 
 		// Default permissions for answers
 		List<String> permissions = List.of(RolePermissions.AnswerPermissions.COMMENT.name(),
-				RolePermissions.AnswerPermissions.DELETE.name(),
-				RolePermissions.AnswerPermissions.EDIT.name());
+				RolePermissions.AnswerPermissions.DELETE.name(), RolePermissions.AnswerPermissions.EDIT.name());
 
 		// Build a new post view model
 		PostDisplayViewModel newPostVM = buildPost(answerToAdd, permissions, questionId, parentAnswerId,
@@ -175,7 +238,6 @@ public class PostListViewModel {
 			expandChildren(parentVM, parentIndex, parentKey);
 		}
 	}
-
 
 	// get questions that are visible to the user [-->Q1<--, A1, A2, -->Q2<--, A1,
 	// -->Q3<--, A1, A2]
@@ -224,6 +286,7 @@ public class PostListViewModel {
 				return i;
 			}
 		}
+		// If no more questions after current index
 		return visiblePosts.size();
 	}
 
@@ -233,7 +296,16 @@ public class PostListViewModel {
 	private void expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
 			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
 
-		List<PostDisplayViewModel> children = postParentMap.get(questionAnswerIDKeyPair);
+		List<PostDisplayViewModel> children = null;
+		
+		switch(currentFilterMode) {
+		case NONE:
+			children = postParentMap.get(questionAnswerIDKeyPair);
+			break;
+		case REVIEW:
+			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
+		}
+		
 		if (children == null)
 			return;
 
@@ -247,7 +319,7 @@ public class PostListViewModel {
 		}
 
 		// Ensure fresh state
-		visiblePosts.removeAll(children);
+		visiblePosts.removeAll(postParentMap.get(questionAnswerIDKeyPair));
 
 		// Insert each child below the parent in reverse order (so order is preserved)
 		for (int i = children.size() - 1; i >= 0; i--) {
@@ -264,9 +336,7 @@ public class PostListViewModel {
 			}
 		}
 	}
-	
-	
-	
+
 	/**
 	 * Collapses (hides) all children of the given post.
 	 */
@@ -298,7 +368,7 @@ public class PostListViewModel {
 	 * Creates and configures a PostDisplayViewModel for display. Attaches delete,
 	 * add, and update callbacks that interact with services.
 	 */
-	private PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
+	public PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
 			IPost.Type postType) {
 
 		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession,
@@ -318,9 +388,9 @@ public class PostListViewModel {
 				// ADD callback
 				newPost -> {
 					try {
-						Answer answerToAdd = (Answer) newPost;
-						Answer addedAnswer = answerService.addAnswer(answerToAdd); // DB call
-						addAnswerToVisibleList(addedAnswer); // Reflect in UI
+						Answer postToAdd = (Answer) newPost;
+						Answer addedPost = answerService.addAnswer(postToAdd); // DB call
+						addAnswerToVisibleList(addedPost); // Reflect in UI
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
