@@ -1,7 +1,7 @@
 package Database.Repositories;
 
 import Models.Answer;
-
+import Models.User;
 import Utils.Debug;
 
 import java.sql.Connection;
@@ -311,5 +311,32 @@ public class AnswerRepository implements IAnswerRepository {
 		}
 		return true;
 	}
-
+	
+	@Override
+	public List<Answer> getAnswersByUser(int userId) throws SQLException {
+		List<Answer> answersByUser = new ArrayList<>();
+		String getAnswersByUserSql = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getAnswersByUserSql)){
+			pstmt.setInt(1, userId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Answer a = new Answer(
+					rs.getInt("id"),
+					rs.getInt("questionId"),
+					rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
+					rs.getInt("userId"),
+					rs.getString("authorName"),
+					rs.getString("body"),
+					rs.getTimestamp("created"),
+					rs.getTimestamp("lastUpdated"),
+					rs.getInt("upvoteCount"),
+					rs.getBoolean("isCorrect"),
+					rs.getBoolean("isDeleted"), 0
+				);
+				answersByUser.add(a);
+			}
+		}
+		return answersByUser;
+	}
 }
