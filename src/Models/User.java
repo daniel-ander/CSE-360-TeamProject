@@ -2,6 +2,7 @@ package Models;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import Utils.RolePermissions.QuestionPermissions;
 
@@ -47,7 +48,7 @@ public class User {
     
     // ===================
     // 		  GETTERS 
- 	// ===================
+    // ===================
     
     public String getUserName() { return userName; }
     public String getPassword() { return password; }
@@ -56,7 +57,7 @@ public class User {
     
     // ===================
     // 		  SETTERS 
- 	// ===================
+    // ===================
     
     // Sets the role of the user.
     public void setRole(Role role) {
@@ -65,18 +66,51 @@ public class User {
     
     public void setId(int newId) { this.id = newId; }
     
-    public static Role roleFromString(String value) {    	
+    /**
+     * Parse a role string and return a single Role.
+     * If the string contains multiple comma-separated roles, return the first matching role.
+     */
+    public static Role roleFromString(String value) {
 
-    	for(Role role : Role.values()) {
-    		if(role.name().equalsIgnoreCase(value))
-    			return role;
+    	if (value == null) throw new IllegalArgumentException("Invalid role: null");
+    	String v = value.trim();
+    	if (v.isEmpty()) throw new IllegalArgumentException("Invalid role: " + value);
+
+    	// If multiple roles are present (comma-separated) try each and return first match
+    	if (v.contains(",")) {
+    		String[] parts = v.split(",");
+    		for (String p : parts) {
+    			String t = p.trim();
+    			for (Role role : Role.values()) {
+    				if (role.name().equalsIgnoreCase(t)) return role;
+    			}
+    		}
+    	} else {
+    		for (Role role : Role.values()) {
+    			if (role.name().equalsIgnoreCase(v)) return role;
+    		}
     	}
     	
-    	// NOTE/BUG: - This may cause an error if more than one role is selected.
-    	// We need to decide on how we'll handle the roles, but a check box is
-    	// not appropriate when only a single role can be had.
-    	
     	throw new IllegalArgumentException("Invalid role: " + value);
+    }
+
+    /**
+     * Parse comma-separated roles and return a list of Role enums (may be empty).
+     */
+    public static List<Role> rolesFromString(String value) {
+        List<Role> out = new ArrayList<>();
+        if (value == null || value.trim().isEmpty()) return out;
+        String[] parts = value.split(",");
+        for (String p : parts) {
+            String t = p.trim();
+            for (Role role : Role.values()) {
+                if (role.name().equalsIgnoreCase(t)) {
+                    out.add(role);
+                    break;
+                }
+            }
+        }
+        return out;
     }
     
     public void changeRole(Role newRole) {
