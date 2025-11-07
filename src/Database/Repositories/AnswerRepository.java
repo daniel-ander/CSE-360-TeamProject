@@ -94,19 +94,8 @@ public class AnswerRepository implements IAnswerRepository {
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswers)){
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
+				
 				allAnswers.add(a);
 			}
 		}
@@ -124,20 +113,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, questionId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
-				
+				Answer a = filledAnswerModel(rs);
 				
 				allAnswersForQuestion.add(a);
 			}
@@ -153,19 +129,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, parentAnswerId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				repliesToAnswerById.add(a);
 			}
 		}
@@ -182,19 +146,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, answerId);
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				return a;
 			}
 		}
@@ -209,19 +161,7 @@ public class AnswerRepository implements IAnswerRepository {
 				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswers)){
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				correctAnswers.add(a);
 			}
     	}
@@ -237,19 +177,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setString(1, "%" + searchString + "%");
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				answersBySearch.add(a);
 			}
     	}
@@ -310,6 +238,27 @@ public class AnswerRepository implements IAnswerRepository {
 			}
 		}
 		return true;
+	}
+	
+	// ===================
+    // 		HELPERS
+ 	// ===================
+	
+	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
+		return new Answer(
+				rs.getInt("id"),
+				rs.getInt("questionId"),
+				rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
+				rs.getInt("userId"),
+				rs.getString("authorName"),
+				rs.getString("body"),
+				rs.getTimestamp("created"),
+				rs.getTimestamp("lastUpdated"),
+				rs.getInt("upvoteCount"),
+				rs.getBoolean("isCorrect"),
+				rs.getBoolean("isReview"),
+				rs.getBoolean("isDeleted"), 0
+		);
 	}
 
 }

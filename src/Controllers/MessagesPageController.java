@@ -105,7 +105,7 @@ public class MessagesPageController {
 					userSession
 			);
 			
-			ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
+			ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(userSession); 
 			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
 			
 			new ForumPageController(
