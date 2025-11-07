@@ -132,7 +132,8 @@ public class MessagesPageController {
 
 	    initializeMessageListListeners();
 	    setMessageListActions();
-
+	    
+	    // TODO: Replace this once real data is available
 	    ObservableList<RecentUsersListViewModel> users = FXCollections.observableArrayList(
 	            new RecentUsersListViewModel(1, "Alice", "See you soon!", "10:32 AM", 0),
 	            new RecentUsersListViewModel(2, "Bob", "Got your message", "9:47 AM", 2)
