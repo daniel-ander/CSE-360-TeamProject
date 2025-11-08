@@ -140,7 +140,7 @@ public class MessagesPageController {
 	    );
 
 	    // Populate the ListView that's actually shown in the UI
-	    view.getMessagesListView().setItems(users);
+	    view.getRecentInteractionsListView().setItems(users);
 
 	}
     

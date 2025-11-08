@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import UI.Elements.MessageCell;
 import UI.Elements.RecentInteractionsCell;
 import UI.Interfaces.IInitializable;
 import javafx.application.Platform;
@@ -16,7 +17,9 @@ import java.util.function.Consumer;
 
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.Messages.MessagesViewModel;
 import Controllers.Messages.RecentInteractionsViewModel;
+import Models.Message;
 
 public class MessagesPage implements IInitializable {
 
@@ -31,6 +34,10 @@ public class MessagesPage implements IInitializable {
 
     private final ObservableList<RecentInteractionsViewModel> viewModels = FXCollections.observableArrayList();
     private final ListView<RecentInteractionsViewModel> recentInteractionsListView = new ListView<>(viewModels);
+    
+    private final ObservableList<MessagesViewModel> messagesViewModel = FXCollections.observableArrayList();
+
+    private final ListView<MessagesViewModel> messagesListView = new ListView<>(messagesViewModel);
 
     private final ForumHeaderViewModel messagesHeaderViewModel;
     private final QuestionPaneViewModel messagesPaneViewModel;
@@ -47,7 +54,6 @@ public class MessagesPage implements IInitializable {
             if (e.getCode() == KeyCode.ENTER) messagesHeaderViewModel.triggerPostsFilter();
         });
     }
-
     public void setInitialLayout(Stage primaryStage) {
         // top header
         Region spacer = new Region();
@@ -60,15 +66,14 @@ public class MessagesPage implements IInitializable {
         // left: recent interactions
         recentInteractionsListView.setCellFactory(_ -> new RecentInteractionsCell());
         recentInteractionsListView.setPrefWidth(200);
-        root.setLeft(recentInteractionsListView);
 
-        // right: placeholder for future messages/questions area
-        VBox rightPane = new VBox();
-        rightPane.setPrefWidth(600);
-        rightPane.setStyle("-fx-background-color: #f4f4f4; -fx-alignment: center; -fx-padding: 10;");
-        Label placeHolderLabel = new Label("Something happens here");
-        rightPane.getChildren().add(placeHolderLabel);
-        root.setCenter(rightPane);
+        // center: messages list
+        messagesListView.setCellFactory(_ -> new MessageCell());
+        messagesListView.setPrefWidth(600);
+
+        // layout
+        HBox content = new HBox(recentInteractionsListView, messagesListView);
+        root.setCenter(content);
 
         // scene setup
         Scene scene = new Scene(root, 800, 400);
@@ -78,6 +83,7 @@ public class MessagesPage implements IInitializable {
 
         setupScrollVisibilityCallback();
     }
+
 
     private void setupScrollVisibilityCallback() {
         recentInteractionsListView.skinProperty().addListener((_, _, newSkin) -> {
@@ -109,7 +115,9 @@ public class MessagesPage implements IInitializable {
     public Button getLogoutButton() { return logoutButton; }
     public Button getChangeRolesButton() { return changeRolesButton; }
     public Button getEnterForumButton() { return enterForumButton; }
-    public ListView<RecentInteractionsViewModel> getMessagesListView() { return recentInteractionsListView; }
+    public ListView<RecentInteractionsViewModel> getRecentInteractionsListView() { return recentInteractionsListView; }
+    public ListView<MessagesViewModel> getMessagesListView() { return messagesListView; }
+    
 
     // SETTERS
     public void setGetVisibleMessageIDsCallback(Consumer<int[]> callback) { this.getVisibleMessagesCallback = callback; }
