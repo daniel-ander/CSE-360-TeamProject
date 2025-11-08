@@ -9,7 +9,7 @@ import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
-
+import Models.IPost.Type;
 import Sessions.UserSession;
 import Utils.RolePermissions;
 import Utils.KeyPairHolder;
@@ -98,7 +98,7 @@ public class PostListViewModel {
 
 		List<Integer> idsOfQuestionsContainingReview = new ArrayList<>();
 
-		reviewPostParentMap.forEach((questionAnswerIDKeys, reviewVMs) -> {
+		reviewPostParentMap.forEach((questionAnswerIDKeys, _) -> {
 			if (!idsOfQuestionsContainingReview.contains(questionAnswerIDKeys.getFirstKey())) {
 				idsOfQuestionsContainingReview.add(questionAnswerIDKeys.getFirstKey());
 			}
@@ -119,6 +119,7 @@ public class PostListViewModel {
 	private void populateReviewMap(KeyPairHolder<Integer, Integer> parentQuestionAnswerIDKey,
 			PostDisplayViewModel answerVM) {
 		PostDisplayViewModel directParentAnswer = getDirectParentOfAnswer(answerVM.getPost().getId());
+		System.out.println("The parent body is: " + directParentAnswer.getBodyTextProperty().get());
 
 		if (reviewPostParentMap.containsKey(parentQuestionAnswerIDKey)) {
 			List<PostDisplayViewModel> reviewList = reviewPostParentMap.get(parentQuestionAnswerIDKey);
@@ -129,8 +130,6 @@ public class PostListViewModel {
 			List<PostDisplayViewModel> newReviewList = new ArrayList<>(Arrays.asList(directParentAnswer, answerVM));
 			reviewPostParentMap.put(parentQuestionAnswerIDKey, newReviewList);
 		}
-		
-		
 	}
 
 	/**
@@ -269,7 +268,7 @@ public class PostListViewModel {
 
 		// Set nesting depth and relationships
 		newPostVM.setDepthLevel(parentVM.getDepthLevel() + 1);
-		parentVM.setDoesHaveChildren(true);
+		parentVM.setDoesHaveChildrenProperty(true);
 
 		// Register new answer under parent
 		final KeyPairHolder<Integer, Integer> relationKey = new KeyPairHolder<>(questionId, parentAnswerId);
@@ -339,6 +338,7 @@ public class PostListViewModel {
 	 */
 	private void expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
 			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
+		System.out.println("Expanded");
 
 		List<PostDisplayViewModel> children = null;
 
@@ -348,7 +348,7 @@ public class PostListViewModel {
 			break;
 		case REVIEW:
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
-			children = postParentMap.get(questionAnswerIDKeyPair);
+//			children = postParentMap.get(questionAnswerIDKeyPair);
 			break;
 		}
 
@@ -369,18 +369,44 @@ public class PostListViewModel {
 
 		// Insert each child below the parent in reverse order (so order is preserved)
 		for (int i = children.size() - 1; i >= 0; i--) {
-			PostDisplayViewModel child = children.get(i);
-			child.setDepthLevel(parentPost.getDepthLevel() + 1);
-			visiblePosts.add(visibleParentPostIndex + 1, child);
+		    PostDisplayViewModel child = children.get(i);
+		    child.setDepthLevel(parentPost.getDepthLevel() + 1);
 
-			// Determine if child itself has children
-			KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(((Answer) child.getPost()).getQuestionId(),
-					child.getPost().getId());
+		    if (currentFilterMode == FilterMode.REVIEW && child.getPost().getPostType() == Type.Answer) {
+		        Answer reviewAnswer = (Answer) child.getPost();
 
-			if (postParentMap.get(childKeys) == null) {
-				child.setDoesHaveChildren(false);
-			}
+		        // Check if review is related to another answer
+		        if (reviewAnswer.getParentAnswerId() != null) {
+		            // Get the direct parent answer
+		            PostDisplayViewModel parentAnswerVM = getDirectParentOfAnswer(reviewAnswer.getId());
+		            if (parentAnswerVM != null && !visiblePosts.contains(parentAnswerVM)) {
+		                parentAnswerVM.setDepthLevel(parentPost.getDepthLevel() + 1);
+		                visiblePosts.add(visibleParentPostIndex + 1, parentAnswerVM);
+		            }
+
+		            // Place the review directly under that parent answer
+		            child.setDepthLevel(parentPost.getDepthLevel() + 2);
+		            visiblePosts.add(visibleParentPostIndex + 2, child);
+		        } else {
+		            // Review directly on question
+		            visiblePosts.add(visibleParentPostIndex + 1, child);
+		        }
+		    } else {
+		        // Default (non-review mode)
+		        visiblePosts.add(visibleParentPostIndex + 1, child);
+		    }
+
+		    // Determine if child has its own children
+		    KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(
+		        ((Answer) child.getPost()).getQuestionId(),
+		        child.getPost().getId()
+		    );
+
+		    if (postParentMap.get(childKeys) == null) {
+		        child.setDoesHaveChildrenProperty(false);
+		    }
 		}
+
 	}
 
 	/**

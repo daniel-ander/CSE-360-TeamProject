@@ -1,5 +1,6 @@
 package Controllers.ForumPage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -130,12 +131,17 @@ public class PostDisplayViewModel {
 	public boolean isExpandButtonPressed() {
 		return isExpandedProperty.get();
 	}
+	
+	// Properties that cannot be active at once
+	private List<BooleanProperty> nonConcurrentProperties() {
+		return new ArrayList<BooleanProperty>(List.of(isReviewingProperty, isCommentingProperty));
+	}
 
 	// ===================
 	// SETTERS
 	// ===================
 
-	public void setDoesHaveChildren(boolean doesHaveChildren) {
+	public void setDoesHaveChildrenProperty(boolean doesHaveChildren) {
 		this.doesHaveChildrenProperty.set(doesHaveChildren);
 	}
 
@@ -152,10 +158,12 @@ public class PostDisplayViewModel {
 	}
 
 	public void setIsReviewingProperty(boolean isReviewing) {
+		resetNonConcurrentActions();
 		this.isReviewingProperty.set(isReviewing);
 	}
 
 	public void setIsCommentingProperty(boolean isCommenting) {
+		resetNonConcurrentActions();
 		this.isCommentingProperty.set(isCommenting);
 	}
 
@@ -234,5 +242,17 @@ public class PostDisplayViewModel {
 		);
 
 		addCallBack.accept(newAnswer);
+	}
+	
+	// ===================
+	// HELPERS
+	// ===================
+	
+	// Properties that cannot be active at the same time. 
+	// IE: Commenting and Reviewing windows cannot both be open at once
+	private void resetNonConcurrentActions() {
+		nonConcurrentProperties().forEach(property -> {
+			property.set(false);
+		});
 	}
 }
