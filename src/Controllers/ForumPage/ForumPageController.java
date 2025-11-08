@@ -6,6 +6,7 @@ import java.util.List;
 import Config.AppCache;
 import Controllers.UserLoginPageController;
 import Controllers.WelcomeLoginPageController;
+import Controllers.ForumPage.PostListViewModel.FilterMode;
 import Database.*;
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
@@ -54,9 +55,20 @@ public class ForumPageController {
 		setLogoutButtonAction();
 		setChangeRolesButtonAction();
 
-		forumHeaderViewModel.getSearchButtonPressedProperty().addListener((_, _, isTriggered) -> {
-			if (isTriggered) {
+		forumHeaderViewModel.getSearchButtonPressedProperty().addListener((_, _, isPressed) -> {
+			if (isPressed) {
+				// TODO: - this can be delegated entirely to the 
 				postListViewModel.filterVisibleQuestionsByText(forumHeaderViewModel.getSearchFieldText());
+			}
+		});
+		
+		forumHeaderViewModel.getSeeReviewsButtonPressedProperty().addListener((_, _, isPressed) -> {
+			if(isPressed) {
+				postListViewModel.setFilterMode(FilterMode.REVIEW);
+				postListViewModel.filterVisibleQuestionsByReview();
+			} else {
+				postListViewModel.setFilterMode(FilterMode.NONE);
+				postListViewModel.resetVisiblePosts();
 			}
 		});
 
@@ -129,7 +141,7 @@ public class ForumPageController {
 		List<PostWithPermissions> initialQuestions = new ArrayList<>();
 
 		if (AppCache.getInstance().areInitialQuestionsLoaded()) {
-			initialQuestions.addAll(AppCache.getInstance().getInitialQuestionData().get());
+			initialQuestions.addAll(AppCache.getInstance().getInitialQuestionDataProperty().get());
 			postListViewModel.populateQuestions(initialQuestions);
 			view.getForumListView().setItems(postListViewModel.getVisiblePosts());
 		}
@@ -138,7 +150,7 @@ public class ForumPageController {
 			postListViewModel.addToAnswerPool(AppCache.getInstance().getAllInitialAnswersDataProperty().get());
 		}
 
-		AppCache.getInstance().getInitialQuestionData().addListener((_, _, questionsWithPermissions) -> {
+		AppCache.getInstance().getInitialQuestionDataProperty().addListener((_, _, questionsWithPermissions) -> {
 			if (questionsWithPermissions == null)
 				return;
 

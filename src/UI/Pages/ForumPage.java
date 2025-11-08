@@ -27,6 +27,7 @@ public class ForumPage implements IInitializable {
     private final Label userLabel = new Label();
     private final Button logoutButton = new Button("Logout");
     private final Button changeRolesButton = new Button("Change Roles");
+    private final Button seeMyReviewsButton = new Button("See My Reviews");
 
     // Center UI components (formerly QuestionListView)
     private final ObservableList<PostDisplayViewModel> viewModels = FXCollections.observableArrayList();
@@ -57,6 +58,20 @@ public class ForumPage implements IInitializable {
     	searchQuestionsTextField.setOnKeyPressed(e -> {
     		if(e.getCode() == KeyCode.ENTER) {
     			forumHeaderViewModel.triggerPostsFilter(); 
+    		}
+    	});
+    	
+    	seeMyReviewsButton.setOnMouseClicked(_ -> {
+    		forumHeaderViewModel.setSeeReviewsButtonPressedProperty(!forumHeaderViewModel.getSeeReviewsButtonPressedProperty().get());
+    	});
+    	
+    	forumHeaderViewModel.getSeeReviewsButtonPressedProperty().addListener((_, _, isPressed) -> {
+    		if(isPressed) {
+    			seeMyReviewsButton.setText("See All Posts");
+    			seeMyReviewsButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+    		} else {
+    			seeMyReviewsButton.setText("See My Reviews");
+    			seeMyReviewsButton.setStyle("");
     		}
     	});
     	
@@ -109,6 +124,11 @@ public class ForumPage implements IInitializable {
     	HBox.setHgrow(spacer, Priority.ALWAYS);
     	
     	header.getChildren().addAll(logoutButton, changeRolesButton, spacer, addQuestionButton, searchQuestionsTextField, filterQuestionsButton);
+    	
+    	if(forumHeaderViewModel.isReviewer()) {
+    		header.getChildren().add(3, seeMyReviewsButton);
+    	}
+    	
         header.setStyle("-fx-padding: 10; -fx-alignment: center-left;");
         root.setTop(header);
 

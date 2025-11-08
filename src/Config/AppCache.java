@@ -76,7 +76,7 @@ public class AppCache {
     	return fullDataProperty;
     }
     
-    public ObjectProperty<List<PostWithPermissions>> getInitialQuestionData() {
+    public ObjectProperty<List<PostWithPermissions>> getInitialQuestionDataProperty() {
     	return initialQuestionDataProperty;
     }
     

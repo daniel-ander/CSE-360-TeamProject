@@ -4,9 +4,10 @@ import java.sql.Timestamp;
 
 public interface IPost {
 	enum Type {
-		Question, Answer
+		Question, Answer, Review
 	}
 	
+	public Integer getAuthorId();
 	public Integer getId();
 	public String getBodyText();
 	public boolean getIsDeleted();

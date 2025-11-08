@@ -8,6 +8,7 @@ public class Answer implements IPost {
 	private Integer id;
 	private String bodyText;
 	private boolean isCorrect;
+	private boolean isReview;
 	private Integer questionId;
 	private Integer authorId;
 	private String authorName;
@@ -21,12 +22,12 @@ public class Answer implements IPost {
 
 	// Constructor for creating a new answer (not yet in DB)
 	public Answer(int questionId, int authorId, String authorName, String bodyText) {
-		this(questionId, null, authorId, authorName, bodyText);
+		this(questionId, null, authorId, authorName, bodyText, false);
 	}
 	
 	// Constructor for creating a new nested answer (not yet in DB)
-	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText) {
-		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, false, 0);
+	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText, boolean isReview) {
+		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, isReview, false, 0);
 	}
 	
 	// Constructor for pulling from DB with all fields
@@ -41,6 +42,7 @@ public class Answer implements IPost {
 			Timestamp lastUpdatedTimestamp, 
 			Integer upvoteCount, 
 			boolean isCorrect, 
+			boolean isReview,
 			boolean isDeleted, 
 			int replyDepth
 	) {
@@ -58,8 +60,8 @@ public class Answer implements IPost {
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
 		this.upvoteCount = upvoteCount;
 		this.replyDepth = replyDepth;
-		
 		this.isCorrect = isCorrect;
+		this.isReview = isReview;
 		this.isDeleted = isDeleted;
 
 	}
@@ -80,13 +82,19 @@ public class Answer implements IPost {
 	public Integer getUpvoteCount() {return upvoteCount;}
 	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
+	public boolean isReview() {return isReview;}
 	public int getReplyDepth() {return replyDepth;}
 	@Override
 	public String getBodyText() { return bodyText;}
 	@Override
 	public String getTitleText() {return null;}
 	@Override
-	public Type getPostType() {return Type.Answer;}
+	public Type getPostType() {
+		if(isReview) 
+			return Type.Review;
+		else
+			return Type.Answer;
+	}
 	
 	// ===================
     // 		 SETTERS 
@@ -94,6 +102,7 @@ public class Answer implements IPost {
 	
 	public void setQuestionId(int givenId) {questionId = givenId;}
 	public void setIsCorrect(boolean correct) { isCorrect = correct;}
+	public void setIsReview(boolean isReview) { this.isReview = isReview;}
 	public void setIsDeleted(boolean deleted) { isDeleted = deleted;}
 	public void setUpvoteCount(int newCount) { upvoteCount = newCount;}
 	public void setParentAnswerId(int givenId) {parentAnswerId = givenId;}

@@ -1,11 +1,12 @@
 package UI.Elements;
 
-import org.mockito.Mockito;
-
 import Controllers.ForumPage.PostDisplayViewModel;
+import Models.IPost;
+import Models.IPost.Type;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
+
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
@@ -25,7 +26,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final TextArea bodyTextField = new TextArea();
 
 	private final TextArea newCommentTextField = new TextArea();
-	
+
 	private final TextArea newReviewTextField = new TextArea();
 
 	private final Label statusLabel = new Label();
@@ -37,10 +38,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	public PostCell() {
 		setInitialProperties();
 		setInitialListeners();
-		setStyles();
 
 		bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
-		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, newReviewTextField, statusLabel, actionsContainer);
+		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, newReviewTextField, statusLabel,
+				actionsContainer);
 		outerMostContainer.getChildren().addAll(spacer, layout);
 
 		setGraphic(outerMostContainer);
@@ -66,6 +67,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		// Assign current ViewModel
 		currentVm = vm;
+		
+		setStyles(currentVm);
 
 		populateTextFields(currentVm);
 		populateActionsContainer(currentVm);
@@ -74,6 +77,23 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		currentVm.getIsEditingPostProperty().addListener(editingListener);
 
 		setGraphic(outerMostContainer);
+	}
+
+	private void setStyles(PostDisplayViewModel vm) {
+		// Apply style sheet
+		layout.getStylesheets().add(getClass().getResource("/Styles/styles.css").toExternalForm());
+
+		// Style classes
+		layout.getStyleClass().add("question-cell");
+		titleLabel.getStyleClass().add("question-title");
+		bodyText.getStyleClass().add("question-body");
+		statusLabel.getStyleClass().add("question-status");
+		
+		if (vm.getPost().getPostType() == Type.Review) {
+			outerMostContainer.setStyle("-fx-background-color: #5189A1; -fx-text-fill: white;");
+		} else {
+			outerMostContainer.setStyle("");
+		}
 	}
 
 	private void populateTextFields(PostDisplayViewModel vm) {
@@ -141,13 +161,13 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 				Button deleteButton = new Button("Delete");
 				deleteButton.setOnAction(_ -> {
 					vm.deletePost();
-					
-					if(vm.getIsDeletedProperty().get()) {
+
+					if (vm.getIsDeletedProperty().get()) {
 						bodyText.setText("This message was deleted");
 						bodyTextField.setText("This message was deleted");
 					}
 				});
-				
+
 				actionsContainer.getChildren().add(deleteButton);
 				break;
 
@@ -155,14 +175,14 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 				Button commentButton = new Button("Comment");
 				commentButton.textProperty()
 						.bind(Bindings.when(vm.getIsCommentingProperty()).then("Post").otherwise("Comment"));
-				
+
 				commentButton.setOnAction(_ -> {
 					if (!vm.getIsCommentingProperty().get()) {
 						vm.setIsCommentingProperty(true);
 					} else {
 						String newCommentText = newCommentTextField.getText().trim();
 						if (!newCommentText.isEmpty()) {
-							vm.addAnswer(null, newCommentText);
+							vm.addAnswer(null, newCommentText, IPost.Type.Answer);
 							newCommentTextField.clear();
 							vm.setIsCommentingProperty(false);
 						} else {
@@ -173,7 +193,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 				actionsContainer.getChildren().add(commentButton);
 				break;
 
-				
 			case "REVIEW":
 				Button reviewButton = new Button("Review");
 				reviewButton.textProperty()
@@ -185,24 +204,23 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 					} else {
 						String newReviewText = newReviewTextField.getText().trim();
 						if (!newReviewText.isEmpty()) {
-							vm.addAnswer(null, newReviewText);
+							vm.addAnswer(null, newReviewText, IPost.Type.Review);
 							newReviewTextField.clear();
 							vm.setIsReviewingProperty(false);
 						} else {
 							System.out.println("Review is empty!");
 						}
 					}
-					
-					
+
 				});
 				actionsContainer.getChildren().add(reviewButton);
 				break;
-				
+
 			case "EDIT":
 				Button updateButton = new Button("Edit");
 				updateButton.textProperty()
 						.bind(Bindings.when(vm.getIsEditingPostProperty()).then("Commit Edit").otherwise("Edit"));
-				
+
 				updateButton.setOnAction(_ -> {
 					if (vm.getIsEditingPostProperty().get()) {
 						// Commit manually, then exit edit mode
@@ -220,7 +238,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		// Expand / Collapse button
 		Button toggleExpandButton = new Button();
-		
+
 		toggleExpandButton.textProperty()
 				.bind(Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand"));
 		toggleExpandButton.visibleProperty().bind(vm.getDoesHaveChildren());
@@ -229,7 +247,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		actionsContainer.getChildren().add(toggleExpandButton);
 	}
 
-	// Keeping track of the listener to add and remove it to adhere to cell reuse logic
+	// Keeping track of the listener to add and remove it to adhere to cell reuse
+	// logic
 	private final ChangeListener<Boolean> editingListener = (_, _, isEditing) -> {
 		if (currentVm == null)
 			return;
@@ -253,17 +272,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		bodyTextField.setPrefHeight(height);
 	};
 
-	private void setStyles() {
-		// Apply style sheet
-		layout.getStylesheets().add(getClass().getResource("/Styles/styles.css").toExternalForm());
-
-		// Style classes
-		layout.getStyleClass().add("question-cell");
-		titleLabel.getStyleClass().add("question-title");
-		bodyText.getStyleClass().add("question-body");
-		statusLabel.getStyleClass().add("question-status");
-	}
-
 	private void setInitialProperties() {
 		// Setup wrapping and alignment
 		bodyTextField.setWrapText(true);
@@ -284,7 +292,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		newCommentTextField.setVisible(false);
 		newCommentTextField.setManaged(false);
-		
+
 		newReviewTextField.setVisible(false);
 		newReviewTextField.setManaged(false);
 
@@ -298,7 +306,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		// Comment field visibility
 		newCommentTextField.visibleProperty().bind(vm.getIsCommentingProperty());
 		newCommentTextField.managedProperty().bind(vm.getIsCommentingProperty());
-		
+
 		// Review field visibility
 		newReviewTextField.visibleProperty().bind(vm.getIsReviewingProperty());
 		newReviewTextField.managedProperty().bind(vm.getIsReviewingProperty());
@@ -306,7 +314,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		// Manage visibility for edit vs view mode
 		titleLabel.visibleProperty().bind(vm.getIsEditingPostProperty().not());
 		titleTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
-		
+
 		bodyText.visibleProperty().bind(vm.getIsEditingPostProperty().not());
 		bodyTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
 	}

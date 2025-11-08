@@ -127,37 +127,30 @@ public class WelcomeLoginPageController {
      * 3. Add a case here → launch NewRoleHomePage.
      */
     private void navigateToPage(Stage stage, User.Role role, String username) {
-        switch (role.name()) {
-            case "admin":
+        switch (role) {
+            case User.Role.admin:
                 //new AdminHomePageController(databaseHelper, username).show(stage);
             	new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
                 break;
-            case "student":
+            case User.Role.student:
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
-            case "instructor":
+            case User.Role.instructor:
                 new InstructorHomePageController(dBConnectionStore, stage, userSession, new InstructorHomePage());
                 break;
-            case "staff":
+            case User.Role.staff:
                 new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage());
                 break;
-            case "reviewer":
+            case User.Role.reviewer:
     			PostListViewModel postListViewModel = new PostListViewModel(
     					dBConnectionStore.getQuestionService(), 
     					dBConnectionStore.getAnswerService(),
     					userSession
     			);
-            	ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(); 
+            	ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(userSession); 
     			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
                 new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage(forumHeaderViewModel, questionPaneViewModel), postListViewModel, forumHeaderViewModel, questionPaneViewModel);
                 break;
-            case "user":
-            	// TODO: - Fix Roles
-                new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
-                break;
-            // Add more roles here as needed, following the same pattern.
-                
-            
             // since this isnt dynamic youll have to update other places too
             default:
                 // 👀 Fallback if role has no page mapped yet
