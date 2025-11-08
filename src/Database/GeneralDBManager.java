@@ -130,9 +130,9 @@ public class GeneralDBManager implements IGeneralDBManager {
 			  + "parent_message_id INT, "
 			  + "message_text TEXT, "
 			  + "sent_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-			  + "FOREIGN KEY (review_id) REFERENCES %s(answer_id), "
-			  + "FOREIGN KEY (sender_id) REFERENCES %s(user_id), "
-			  + "FOREIGN KEY (receiver_id) REFERENCES %s(user_id), "
+			  + "FOREIGN KEY (review_id) REFERENCES %s(id), "
+			  + "FOREIGN KEY (sender_id) REFERENCES %s(id), "
+			  + "FOREIGN KEY (receiver_id) REFERENCES %s(id), "
 			  + "FOREIGN KEY (parent_message_id) REFERENCES %s(message_id))",
 			  interactionTableName, answerTableName, userTableName, userTableName, interactionTableName
 			);
