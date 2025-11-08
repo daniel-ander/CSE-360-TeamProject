@@ -86,8 +86,8 @@ public class InstructorHomePageController {
 					Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Grant reviewer role to '" + student + "'?", ButtonType.YES, ButtonType.NO);
 					Optional<ButtonType> resp = confirm.showAndWait();
 					if (resp.isPresent() && resp.get() == ButtonType.YES) {
-						boolean ok = requestService.grantReviewerRole(student);
-						Alert res = new Alert(ok ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR, ok ? "Reviewer role granted." : "Failed to grant reviewer role.");
+						boolean didGrantRole = requestService.grantReviewerRole(student);
+						Alert res = new Alert(didGrantRole ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR, didGrantRole ? "Reviewer role granted." : "Failed to grant reviewer role.");
 						res.showAndWait();
 					}
 				}
