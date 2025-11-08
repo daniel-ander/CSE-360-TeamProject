@@ -5,6 +5,7 @@ import java.sql.*;
 
 import Models.Answer;
 import Models.Invitation;
+import Models.Message;
 import Models.Permission;
 import Models.Question;
 import Models.User;
@@ -29,6 +30,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 	
 	// CRUD-related
 	private final String userTableName = User.tableName;
+	private final String interactionTableName = Message.tableName;
 	private final String questionTableName = Question.tableName;
 	private final String answerTableName = Answer.tableName;
 	private final String invitationTableName = Invitation.tableName;
@@ -118,6 +120,24 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
 					answerTableName, answerPermissionSQL);
+		
+		String messageTableQuery = String.format(
+			    "CREATE TABLE IF NOT EXISTS %s ("
+			  + "message_id INT AUTO_INCREMENT PRIMARY KEY, "
+			  + "review_id INT, "
+			  + "sender_id INT, "
+			  + "receiver_id INT, "
+			  + "parent_message_id INT, "
+			  + "message_text TEXT, "
+			  + "sent_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+			  + "FOREIGN KEY (review_id) REFERENCES %s(id), "
+			  + "FOREIGN KEY (sender_id) REFERENCES %s(id), "
+			  + "FOREIGN KEY (receiver_id) REFERENCES %s(id), "
+			  + "FOREIGN KEY (parent_message_id) REFERENCES %s(message_id))",
+			  interactionTableName, answerTableName, userTableName, userTableName, interactionTableName
+			);
+
+	
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -130,6 +150,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(questionPermissionTableQuery);
 			stmt.execute(userQuestionPermissionTableQuery);
 			stmt.execute(userAnswerPermissionTableQuery);
+			stmt.execute(messageTableQuery);
 		}
 
 	}
@@ -220,14 +241,23 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (3, NULL, 3, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),
 			    (3, NULL, 3, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
 			    """, answerTableName);
-
-
+		
+	    String populateMessagesTable = String.format(
+	            "INSERT INTO %s (review_id, sender_id, receiver_id, parent_message_id, message_text, sent_timestamp) VALUES "
+	            + "(NULL, 1, 2, NULL, 'Hey, did you check the assignment?', '2023-11-01 10:00:00'),"
+	            + "(NULL, 2, 1, NULL, 'Yes, looks good to me.', '2023-11-01 10:05:00'),"
+	            + "(1, 3, 2, NULL, 'I left a review comment on your answer — consider edge cases.', '2023-11-02 12:00:00'),"
+	            + "(2, 2, 3, NULL, 'Thanks for the review, I updated the answer.', '2023-11-02 12:30:00'),"
+	            + "(NULL, 4, 1, NULL, 'Reminder: meeting at 2pm today.', '2023-11-03 09:00:00'),"
+	            + "(3, 5, 1, NULL, 'Feedback on review: good point about performance.', '2023-11-04 14:20:00');",
+	            interactionTableName);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
 			stmt.execute(populateUserTable);
 			stmt.execute(populateQuestionTable);
 			stmt.execute(populateAnswersTable);
+			stmt.execute(populateMessagesTable);
 		}
 
 	}
