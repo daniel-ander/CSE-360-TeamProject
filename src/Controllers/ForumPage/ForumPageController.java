@@ -65,6 +65,8 @@ public class ForumPageController {
 			if(isPressed) {
 				postListViewModel.setFilterMode(FilterMode.REVIEW);
 				postListViewModel.filterVisibleQuestionsByReview();
+			} else {
+				postListViewModel.resetVisiblePosts();
 			}
 		});
 

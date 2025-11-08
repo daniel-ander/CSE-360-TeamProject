@@ -61,6 +61,13 @@ public class PostListViewModel {
 	// ==============================
 	// PUBLIC METHODS
 	// ==============================
+	
+	/**
+	 * Resets visible posts to initial state with all the questions
+	 */
+	public void resetVisiblePosts() {
+	    visiblePosts.setAll(allQuestionsStore);
+	}
 
 	/**
 	 * Filters visible posts by title and body text with the given search term
@@ -83,12 +90,13 @@ public class PostListViewModel {
 	//
 	public void filterVisibleQuestionsByReview() {
 		reviewPostParentMap.clear();
-		
+
 		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {
 			for (PostDisplayViewModel answerVM : postVMs) {
 				boolean postIsReviewType = ((Answer) answerVM.getPost()).isReview();
-				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession.getCurrentUserId();
-				
+				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession
+						.getCurrentUserId();
+
 				if (postIsReviewType && postBelongsToUser) {
 					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;
 					populateReviewMap(parentQuestionAnswerIDKey, reviewOfCurrentReviewer);
@@ -199,31 +207,25 @@ public class PostListViewModel {
 	public ObservableList<PostDisplayViewModel> getVisiblePosts() {
 		return visiblePosts;
 	}
-	
+
 	public PostDisplayViewModel getDirectParentOfAnswer(int answerId) {
-	    PostDisplayViewModel answerVM = postParentMap.values().stream()
-	        .flatMap(List::stream)
-	        .filter(vm -> vm.getPost().getId() == answerId)
-	        .findFirst()
-	        .orElse(null);
+		PostDisplayViewModel answerVM = postParentMap.values().stream().flatMap(List::stream)
+				.filter(vm -> vm.getPost().getId() == answerId).findFirst().orElse(null);
 
-	    if (answerVM == null) return null; // not found
+		if (answerVM == null)
+			return null; // not found
 
-	    Answer answer = (Answer) answerVM.getPost();
-	    Integer parentAnswerId = answer.getParentAnswerId();
-	    int questionId = answer.getQuestionId();
+		Answer answer = (Answer) answerVM.getPost();
+		Integer parentAnswerId = answer.getParentAnswerId();
+		int questionId = answer.getQuestionId();
 
-	    if (parentAnswerId == null) {
-	        return getVisiblePostByID(questionId, IPost.Type.Question);
-	    }
-	    
-	    return postParentMap.values().stream()
-	        .flatMap(List::stream)
-	        .filter(vm -> vm.getPost().getId().equals(parentAnswerId))
-	        .findFirst()
-	        .orElse(null);
+		if (parentAnswerId == null) {
+			return getVisiblePostByID(questionId, IPost.Type.Question);
+		}
+
+		return postParentMap.values().stream().flatMap(List::stream)
+				.filter(vm -> vm.getPost().getId().equals(parentAnswerId)).findFirst().orElse(null);
 	}
-
 
 	/**
 	 * Expands or collapses the children of a given post (question or answer).
@@ -338,7 +340,6 @@ public class PostListViewModel {
 	 */
 	private void expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
 			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
-		System.out.println("Expanded");
 
 		List<PostDisplayViewModel> children = null;
 
@@ -348,7 +349,7 @@ public class PostListViewModel {
 			break;
 		case REVIEW:
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
-//			children = postParentMap.get(questionAnswerIDKeyPair);
+			children = postParentMap.get(questionAnswerIDKeyPair);
 			break;
 		}
 
@@ -363,50 +364,23 @@ public class PostListViewModel {
 		default:
 			break;
 		}
-
 		// Ensure fresh state
 		visiblePosts.removeAll(postParentMap.get(questionAnswerIDKeyPair));
 
 		// Insert each child below the parent in reverse order (so order is preserved)
 		for (int i = children.size() - 1; i >= 0; i--) {
-		    PostDisplayViewModel child = children.get(i);
-		    child.setDepthLevel(parentPost.getDepthLevel() + 1);
+			PostDisplayViewModel child = children.get(i);
+			child.setDepthLevel(parentPost.getDepthLevel() + 1);
+			visiblePosts.add(visibleParentPostIndex + 1, child);
 
-		    if (currentFilterMode == FilterMode.REVIEW && child.getPost().getPostType() == Type.Answer) {
-		        Answer reviewAnswer = (Answer) child.getPost();
+			// Determine if child itself has children
+			KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(((Answer) child.getPost()).getQuestionId(),
+					child.getPost().getId());
 
-		        // Check if review is related to another answer
-		        if (reviewAnswer.getParentAnswerId() != null) {
-		            // Get the direct parent answer
-		            PostDisplayViewModel parentAnswerVM = getDirectParentOfAnswer(reviewAnswer.getId());
-		            if (parentAnswerVM != null && !visiblePosts.contains(parentAnswerVM)) {
-		                parentAnswerVM.setDepthLevel(parentPost.getDepthLevel() + 1);
-		                visiblePosts.add(visibleParentPostIndex + 1, parentAnswerVM);
-		            }
-
-		            // Place the review directly under that parent answer
-		            child.setDepthLevel(parentPost.getDepthLevel() + 2);
-		            visiblePosts.add(visibleParentPostIndex + 2, child);
-		        } else {
-		            // Review directly on question
-		            visiblePosts.add(visibleParentPostIndex + 1, child);
-		        }
-		    } else {
-		        // Default (non-review mode)
-		        visiblePosts.add(visibleParentPostIndex + 1, child);
-		    }
-
-		    // Determine if child has its own children
-		    KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(
-		        ((Answer) child.getPost()).getQuestionId(),
-		        child.getPost().getId()
-		    );
-
-		    if (postParentMap.get(childKeys) == null) {
-		        child.setDoesHaveChildrenProperty(false);
-		    }
+			if (postParentMap.get(childKeys) == null) {
+				child.setDoesHaveChildrenProperty(false);
+			}
 		}
-
 	}
 
 	/**

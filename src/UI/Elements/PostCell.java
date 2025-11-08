@@ -8,6 +8,7 @@ import Models.IPost.Type;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
@@ -76,6 +77,17 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		setUpBindings(currentVm);
 
 		currentVm.getIsEditingPostProperty().addListener(editingListener);
+		
+		outerMostContainer.setOnMouseClicked(event -> {
+		    Node target = (Node) event.getTarget();
+
+		    // Only handle if the click was *directly on* the container,
+		    // not on any child node inside it.
+		    if (target == outerMostContainer) {
+		        System.out.println("Clicked empty space in container");
+		        // Your logic here
+		    }
+		});
 
 		setGraphic(outerMostContainer);
 	}
