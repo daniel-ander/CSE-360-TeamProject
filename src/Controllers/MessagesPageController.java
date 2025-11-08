@@ -49,10 +49,7 @@ public class MessagesPageController {
 	private final MessagesPage view;
 	
 	private final PostListViewModel messageListViewModel;
-	private final ForumHeaderViewModel messagesHeaderViewModel;
-	private final QuestionPaneViewModel questionPaneViewModel;
 	private final IUserService userService;
-	private final ListView<RecentInteractionsViewModel> recentUsersListView = new ListView<>();
 	
 		
 	public MessagesPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, MessagesPage view, 
@@ -64,8 +61,6 @@ public class MessagesPageController {
 		this.userSession = userSession;
 		this.view = view;
 		this.messageListViewModel = postListViewModel;
-		this.messagesHeaderViewModel = messagesHeaderViewModel;
-		this.questionPaneViewModel = questionPaneViewModel;
 	    
 	        
 	    setInitialLayout();

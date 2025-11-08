@@ -1,17 +1,22 @@
+// language: java
 package Database.Services.Interfaces;
 
-import java.util.List;
-import Exceptions.DBExceptions.DataAccessException;
 import Models.Message;
+import Exceptions.DBExceptions.DataAccessException;
+
+import java.util.List;
 
 public interface IMessageService {
-	public List<Message> getMessagesForUsername(String username) throws DataAccessException;
-	
-	public boolean updateMessage(int messageId, String newContent) throws DataAccessException;
-	
-	public Message insertMessage(Message message) throws DataAccessException;
-	
-	public boolean deleteMessage(int messageId) throws DataAccessException;
-	
+    // CREATE
+    Message insertMessage(Message message) throws DataAccessException;
 
+    // READ
+    List<Message> getMessagesForUsername(String username) throws DataAccessException;
+    List<Message> getMessagesByReviewId(int reviewId) throws DataAccessException;
+
+    // UPDATE
+    boolean updateMessage(int messageId, String newContent) throws DataAccessException;
+
+    // DELETE
+    boolean deleteMessage(int messageId) throws DataAccessException;
 }
