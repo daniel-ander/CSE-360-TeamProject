@@ -7,6 +7,7 @@ import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.Messages.MessagesViewModel;
 import Controllers.Messages.RecentInteractionsViewModel;
 import Database.*;
 import Database.Services.UserService;
@@ -139,8 +140,16 @@ public class MessagesPageController {
 	            new RecentInteractionsViewModel(2, "Bob", "Got your message", "9:47 AM", 2)
 	    );
 
+	    ObservableList<MessagesViewModel> messages = FXCollections.observableArrayList(
+	            new MessagesViewModel(101, "Alice", "You", "Looking forward to our meeting.", "10:30 AM"),
+	            new MessagesViewModel(102, "You", "Alice", "See you soon!", "10:32 AM"),
+	            new MessagesViewModel(201, "Bob", "You", "Did you get my last message?", "9:45 AM"),
+	            new MessagesViewModel(202, "You", "Bob", "Got your message", "9:47 AM")
+	    );
+	    
 	    // Populate the ListView that's actually shown in the UI
 	    view.getRecentInteractionsListView().setItems(users);
+	    view.getMessagesListView().setItems(messages);
 
 	}
     
