@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class MessagesPageViewModel {
+public class RecentInteractionsViewModel {
 
     private final IntegerProperty userIdProperty = new SimpleIntegerProperty();
     private final StringProperty usernameProperty = new SimpleStringProperty();
@@ -13,16 +13,24 @@ public class MessagesPageViewModel {
     private final StringProperty timestampProperty = new SimpleStringProperty();
     private final IntegerProperty unreadCountProperty = new SimpleIntegerProperty();
 
-    public MessagesPageViewModel() { }
+    public RecentInteractionsViewModel() { }
 
-    public MessagesPageViewModel(int userId, String username, String lastMessage, String timestamp, int unreadCount) {
+    public RecentInteractionsViewModel(int userId, String username, String lastMessage, String timestamp, int unreadCount) {
         setUserId(userId);
         setUsername(username);
         setLastMessage(lastMessage);
         setTimestamp(timestamp);
         setUnreadCount(unreadCount);
     }
-
+    // This will need to hook into the messages model
+    // all of the data should come from that table
+    // the recency of the interaction will go by the
+    // timestamp of the last message exchanged between users
+    
+    
+    // 
+    
+    
     // Properties
     public IntegerProperty getUserIdProperty() {
         return userIdProperty;

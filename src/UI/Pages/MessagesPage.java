@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
-import Controllers.Messages.MessagesPageViewModel;
+import Controllers.Messages.RecentInteractionsViewModel;
 
 public class MessagesPage implements IInitializable {
 
@@ -29,8 +29,8 @@ public class MessagesPage implements IInitializable {
     private final TextField searchMessagesTextField = new TextField();
     private final Button filterMessagesButton = new Button("Filter Messages");
 
-    private final ObservableList<MessagesPageViewModel> viewModels = FXCollections.observableArrayList();
-    private final ListView<MessagesPageViewModel> recentInteractionsListView = new ListView<>(viewModels);
+    private final ObservableList<RecentInteractionsViewModel> viewModels = FXCollections.observableArrayList();
+    private final ListView<RecentInteractionsViewModel> recentInteractionsListView = new ListView<>(viewModels);
 
     private final ForumHeaderViewModel messagesHeaderViewModel;
     private final QuestionPaneViewModel messagesPaneViewModel;
@@ -109,7 +109,7 @@ public class MessagesPage implements IInitializable {
     public Button getLogoutButton() { return logoutButton; }
     public Button getChangeRolesButton() { return changeRolesButton; }
     public Button getEnterForumButton() { return enterForumButton; }
-    public ListView<MessagesPageViewModel> getMessagesListView() { return recentInteractionsListView; }
+    public ListView<RecentInteractionsViewModel> getMessagesListView() { return recentInteractionsListView; }
 
     // SETTERS
     public void setGetVisibleMessageIDsCallback(Consumer<int[]> callback) { this.getVisibleMessagesCallback = callback; }
