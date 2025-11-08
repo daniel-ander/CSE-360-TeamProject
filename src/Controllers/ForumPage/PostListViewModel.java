@@ -22,16 +22,15 @@ public class PostListViewModel {
 	// ==============================
 	// DATA STRUCTURES
 	// ==============================
-	
+
 	public enum FilterMode {
-		NONE,
-		REVIEW
+		NONE, REVIEW
 	}
-	
+
 	public void setFilterMode(FilterMode mode) {
 		currentFilterMode = mode;
 	}
-	
+
 	private FilterMode currentFilterMode = FilterMode.NONE;
 
 	// Observable list of currently visible posts (questions + answers)
@@ -80,46 +79,66 @@ public class PostListViewModel {
 	 * Filters visible posts by ones that contain a review by the current user who
 	 * is a reviewer
 	 */
+
+	//
 	public void filterVisibleQuestionsByReview() {
+		reviewPostParentMap.clear();
+		
 		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {
 			for (PostDisplayViewModel answerVM : postVMs) {
-				if (((Answer) answerVM.getPost()).isReview()) {
-					PostDisplayViewModel reviewVM = answerVM;
-					populateReviewMap(parentQuestionAnswerIDKey, reviewVM);
+				boolean postIsReviewType = ((Answer) answerVM.getPost()).isReview();
+				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession.getCurrentUserId();
+				
+				if (postIsReviewType && postBelongsToUser) {
+					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;
+					populateReviewMap(parentQuestionAnswerIDKey, reviewOfCurrentReviewer);
 				}
 			}
 		});
-		
-		List<PostWithPermissions> reviewsWithPermissions = new ArrayList<>();
-		reviewPostParentMap.forEach((_, reviewVMs) -> {
-			for(PostDisplayViewModel vm : reviewVMs) {
-				reviewsWithPermissions.add(new PostWithPermissions(vm.getPost(), vm.getPermissionList()));
+
+		List<Integer> idsOfQuestionsContainingReview = new ArrayList<>();
+
+		reviewPostParentMap.forEach((questionAnswerIDKeys, reviewVMs) -> {
+			if (!idsOfQuestionsContainingReview.contains(questionAnswerIDKeys.getFirstKey())) {
+				idsOfQuestionsContainingReview.add(questionAnswerIDKeys.getFirstKey());
 			}
 		});
-		
-		populateQuestions(reviewsWithPermissions);
-		// TODO: - Need to also get the direct parent of the reivew to show for context
-//		expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
-//				KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair)
+
+		List<PostWithPermissions> questionsContainingReviews = new ArrayList<>();
+
+		idsOfQuestionsContainingReview.forEach(questionID -> {
+			PostDisplayViewModel questionContainingReviews = getVisiblePostByID(questionID, IPost.Type.Question);
+			PostWithPermissions questionWithPermissions = new PostWithPermissions(questionContainingReviews.getPost(),
+					questionContainingReviews.getPermissionList());
+			questionsContainingReviews.add(questionWithPermissions);
+		});
+
+		populateQuestions(questionsContainingReviews);
 	}
 
-	private void populateReviewMap(KeyPairHolder<Integer, Integer> parentQuestionAnswerIDKey, PostDisplayViewModel answerVM) {
+	private void populateReviewMap(KeyPairHolder<Integer, Integer> parentQuestionAnswerIDKey,
+			PostDisplayViewModel answerVM) {
+		PostDisplayViewModel directParentAnswer = getDirectParentOfAnswer(answerVM.getPost().getId());
+
 		if (reviewPostParentMap.containsKey(parentQuestionAnswerIDKey)) {
 			List<PostDisplayViewModel> reviewList = reviewPostParentMap.get(parentQuestionAnswerIDKey);
+			reviewList.add(directParentAnswer);
 			reviewList.add(answerVM);
 			reviewPostParentMap.replace(parentQuestionAnswerIDKey, reviewList);
 		} else {
-			List<PostDisplayViewModel> newReviewList = new ArrayList<>(Arrays.asList(answerVM));
+			List<PostDisplayViewModel> newReviewList = new ArrayList<>(Arrays.asList(directParentAnswer, answerVM));
 			reviewPostParentMap.put(parentQuestionAnswerIDKey, newReviewList);
 		}
+		
+		
 	}
 
 	/**
 	 * Populates the visible posts with questions
 	 */
 	public void populateQuestions(List<PostWithPermissions> questionsWithPermissions) {
-		visiblePosts = FXCollections.observableArrayList();
-		
+		visiblePosts.clear();
+
 		for (PostWithPermissions questionWithPermissions : questionsWithPermissions) {
 			addQuestionToVisibleList(questionWithPermissions, false);
 		}
@@ -131,19 +150,19 @@ public class PostListViewModel {
 				questionWithPermissions.getPost().getId(), null, IPost.Type.Question);
 
 		vm.setDepthLevel(0); // Top-level (no indentation)
-		
+
 		if (toTopOfStack) {
 			visiblePosts.add(0, vm); // Add to the visible post list
-			for(PostDisplayViewModel question : allQuestionsStore) {
-				if(question.getPost().getId() == vm.getPost().getId()) {
+			for (PostDisplayViewModel question : allQuestionsStore) {
+				if (question.getPost().getId() == vm.getPost().getId()) {
 					return;
 				}
 			}
 			allQuestionsStore.add(0, vm);
 		} else {
 			visiblePosts.add(vm); // Add to the visible post list
-			for(PostDisplayViewModel question : allQuestionsStore) {
-				if(question.getPost().getId() == vm.getPost().getId()) {
+			for (PostDisplayViewModel question : allQuestionsStore) {
+				if (question.getPost().getId() == vm.getPost().getId()) {
 					return;
 				}
 			}
@@ -181,6 +200,31 @@ public class PostListViewModel {
 	public ObservableList<PostDisplayViewModel> getVisiblePosts() {
 		return visiblePosts;
 	}
+	
+	public PostDisplayViewModel getDirectParentOfAnswer(int answerId) {
+	    PostDisplayViewModel answerVM = postParentMap.values().stream()
+	        .flatMap(List::stream)
+	        .filter(vm -> vm.getPost().getId() == answerId)
+	        .findFirst()
+	        .orElse(null);
+
+	    if (answerVM == null) return null; // not found
+
+	    Answer answer = (Answer) answerVM.getPost();
+	    Integer parentAnswerId = answer.getParentAnswerId();
+	    int questionId = answer.getQuestionId();
+
+	    if (parentAnswerId == null) {
+	        return getVisiblePostByID(questionId, IPost.Type.Question);
+	    }
+	    
+	    return postParentMap.values().stream()
+	        .flatMap(List::stream)
+	        .filter(vm -> vm.getPost().getId().equals(parentAnswerId))
+	        .findFirst()
+	        .orElse(null);
+	}
+
 
 	/**
 	 * Expands or collapses the children of a given post (question or answer).
@@ -297,15 +341,17 @@ public class PostListViewModel {
 			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
 
 		List<PostDisplayViewModel> children = null;
-		
-		switch(currentFilterMode) {
+
+		switch (currentFilterMode) {
 		case NONE:
 			children = postParentMap.get(questionAnswerIDKeyPair);
 			break;
 		case REVIEW:
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
+			children = postParentMap.get(questionAnswerIDKeyPair);
+			break;
 		}
-		
+
 		if (children == null)
 			return;
 

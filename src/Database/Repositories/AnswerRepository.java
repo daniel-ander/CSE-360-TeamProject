@@ -30,7 +30,7 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public Answer insertAnswer(Answer a) throws SQLException {
 	    String insertSQL = String.format(
-	        "INSERT INTO %s (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)",
+	        "INSERT INTO %s (questionId, parentAnswerId, userId, body, isReview) VALUES (?, ?, ?, ?, ?)",
 	        Answer.tableName
 	    );
 
@@ -45,6 +45,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        pstmt.setInt(3, a.getAuthorId());
 	        pstmt.setString(4, a.getBodyText());
+	        pstmt.setBoolean(5, a.isReview());
 	        pstmt.executeUpdate();
 
 	        try (ResultSet keys = pstmt.getGeneratedKeys()) {
@@ -54,7 +55,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        // Fetch the full row from the database
 	        String selectSQL = String.format(
-	            "SELECT id, questionId, parentAnswerId, userId, authorName, body, isCorrect, created, lastUpdated, isDeleted, upvoteCount " +
+	            "SELECT id, questionId, parentAnswerId, userId, authorName, body, isCorrect, created, lastUpdated, isDeleted, isReview, upvoteCount " +
 	            "FROM %s WHERE id = ?",
 	            Answer.tableName
 	        );
@@ -67,6 +68,7 @@ public class AnswerRepository implements IAnswerRepository {
 	                    a.setLastUpdatedTimestamp(rs.getTimestamp("lastUpdated"));
 	                    a.setIsCorrect(rs.getBoolean("isCorrect"));
 	                    a.setIsDeleted(rs.getBoolean("isDeleted"));
+	                    a.setIsReview(rs.getBoolean("isReview"));
 	                    a.setUpvoteCount(rs.getInt("upvoteCount"));
 	                }
 	            }

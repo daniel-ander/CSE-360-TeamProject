@@ -214,7 +214,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (15, 18, 3, 'reviewer', 'SQLite is good for fast prototyping.', FALSE, FALSE, 2),
 			    (16, 19, 4, 'admin1', 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, FALSE, 2),
 			    (17, 20, 1, 'student', 'Save tokens or use Java Preferences API.', FALSE, FALSE, 3),
-			    -- Reviewer-specific additions with valid userId (3 = reviewer) --
+
 			    (2, NULL, 3, 'reviewer', 'Additional reviewer insight for question 2.', FALSE, TRUE, 3),
 			    (2, 3, 3, 'reviewer', 'Second review attached to answer 3 of question 2.', FALSE, TRUE, 2),
 			    (3, NULL, 3, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),

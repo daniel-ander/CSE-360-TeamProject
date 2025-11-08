@@ -7,6 +7,7 @@ public interface IPost {
 		Question, Answer, Review
 	}
 	
+	public Integer getAuthorId();
 	public Integer getId();
 	public String getBodyText();
 	public boolean getIsDeleted();

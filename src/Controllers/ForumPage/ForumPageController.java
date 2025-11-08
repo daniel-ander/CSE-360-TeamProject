@@ -6,6 +6,7 @@ import java.util.List;
 import Config.AppCache;
 import Controllers.UserLoginPageController;
 import Controllers.WelcomeLoginPageController;
+import Controllers.ForumPage.PostListViewModel.FilterMode;
 import Database.*;
 import Database.Services.Interfaces.IQuestionService;
 import DisplayModels.PostWithPermissions;
@@ -62,7 +63,8 @@ public class ForumPageController {
 		
 		forumHeaderViewModel.getSeeReviewsButtonPressedProperty().addListener((_, _, isPressed) -> {
 			if(isPressed) {
-				
+				postListViewModel.setFilterMode(FilterMode.REVIEW);
+				postListViewModel.filterVisibleQuestionsByReview();
 			}
 		});
 
