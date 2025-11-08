@@ -1,5 +1,4 @@
 // language: java
-// File: CSE-360-TeamProject/src/Controllers/Messages/MessagesViewModel.java
 package Controllers.Messages;
 
 import Models.Message;
@@ -9,8 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /*
- Updated: added convenience constructor to build a MessagesViewModel from Models.Message.
- If only ids are available for sender/receiver, they are converted to strings.
+ Updated: prefer sender/recipient username when Message provides them.
 */
 
 public class MessagesViewModel {
@@ -31,11 +29,15 @@ public class MessagesViewModel {
         setTimestamp(timestamp);
     }
 
-    // Convenience: construct from Models.Message (sender/receiver converted to id strings if no username available)
+    // Convenience: construct from Models.Message (prefer usernames if available, else fallback to ids)
     public MessagesViewModel(Message m) {
         if (m.getReviewId() != null) setReviewId(m.getReviewId());
-        setSender(m.getSenderId() == null ? "" : String.valueOf(m.getSenderId()));
-        setRecipient(m.getReceiverId() == null ? "" : String.valueOf(m.getReceiverId()));
+        String sender = (m.getSenderUsername() != null && !m.getSenderUsername().isBlank()) ? m.getSenderUsername()
+                : (m.getSenderId() == null ? "" : String.valueOf(m.getSenderId()));
+        String recipient = (m.getReceiverUsername() != null && !m.getReceiverUsername().isBlank()) ? m.getReceiverUsername()
+                : (m.getReceiverId() == null ? "" : String.valueOf(m.getReceiverId()));
+        setSender(sender);
+        setRecipient(recipient);
         setMessageText(m.getContent() == null ? "" : m.getContent());
         setTimestamp(m.getSentTimestamp() == null ? "" : m.getSentTimestamp().toString());
     }

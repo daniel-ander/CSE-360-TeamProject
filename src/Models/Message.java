@@ -1,5 +1,4 @@
 // language: java
-// File: CSE-360-TeamProject/src/Models/Message.java
 package Models;
 
 import java.sql.ResultSet;
@@ -16,6 +15,10 @@ public class Message {
     private Integer parentMessageId;
     private String messageText;
     private Timestamp sentTimestamp;
+
+    // Optional username fields (populated when repository selects them)
+    private String senderUsername;
+    private String receiverUsername;
 
     // Non-DB constructor
     public Message(Integer senderId, Integer reviewId, Integer receiverId,
@@ -44,7 +47,33 @@ public class Message {
         Integer parentId = rs.getObject("parent_message_id") == null ? null : rs.getInt("parent_message_id");
         String text = rs.getString("message_text");
         Timestamp ts = rs.getTimestamp("sent_timestamp");
-        return new Message(id, reviewId, senderId, receiverId, parentId, text, ts);
+
+        Message m = new Message(id, reviewId, senderId, receiverId, parentId, text, ts);
+
+        // If repository included username aliases, read them (may be null)
+        try {
+            String sUser = null;
+            String rUser = null;
+            // Use column labels that repository will alias
+            if (hasColumn(rs, "sender_username")) sUser = rs.getString("sender_username");
+            if (hasColumn(rs, "receiver_username")) rUser = rs.getString("receiver_username");
+            m.setSenderUsername(sUser);
+            m.setReceiverUsername(rUser);
+        } catch (Exception ignored) {
+            // no-op if aliases not present
+        }
+
+        return m;
+    }
+
+    // helper to check presence of column in ResultSet (avoids SQLException if not selected)
+    private static boolean hasColumn(ResultSet rs, String columnName) {
+        try {
+            rs.findColumn(columnName);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     // ===================
@@ -79,8 +108,16 @@ public class Message {
         return sentTimestamp;
     }
 
+    public String getSenderUsername() {
+        return senderUsername;
+    }
+
+    public String getReceiverUsername() {
+        return receiverUsername;
+    }
+
     // ===================
-    //      SETTERS
+    // SETTERS
     // ===================
 
     public void setContent(String content) {
@@ -112,5 +149,13 @@ public class Message {
 
     public void setId(Integer id) {
         this.messageId = id;
+    }
+
+    public void setSenderUsername(String senderUsername) {
+        this.senderUsername = senderUsername;
+    }
+
+    public void setReceiverUsername(String receiverUsername) {
+        this.receiverUsername = receiverUsername;
     }
 }

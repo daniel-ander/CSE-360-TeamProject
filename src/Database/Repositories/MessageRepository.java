@@ -1,7 +1,7 @@
 // language: java
-// File: CSE-360-TeamProject/src/Database/Repositories/MessageRepository.java
 package Database.Repositories;
 
+import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IMessageRepository;
 import Models.Message;
 
@@ -11,17 +11,19 @@ import java.util.List;
 
 public class MessageRepository implements IMessageRepository {
 
-    private final Connection conn;
+    private final IGeneralDBManager generalDBManager;
 
-    public MessageRepository(Connection conn) {
-        this.conn = conn;
+    public MessageRepository(IGeneralDBManager generalDBManager) {
+        this.generalDBManager = generalDBManager;
     }
 
     @Override
     public Message insertMessage(Message m) throws SQLException {
         String sql = "INSERT INTO " + Message.tableName +
                 " (review_id, sender_id, receiver_id, parent_message_id, message_text) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             if (m.getReviewId() == null) ps.setNull(1, Types.INTEGER); else ps.setInt(1, m.getReviewId());
             if (m.getSenderId() == null) ps.setNull(2, Types.INTEGER); else ps.setInt(2, m.getSenderId());
             if (m.getReceiverId() == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, m.getReceiverId());
@@ -41,8 +43,12 @@ public class MessageRepository implements IMessageRepository {
 
     @Override
     public List<Message> getMessagesByReviewId(int reviewId) throws SQLException {
-        String sql = "SELECT * FROM " + Message.tableName + " WHERE review_id = ? ORDER BY sent_timestamp ASC";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        // include usernames where available
+        String sql = "SELECT m.*, s.username AS sender_username, r.username AS receiver_username FROM " + Message.tableName +
+                     " m LEFT JOIN users s ON m.sender_id = s.id LEFT JOIN users r ON m.receiver_id = r.id " +
+                     "WHERE review_id = ? ORDER BY sent_timestamp ASC";
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, reviewId);
             try (ResultSet rs = ps.executeQuery()) {
                 List<Message> list = new ArrayList<>();
@@ -54,12 +60,13 @@ public class MessageRepository implements IMessageRepository {
 
     @Override
     public List<Message> getMessagesForUsername(String username) throws SQLException {
-        // assumes a `users` table with columns `id` and `username`
-        String sql = "SELECT m.* FROM " + Message.tableName + " m " +
+        // return sender/receiver usernames as well
+        String sql = "SELECT m.*, s.username AS sender_username, r.username AS receiver_username FROM " + Message.tableName + " m " +
                      "LEFT JOIN users s ON m.sender_id = s.id " +
                      "LEFT JOIN users r ON m.receiver_id = r.id " +
                      "WHERE s.username = ? OR r.username = ? ORDER BY m.sent_timestamp ASC";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, username);
             try (ResultSet rs = ps.executeQuery()) {
@@ -73,7 +80,8 @@ public class MessageRepository implements IMessageRepository {
     @Override
     public boolean updateMessage(int messageId, String newContent) throws SQLException {
         String sql = "UPDATE " + Message.tableName + " SET message_text = ? WHERE message_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newContent);
             ps.setInt(2, messageId);
             return ps.executeUpdate() > 0;
@@ -83,7 +91,8 @@ public class MessageRepository implements IMessageRepository {
     @Override
     public boolean deleteMessageById(int messageId) throws SQLException {
         String sql = "DELETE FROM " + Message.tableName + " WHERE message_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, messageId);
             return ps.executeUpdate() > 0;
         }
@@ -91,8 +100,10 @@ public class MessageRepository implements IMessageRepository {
 
     @Override
     public Message getMessageById(int messageId) throws SQLException {
-        String sql = "SELECT * FROM " + Message.tableName + " WHERE message_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT m.*, s.username AS sender_username, r.username AS receiver_username FROM " + Message.tableName +
+                     " m LEFT JOIN users s ON m.sender_id = s.id LEFT JOIN users r ON m.receiver_id = r.id WHERE message_id = ?";
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, messageId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return Message.fromResultSet(rs);

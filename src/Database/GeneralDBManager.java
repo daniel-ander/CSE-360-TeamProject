@@ -232,12 +232,23 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "(15, 18, 3, 'reviewer', 'SQLite is good for fast prototyping.', FALSE, 2),"
 				+ "(16, 19, 4, 'admin1', 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, 2),"
 				+ "(17, 20, 1, 'student', 'Save tokens or use Java Preferences API.', FALSE, 3);", answerTableName);
+		
+	    String populateMessagesTable = String.format(
+	            "INSERT INTO %s (review_id, sender_id, receiver_id, parent_message_id, message_text, sent_timestamp) VALUES "
+	            + "(NULL, 1, 2, NULL, 'Hey, did you check the assignment?', '2023-11-01 10:00:00'),"
+	            + "(NULL, 2, 1, NULL, 'Yes, looks good to me.', '2023-11-01 10:05:00'),"
+	            + "(1, 3, 2, NULL, 'I left a review comment on your answer — consider edge cases.', '2023-11-02 12:00:00'),"
+	            + "(2, 2, 3, NULL, 'Thanks for the review, I updated the answer.', '2023-11-02 12:30:00'),"
+	            + "(NULL, 4, 1, NULL, 'Reminder: meeting at 2pm today.', '2023-11-03 09:00:00'),"
+	            + "(3, 5, 1, NULL, 'Feedback on review: good point about performance.', '2023-11-04 14:20:00');",
+	            interactionTableName);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
 			stmt.execute(populateUserTable);
 			stmt.execute(populateQuestionTable);
 			stmt.execute(populateAnswersTable);
+			stmt.execute(populateMessagesTable);
 		}
 
 	}
