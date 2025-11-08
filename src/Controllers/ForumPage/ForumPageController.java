@@ -57,6 +57,7 @@ public class ForumPageController {
 
 		forumHeaderViewModel.getSearchButtonPressedProperty().addListener((_, _, isPressed) -> {
 			if (isPressed) {
+				// TODO: - this can be delegated entirely to the 
 				postListViewModel.filterVisibleQuestionsByText(forumHeaderViewModel.getSearchFieldText());
 			}
 		});
@@ -66,6 +67,7 @@ public class ForumPageController {
 				postListViewModel.setFilterMode(FilterMode.REVIEW);
 				postListViewModel.filterVisibleQuestionsByReview();
 			} else {
+				postListViewModel.setFilterMode(FilterMode.NONE);
 				postListViewModel.resetVisiblePosts();
 			}
 		});

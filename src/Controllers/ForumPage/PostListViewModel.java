@@ -122,6 +122,8 @@ public class PostListViewModel {
 		});
 
 		populateQuestions(questionsContainingReviews);
+		
+		expandAllVisibleQuestions();
 	}
 
 	private void populateReviewMap(KeyPairHolder<Integer, Integer> parentQuestionAnswerIDKey,
@@ -131,11 +133,19 @@ public class PostListViewModel {
 
 		if (reviewPostParentMap.containsKey(parentQuestionAnswerIDKey)) {
 			List<PostDisplayViewModel> reviewList = reviewPostParentMap.get(parentQuestionAnswerIDKey);
-			reviewList.add(directParentAnswer);
+			if(directParentAnswer.getPost().getPostType() == Type.Answer) {
+				reviewList.add(directParentAnswer);
+			}
 			reviewList.add(answerVM);
 			reviewPostParentMap.replace(parentQuestionAnswerIDKey, reviewList);
 		} else {
-			List<PostDisplayViewModel> newReviewList = new ArrayList<>(Arrays.asList(directParentAnswer, answerVM));
+			List<PostDisplayViewModel> newReviewList;
+			
+			if(directParentAnswer.getPost().getPostType() == Type.Answer) {
+				newReviewList = new ArrayList<>(Arrays.asList(directParentAnswer, answerVM));
+			} else {
+				newReviewList = new ArrayList<>(Arrays.asList(answerVM));
+			}
 			reviewPostParentMap.put(parentQuestionAnswerIDKey, newReviewList);
 		}
 	}
@@ -247,11 +257,19 @@ public class PostListViewModel {
 			collapseChildren(selectedPostVM, selectedPostIndex, nextQuestionIndex, questionAnswerIDKeyPair);
 		}
 	}
+	
+	private void expandAllVisibleQuestions() {
+		new ArrayList<>(visiblePosts).forEach(postVM -> {
+		    int postIndex = getIndexOfVisiblePost(postVM.getPost().getId(), true);
+		    KeyPairHolder<Integer, Integer> keyPairHolder = new KeyPairHolder<>(postVM.getPost().getId(), null);
+		    expandChildren(postVM, postIndex, keyPairHolder);
+		});
+	}
 
 	/**
 	 * Adds a new answer post under a question or another answer.
 	 */
-	public void addAnswerToVisibleList(Answer answerToAdd) {
+		private void addAnswerToVisibleList(Answer answerToAdd) {
 		int questionId = answerToAdd.getQuestionId();
 		Integer parentAnswerId = answerToAdd.getParentAnswerId();
 		IPost.Type parentType = (parentAnswerId == null) ? IPost.Type.Question : IPost.Type.Answer;
@@ -349,7 +367,6 @@ public class PostListViewModel {
 			break;
 		case REVIEW:
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
-			children = postParentMap.get(questionAnswerIDKeyPair);
 			break;
 		}
 
@@ -370,6 +387,7 @@ public class PostListViewModel {
 		// Insert each child below the parent in reverse order (so order is preserved)
 		for (int i = children.size() - 1; i >= 0; i--) {
 			PostDisplayViewModel child = children.get(i);
+			
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
 			visiblePosts.add(visibleParentPostIndex + 1, child);
 

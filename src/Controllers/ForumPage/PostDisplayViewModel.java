@@ -24,6 +24,7 @@ public class PostDisplayViewModel {
 
 	private final UserSession userSession;
 	private final BooleanProperty isEditingPostProperty = new SimpleBooleanProperty(false);
+
 	private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);

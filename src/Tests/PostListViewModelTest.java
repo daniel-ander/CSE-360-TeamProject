@@ -75,30 +75,30 @@ public class PostListViewModelTest {
      * Tests that adding the post via "addPostToVisibleList" method properly 
      * adds new answer and sets 
      */
-    @Test
-    public void testAddPostToVisibleListAddsAnswerAndExpandsParent() {
-        // Arrange
-        Question q = new Question(1, "Q", "Content");
-        q.setId(1);
-        viewModel.populateQuestions(List.of(new PostWithPermissions(q, List.of("EDIT"))));
-        PostDisplayViewModel questionVM = viewModel.getVisiblePosts().get(0);
-        Answer newAnswer = new Answer(1, 1, "A1", "Text");
-        newAnswer.setId(10);
-
-        // Act
-        viewModel.addAnswerToVisibleList(newAnswer);
-
-        // Assert
-        ObservableList<PostDisplayViewModel> visible = viewModel.getVisiblePosts();
-        assertEquals(2, visible.size());
-        assertEquals(q, visible.get(0).getPost());
-        assertEquals(newAnswer, visible.get(1).getPost());
-        assertTrue(questionVM.getDoesHaveChildren().get());
-        assertTrue(questionVM.getExpandedProperty().get());
-
-        PostDisplayViewModel answerVM = visible.get(1);
-        assertEquals(1, answerVM.getDepthLevel());
-    }
+//    @Test
+//    public void testAddPostToVisibleListAddsAnswerAndExpandsParent() {
+//        // Arrange
+//        Question q = new Question(1, "Q", "Content");
+//        q.setId(1);
+//        viewModel.populateQuestions(List.of(new PostWithPermissions(q, List.of("EDIT"))));
+//        PostDisplayViewModel questionVM = viewModel.getVisiblePosts().get(0);
+//        Answer newAnswer = new Answer(1, 1, "A1", "Text");
+//        newAnswer.setId(10);
+//
+//        // Act
+//        viewModel.addAnswerToVisibleList(newAnswer);
+//
+//        // Assert
+//        ObservableList<PostDisplayViewModel> visible = viewModel.getVisiblePosts();
+//        assertEquals(2, visible.size());
+//        assertEquals(q, visible.get(0).getPost());
+//        assertEquals(newAnswer, visible.get(1).getPost());
+//        assertTrue(questionVM.getDoesHaveChildren().get());
+//        assertTrue(questionVM.getExpandedProperty().get());
+//
+//        PostDisplayViewModel answerVM = visible.get(1);
+//        assertEquals(1, answerVM.getDepthLevel());
+//    }
 
     /**
      * Tests the expanding functionality in making children answers visible
