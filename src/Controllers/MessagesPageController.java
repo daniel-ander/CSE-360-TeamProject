@@ -7,7 +7,7 @@ import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
-import Controllers.Messages.RecentUsersListViewModel;
+import Controllers.Messages.MessagesPageViewModel;
 import Database.*;
 import Database.Services.UserService;
 import Database.Services.Interfaces.IUserService;
@@ -51,7 +51,7 @@ public class MessagesPageController {
 	private final ForumHeaderViewModel messagesHeaderViewModel;
 	private final QuestionPaneViewModel questionPaneViewModel;
 	private final IUserService userService;
-	private final ListView<RecentUsersListViewModel> recentUsersListView = new ListView<>();
+	private final ListView<MessagesPageViewModel> recentUsersListView = new ListView<>();
 	
 		
 	public MessagesPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, MessagesPage view, 
@@ -134,9 +134,9 @@ public class MessagesPageController {
 	    setMessageListActions();
 	    
 	    // TODO: Replace this once real data is available
-	    ObservableList<RecentUsersListViewModel> users = FXCollections.observableArrayList(
-	            new RecentUsersListViewModel(1, "Alice", "See you soon!", "10:32 AM", 0),
-	            new RecentUsersListViewModel(2, "Bob", "Got your message", "9:47 AM", 2)
+	    ObservableList<MessagesPageViewModel> users = FXCollections.observableArrayList(
+	            new MessagesPageViewModel(1, "Alice", "See you soon!", "10:32 AM", 0),
+	            new MessagesPageViewModel(2, "Bob", "Got your message", "9:47 AM", 2)
 	    );
 
 	    // Populate the ListView that's actually shown in the UI

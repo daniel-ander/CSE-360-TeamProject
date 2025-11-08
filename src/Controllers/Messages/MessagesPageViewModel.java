@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class RecentUsersListViewModel {
+public class MessagesPageViewModel {
 
     private final IntegerProperty userIdProperty = new SimpleIntegerProperty();
     private final StringProperty usernameProperty = new SimpleStringProperty();
@@ -13,9 +13,9 @@ public class RecentUsersListViewModel {
     private final StringProperty timestampProperty = new SimpleStringProperty();
     private final IntegerProperty unreadCountProperty = new SimpleIntegerProperty();
 
-    public RecentUsersListViewModel() { }
+    public MessagesPageViewModel() { }
 
-    public RecentUsersListViewModel(int userId, String username, String lastMessage, String timestamp, int unreadCount) {
+    public MessagesPageViewModel(int userId, String username, String lastMessage, String timestamp, int unreadCount) {
         setUserId(userId);
         setUsername(username);
         setLastMessage(lastMessage);

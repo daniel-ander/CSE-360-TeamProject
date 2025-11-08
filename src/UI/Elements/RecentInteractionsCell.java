@@ -1,6 +1,6 @@
 package UI.Elements;
 
-import Controllers.Messages.RecentUsersListViewModel;
+import Controllers.Messages.MessagesPageViewModel;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.VBox;
@@ -9,7 +9,7 @@ import javafx.geometry.Insets;
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
 
-public class RecentInteractionsCell extends ListCell<RecentUsersListViewModel> {
+public class RecentInteractionsCell extends ListCell<MessagesPageViewModel> {
     private final Label usernameLabel = new Label();
     private final Label lastMessageLabel = new Label();
     private final VBox content;
@@ -26,7 +26,7 @@ public class RecentInteractionsCell extends ListCell<RecentUsersListViewModel> {
     }
 
     @Override
-    protected void updateItem(RecentUsersListViewModel vm, boolean empty) {
+    protected void updateItem(MessagesPageViewModel vm, boolean empty) {
         super.updateItem(vm, empty);
         if (vm == null || empty) {
             setGraphic(null);

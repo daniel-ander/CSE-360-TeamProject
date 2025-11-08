@@ -5,6 +5,7 @@ import java.sql.*;
 
 import Models.Answer;
 import Models.Invitation;
+import Models.Message;
 import Models.Permission;
 import Models.Question;
 import Models.User;
@@ -29,6 +30,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 	
 	// CRUD-related
 	private final String userTableName = User.tableName;
+	private final String interactionTableName = Message.tableName;
 	private final String questionTableName = Question.tableName;
 	private final String answerTableName = Answer.tableName;
 	private final String invitationTableName = Invitation.tableName;
@@ -118,6 +120,24 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
 					answerTableName, answerPermissionSQL);
+		
+		String messageTableQuery = String.format(
+			    "CREATE TABLE IF NOT EXISTS %s ("
+			  + "message_id INT AUTO_INCREMENT PRIMARY KEY, "
+			  + "review_id INT, "
+			  + "sender_id INT, "
+			  + "receiver_id INT, "
+			  + "parent_message_id INT, "
+			  + "message_text TEXT, "
+			  + "sent_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+			  + "FOREIGN KEY (review_id) REFERENCES %s(answer_id), "
+			  + "FOREIGN KEY (sender_id) REFERENCES %s(user_id), "
+			  + "FOREIGN KEY (receiver_id) REFERENCES %s(user_id), "
+			  + "FOREIGN KEY (parent_message_id) REFERENCES %s(message_id))",
+			  interactionTableName, answerTableName, userTableName, userTableName, interactionTableName
+			);
+
+	
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -130,6 +150,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(questionPermissionTableQuery);
 			stmt.execute(userQuestionPermissionTableQuery);
 			stmt.execute(userAnswerPermissionTableQuery);
+			stmt.execute(messageTableQuery);
 		}
 
 	}
