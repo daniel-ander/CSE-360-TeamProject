@@ -12,6 +12,7 @@ import Sessions.UserSession;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
+import UI.Pages.InstructorRequestsPage;
 
 import Utils.Debug;
 
@@ -41,6 +42,7 @@ public class InstructorHomePageController {
         
         setLogoutButtonAction();
         setChangeRolesButtonAction();
+        setManageRequestsButtonAction();
         
         if(Debug.isEnabled) {
         	setUpDebugEnvironment();
@@ -74,6 +76,15 @@ public class InstructorHomePageController {
 
 	    });
 	}
+
+    // Add action to open the Manage Reviewer Requests page
+    private void setManageRequestsButtonAction() {
+        view.getManageRequestsButton().setOnAction(_ -> {
+            // Create controller for the requests page and show it
+            InstructorRequestsPageController reqController = new InstructorRequestsPageController(dBConnectionStore, primaryStage, userSession, new InstructorRequestsPage());
+            reqController.show();
+        });
+    }
     
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);

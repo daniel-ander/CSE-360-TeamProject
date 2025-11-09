@@ -2,6 +2,7 @@ package Database.Services.Interfaces;
 
 import Models.Answer;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import Exceptions.DBExceptions.DataAccessException;
@@ -12,6 +13,7 @@ public interface IAnswerService {
 	public List<Answer> getCorrectAnswers() throws DataAccessException;
 	public List<Answer> getAnswersBySearch(String searchString) throws DataAccessException;
 	public List<Answer> getAnswersByQuestionID(int questionId) throws DataAccessException;
+	public List<Answer> getAnswersByUser(int userId) throws DataAccessException;
 	
 	public Answer getAnswerById(int answerId) throws DataAccessException;
 	public Answer addAnswer(Answer a) throws DataAccessException;

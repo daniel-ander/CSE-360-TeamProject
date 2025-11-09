@@ -93,7 +93,7 @@ public class PostListViewModel {
 		// Build a map of review-type posts by this user
 		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {
 			for (PostDisplayViewModel answerVM : postVMs) {
-				boolean postIsReviewType = ((Answer) answerVM.getPost()).isReview();
+				boolean postIsReviewType = ((Answer) answerVM.getPost()).getIsReview();
 				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession
 						.getCurrentUserId();
 

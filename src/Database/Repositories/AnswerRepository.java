@@ -45,7 +45,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        pstmt.setInt(3, a.getAuthorId());
 	        pstmt.setString(4, a.getBodyText());
-	        pstmt.setBoolean(5, a.isReview());
+	        pstmt.setBoolean(5, a.getIsReview());
 	        pstmt.executeUpdate();
 
 	        try (ResultSet keys = pstmt.getGeneratedKeys()) {
@@ -258,9 +258,15 @@ public class AnswerRepository implements IAnswerRepository {
 				rs.getTimestamp("lastUpdated"),
 				rs.getInt("upvoteCount"),
 				rs.getBoolean("isCorrect"),
-				rs.getBoolean("isReview"),
-				rs.getBoolean("isDeleted"), 0
+				rs.getBoolean("isDeleted"),
+				rs.getBoolean("isReview")
 		);
+	}
+
+	@Override
+	public List<Answer> getAnswersByUser(int userId) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

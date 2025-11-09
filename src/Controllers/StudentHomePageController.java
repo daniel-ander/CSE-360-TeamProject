@@ -5,6 +5,7 @@ import Controllers.ForumPage.QuestionPaneViewModel;
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.PostListViewModel;
 import Database.*;
+import Database.Services.RequestService;
 
 import Sessions.UserSession;
 
@@ -31,7 +32,7 @@ public class StudentHomePageController {
 	private final UserSession userSession;
 
 	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession,
-			StudentHomePage view) {
+							StudentHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
 		this.view = view;
 		this.primaryStage = primaryStage;
@@ -42,6 +43,7 @@ public class StudentHomePageController {
 		setLogoutButtonAction();
 		setChangeRolesButtonAction();
 		setEnterForumButtonAction();
+		setRequestReviewerButtonAction();
 
 		if (Debug.isEnabled) {
 			setUpDebugEnvironment();
@@ -94,9 +96,35 @@ public class StudentHomePageController {
 			);
 		});
 	}
+	
+	 // request reviewer button action
+    private void setRequestReviewerButtonAction() {
+        view.getRequestReviewerButton().setOnAction(_ -> {
+            String currentUserName = userSession.getCurrentUserName();
+            try { 
+                boolean requestSubmitted = submitReviewerRequest(currentUserName);
+                // show success/error message based on the result
+                if (requestSubmitted) {
+                    view.showSuccessMessage("Request to become reviewer submitted successfully.");
+                } else {
+                    view.showErrorMessage("Failed to submit request. Please try again.");
+                }
+            } catch (Exception e) {
+                view.showErrorMessage("Error submitting request: " + e.getMessage());
+            }
+        });
+    }
+
+	// submit reviewer request
+	private boolean submitReviewerRequest(String studentUsername) { 
+		// interact w/ RequestService to submit the request
+		RequestService requestService = new RequestService(dBConnectionStore);
+		return requestService.submitReviewerRequest(studentUsername);
+	}
 
 	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
+		view.setUserLabel(userSession.getCurrentUserName());
 	}
 
 	private final void setUpDebugEnvironment() {

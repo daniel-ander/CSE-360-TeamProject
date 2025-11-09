@@ -82,5 +82,4 @@ public class MessagesViewModel {
     public void setRecipient(String recipient) { this.recipientProperty.set(recipient); }
     public void setMessageText(String messageText) { this.messageTextProperty.set(messageText); }
     public void setTimestamp(String timestamp) { this.timestampProperty.set(timestamp); }
-
 }
