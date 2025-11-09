@@ -1,7 +1,7 @@
 package Database.Repositories;
 
 import Models.Answer;
-import Models.User;
+
 import Utils.Debug;
 
 import java.sql.Connection;
@@ -30,7 +30,7 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public Answer insertAnswer(Answer a) throws SQLException {
 	    String insertSQL = String.format(
-	        "INSERT INTO %s (questionId, parentAnswerId, userId, body) VALUES (?, ?, ?, ?)",
+	        "INSERT INTO %s (questionId, parentAnswerId, userId, body, isReview) VALUES (?, ?, ?, ?, ?)",
 	        Answer.tableName
 	    );
 
@@ -45,6 +45,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        pstmt.setInt(3, a.getAuthorId());
 	        pstmt.setString(4, a.getBodyText());
+	        pstmt.setBoolean(5, a.getIsReview());
 	        pstmt.executeUpdate();
 
 	        try (ResultSet keys = pstmt.getGeneratedKeys()) {
@@ -54,7 +55,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        // Fetch the full row from the database
 	        String selectSQL = String.format(
-	            "SELECT id, questionId, parentAnswerId, userId, authorName, body, isCorrect, created, lastUpdated, isDeleted, upvoteCount " +
+	            "SELECT id, questionId, parentAnswerId, userId, authorName, body, isCorrect, created, lastUpdated, isDeleted, isReview, upvoteCount " +
 	            "FROM %s WHERE id = ?",
 	            Answer.tableName
 	        );
@@ -67,6 +68,7 @@ public class AnswerRepository implements IAnswerRepository {
 	                    a.setLastUpdatedTimestamp(rs.getTimestamp("lastUpdated"));
 	                    a.setIsCorrect(rs.getBoolean("isCorrect"));
 	                    a.setIsDeleted(rs.getBoolean("isDeleted"));
+	                    a.setIsReview(rs.getBoolean("isReview"));
 	                    a.setUpvoteCount(rs.getInt("upvoteCount"));
 	                }
 	            }
@@ -94,19 +96,8 @@ public class AnswerRepository implements IAnswerRepository {
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswers)){
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
+				
 				allAnswers.add(a);
 			}
 		}
@@ -124,20 +115,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, questionId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
-				
+				Answer a = filledAnswerModel(rs);
 				
 				allAnswersForQuestion.add(a);
 			}
@@ -153,19 +131,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, parentAnswerId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				repliesToAnswerById.add(a);
 			}
 		}
@@ -182,19 +148,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setInt(1, answerId);
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				return a;
 			}
 		}
@@ -209,19 +163,7 @@ public class AnswerRepository implements IAnswerRepository {
 				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswers)){
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				correctAnswers.add(a);
 			}
     	}
@@ -237,19 +179,7 @@ public class AnswerRepository implements IAnswerRepository {
 			pstmt.setString(1, "%" + searchString + "%");
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Answer a = new Answer(
-						rs.getInt("id"),
-						rs.getInt("questionId"),
-						rs.getInt("parentAnswerId"),
-						rs.getInt("userId"),
-						rs.getString("authorName"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getInt("upvoteCount"),
-						rs.getBoolean("isCorrect"),
-						rs.getBoolean("isDeleted"), 0
-				);
+				Answer a = filledAnswerModel(rs);
 				answersBySearch.add(a);
 			}
     	}
@@ -312,31 +242,31 @@ public class AnswerRepository implements IAnswerRepository {
 		return true;
 	}
 	
+	// ===================
+    // 		HELPERS
+ 	// ===================
+	
+	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
+		return new Answer(
+				rs.getInt("id"),
+				rs.getInt("questionId"),
+				rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
+				rs.getInt("userId"),
+				rs.getString("authorName"),
+				rs.getString("body"),
+				rs.getTimestamp("created"),
+				rs.getTimestamp("lastUpdated"),
+				rs.getInt("upvoteCount"),
+				rs.getBoolean("isCorrect"),
+				rs.getBoolean("isDeleted"),
+				rs.getBoolean("isReview")
+		);
+	}
+
 	@Override
 	public List<Answer> getAnswersByUser(int userId) throws SQLException {
-		List<Answer> answersByUser = new ArrayList<>();
-		String getAnswersByUserSql = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
-		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getAnswersByUserSql)){
-			pstmt.setInt(1, userId);
-			ResultSet rs = pstmt.executeQuery();
-			while (rs.next()) {
-				Answer a = new Answer(
-					rs.getInt("id"),
-					rs.getInt("questionId"),
-					rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
-					rs.getInt("userId"),
-					rs.getString("authorName"),
-					rs.getString("body"),
-					rs.getTimestamp("created"),
-					rs.getTimestamp("lastUpdated"),
-					rs.getInt("upvoteCount"),
-					rs.getBoolean("isCorrect"),
-					rs.getBoolean("isDeleted"), 0
-				);
-				answersByUser.add(a);
-			}
-		}
-		return answersByUser;
+		// TODO Auto-generated method stub
+		return null;
 	}
+
 }
