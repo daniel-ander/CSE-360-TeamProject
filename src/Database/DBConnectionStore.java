@@ -6,6 +6,7 @@ import Database.Repositories.AnswerRepository;
 import Database.Repositories.InvitationRepository;
 import Database.Repositories.MessageRepository;
 import Database.Repositories.QuestionRepository;
+import Database.Repositories.ReviewerRequestRepository;
 import Database.Repositories.UserRepository;
 import Database.Repositories.PermissionRepository;
 import Database.Repositories.Interfaces.IInvitationRepository;
@@ -81,7 +82,8 @@ public class DBConnectionStore {
 		IGeneralDBManager dbHelper = new GeneralDBManager();
 		
 		IUserRepository userRepository = new UserRepository(dbHelper);
-		IUserService userService = new UserService(userRepository);
+		IReviewerRequestRepository reviewerRequestRepository = new ReviewerRequestRepository(dbHelper);
+		IUserService userService = new UserService(userRepository, reviewerRequestRepository);
 		
 		IInvitationRepository invitationRepository = new InvitationRepository(dbHelper);
 		IInvitationService invitationService = new InvitationService(invitationRepository);

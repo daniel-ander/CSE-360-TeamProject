@@ -60,8 +60,8 @@ public class AnswerServiceTest {
     @Test
     public void GetAllAnswers_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
-                new Answer(1, 1, 0, 1, "Author1", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false, 0),
-                new Answer(2, 1, 0, 2, "Author2", "A2", new Timestamp(0), new Timestamp(0), 0, false, false, false, 0)
+                new Answer(1, 1, 0, 1, "Author1", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false),
+                new Answer(2, 1, 0, 2, "Author2", "A2", new Timestamp(0), new Timestamp(0), 0, false, false, false)
         );
         when(mockRepo.getAll()).thenReturn(answers);
 
@@ -74,7 +74,7 @@ public class AnswerServiceTest {
     @Test
     public void GetAllAnswersForQuestion_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
-                new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false, 0)
+                new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false)
         );
         when(mockRepo.getAnswersByQuestionId(1)).thenReturn(answers);
 
@@ -87,7 +87,7 @@ public class AnswerServiceTest {
     @Test
     public void GetCorrectAnswers_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
-                new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false, 0)
+                new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false)
         );
         when(mockRepo.getCorrectAnswers()).thenReturn(answers);
 
@@ -100,7 +100,7 @@ public class AnswerServiceTest {
     @Test
     public void GetAnswersBySearch_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
-                new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false, 0)
+                new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false)
         );
         when(mockRepo.getAnswersBySearch("A1")).thenReturn(answers);
 
@@ -112,7 +112,7 @@ public class AnswerServiceTest {
 
     @Test
     public void GetAnswerById_ReturnsAnswer() throws Exception {
-        Answer a = new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false, 0);
+        Answer a = new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false);
         when(mockRepo.getAnswerById(1)).thenReturn(a);
 
         Answer result = answerService.getAnswerById(1);
@@ -127,7 +127,7 @@ public class AnswerServiceTest {
     // =====================
     @Test
     public void UpdateAnswer_ReturnsTrue() throws Exception {
-        Answer a = new Answer(1, 1, 0, 1, "Author", "Old", new Timestamp(0), new Timestamp(0), 0, false, false, false, 0);
+        Answer a = new Answer(1, 1, 0, 1, "Author", "Old", new Timestamp(0), new Timestamp(0), 0, false, false, false);
         when(mockRepo.getAnswerById(1)).thenReturn(a);
         when(mockRepo.updateAnswer(1, "New", true)).thenReturn(true);
 
@@ -141,7 +141,7 @@ public class AnswerServiceTest {
 
     @Test
     public void UpdateAnswer_WithEmptyText_ThrowsIllegalArgument() throws Exception {
-        Answer a = new Answer(1, 1, 0, 1, "Author", "Old", new Timestamp(0), new Timestamp(0), 0, false, false, false, 0);
+        Answer a = new Answer(1, 1, 0, 1, "Author", "Old", new Timestamp(0), new Timestamp(0), 0, false, false, false);
         when(mockRepo.getAnswerById(1)).thenReturn(a);
 
         assertThrows(IllegalArgumentException.class, () -> {
