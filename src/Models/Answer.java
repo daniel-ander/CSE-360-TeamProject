@@ -8,7 +8,6 @@ public class Answer implements IPost {
 	private Integer id;
 	private String bodyText;
 	private boolean isCorrect;
-	private boolean isReview;
 	private Integer questionId;
 	private Integer authorId;
 	private String authorName;
@@ -18,19 +17,25 @@ public class Answer implements IPost {
 	private boolean isDeleted;
 	private Integer upvoteCount;
 	private int replyDepth;
+	private boolean isReview; // new flag to indicate review-type post
 	
 
 	// Constructor for creating a new answer (not yet in DB)
 	public Answer(int questionId, int authorId, String authorName, String bodyText) {
-		this(questionId, null, authorId, authorName, bodyText, false);
+		this(questionId, null, authorId, authorName, bodyText);
 	}
 	
 	// Constructor for creating a new nested answer (not yet in DB)
+	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText) {
+		this(questionId, parentAnswerId, authorId, authorName, bodyText, false);
+	}
+
+	// New constructor that accepts a review flag
 	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText, boolean isReview) {
-		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, isReview, false, 0);
+		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, false, isReview, 0);
 	}
 	
-	// Constructor for pulling from DB with all fields
+	// Constructor for pulling from DB with all fields (new full signature)
 	public Answer(
 			Integer id, 
 			Integer questionId, 
@@ -42,8 +47,8 @@ public class Answer implements IPost {
 			Timestamp lastUpdatedTimestamp, 
 			Integer upvoteCount, 
 			boolean isCorrect, 
+			boolean isDeleted,
 			boolean isReview,
-			boolean isDeleted, 
 			int replyDepth
 	) {
 		if (bodyText == null || bodyText.strip().isEmpty()) {
@@ -60,10 +65,18 @@ public class Answer implements IPost {
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
 		this.upvoteCount = upvoteCount;
 		this.replyDepth = replyDepth;
+		
 		this.isCorrect = isCorrect;
-		this.isReview = isReview;
 		this.isDeleted = isDeleted;
+		this.isReview = isReview;
 
+	}
+
+	// Backwards-compatible constructor matching existing repository calls (no isReview param)
+	public Answer(Integer id, Integer questionId, Integer parentAnswerId, Integer authorId, String authorName,
+			String bodyText, Timestamp createdTimestamp, Timestamp lastUpdatedTimestamp, Integer upvoteCount,
+			boolean isCorrect, boolean isDeleted, int replyDepth) {
+		this(id, questionId, parentAnswerId, authorId, authorName, bodyText, createdTimestamp, lastUpdatedTimestamp, upvoteCount, isCorrect, isDeleted, false, replyDepth);
 	}
 	
 	// ===================
@@ -82,19 +95,16 @@ public class Answer implements IPost {
 	public Integer getUpvoteCount() {return upvoteCount;}
 	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
-	public boolean isReview() {return isReview;}
 	public int getReplyDepth() {return replyDepth;}
 	@Override
 	public String getBodyText() { return bodyText;}
 	@Override
 	public String getTitleText() {return null;}
 	@Override
-	public Type getPostType() {
-		if(isReview) 
-			return Type.Review;
-		else
-			return Type.Answer;
-	}
+	public Type getPostType() {return Type.Answer;}
+	
+	// new getter to expose review flag
+	public boolean isReview() { return isReview; }
 	
 	// ===================
     // 		 SETTERS 
@@ -102,7 +112,6 @@ public class Answer implements IPost {
 	
 	public void setQuestionId(int givenId) {questionId = givenId;}
 	public void setIsCorrect(boolean correct) { isCorrect = correct;}
-	public void setIsReview(boolean isReview) { this.isReview = isReview;}
 	public void setIsDeleted(boolean deleted) { isDeleted = deleted;}
 	public void setUpvoteCount(int newCount) { upvoteCount = newCount;}
 	public void setParentAnswerId(int givenId) {parentAnswerId = givenId;}

@@ -156,19 +156,20 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public List<String> getUsersSortedByRecentInteraction(String userName) throws SQLException {
-	    List<String> usersByInteraction = new ArrayList<>();
-	    //TODO: update the query to get users sorted by recent interaction
-	    String query = String.format("", User.tableName);
-	    try (Connection connection = generalDBManager.getConnection();
-	    		PreparedStatement pstmt = connection.prepareStatement(query)){
-	    	ResultSet rs = pstmt.executeQuery();
-	    	while (rs.next()) {
-	    		usersByInteraction.add((rs.getString("userName")));
-	    	}
-	    }
-	    
-	    return usersByInteraction;
-	}
+        List<String> usersByInteraction = new ArrayList<>();
+        // Return other users (simple fallback) sorted by id descending as a proxy for recent interaction
+        String query = String.format("SELECT userName FROM %s WHERE userName <> ? ORDER BY id DESC", User.tableName);
+        try (Connection connection = generalDBManager.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(query)){
+            pstmt.setString(1, userName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    usersByInteraction.add(rs.getString("userName"));
+                }
+            }
+        }
+        return usersByInteraction;
+    }
 
 
 	
@@ -178,74 +179,110 @@ public class UserRepository implements IUserRepository {
 	
 	@Override
 	public void updateUserRole(String userName, String roleString) throws SQLException {
-	    String query = String.format("UPDATE %s SET role = ? WHERE userName = ?", User.tableName);
-	    try (Connection connection = generalDBManager.getConnection(); 
-				PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, roleString);
-	        pstmt.setString(2, userName);
-	        pstmt.executeUpdate();
-	    }
-	}
-	
-	@Override
-	public String updatePasswordForUser(String userName, String newPassword) throws SQLException {
-	    String sql = String.format("UPDATE %s SET password = ? WHERE userName = ?", User.tableName);
-	    try (Connection connection = generalDBManager.getConnection(); 
-				PreparedStatement pstmt = connection.prepareStatement(sql)) {
-	        pstmt.setString(1, newPassword);
-	        pstmt.setString(2, userName);
-	        pstmt.executeUpdate();
-	    } 
-	    return newPassword;
-	}
+        String query = String.format("UPDATE %s SET role = ? WHERE userName = ?", User.tableName);
+        try (Connection connection = generalDBManager.getConnection(); 
+                PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, roleString);
+            pstmt.setString(2, userName);
+            pstmt.executeUpdate();
+        }
+    }
 
-	// ===================
+    @Override
+    public String updatePasswordForUser(String userName, String newPassword) throws SQLException {
+        String sql = String.format("UPDATE %s SET password = ? WHERE userName = ?", User.tableName);
+        try (Connection connection = generalDBManager.getConnection(); 
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, userName);
+            pstmt.executeUpdate();
+        } 
+        return newPassword;
+    }
+
+    // ===================
     // 		 DESTROY 
  	// ===================
 
-	@Override
-	public boolean deleteUser(String targetUser) throws SQLException {
-	    String query = String.format("DELETE FROM %s WHERE userName = ?", User.tableName);
-	    try (Connection connection = generalDBManager.getConnection(); 
-	         PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, targetUser);
-	        pstmt.executeUpdate();
-	        return true;
-	    }
-	}
-	
-	// ===================
+    @Override
+    public boolean deleteUser(String targetUser) throws SQLException {
+        String query = String.format("DELETE FROM %s WHERE userName = ?", User.tableName);
+        try (Connection connection = generalDBManager.getConnection(); 
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, targetUser);
+            pstmt.executeUpdate();
+            return true;
+        }
+    }
+    
+    // ===================
     // 		 OTHER 
  	// ===================
 
-	@Override
-	public void printAllRows() throws SQLException {
-		String query = String.format("SELECT id, userName, password, role FROM %s", User.tableName);
-		try (Connection connection = generalDBManager.getConnection(); 
-				PreparedStatement pstmt = connection.prepareStatement(query);
-				ResultSet rs = pstmt.executeQuery()) {
-	
-	        System.out.printf("%-5s %-20s %-20s %-30s%n", "ID", "Username", "Password", "Roles");
-	        System.out.println("--------------------------------------------------------------------------");
+    @Override
+    public void printAllRows() throws SQLException {
+        String query = String.format("SELECT id, userName, password, role FROM %s", User.tableName);
+        try (Connection connection = generalDBManager.getConnection(); 
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
 
-	        while (rs.next()) {
-	            int id = rs.getInt("id");
-	            String userName = rs.getString("userName");
-	            String password = rs.getString("password");
-	            String role = rs.getString("role");
+            System.out.printf("%-5s %-20s %-20s %-30s%n", "ID", "Username", "Password", "Roles");
+            System.out.println("--------------------------------------------------------------------------");
 
-	            System.out.printf("%-5d %-20s %-20s %-30s%n", id, userName, password, role);
-	        }
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String userName = rs.getString("userName");
+                String password = rs.getString("password");
+                String role = rs.getString("role");
 
-	    } 
-	}
+                System.out.printf("%-5d %-20s %-20s %-30s%n", id, userName, password, role);
+            }
 
-	@Override
-	public User getUserByName(String userName) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        } 
+    }
+
+    @Override
+    public User getUserByName(String userName) throws SQLException {
+        String query = String.format("SELECT * FROM %s WHERE userName = ?", User.tableName);
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    String dbUserName = rs.getString("userName");
+                    String dbPassword = rs.getString("password");
+                    String roleString = rs.getString("role");
+                    User.Role role = User.roleFromString(roleString);
+
+                    return new User(id, dbUserName, dbPassword, role);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public User getUserById(int id) throws SQLException {
+        String query = String.format("SELECT * FROM %s WHERE id = ?", User.tableName);
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int userId = rs.getInt("id");
+                    String dbUserName = rs.getString("userName");
+                    String dbPassword = rs.getString("password");
+                    String roleString = rs.getString("role");
+                    User.Role role = User.roleFromString(roleString);
+
+                    return new User(userId, dbUserName, dbPassword, role);
+                }
+            }
+        }
+        return null;
+    }
 
 
-		
+        
 }
