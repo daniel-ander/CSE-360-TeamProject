@@ -154,6 +154,7 @@ public class WelcomeLoginPageController {
                 PostListViewModel postListViewModel = new PostListViewModel(
                         dBConnectionStore.getQuestionService(), 
                         dBConnectionStore.getAnswerService(),
+                        dBConnectionStore.getUserService(),
                         userSession
                 );
                 Controllers.ForumPage.ForumHeaderViewModel forumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(userSession); 

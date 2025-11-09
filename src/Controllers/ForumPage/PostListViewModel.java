@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IUserService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
@@ -48,15 +49,22 @@ public class PostListViewModel {
 	// External dependencies (services and user session)
 	private final IQuestionService questionService;
 	private final IAnswerService answerService;
+	private final IUserService userService;
 	private final UserSession userSession;
 
 	// ==============================
 	// CONSTRUCTOR
 	// ==============================
 
-	public PostListViewModel(IQuestionService questionService, IAnswerService answerService, UserSession userSession) {
+	public PostListViewModel(
+			IQuestionService questionService, 
+			IAnswerService answerService, 
+			IUserService userService,
+			UserSession userSession
+	) {
 		this.questionService = questionService;
 		this.answerService = answerService;
+		this.userService = userService;
 		this.userSession = userSession;
 	}
 
@@ -436,7 +444,7 @@ public class PostListViewModel {
 	public PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
 			IPost.Type postType) {
 
-		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession,
+		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession, userService,
 
 				// DELETE callback
 				postId -> {

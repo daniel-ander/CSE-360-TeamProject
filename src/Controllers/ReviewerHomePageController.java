@@ -95,6 +95,7 @@ public class ReviewerHomePageController {
 			PostListViewModel postListViewModel = new PostListViewModel(
 					dBConnectionStore.getQuestionService(), 
 					dBConnectionStore.getAnswerService(),
+					dBConnectionStore.getUserService(),
 					userSession
 			);
 			
@@ -119,6 +120,7 @@ public class ReviewerHomePageController {
 			PostListViewModel postListViewModel = new PostListViewModel(
 					dBConnectionStore.getQuestionService(), 
 					dBConnectionStore.getAnswerService(),
+					dBConnectionStore.getUserService(),
 					userSession
 			);
 			

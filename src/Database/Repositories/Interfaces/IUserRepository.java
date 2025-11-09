@@ -18,6 +18,7 @@ public interface IUserRepository {
 	public boolean doesUserExist(User user) throws SQLException;
 	public boolean doesUserExistByName(String userName) throws SQLException;
 	public boolean deleteUser(String targetUser) throws SQLException;
+	public boolean checkIfFavoredReviewerExists(int currentUserId, int idOfFavoredReviewer) throws SQLException;
 
 	public String getUserRole(String userName) throws SQLException;
 	public User getUserByNameAndPassword(String userName, String password) throws SQLException;
@@ -26,6 +27,8 @@ public interface IUserRepository {
 
 	public int getUserIdByName(String userName) throws SQLException;
 	public User getUserById(int id) throws SQLException;
+	
+	public void toggleIsFavoredReviewer(int currentUserId, int idOfFavoredReviewer) throws SQLException;
 
 	List<String> getUsersSortedByRecentInteraction(String userName) throws SQLException;
 }

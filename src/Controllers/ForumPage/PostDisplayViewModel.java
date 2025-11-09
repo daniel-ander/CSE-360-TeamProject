@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import Database.Services.UserService;
+import Database.Services.Interfaces.IUserService;
 import Models.Answer;
 import Models.IPost;
 import Models.IPost.Type;
@@ -24,10 +26,13 @@ public class PostDisplayViewModel {
 
 	private final UserSession userSession;
 	private final BooleanProperty isEditingPostProperty = new SimpleBooleanProperty(false);
+	
+	private final IUserService userService;
 
 	private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
+	private BooleanProperty isFavoredReviewerProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
 	private BooleanProperty isReviewingProperty = new SimpleBooleanProperty(false);
 	private ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
@@ -46,12 +51,20 @@ public class PostDisplayViewModel {
 		TIME
 	}
 
-	public PostDisplayViewModel(IPost post, List<String> permissionList, UserSession userSession,
-			Consumer<Integer> deleteCallBack, Consumer<IPost> addCallBack,
-			TriConsumer<Integer, String, String> updateCallBack, Runnable toggleExpandCallback) {
+	public PostDisplayViewModel(
+			IPost post, 
+			List<String> permissionList, 
+			UserSession userSession,
+			IUserService userService,
+			Consumer<Integer> deleteCallBack, 
+			Consumer<IPost> addCallBack,
+			TriConsumer<Integer, String, String> updateCallBack, 
+			Runnable toggleExpandCallback
+	) {
 		this.post = post;
 		this.permissionList = permissionList;
 		this.userSession = userSession;
+		this.userService = userService;
 		this.deleteCallback = deleteCallBack;
 		this.addCallBack = addCallBack;
 		this.updateCallBack = updateCallBack;
@@ -131,6 +144,11 @@ public class PostDisplayViewModel {
 
 	public boolean isExpandButtonPressed() {
 		return isExpandedProperty.get();
+	}
+	
+	public boolean shouldDisplayFavoredReviewerButton() {
+		return getPost().getPostType() == Type.Review 
+				&& userSession.getCurrentUserId() != getPost().getAuthorId();
 	}
 	
 	// Properties that cannot be active at once

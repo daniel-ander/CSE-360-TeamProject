@@ -13,6 +13,7 @@ public interface IUserService {
 	public void register(User user) throws DataAccessException, DuplicateRecordIDException;
 	public void printUsersTable() throws DataAccessException;
 	public void updateUserRole(String userName, User.Role newRole) throws DataAccessException;
+	public void toggleIsFavoredReviewer(int currentUserId, int idOfFavoredReviewer) throws DataAccessException;
 	
 	// add a role to an existing user without removing existing roles (roles stored as comma-separated string)
 	public void addRoleToUser(String userName, User.Role roleToAdd) throws DataAccessException;
@@ -20,6 +21,7 @@ public interface IUserService {
 	public boolean performLogin(User user) throws DataAccessException;
 	public boolean doesUserExistByName(String userName) throws DataAccessException;
 	public boolean deleteUser(String currentUserName, String targetUserName) throws DataAccessException;
+	public boolean checkIfFavoredReviewerExists(int currentUserId, int idOfFavoredReviewer) throws DataAccessException;
 	
 	public User.Role getUserRole(String userName) throws DataAccessException;
 	
