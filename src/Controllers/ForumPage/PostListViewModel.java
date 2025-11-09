@@ -104,8 +104,12 @@ public class PostListViewModel {
 				boolean postIsReviewType = ((Answer) answerVM.getPost()).getIsReview();
 				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession
 						.getCurrentUserId();
+				
+				System.out.println("Get is Review: " + postIsReviewType);
+				System.out.println("Get belongs to user: " + postBelongsToUser);
 
 				if (postIsReviewType && postBelongsToUser) {
+					System.out.println("Did find post");
 					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;
 					populateReviewMap(parentQuestionAnswerIDKey, reviewOfCurrentReviewer);
 				}
