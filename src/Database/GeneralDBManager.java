@@ -242,15 +242,47 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (3, NULL, 3, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
 			    """, answerTableName);
 		
-	    String populateMessagesTable = String.format(
-	            "INSERT INTO %s (review_id, sender_id, receiver_id, parent_message_id, message_text, sent_timestamp) VALUES "
-	            + "(NULL, 1, 2, NULL, 'Hey, did you check the assignment?', '2023-11-01 10:00:00'),"
-	            + "(NULL, 2, 1, NULL, 'Yes, looks good to me.', '2023-11-01 10:05:00'),"
-	            + "(1, 3, 2, NULL, 'I left a review comment on your answer — consider edge cases.', '2023-11-02 12:00:00'),"
-	            + "(2, 2, 3, NULL, 'Thanks for the review, I updated the answer.', '2023-11-02 12:30:00'),"
-	            + "(NULL, 4, 1, NULL, 'Reminder: meeting at 2pm today.', '2023-11-03 09:00:00'),"
-	            + "(3, 5, 1, NULL, 'Feedback on review: good point about performance.', '2023-11-04 14:20:00');",
-	            interactionTableName);
+		String populateMessagesTable = String.format("""
+			    INSERT INTO %s (review_id, sender_id, receiver_id, parent_message_id, message_text, sent_timestamp) VALUES
+			    (NULL, 1, 2, NULL, 'Hey, did you check the assignment?', '2023-11-01 10:00:00'),
+			    (NULL, 2, 1, NULL, 'Yes, looks good to me.', '2023-11-01 10:05:00'),
+			    (1, 3, 2, NULL, 'Review posted on your answer — check edge cases.', '2023-11-02 12:00:00'),
+			    (1, 2, 3, 3, 'Got it, I’ll refine my code accordingly.', '2023-11-02 12:15:00'),
+			    (2, 3, 4, NULL, 'Review added: watch your variable naming.', '2023-11-03 09:30:00'),
+			    (2, 4, 3, 5, 'Thanks, I’ll make the updates.', '2023-11-03 09:45:00'),
+			    (3, 3, 2, NULL, 'I left a comment on your loop structure.', '2023-11-03 14:10:00'),
+			    (3, 2, 3, 7, 'Fixed it, using enhanced for-loop now.', '2023-11-03 14:25:00'),
+			    (4, 5, 1, NULL, 'Feedback: your review of ExecutorService was clear.', '2023-11-04 08:40:00'),
+			    (4, 1, 5, 9, 'Appreciate it! Glad it helped.', '2023-11-04 08:45:00'),
+			    (5, 2, 3, NULL, 'Please clarify your annotation example.', '2023-11-05 11:00:00'),
+			    (5, 3, 2, 11, 'Sure, added @FunctionalInterface usage.', '2023-11-05 11:10:00'),
+			    (6, 3, 4, NULL, 'Your review on SceneManager is excellent.', '2023-11-05 13:15:00'),
+			    (6, 4, 3, 13, 'Thank you — your example made it click.', '2023-11-05 13:25:00'),
+			    (7, 1, 3, NULL, 'Could you review my thread-safety explanation?', '2023-11-06 09:00:00'),
+			    (7, 3, 1, 15, 'Done. Added notes about volatile variables.', '2023-11-06 09:15:00'),
+			    (8, 5, 1, NULL, 'Your GC discussion is solid. Added it to review list.', '2023-11-06 10:30:00'),
+			    (8, 1, 5, 17, 'Thanks! Glad to contribute.', '2023-11-06 10:40:00'),
+			    (9, 4, 3, NULL, 'Can you expand on MVC roles?', '2023-11-06 11:00:00'),
+			    (9, 3, 4, 19, 'Added detail on Controller’s mediation role.', '2023-11-06 11:10:00'),
+			    (10, 3, 2, NULL, 'Review for DAO example uploaded.', '2023-11-06 11:30:00'),
+			    (10, 2, 3, 21, 'Acknowledged. Looks well-structured.', '2023-11-06 11:45:00'),
+			    (11, 2, 1, NULL, 'NPE review complete, check test cases.', '2023-11-06 12:00:00'),
+			    (11, 1, 2, 23, 'Confirmed. Updated my unit tests.', '2023-11-06 12:15:00'),
+			    (12, 5, 1, NULL, 'ObservableList review is concise.', '2023-11-06 13:00:00'),
+			    (12, 1, 5, 25, 'Thanks, added more on listener mechanics.', '2023-11-06 13:10:00'),
+			    (13, 3, 4, NULL, 'Review posted for admin roles.', '2023-11-06 14:00:00'),
+			    (13, 4, 3, 27, 'Saw it. Roles now reflected in login view.', '2023-11-06 14:10:00'),
+			    (14, 3, 2, NULL, 'Review complete: password hashing good.', '2023-11-06 15:00:00'),
+			    (14, 2, 3, 29, 'Added BCrypt cost parameter clarification.', '2023-11-06 15:10:00'),
+			    (15, 4, 3, NULL, 'SQLite review done. Short but accurate.', '2023-11-06 16:00:00'),
+			    (15, 3, 4, 31, 'Cheers. Adding comparison with H2.', '2023-11-06 16:10:00'),
+			    (16, 3, 1, NULL, 'Good point on uncaughtExceptionHandler.', '2023-11-06 17:00:00'),
+			    (16, 1, 3, 33, 'Thanks. Using Platform.runLater inside.', '2023-11-06 17:15:00'),
+			    (17, 1, 2, NULL, 'Please review session persistence notes.', '2023-11-06 18:00:00'),
+			    (17, 2, 1, 35, 'Reviewed and approved.', '2023-11-06 18:10:00'),
+			    (NULL, 5, 4, NULL, 'Team check-in tomorrow?', '2023-11-07 09:00:00'),
+			    (NULL, 4, 5, 37, 'Yes, confirmed for 10am.', '2023-11-07 09:10:00');
+			""", interactionTableName);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
