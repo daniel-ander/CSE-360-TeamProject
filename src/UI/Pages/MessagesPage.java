@@ -31,6 +31,8 @@ public class MessagesPage implements IInitializable {
     private final Button enterForumButton = new Button("Enter Forum");
     private final TextField searchMessagesTextField = new TextField();
     private final Button filterMessagesButton = new Button("Filter Messages");
+    private final TextArea messageTextArea = new TextArea();
+    private final Button sendMessageButton = new Button("Send");
 
     private final ObservableList<RecentInteractionsViewModel> viewModels = FXCollections.observableArrayList();
     private final ListView<RecentInteractionsViewModel> recentInteractionsListView = new ListView<>(viewModels);
@@ -58,6 +60,7 @@ public class MessagesPage implements IInitializable {
         // top header
         Region spacer = new Region();
         HBox header = new HBox();
+        
         HBox.setHgrow(spacer, Priority.ALWAYS);
         header.getChildren().addAll(logoutButton, changeRolesButton, enterMessagesButton, enterForumButton, spacer);
         header.setStyle("-fx-padding: 10; -fx-alignment: center-left;");
@@ -67,12 +70,19 @@ public class MessagesPage implements IInitializable {
         recentInteractionsListView.setCellFactory(_ -> new RecentInteractionsCell());
         recentInteractionsListView.setPrefWidth(200);
 
-        // center: messages list
+        // right: messages list
         messagesListView.setCellFactory(_ -> new MessageCell());
         messagesListView.setPrefWidth(600);
+        
 
-        // layout
-        HBox content = new HBox(recentInteractionsListView, messagesListView);
+        messageTextArea.setPromptText("Write a reply...");
+        messageTextArea.setWrapText(true);
+        messageTextArea.setPrefRowCount(3);
+        
+        VBox messageInputBox = new VBox(5, messageTextArea, sendMessageButton);
+        VBox messagesBox = new VBox(10, messagesListView, messageInputBox);
+
+        HBox content = new HBox(recentInteractionsListView, messagesBox);
         root.setCenter(content);
 
         // scene setup
@@ -115,6 +125,8 @@ public class MessagesPage implements IInitializable {
     public Button getLogoutButton() { return logoutButton; }
     public Button getChangeRolesButton() { return changeRolesButton; }
     public Button getEnterForumButton() { return enterForumButton; }
+    public TextArea getMessageTextArea() { return messageTextArea; }
+    public Button getSendMessageButton() { return sendMessageButton; }
     public ListView<RecentInteractionsViewModel> getRecentInteractionsListView() { return recentInteractionsListView; }
     public ListView<MessagesViewModel> getMessagesListView() { return messagesListView; }
     

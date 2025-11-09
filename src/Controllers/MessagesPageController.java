@@ -1,6 +1,7 @@
 // language: java
 package Controllers;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import Controllers.ForumPage.QuestionPaneViewModel;
 import Controllers.Messages.MessagesViewModel;
 import Controllers.Messages.RecentInteractionsViewModel;
 import Database.*;
+import Database.Repositories.Interfaces.IMessageRepository;
 import Database.Services.Interfaces.IMessageService;
 import Database.Services.UserService;
 import Database.Services.Interfaces.IUserService;
@@ -40,6 +42,7 @@ public class MessagesPageController {
 	private final DBConnectionStore dBConnectionStore;
 	private final UserSession userSession;
 	private final IQuestionService questionService;
+	private final IMessageService messageService;
 	private final Stage primaryStage;
 	private final MessagesPage view;
 	private final PostListViewModel messageListViewModel;
@@ -50,6 +53,7 @@ public class MessagesPageController {
 		this.dBConnectionStore = dBConnectionStore;
 		this.questionService = dBConnectionStore.getQuestionService();
 		this.primaryStage = primaryStage;
+		this.messageService = dBConnectionStore.getMessageService();
 		this.userService = dBConnectionStore.getUserService();
 		this.userSession = userSession;
 		this.view = view;
@@ -59,6 +63,7 @@ public class MessagesPageController {
 	    setEnterForumButtonAction();
 	    setLogoutButtonAction();
 	    setChangeRolesButtonAction();
+	    setSendMessageButtonAction();
 	    
 		messagesHeaderViewModel.getSearchButtonPressedProperty().addListener((_, _, isTriggered) -> {
 			if (isTriggered) {
@@ -105,93 +110,142 @@ public class MessagesPageController {
 		});
 	}
 
+	private void setSendMessageButtonAction() {
+	    view.getSendMessageButton().setOnAction(_ -> {
+	        String text = view.getMessageTextArea().getText().trim();
+	        if (text.isEmpty()) return;
+
+	        ObservableList<MessagesViewModel> items = view.getMessagesListView().getItems();
+	        if (items == null || items.isEmpty()) return;
+
+	        MessagesViewModel last = items.get(items.size() - 1);
+	        Integer reviewId = last.getReviewId();
+	        Integer parentMessageId = last.getMessageId();
+	        if (parentMessageId == null || parentMessageId == 0) parentMessageId = null;
+
+	        int senderId = userSession.getCurrentUserId();
+	        int receiverId = (last.getSenderId() == senderId)
+	                ? last.getReceiverId()
+	                : last.getSenderId();
+
+	        try {
+	            Message toInsert = new Message(
+	                0,
+	                reviewId,
+	                senderId,
+	                receiverId,
+	                parentMessageId,
+	                text,
+	                null
+	            );
+
+	            messageService.insertMessage(toInsert);
+
+	            view.getMessageTextArea().clear();
+	            reloadMessagesForCurrentThread(reviewId);
+
+	        } catch (DataAccessException e) {
+	            e.printStackTrace();
+	        }
+	    });
+	}
+
+	private void reloadMessagesForCurrentThread(int reviewId) {
+	    try {
+	        List<Message> refreshed = messageService.getMessagesByReviewId(reviewId);
+	        ObservableList<MessagesViewModel> models = FXCollections.observableArrayList();
+	        for (Message m : refreshed) {
+	            models.add(new MessagesViewModel(m));
+	        }
+	        view.getMessagesListView().setItems(models);
+	        view.getMessagesListView().scrollTo(models.size() - 1);
+	    } catch (DataAccessException e) {
+	        e.printStackTrace();
+	    }
+	}
+
 	private void setInitialLayout() {
 	    view.setInitialLayout(primaryStage);
 
 	    initializeMessageListListeners();
 	    setMessageListActions();
-	    
-	    // Try to load messages from service and populate the UI lists
-	    IMessageService messageService = dBConnectionStore.getMessageService();
+
+	    // Only load data if lists are empty — prevents full refresh on every reopen
+	    if (!view.getMessagesListView().getItems().isEmpty()
+	            && !view.getRecentInteractionsListView().getItems().isEmpty()) {
+	        return;
+	    }
+
 	    try {
-	    	List<Message> messages = messageService.getMessagesForUsername(userSession.getCurrentUserName());
-	    	// Build full messages list view models
-	    	ObservableList<MessagesViewModel> messagesVMList = FXCollections.observableArrayList();
-	    	for (Message m : messages) {
-	    		messagesVMList.add(new MessagesViewModel(m));
-	    	}
+	        List<Message> messages = messageService.getMessagesForUsername(userSession.getCurrentUserName());
+	        ObservableList<MessagesViewModel> messagesVMList = FXCollections.observableArrayList();
+	        for (Message m : messages) {
+	            messagesVMList.add(new MessagesViewModel(m));
+	        }
 
-	    	// Build recent interactions by grouping messages by "other" participant and picking last message
-	    	Map<Integer, Message> lastByOther = new HashMap<>();
-	    	for (Message m : messages) {
-	    		Integer sender = m.getSenderId();
-	    		Integer receiver = m.getReceiverId();
-	    		Integer current = userSession.getCurrentUserId();
-	    		Integer other = null;
-	    		if (current != null && current.equals(sender)) other = receiver;
-	    		else other = sender;
-	    		if (other == null) continue;
-	    		Message existing = lastByOther.get(other);
-	    		if (existing == null) {
-	    			lastByOther.put(other, m);
-	    		} else {
-	    			// prefer later timestamp when available
-	    			if (m.getSentTimestamp() != null && (existing.getSentTimestamp() == null || m.getSentTimestamp().after(existing.getSentTimestamp()))) {
-	    				lastByOther.put(other, m);
-	    			}
-	    		}
-	    	}
+	        // Group by other user, keep most recent message per conversation
+	        Map<Integer, Message> lastByOther = new HashMap<>();
+	        for (Message m : messages) {
+	            Integer current = userSession.getCurrentUserId();
+	            Integer sender = m.getSenderId();
+	            Integer receiver = m.getReceiverId();
+	            if (sender == null || receiver == null) continue;
 
-	    	ObservableList<RecentInteractionsViewModel> recentList = FXCollections.observableArrayList();
-	    	for (Map.Entry<Integer, Message> entry : lastByOther.entrySet()) {
-	    		Integer otherId = entry.getKey();
-	    		Message lastMsg = entry.getValue();
-	    		String usernameFallback = otherId == null ? "" : String.valueOf(otherId);
-	    		String preview = lastMsg.getContent() == null ? "" : lastMsg.getContent();
-	    		String ts = lastMsg.getSentTimestamp() == null ? "" : lastMsg.getSentTimestamp().toString();
-	    		recentList.add(new RecentInteractionsViewModel(otherId == null ? 0 : otherId, usernameFallback, preview, ts, 0));
-	    	}
+	            Integer other = current.equals(sender) ? receiver : sender;
+	            Message existing = lastByOther.get(other);
+	            if (existing == null
+	                    || (m.getSentTimestamp() != null && existing.getSentTimestamp() != null
+	                        && m.getSentTimestamp().after(existing.getSentTimestamp()))) {
+	                lastByOther.put(other, m);
+	            }
+	        }
 
-	    	// Populate the UI list views
-	    	view.getRecentInteractionsListView().setItems(recentList);
-	    	view.getMessagesListView().setItems(messagesVMList);
+	        ObservableList<RecentInteractionsViewModel> recentList = FXCollections.observableArrayList();
+	        for (Map.Entry<Integer, Message> entry : lastByOther.entrySet()) {
+	            Integer otherId = entry.getKey();
+	            Message lastMsg = entry.getValue();
+	            String username = String.valueOf(otherId);
+	            String preview = lastMsg.getContent() == null ? "" : lastMsg.getContent();
+	            String ts = lastMsg.getSentTimestamp() == null ? "" : lastMsg.getSentTimestamp().toString();
+	            recentList.add(new RecentInteractionsViewModel(otherId, username, preview, ts, 0));
+	        }
 
-	    	// When selecting a recent interaction, filter messages to that conversation
-	    	view.getRecentInteractionsListView().getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-	    		if (newV == null) {
-	    			view.getMessagesListView().setItems(messagesVMList);
-	    			return;
-	    		}
-	    		int otherId = newV.getUserId();
-	    		ObservableList<MessagesViewModel> convo = FXCollections.observableArrayList();
-	    		for (Message m : messages) {
-	    			if ((m.getSenderId() != null && m.getSenderId().equals(otherId)) ||
-	    				(m.getReceiverId() != null && m.getReceiverId().equals(otherId))) {
-	    				convo.add(new MessagesViewModel(m));
-	    			}
-	    		}
-	    		view.getMessagesListView().setItems(convo);
-	    	});
+	        // Set items only once
+	        view.getRecentInteractionsListView().setItems(recentList);
+	        view.getMessagesListView().setItems(messagesVMList);
+
+	        // Conversation filter when selecting a user
+	     // Conversation filter when selecting a user
+	        view.getRecentInteractionsListView().getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+	            if (newV == null) return;
+	            int otherId = newV.getUserId();
+
+	            try {
+	                // always pull latest from DB to stay current
+	                List<Message> refreshed = messageService.getMessagesForUsername(userSession.getCurrentUserName());
+	                ObservableList<MessagesViewModel> convo = FXCollections.observableArrayList();
+
+	                for (Message m : refreshed) {
+	                    if ((m.getSenderId() != null && m.getSenderId().equals(otherId)) ||
+	                        (m.getReceiverId() != null && m.getReceiverId().equals(otherId))) {
+	                        convo.add(new MessagesViewModel(m));
+	                    }
+	                }
+
+	                // keep same list reference, update contents
+	                view.getMessagesListView().getItems().setAll(convo);
+	                view.getMessagesListView().scrollTo(convo.size() - 1);
+	            } catch (DataAccessException e) {
+	                e.printStackTrace();
+	            }
+	        });
+
 
 	    } catch (DataAccessException ex) {
-	    	ex.printStackTrace();
-	    	// fallback to placeholder data if DB call fails
-	    	ObservableList<RecentInteractionsViewModel> users = FXCollections.observableArrayList(
-	                new RecentInteractionsViewModel(1, "Alice", "See you soon!", "10:32 AM", 0),
-	                new RecentInteractionsViewModel(2, "Bob", "Got your message", "9:47 AM", 2)
-	        );
-
-	        ObservableList<MessagesViewModel> messages = FXCollections.observableArrayList(
-	                new MessagesViewModel(101, "Alice", "You", "Looking forward to our meeting.", "10:30 AM"),
-	                new MessagesViewModel(102, "You", "Alice", "See you soon!", "10:32 AM"),
-	                new MessagesViewModel(201, "Bob", "You", "Did you get my last message?", "9:45 AM"),
-	                new MessagesViewModel(202, "You", "Bob", "Got your message", "9:47 AM")
-	        );
-
-	        view.getRecentInteractionsListView().setItems(users);
-	        view.getMessagesListView().setItems(messages);
+	        ex.printStackTrace();
 	    }
 	}
+
     
     private void setMessageListActions() {
 		// TODO: implement sending/updating/deleting messages using messageService

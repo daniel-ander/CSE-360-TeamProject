@@ -68,6 +68,7 @@ public class DBConnectionStore {
 	public IMessageService getMessageService() {
 		return messageService;
 	}
+	
 	public IPermissionService getPermissionService() {
 		return permissionService;
 	}
@@ -96,7 +97,7 @@ public class DBConnectionStore {
 		IPermissionService permissionService = new PermissionService(permissionRepository);
 		
 		IMessageRepository messageRepository = new MessageRepository(dbHelper);
-		IMessageService messageService = new MessageService(messageRepository); // Placeholder for message service
+		IMessageService messageService = new MessageService(messageRepository);
 		
 		
 		
