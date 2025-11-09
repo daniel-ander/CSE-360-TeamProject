@@ -233,7 +233,9 @@ public class MessagesPageController {
 
 	                // keep same list reference, update contents
 	                view.getMessagesListView().getItems().setAll(convo);
-	                view.getMessagesListView().scrollTo(convo.size() - 1);
+	                if (!convo.isEmpty()) {
+	                    view.getMessagesListView().scrollTo(convo.size() - 1);
+	                }
 	            } catch (DataAccessException e) {
 	                e.printStackTrace();
 	            }
