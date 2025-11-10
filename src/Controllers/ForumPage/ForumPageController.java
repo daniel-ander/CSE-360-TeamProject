@@ -9,8 +9,11 @@ import Controllers.WelcomeLoginPageController;
 import Controllers.ForumPage.PostListViewModel.FilterMode;
 import Database.*;
 import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IUserService;
 import DisplayModels.PostWithPermissions;
+import Exceptions.DBExceptions.DataAccessException;
 import Models.Question;
+import Models.User.Role;
 import Sessions.UserSession;
 
 import UI.Pages.ForumPage;
@@ -30,6 +33,7 @@ public class ForumPageController {
 
 	private final DBConnectionStore dBConnectionStore;
 	private final IQuestionService questionService;
+	private final IUserService userService;
 	private final Stage primaryStage;
 	private final ForumPage view;
 	private final UserSession userSession;
@@ -44,6 +48,7 @@ public class ForumPageController {
 			QuestionPaneViewModel questionPaneViewModel) {
 		this.dBConnectionStore = dBConnectionStore;
 		this.questionService = dBConnectionStore.getQuestionService();
+		this.userService = dBConnectionStore.getUserService();
 		this.primaryStage = primaryStage;
 		this.userSession = userSession;
 		this.view = view;
@@ -65,7 +70,16 @@ public class ForumPageController {
 		forumHeaderViewModel.getSeeReviewsButtonPressedProperty().addListener((_, _, isPressed) -> {
 			if(isPressed) {
 				postListViewModel.setFilterMode(FilterMode.REVIEW);
-				postListViewModel.filterVisibleQuestionsByReview();
+				if(userSession.getCurrentUserRole() == Role.reviewer) {
+					postListViewModel.filterVisibleQuestionsByReview();
+				} else {
+					try {
+						List<Integer> favoredReviewerIds = userService.getFavoredReviewerIdsForUser(userSession.getCurrentUserId());
+						postListViewModel.filterVisibleQuestionsByReview(favoredReviewerIds);
+					} catch(DataAccessException e) {
+						System.out.println(e.getLocalizedMessage());
+					}
+				}
 			} else {
 				postListViewModel.setFilterMode(FilterMode.NONE);
 				postListViewModel.resetVisiblePosts();

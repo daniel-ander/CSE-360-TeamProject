@@ -348,5 +348,24 @@ public class UserRepository implements IUserRepository {
 			return false;
 
 	}
+	
+	@Override
+	public List<Integer> getFavoredReviewerIdsForUser(int userId) throws SQLException {
+	    String query = "SELECT favoredReviewerId FROM " + FavoredReviewer.tableName + " WHERE userId = ?";
+	    List<Integer> reviewerIds = new ArrayList<>();
+
+	    try (Connection conn = generalDBManager.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(query)) {
+	        stmt.setInt(1, userId);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                reviewerIds.add(rs.getInt("favoredReviewerId"));
+	            }
+	        }
+	    }
+
+	    return reviewerIds;
+	}
         
 }

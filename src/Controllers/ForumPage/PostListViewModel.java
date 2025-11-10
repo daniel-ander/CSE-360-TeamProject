@@ -96,20 +96,21 @@ public class PostListViewModel {
 	 * Filters visible posts to those that contain a review authored by the current user.
 	 */
 	public void filterVisibleQuestionsByReview() {
+	    filterVisibleQuestionsByReview(
+	        new ArrayList<>(List.of(userSession.getCurrentUserId()))
+	    );
+	}
+	
+	public void filterVisibleQuestionsByReview(List<Integer> reviewersToShow) {
 		reviewPostParentMap.clear();
 
 		// Build a map of review-type posts by this user
-		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {
+		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {			
 			for (PostDisplayViewModel answerVM : postVMs) {
 				boolean postIsReviewType = ((Answer) answerVM.getPost()).getIsReview();
-				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession
-						.getCurrentUserId();
-				
-				System.out.println("Get is Review: " + postIsReviewType);
-				System.out.println("Get belongs to user: " + postBelongsToUser);
+				boolean postBelongsToUser = reviewersToShow.contains(((Answer) answerVM.getPost()).getAuthorId());
 
 				if (postIsReviewType && postBelongsToUser) {
-					System.out.println("Did find post");
 					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;
 					populateReviewMap(parentQuestionAnswerIDKey, reviewOfCurrentReviewer);
 				}
@@ -447,8 +448,10 @@ public class PostListViewModel {
 	 */
 	public PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
 			IPost.Type postType) {
+		
+		SharedForumState sharedForumState = new SharedForumState();
 
-		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession, userService,
+		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession, userService, sharedForumState,
 
 				// DELETE callback
 				postId -> {

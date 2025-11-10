@@ -18,16 +18,20 @@ import java.util.function.Consumer;
 
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
+import Models.User;
+import Models.User.Role;
 import Controllers.ForumPage.PostDisplayViewModel;
 
 public class ForumPage implements IInitializable {
 
     private final BorderPane root = new BorderPane();
+    
+    private final User.Role currentUserRole;
 
     private final Label userLabel = new Label();
     private final Button logoutButton = new Button("Logout");
     private final Button changeRolesButton = new Button("Change Roles");
-    private final Button seeMyReviewsButton = new Button("See My Reviews");
+    private final Button seeMyReviewsButton = new Button();
 
     // Center UI components (formerly QuestionListView)
     private final ObservableList<PostDisplayViewModel> viewModels = FXCollections.observableArrayList();
@@ -51,6 +55,10 @@ public class ForumPage implements IInitializable {
     	this.forumHeaderViewModel = forumHeaderViewModel;
     	this.questionPaneViewModel = questionPaneViewModel;
     	
+    	currentUserRole = forumHeaderViewModel.getUserSession().getCurrentUserRole();
+    	
+    	seeMyReviewsButton.setText(currentUserRole == Role.reviewer ? "See My Reviews" : "See Favored Reviewer Posts");
+    	
     	bindViewModelProperties();
     	
     	filterQuestionsButton.setOnMouseClicked(_ -> forumHeaderViewModel.triggerPostsFilter());
@@ -70,7 +78,11 @@ public class ForumPage implements IInitializable {
     			seeMyReviewsButton.setText("See All Posts");
     			seeMyReviewsButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
     		} else {
-    			seeMyReviewsButton.setText("See My Reviews");
+    			if(forumHeaderViewModel.getUserSession().getCurrentUserRole() == Role.reviewer) {
+    				seeMyReviewsButton.setText("See My Reviews");
+    			} else {
+    				seeMyReviewsButton.setText("See Favored Reviewer Posts");
+    			}
     			seeMyReviewsButton.setStyle("");
     		}
     	});
@@ -125,9 +137,9 @@ public class ForumPage implements IInitializable {
     	
     	header.getChildren().addAll(logoutButton, changeRolesButton, spacer, addQuestionButton, searchQuestionsTextField, filterQuestionsButton);
     	
-    	if(forumHeaderViewModel.isReviewer()) {
+//    	if(forumHeaderViewModel.isReviewer()) {
     		header.getChildren().add(3, seeMyReviewsButton);
-    	}
+//    	}
     	
         header.setStyle("-fx-padding: 10; -fx-alignment: center-left;");
         root.setTop(header);

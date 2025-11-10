@@ -26,6 +26,8 @@ public interface IUserService {
 	public User.Role getUserRole(String userName) throws DataAccessException;
 	
 	public List<String> getAllUsernames() throws DataAccessException;
+	public List<Integer> getFavoredReviewerIdsForUser(int userId) throws DataAccessException;
+	
 	public User getUserByNameAndPassword(String userName, String password) throws DataAccessException;
 	public int getUserIdByName(String userName) throws DataAccessException;
 	// return the username for a given user id

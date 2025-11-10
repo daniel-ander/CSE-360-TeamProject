@@ -349,5 +349,14 @@ public class UserService implements IUserService {
 		}
 	}
 	
+	@Override
+	public List<Integer> getFavoredReviewerIdsForUser(int userId) throws DataAccessException {
+		try {
+			return userRepository.getFavoredReviewerIdsForUser(userId);
+		} catch(SQLException e) {
+			throw new DataAccessException("Could not fetch favored reviewers due to: " + e);
+		}
+	}
+	
 
 }

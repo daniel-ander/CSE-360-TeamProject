@@ -71,7 +71,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 		currentVm = vm;
 		
 		favorReviewerButton.textProperty()
-		.bind(Bindings.when(currentVm.getIsFavoredReviewerProperty()).then("Unavor This Reviewer").otherwise("Favor This Reviewer"));
+		.bind(Bindings.when(currentVm.getIsFavoredReviewerProperty()).then("Unfavor This Reviewer").otherwise("Favor This Reviewer"));
 		
 		favorReviewerButton.setOnMouseClicked(_ -> {
     		vm.toggleFavoredReviewerStatus(!vm.getIsFavoredReviewerProperty().get());

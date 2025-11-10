@@ -10,6 +10,7 @@ import Models.User;
 public interface IUserRepository {
 	
 	public List<String> getAllUsernames() throws SQLException;
+	public List<Integer> getFavoredReviewerIdsForUser(int userId) throws SQLException;
 	
 	public int insertNewUser(User user) throws SQLException;
 	public void updateUserRole(String userName, String roleString) throws SQLException;

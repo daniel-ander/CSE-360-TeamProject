@@ -36,6 +36,10 @@ public class ForumHeaderViewModel {
 		return seeReviewsButtonPressedProperty;
 	}
 	
+	public UserSession getUserSession() {
+		return userSession;
+	}
+	
 	public String getSearchFieldText() {
 		return searchFieldTextProperty.get();
 	}

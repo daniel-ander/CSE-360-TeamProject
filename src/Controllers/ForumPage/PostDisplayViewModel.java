@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import Database.Services.UserService;
 import Database.Services.Interfaces.IUserService;
 import Exceptions.DBExceptions.DataAccessException;
 import Models.Answer;
@@ -33,7 +32,6 @@ public class PostDisplayViewModel {
 	private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
-	private BooleanProperty isFavoredReviewerProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
 	private BooleanProperty isReviewingProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty shouldDisplayFavoredReviewerButtonProperty = new SimpleBooleanProperty(false);
@@ -43,6 +41,8 @@ public class PostDisplayViewModel {
 	private StringProperty bodyTextProperty = new SimpleStringProperty();
 
 	private int depthLevel;
+	
+	private final SharedForumState sharedForumState;
 	
 	private final Consumer<Integer> deleteCallback;
 	private final Consumer<IPost> addCallBack;
@@ -58,6 +58,7 @@ public class PostDisplayViewModel {
 			List<String> permissionList, 
 			UserSession userSession,
 			IUserService userService,
+			SharedForumState sharedForumState,
 			Consumer<Integer> deleteCallBack, 
 			Consumer<IPost> addCallBack,
 			TriConsumer<Integer, String, String> updateCallBack, 
@@ -67,6 +68,7 @@ public class PostDisplayViewModel {
 		this.permissionList = permissionList;
 		this.userSession = userSession;
 		this.userService = userService;
+		this.sharedForumState = sharedForumState;
 		this.deleteCallback = deleteCallBack;
 		this.addCallBack = addCallBack;
 		this.updateCallBack = updateCallBack;
@@ -127,7 +129,7 @@ public class PostDisplayViewModel {
 	}
 	
 	public BooleanProperty getIsFavoredReviewerProperty() {
-		return isFavoredReviewerProperty;
+		return sharedForumState.getIsFavoredReviewerProperty();
 	}
 	
 	public BooleanProperty getShouldDisplayFavoredReviewerButtonProperty() {
@@ -184,13 +186,11 @@ public class PostDisplayViewModel {
 	}
 	
 	public void setShouldDisplayFavoredReviewerButton() {
-		boolean isReviewType = post.getPostType() == Type.Review;
-		boolean isCurrentUserAuthor = userSession.getCurrentUserId() == post.getAuthorId();
-		
-	    if (!isReviewType) shouldDisplayFavoredReviewerButtonProperty.set(false);
-	    if (isCurrentUserAuthor) shouldDisplayFavoredReviewerButtonProperty.set(false);
-	    
-	    shouldDisplayFavoredReviewerButtonProperty.set(true);
+	    boolean isReviewType = post.getPostType() == Type.Review;
+	    boolean isCurrentUserAuthor = userSession.getCurrentUserId() == post.getAuthorId();
+
+	    boolean shouldDisplay = isReviewType && !isCurrentUserAuthor;
+	    shouldDisplayFavoredReviewerButtonProperty.set(shouldDisplay);
 	}
 
 	public void setFilterType(FilterType newFilterType) {
@@ -220,7 +220,7 @@ public class PostDisplayViewModel {
 	}
 	
 	public void setIsFavoredReviewerProperty(boolean isFavored) {
-		this.isFavoredReviewerProperty.set(isFavored);
+		sharedForumState.setIsFavoredReviewerProperty(isFavored);
 	}
 
 	// Displaying children elements
