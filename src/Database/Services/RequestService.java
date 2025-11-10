@@ -29,7 +29,7 @@ public class RequestService {
         this.userService = store.getUserService();
     }
 
-    // ensure the reviewer_requests table exists
+    /** ensure the reviewer_requests table exists */
     private void ensureReviewerRequestsTable(Connection conn) throws SQLException {
         String createSql = "CREATE TABLE IF NOT EXISTS reviewer_requests ("
                 + "request_id IDENTITY PRIMARY KEY, "
@@ -44,7 +44,7 @@ public class RequestService {
         }
     }
 
-    // student req reviewer role and finds instructor to assign request to
+    /** student req reviewer role and finds instructor to assign request to */
     public boolean submitReviewerRequest(String studentUsername) {
         try (Connection conn = store.getGeneralDBManager().getConnection()) {
             // table exists before inserting
@@ -100,7 +100,7 @@ public class RequestService {
         }
     }
 
-    // returns list of users who have pending requests
+    /** returns list of users who have pending requests */
     public List<String> getPendingRequests() throws DataAccessException {
         List<String> result = new ArrayList<>();
         String sql = "SELECT u.userName FROM reviewer_requests r JOIN users u ON r.student_id = u.id WHERE r.status = 'PENDING'";
@@ -122,7 +122,7 @@ public class RequestService {
         }
     }
 
-    // gives reviewer role to student user + mark request as approved
+    /** gives reviewer role to student user + mark request as approved */
     public boolean grantReviewerRole(String studentUsername) {
         try (Connection conn = store.getGeneralDBManager().getConnection()) {
             // ensures table exists before update
@@ -151,7 +151,7 @@ public class RequestService {
         }
     }
 
-    // deny a reviewer request for the given student user + set status = DENIED
+    /** deny a reviewer request for the given student user + set status = DENIED */
     public boolean denyReviewerRequest(String studentUsername) {
         try (Connection conn = store.getGeneralDBManager().getConnection()) {
             ensureReviewerRequestsTable(conn);

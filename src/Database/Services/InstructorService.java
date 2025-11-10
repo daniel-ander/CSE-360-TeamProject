@@ -14,12 +14,12 @@ public class InstructorService {
         this.userService = userService;
     }
 
-    // view all pending reviewer access requests sent
+    /** view all pending reviewer access requests sent */
     public List<ReviewerRequest> viewReviewerRequests(int instructorId) throws SQLException {
         return requestRepo.getPendingRequestsByInstructor(instructorId);
     }
 
-    // approve or deny a reviewer request + grant reviewer role if approved
+    /** approve or deny a reviewer request + grant reviewer role if approved */
     public void processReviewerRequest(int requestId, String decision) throws SQLException {
         // transfer to the userService to update request status + granting role
         try { // handle DataAccessException

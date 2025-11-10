@@ -53,7 +53,7 @@ public class UserService implements IUserService {
     // 		 READ 
  	// ===================
 
-	// Validates a user's login credentials.
+	/** Validates a user's login credentials. */
 	@Override
 	public boolean performLogin(User user) throws DataAccessException {
 		try {
@@ -64,7 +64,7 @@ public class UserService implements IUserService {
 		}
 	}
 
-	// Checks if a user already exists in the database based on their userName.
+	/** Checks if a user already exists in the database based on their userName. */
 	@Override
 	public boolean doesUserExistByName(String userName) throws DataAccessException {
 		try {
@@ -117,7 +117,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
-	// Update user's roles using a comma-separated string (e.g., "student,reviewer")
+	/** Update user's roles using a comma-separated string (e.g., "student,reviewer") */
     @Override
     public void updateUserRoles(String userName, String roleString) throws DataAccessException {
         try {
@@ -150,7 +150,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
-	// add a role to an existing user without removing existing roles
+	/** add a role to an existing user without removing existing roles */
     public void addRoleToUser(String userName, User.Role roleToAdd) throws DataAccessException {
         try {
             String currentRoles = userRepository.getUserRole(userName);
@@ -180,7 +180,7 @@ public class UserService implements IUserService {
         }
     }
     
- // reviewer request related methods
+    /** reviewer request related methods */
     public void submitReviewerRequest(int studentId, int instructorId) throws DataAccessException {
         if (reviewerRequestRepository == null) {
             throw new DataAccessException("Reviewer request repository not available.");
@@ -194,7 +194,7 @@ public class UserService implements IUserService {
         }
     }
     
-    // for instructor to view all pending reviewer requests
+    /** for instructor to view all pending reviewer requests */
     public List<ReviewerRequest> viewPendingReviewerRequests(int instructorId) throws DataAccessException {
         if (reviewerRequestRepository == null) {
             throw new DataAccessException("Reviewer request repository not available.");
@@ -206,7 +206,7 @@ public class UserService implements IUserService {
         }
     }
     
-    // instructor processes a reviewer request to approve/deny
+    /** instructor processes a reviewer request to approve/deny */
     public void processReviewerRequest(int requestId, String decision) throws DataAccessException {
         if (reviewerRequestRepository == null) {
             throw new DataAccessException("Reviewer request repository not available.");
