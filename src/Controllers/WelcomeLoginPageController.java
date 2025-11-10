@@ -26,8 +26,9 @@ import UI.Pages.StudentHomePage;
 import UI.Pages.WelcomeLoginPage;
 
 /**
- * The UserLoginPage class provides a login interface for users to access their accounts.
- * It validates the user's credentials and navigates to the appropriate page upon successful login.
+ * The WelcomeLoginPageController class manages the welcome page after user login.
+ * It validates user roles, allows role selection if multiple exist,
+ * and navigates to the appropriate home page based on the chosen role.
  */
 public class WelcomeLoginPageController {
 	
@@ -41,6 +42,10 @@ public class WelcomeLoginPageController {
     String roleString;
     ArrayList<String> roles = new ArrayList<String>();
 
+    /**
+     * Creates a new WelcomeLoginPageController.
+     * Initializes layout, assigns roles, and sets up button actions.
+     */
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
      this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
@@ -61,6 +66,11 @@ public class WelcomeLoginPageController {
     // 		SETTERS 
     // ===================
     
+    /**
+     * Configures the continue button action.
+     * If the user has multiple roles, prompts them to select one.
+     * Navigates to the appropriate page based on the chosen role.
+     */
     private void setContinueButtonAction() {
      
         view.getContinueButton().setOnAction(_ -> {
@@ -83,12 +93,19 @@ public class WelcomeLoginPageController {
         });
  	}
     
+    /**
+     * Configures the quit button action.
+     * Exits the JavaFX application.
+     */
     private void setQuitButtonAction() {
     	view.getQuitButton().setOnAction(_ -> {
             Platform.exit(); // Exit the JavaFX application
         });
     }
     
+    /**
+     * Configures the invite button action.
+     */
     private void setInviteButtonAction() {
     	view.getInviteButton().setOnAction(_ -> {
             new InvitationPageController(dBConnectionStore, primaryStage, new InvitationPage());
@@ -97,10 +114,17 @@ public class WelcomeLoginPageController {
      	view.getLayout().getChildren().add(view.getInviteButton());
     }
     
+    /**
+     * Sets up the initial layout of the welcome login page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
     
+    /**
+     * Assigns roles to the current user by querying the database.
+     * Adds the invite button if the user has the admin role.
+     */
     private void assignRoles(User user) {
      try {
          String roleStr = userService.getUserRolesString(user.getUserName());
@@ -128,13 +152,9 @@ public class WelcomeLoginPageController {
  }
     
     /**
-     * 🔀 Central branching method:
-     * Based on role, decide which HomePage to launch.
-     *
-     * ✨ Where to look if you want to add a new role:
-     * 1. Add it to your DB (users can be assigned).
-     * 2. Add checkbox in AdminHomePage if needed.
-     * 3. Add a case here → launch NewRoleHomePage.
+     * Central branching method.
+     * Based on role, decides which home page to launch.
+     * Extend this method to add new roles in the future.
      */
     private void navigateToPage(Stage stage, String roleName, String username) {
         switch (roleName) {

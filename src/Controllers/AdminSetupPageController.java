@@ -19,10 +19,8 @@ import Utils.UserNameRecognizer;
 /**
  * The SetupAdmin class handles the setup process for creating an administrator account.
  * This is intended to be used by the first user to initialize the system with admin credentials.
+ * This is the page that the first User to login will be sent to. 
  */
-
-// This is the page that the first User to login will be sent to. 
-// 
 public class AdminSetupPageController {
 	
 	private final DBConnectionStore dbConnectionStore;
@@ -30,6 +28,10 @@ public class AdminSetupPageController {
     private final Stage primaryStage;
     private final AdminSetupPage view;
 
+    /**
+     * Creates a new AdminSetupPageController.
+     * Initializes the layout, sets up button actions, and configures debug environment if enabled.
+     */
     public AdminSetupPageController(DBConnectionStore dbConnectionStore, Stage primaryStage,  AdminSetupPage view) {
     	this.dbConnectionStore = dbConnectionStore;
     	this.userService = dbConnectionStore.getUserService();
@@ -49,10 +51,17 @@ public class AdminSetupPageController {
     // 		 SETTERS 
  	// ===================
     
+    /**
+     * Sets up the initial layout of the admin setup page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
     
+    /**
+     * Configures the action for the setup button.
+     * Validates the username and password, registers the admin user, and navigates to the login page.
+     */
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(_ -> {
 			// Retrieve user input
@@ -92,6 +101,10 @@ public class AdminSetupPageController {
 		});
 	}
     
+    /**
+     * Configures the debug environment.
+     * Provides an autofill button to quickly populate admin credentials for testing.
+     */
     private void setupDebugEnvironment() {
 		view.getAdminAutoFillButton().setText("AutoFill Admin Info (Debug)");
 		view.getAdminAutoFillButton().setOnAction(_ -> {

@@ -19,18 +19,25 @@ import Utils.Debug;
 import javafx.stage.Stage;
 
 /**
- * FirstPage class represents the initial screen for the first user. It prompts
- * the user to set up administrator access and navigate to the setup screen.
+ * The StudentHomePageController class manages the student home page.
+ * It handles navigation actions such as logging out, changing roles,
+ * entering the forum, and submitting reviewer requests.
  */
 public class StudentHomePageController {
 
-	// Reference to the DatabaseHelper for database interactions
+	/**
+	 *  Reference to the DatabaseHelper for database interactions
+	 */
 	private final DBConnectionStore dBConnectionStore;
 
 	private final Stage primaryStage;
 	private final StudentHomePage view;
 	private final UserSession userSession;
 
+    /**
+     * Creates a new StudentHomePageController.
+     * Initializes the layout, sets up button actions, and configures debug environment if enabled.
+     */
 	public StudentHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession,
 							StudentHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
@@ -54,6 +61,10 @@ public class StudentHomePageController {
 	// SETTERS
 	// ===================
 
+    /**
+     * Configures the logout button action.
+     * Logs the user out, updates session status, and navigates back to the login page.
+     */
 	private void setLogoutButtonAction() {
 		view.getLogoutButton().setOnAction(_ -> {
 			// Return to login page
@@ -62,6 +73,11 @@ public class StudentHomePageController {
 		});
 	}
 
+    /**
+     * Configures the change roles button action.
+     * Navigates back to the welcome page. May require a database update for roles.
+     * TODO: currently not implemented
+     */
 	private void setChangeRolesButtonAction() {
 		view.getChangeRolesButton().setOnAction(_ -> {
 			// TODO: -- Something weird happening here. Might need to make a DB call to
@@ -73,6 +89,10 @@ public class StudentHomePageController {
 		});
 	}
 
+    /**
+     * Configures the enter forum button action.
+     * Navigates to the forum page and initializes its controllers and view models.
+     */
 	private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(_ -> {
 			// Enter the forum page
@@ -97,7 +117,9 @@ public class StudentHomePageController {
 		});
 	}
 	
-	 // request reviewer button action
+	/**
+	 *  request reviewer button action
+	 */
     private void setRequestReviewerButtonAction() {
         view.getRequestReviewerButton().setOnAction(_ -> {
             String currentUserName = userSession.getCurrentUserName();
@@ -115,13 +137,20 @@ public class StudentHomePageController {
         });
     }
 
-	// submit reviewer request
+	/**
+	 *  submit reviewer request
+	 * @param studentUsername
+	 * @return
+	 */
 	private boolean submitReviewerRequest(String studentUsername) { 
 		// interact w/ RequestService to submit the request
 		RequestService requestService = new RequestService(dBConnectionStore);
 		return requestService.submitReviewerRequest(studentUsername);
 	}
 
+    /**
+     * Sets up the initial layout of the student home page.
+     */
 	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
 		view.setUserLabel(userSession.getCurrentUserName());

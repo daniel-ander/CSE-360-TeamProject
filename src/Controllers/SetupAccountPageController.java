@@ -31,7 +31,12 @@ public class SetupAccountPageController {
     private final Stage primaryStage;
     private final SetupAccountPage view;
     
-    // DatabaseHelper to handle database operations.
+    /**
+     *  DatabaseHelper to handle database operations.
+     * @param dBConnectionStore
+     * @param primaryStage
+     * @param view
+     */
     public SetupAccountPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupAccountPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
@@ -45,14 +50,8 @@ public class SetupAccountPageController {
     }
 
     /**
-     * Displays the Setup Account page in the provided stage.
-     * @param primaryStage The primary stage where the scene will be displayed.
+     * Sets up the initial layout
      */
-    
-    // ===================
-    // 		 SETTERS 
- 	// ===================
-    
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	
@@ -67,6 +66,9 @@ public class SetupAccountPageController {
     	}
     }
     
+    /**
+     * Configures SetupButton action
+     */
     private void setSetupButtonAction() {
     	view.getSetupButton().setOnAction(_ -> {
     		System.out.println("Button was pressed");
