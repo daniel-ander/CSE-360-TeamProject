@@ -5,7 +5,7 @@ Team Project for CSE360 - ASU
 ### Project Deliverables - Links to relevant deliverables  
 * [Team Project Report (Google Doc)](https://docs.google.com/document/d/1eKY1ra0Rp9Fvj6Kd1y0YryjP38ertm6kgclr2zKQdCg/edit?tab=t.0)
   (Current Phase Completed PDF turned in on Canvas)
-- Demo Screentest - This screencast documents demonstration of successful testing, as well as a walk through demo of the project. [(Youtube.com)]() 
+- Demo Screentest - This screencast documents demonstration of successful testing, as well as a walk through demo of the project. [(Youtube.com)](https://www.youtube.com/watch?v=qjIEaaubhx4) 
 - Technical ScreenCast - This screencast documents and explains the project's code. [(Youtube.com)]()
 - [Standup Meeting 1](https://drive.google.com/file/d/1jHgE2P6WjzSbBd6ExgwVkffbZeLLi8B6/view?usp=sharing)
 - [Standup Meeting 2](https://drive.google.com/file/d/1JQn_3-jU08iLCtDeEgJPndBQY38tpBL9/view?usp=sharing)
