@@ -3,19 +3,20 @@ Team Project for CSE360 - ASU
 
 # Deliverables
 ### Project Deliverables - Links to relevant deliverables  
-* [Team Project Report (Google Doc)](https://docs.google.com/document/d/1eKY1ra0Rp9Fvj6Kd1y0YryjP38ertm6kgclr2zKQdCg/edit?usp=sharing)
+* [Team Project Report (Google Doc)](https://docs.google.com/document/d/1eKY1ra0Rp9Fvj6Kd1y0YryjP38ertm6kgclr2zKQdCg/edit?tab=t.0)
   (Current Phase Completed PDF turned in on Canvas)
 - Demo Screentest - This screencast documents demonstration of successful testing, as well as a walk through demo of the project. [(Youtube.com)]() 
 - Technical ScreenCast - This screencast documents and explains the project's code. [(Youtube.com)]()
-- [Standup Meeting 1]()
+- [Standup Meeting 1](https://drive.google.com/file/d/1jHgE2P6WjzSbBd6ExgwVkffbZeLLi8B6/view?usp=sharing)
 - [Standup Meeting 2](https://drive.google.com/file/d/1JQn_3-jU08iLCtDeEgJPndBQY38tpBL9/view?usp=sharing)
-- [Standup Meeting 3]()
-- [Standup Meeting 4]()
+- [Standup Meeting 3](https://drive.google.com/file/d/1tImzZoB-6Zg0wOMdRcmKJxXVnvuCqLP-/view?usp=sharing)
+- [Standup Meeting 4]() - No Link, meeting was held in text-based format due to time constraints + life responsibilities
 
 - Team Norms: Included in the above google document 
 
 - Project Source Code : ./src/
 - Project Documents: ./docs/
+- JavaDoc Documents: ./doc/
   - Collab guide for helping get eclipse to work
 - Project Libs: ./libs/
 
