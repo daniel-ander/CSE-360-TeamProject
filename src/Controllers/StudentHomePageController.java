@@ -99,6 +99,7 @@ public class StudentHomePageController {
 			PostListViewModel postListViewModel = new PostListViewModel(
 					dBConnectionStore.getQuestionService(), 
 					dBConnectionStore.getAnswerService(),
+					dBConnectionStore.getUserService(),
 					userSession
 			);
 			

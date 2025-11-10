@@ -6,9 +6,10 @@ import java.sql.*;
 import Models.Answer;
 import Models.Invitation;
 import Models.Message;
-import Models.Permission;
 import Models.Question;
 import Models.User;
+import Models.DBModels.FavoredReviewer;
+import Models.DBModels.Permission;
 import Utils.RolePermissions;
 import Utils.StringUtils;
 
@@ -36,6 +37,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 	private final String answerTableName = Answer.tableName;
 	private final String invitationTableName = Invitation.tableName;
 	private final String permissionTableName = Permission.tableName;
+	private final String favoredReviewerTableName = FavoredReviewer.tableName;
 
 	// TODO: - Not entirely sure what this is.
 	private static int forumPostIdNumber = 0;
@@ -147,6 +149,17 @@ public class GeneralDBManager implements IGeneralDBManager {
 			+ "request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 			+ "FOREIGN KEY (student_id) REFERENCES " + userTableName + "(id), "
 			+ "FOREIGN KEY (instructor_id) REFERENCES " + userTableName + "(id))";
+		
+		String favoredReviewerTableQuery = String.format(
+			    "CREATE TABLE IF NOT EXISTS %s ("
+			  + "id INT AUTO_INCREMENT PRIMARY KEY, "
+			  + "userId INT NOT NULL, "
+			  + "favoredReviewerId INT NOT NULL, "
+			  + "FOREIGN KEY (userId) REFERENCES %s(id) ON DELETE CASCADE, "
+			  + "FOREIGN KEY (favoredReviewerId) REFERENCES %s(id) ON DELETE CASCADE, "
+			  + "UNIQUE (userId, favoredReviewerId))",
+			  favoredReviewerTableName, userTableName, userTableName
+			);
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -161,14 +174,18 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(userAnswerPermissionTableQuery);
 			stmt.execute(messageTableQuery);
 			stmt.execute(reviewerRequestsTableQuery);
+			stmt.execute(favoredReviewerTableQuery);
 		}
 
 	}
 
 	private void seedData() throws SQLException {
 		String populateUserTable = String.format("INSERT INTO %s (userName, password, role) VALUES"
-				+ "('student', 'Password1!', 'student')," + "('instructor', 'Password1!', 'instructor'),"
-				+ "('reviewer', 'Password1!', 'reviewer')," + "('admin1', 'Password1!', 'admin'),"
+				+ "('student', 'Password1!', 'student')," + "('student2', 'Password1!', 'student')," 
+				+ "('student3', 'Password1!', 'student')," + "('reviewer', 'Password1!', 'reviewer')," 
+				+ "('instructor', 'Password1!', 'instructor'),"
+				+ "('reviewer2', 'Password1!', 'reviewer'),"
+				+ "('reviewer3', 'Password1!', 'reviewer')," + "('admin1', 'Password1!', 'admin'),"
 				+ "('staff', 'Password1!', 'staff');", userTableName);
 
 		String populateQuestionTable = String.format("INSERT INTO %s (userId, title, body, answered, resolved, isDeleted, upvoteCount) VALUES "
@@ -246,10 +263,10 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (16, 19, 4, 'admin1', 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, FALSE, 2),
 			    (17, 20, 1, 'student', 'Save tokens or use Java Preferences API.', FALSE, FALSE, 3),
 
-			    (2, NULL, 3, 'reviewer', 'Additional reviewer insight for question 2.', FALSE, TRUE, 3),
-			    (2, 3, 3, 'reviewer', 'Second review attached to answer 3 of question 2.', FALSE, TRUE, 2),
-			    (3, NULL, 3, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),
-			    (3, NULL, 3, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
+			    (2, NULL, 4, 'reviewer', 'Additional reviewer insight for question 2.', FALSE, TRUE, 3),
+			    (2, 3, 4, 'reviewer', 'Second review attached to answer 3 of question 2.', FALSE, TRUE, 2),
+			    (3, NULL, 4, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),
+			    (3, NULL, 4, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
 			    """, answerTableName);
 		
 		String populateMessagesTable = String.format("""
@@ -294,15 +311,6 @@ public class GeneralDBManager implements IGeneralDBManager {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public int getNextForumPostId() {
-		forumPostIdNumber += 1;
-		return forumPostIdNumber;
-		// TODO: This method should be updated to fetch the next ID from the database
-		// once the forum posts table is implemented.
-
 	}
 
 	public Connection getConnection() throws SQLException {

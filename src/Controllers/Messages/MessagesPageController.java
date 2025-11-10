@@ -1,5 +1,5 @@
 // language: java
-package Controllers;
+package Controllers.Messages;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,15 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Controllers.UserLoginPageController;
+import Controllers.WelcomeLoginPageController;
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
-import Controllers.Messages.MessagesViewModel;
-import Controllers.Messages.RecentInteractionsViewModel;
 import Database.*;
 import Database.Services.Interfaces.IMessageService;
-import Database.Services.UserService;
+
 import Database.Services.Interfaces.IUserService;
 import Database.Services.Interfaces.IQuestionService;
 import Exceptions.DBExceptions.DataAccessException;
@@ -23,14 +23,14 @@ import Models.Message;
 import Sessions.UserSession;
 import UI.Pages.ForumPage;
 import UI.Pages.MessagesPage;
-import UI.Pages.ReviewerHomePage;
+
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 
 import Utils.Debug;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
+
 import javafx.stage.Stage;
 
 /**
@@ -107,6 +107,7 @@ public class MessagesPageController {
 			PostListViewModel postListViewModel = new PostListViewModel(
 					dBConnectionStore.getQuestionService(), 
 					dBConnectionStore.getAnswerService(),
+					dBConnectionStore.getUserService(),
 					userSession
 			);
 			

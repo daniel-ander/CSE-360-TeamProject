@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IUserService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
@@ -48,15 +49,22 @@ public class PostListViewModel {
 	// External dependencies (services and user session)
 	private final IQuestionService questionService;
 	private final IAnswerService answerService;
+	private final IUserService userService;
 	private final UserSession userSession;
 
 	// ==============================
 	// CONSTRUCTOR
 	// ==============================
 
-	public PostListViewModel(IQuestionService questionService, IAnswerService answerService, UserSession userSession) {
+	public PostListViewModel(
+			IQuestionService questionService, 
+			IAnswerService answerService, 
+			IUserService userService,
+			UserSession userSession
+	) {
 		this.questionService = questionService;
 		this.answerService = answerService;
+		this.userService = userService;
 		this.userSession = userSession;
 	}
 
@@ -88,14 +96,19 @@ public class PostListViewModel {
 	 * Filters visible posts to those that contain a review authored by the current user.
 	 */
 	public void filterVisibleQuestionsByReview() {
+	    filterVisibleQuestionsByReview(
+	        new ArrayList<>(List.of(userSession.getCurrentUserId()))
+	    );
+	}
+	
+	public void filterVisibleQuestionsByReview(List<Integer> reviewersToShow) {
 		reviewPostParentMap.clear();
 
 		// Build a map of review-type posts by this user
-		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {
+		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {			
 			for (PostDisplayViewModel answerVM : postVMs) {
 				boolean postIsReviewType = ((Answer) answerVM.getPost()).getIsReview();
-				boolean postBelongsToUser = ((Answer) answerVM.getPost()).getAuthorId() == userSession
-						.getCurrentUserId();
+				boolean postBelongsToUser = reviewersToShow.contains(((Answer) answerVM.getPost()).getAuthorId());
 
 				if (postIsReviewType && postBelongsToUser) {
 					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;
@@ -435,16 +448,22 @@ public class PostListViewModel {
 	 */
 	public PostDisplayViewModel buildPost(IPost post, List<String> permissions, int questionKeyID, Integer answerKeyID,
 			IPost.Type postType) {
+		
+		SharedForumState sharedForumState = new SharedForumState();
 
-		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession,
+		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession, userService, sharedForumState,
 
 				// DELETE callback
 				postId -> {
 					try {
-						if (postType == IPost.Type.Question)
+						if (postType == IPost.Type.Question) {
 							questionService.deleteQuestion(postId);
-						else
+							System.out.println("Deleted Question By Id: " + postId);
+						}
+						else {
 							answerService.deleteAnswer(postId);
+							System.out.println("Deleted Answer By Id: " + postId);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -456,6 +475,8 @@ public class PostListViewModel {
 						Answer postToAdd = (Answer) newPost;
 						Answer addedPost = answerService.addAnswer(postToAdd);
 						addAnswerToVisibleList(addedPost);
+						
+						System.out.println("Added Answer By Id: " + postToAdd.getId());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -466,8 +487,12 @@ public class PostListViewModel {
 					try {
 						if (postType == IPost.Type.Question) {
 							questionService.updateQuestion(id, mainText, secondaryText);
+							
+							System.out.println("Updated Question By Id: " + id);
 						} else {
 							answerService.updateAnswer(id, mainText, secondaryText.equals("yes"));
+							
+							System.out.println("Updated Answer By Id: " + id);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

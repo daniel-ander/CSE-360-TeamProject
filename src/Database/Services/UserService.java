@@ -339,5 +339,31 @@ public class UserService implements IUserService {
 		}
 	}
 	
+	public void toggleIsFavoredReviewer(int currentUserId, int idOfFavoredReviewer) throws DataAccessException {
+		try {
+			userRepository.toggleIsFavoredReviewer(currentUserId, idOfFavoredReviewer);
+		} catch(SQLException e) {
+			throw new DataAccessException("Could not add/remove reviewer from favorites due to: " + e);
+		}
+	}
+
+	@Override
+	public boolean checkIfFavoredReviewerExists(int currentUserId, int idOfFavoredReviewer) throws DataAccessException {
+		try {
+			return userRepository.checkIfFavoredReviewerExists(currentUserId, idOfFavoredReviewer);
+		} catch(SQLException e) {
+			throw new DataAccessException("Could not fetch favored reviewer status due to: " + e);
+		}
+	}
+	
+	@Override
+	public List<Integer> getFavoredReviewerIdsForUser(int userId) throws DataAccessException {
+		try {
+			return userRepository.getFavoredReviewerIdsForUser(userId);
+		} catch(SQLException e) {
+			throw new DataAccessException("Could not fetch favored reviewers due to: " + e);
+		}
+	}
+	
 
 }

@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.sql.Connection;
 
 import Models.User;
+import Models.DBModels.FavoredReviewer;
 
 /**
  * The UserRepository class provides database operations for User objects.
@@ -317,6 +318,88 @@ public class UserRepository implements IUserRepository {
         return null;
     }
 
+    @Override
+    public void toggleIsFavoredReviewer(int currentUserId, int idOfFavoredReviewer) throws SQLException {
+        String checkQuery = String.format(
+            "SELECT * FROM %s WHERE userId = ? AND favoredReviewerId = ?", 
+            FavoredReviewer.tableName
+        );
+        String insertQuery = String.format(
+            "INSERT INTO %s (userId, favoredReviewerId) VALUES (?, ?)", 
+            FavoredReviewer.tableName
+        );
+        String deleteQuery = String.format(
+            "DELETE FROM %s WHERE userId = ? AND favoredReviewerId = ?", 
+            FavoredReviewer.tableName
+        );
 
+        try (Connection connection = generalDBManager.getConnection()) {
+            // Check if the relationship already exists
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setInt(1, currentUserId);
+                checkStmt.setInt(2, idOfFavoredReviewer);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) {
+                        // Relationship exists, so we remove the row
+                        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+                            deleteStmt.setInt(1, currentUserId);
+                            deleteStmt.setInt(2, idOfFavoredReviewer);
+                            deleteStmt.executeUpdate();
+                        }
+                    } else {
+                        // Relationship doesn’t exist, so we add the row
+                        try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
+                            insertStmt.setInt(1, currentUserId);
+                            insertStmt.setInt(2, idOfFavoredReviewer);
+                            insertStmt.executeUpdate();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+	@Override
+	public boolean checkIfFavoredReviewerExists(int currentUserId, int idOfFavoredReviewer) throws SQLException {
+		String checkQuery = String.format(
+			    "SELECT 1 FROM %s WHERE userId = ? AND favoredReviewerId = ?", 
+			    FavoredReviewer.tableName
+			);
+
+			try (Connection connection = generalDBManager.getConnection();
+			     PreparedStatement pstmt = connection.prepareStatement(checkQuery)) {
+			    pstmt.setInt(1, currentUserId);
+			    pstmt.setInt(2, idOfFavoredReviewer);
+			    try (ResultSet rs = pstmt.executeQuery()) {
+			        if (rs.next()) {
+			            // Row exists
+			            return true;
+			        }
+			    }
+			} catch (SQLException e) {
+			    e.printStackTrace();
+			}
+			return false;
+
+	}
+	
+	@Override
+	public List<Integer> getFavoredReviewerIdsForUser(int userId) throws SQLException {
+	    String query = "SELECT favoredReviewerId FROM " + FavoredReviewer.tableName + " WHERE userId = ?";
+	    List<Integer> reviewerIds = new ArrayList<>();
+
+	    try (Connection conn = generalDBManager.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(query)) {
+	        stmt.setInt(1, userId);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                reviewerIds.add(rs.getInt("favoredReviewerId"));
+	            }
+	        }
+	    }
+
+	    return reviewerIds;
+	}
         
 }

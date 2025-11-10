@@ -2,6 +2,7 @@ package Tests;
 
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IUserService;
 import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
@@ -28,6 +29,7 @@ public class PostListViewModelTest {
 
     private IQuestionService questionService;
     private IAnswerService answerService;
+    private IUserService userService;
     private UserSession userSession;
     private PostListViewModel viewModel;
 
@@ -35,8 +37,9 @@ public class PostListViewModelTest {
     void setUp() {
         questionService = mock(IQuestionService.class);
         answerService = mock(IAnswerService.class);
+        userService = mock(IUserService.class);
         userSession = mock(UserSession.class);
-        viewModel = new PostListViewModel(questionService, answerService, userSession);
+        viewModel = new PostListViewModel(questionService, answerService, userService, userSession);
     }
 
     /**

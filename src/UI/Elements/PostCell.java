@@ -28,6 +28,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final TextArea newCommentTextField = new TextArea();
 
 	private final TextArea newReviewTextField = new TextArea();
+	
+	private final Button favorReviewerButton = new Button();
 
 	private final Label statusLabel = new Label();
 	private final Label permissionLabel = new Label();
@@ -50,7 +52,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 	@Override
 	protected void updateItem(PostDisplayViewModel vm, boolean empty) {
 		super.updateItem(vm, empty);
-
+		
 		// Clean up old bindings, listeners and state
 		if (currentVm != null) {
 			titleLabel.textProperty().unbind();
@@ -67,6 +69,13 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		// Assign current ViewModel
 		currentVm = vm;
+		
+		favorReviewerButton.textProperty()
+		.bind(Bindings.when(currentVm.getIsFavoredReviewerProperty()).then("Unfavor This Reviewer").otherwise("Favor This Reviewer"));
+		
+		favorReviewerButton.setOnMouseClicked(_ -> {
+    		vm.toggleFavoredReviewerStatus(!vm.getIsFavoredReviewerProperty().get());
+    	});
 		
 		setStyles(currentVm);
 
@@ -149,6 +158,19 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 			bodyText.setText(vm.getPost().getBodyText());
 			bodyTextField.setText(vm.getPost().getBodyText());
 		}
+		
+//		vm.getShouldDisplayFavoredReviewerButtonProperty().addListener((_, _, shouldDisplay) -> {
+//		    if (shouldDisplay) {
+//		        System.out.println("Should add");
+//		        actionsContainer.getChildren().add(new Button("Review stuff"));
+//		    }
+//		});
+//
+//		// Manually trigger if already true when binding is added
+//		if (vm.getShouldDisplayFavoredReviewerButtonProperty().get()) {
+//		    System.out.println("Should add (initial)");
+//		    actionsContainer.getChildren().add(new Button("Review stuff"));
+//		}
 	}
 
 	private void populateActionsContainer(PostDisplayViewModel vm) {
@@ -317,6 +339,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
 		bodyText.visibleProperty().bind(vm.getIsEditingPostProperty().not());
 		bodyTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
+		
+		favorReviewerButton.visibleProperty().bind(vm.getShouldDisplayFavoredReviewerButtonProperty());
+		favorReviewerButton.managedProperty().bind(vm.getShouldDisplayFavoredReviewerButtonProperty());
+		actionsContainer.getChildren().add(favorReviewerButton);
 	}
 
 	private void setInitialListeners() {
