@@ -26,6 +26,11 @@ public class QuestionRepository implements IQuestionRepository {
     // 		 CREATE 
  	// ===================
 	
+	/**
+	 * Handles inserting a question into the question repository
+	 * @param q
+	 * @return
+	 */
 	@Override
 	public boolean insertQuestion(Question q) throws SQLException {
 		String insertQuestion = String.format("INSERT INTO %s (userId, title, body, answered, resolved, isDeleted, upvoteCount) VALUES (?, ?, ?, ?, ?, ?, ?)", Question.tableName);
@@ -54,10 +59,9 @@ public class QuestionRepository implements IQuestionRepository {
 		return true; // Question created
 	}
 	
-	// ===================
-    // 		  READ 
- 	// ===================
-	
+	/**
+	 * Retrieves all questions in the repository
+	 */
 	@Override
 	public List<Question> getAllQuestions() throws SQLException {
 		List<Question> allQuestions = new ArrayList<>();
@@ -85,6 +89,10 @@ public class QuestionRepository implements IQuestionRepository {
 		return allQuestions;
 	}
 	
+	/**
+	 * Gets a restricted amount of questions.
+	 * @param amount
+	 */
 	@Override
 	public List<Question> getLimitedAmountOfQuestions(int amount) throws SQLException {
 		List<Question> questions = new ArrayList<>();
@@ -112,6 +120,10 @@ public class QuestionRepository implements IQuestionRepository {
 		return questions;
 	}
 	
+	/**
+	 * Retrieves one question by ID
+	 * @param searchId
+	 */
 	@Override
 	public Question getQuestionById(int searchId) throws SQLException {
 		String getQuestionById = String.format("SELECT * FROM %s WHERE id = ?", Question.tableName);
@@ -138,6 +150,9 @@ public class QuestionRepository implements IQuestionRepository {
 		return null;
 	}
 	
+	/**
+	 * Retrieves all answered questions
+	 */
 	@Override
 	public List<Question> getAnsweredQuestions() throws SQLException {
 		List<Question> answeredQuestions = new ArrayList<>();
@@ -164,6 +179,9 @@ public class QuestionRepository implements IQuestionRepository {
 		return answeredQuestions;
 	}
 	
+	/**
+	 * Retrieves all unanswered questions
+	 */
 	@Override
 	public List<Question> getUnansweredQuestions() throws SQLException {
 		List<Question> unansweredQuestions = new ArrayList<>();
@@ -192,6 +210,10 @@ public class QuestionRepository implements IQuestionRepository {
 	
 	// TODO: Likely need a way to return Answered/Unanswered by User/other characteristics
 	
+	/**
+	 * Retrieves all questions matching search string
+	 * @param searchString
+	 */
 	@Override
 	public List<Question> getQuestionsBySearch(String searchString) throws SQLException {
 		List<Question> questions = new ArrayList<>();
@@ -221,6 +243,10 @@ public class QuestionRepository implements IQuestionRepository {
 		return questions;
 	}
 	
+	/**
+	 * Retrieves all questions from user
+	 * @param  userId
+	 */
 	@Override
 	public List<Question> getQuestionsFromUser(int userId) throws SQLException {
 		List<Question> questions = new ArrayList<>();
@@ -247,11 +273,13 @@ public class QuestionRepository implements IQuestionRepository {
 		}
 		return questions;
 	}
-	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-	
+
+	/**
+	 * Updates an existing question
+	 * @param id
+	 * @param newTitle
+	 * @param newText
+	 */
 	@Override
 	public boolean updateQuestion(int id, String newTitle, String newText) throws SQLException {
 		String updateQuestion = String.format("UPDATE %s SET title = ?, body = ?, lastUpdated = CURRENT_TIMESTAMP WHERE id = ?", Question.tableName);
@@ -271,11 +299,10 @@ public class QuestionRepository implements IQuestionRepository {
 		return false;
 	}
 	
-	// ===================
-    // 		DESTROY 
- 	// ===================
-	
-	
+	/**
+	 * Deletes an existing question
+	 * @param id
+	 */
 	@Override
 	public boolean deleteQuestion(int id) throws SQLException {
 		String deleteQuestion = String.format("UPDATE %s SET isDeleted = TRUE WHERE id = ?", Question.tableName);

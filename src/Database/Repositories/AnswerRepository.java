@@ -15,18 +15,24 @@ import java.util.List;
 import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IAnswerRepository;
 
-
+/**
+ * The AnswerRepository class provides database operations for Answer objects.
+ * It implements CRUD functionality (create, read, update, delete) and helper methods
+ * to interact with the answers table in the database.
+ */
 public class AnswerRepository implements IAnswerRepository {
 	private final IGeneralDBManager generalDBManager;
 	
+    /**
+     * Creates a new AnswerRepository with the given database manager.
+     */
 	public AnswerRepository(IGeneralDBManager generalDBManager) {
 		this.generalDBManager = generalDBManager;
 	}
 	
-	// ===================
-    // 		 CREATE 
- 	// ===================
-
+	/**
+     * Inserts a new answer into the database and returns the populated Answer object.
+     */
 	@Override
 	public Answer insertAnswer(Answer a) throws SQLException {
 	    String insertSQL = String.format(
@@ -79,15 +85,11 @@ public class AnswerRepository implements IAnswerRepository {
 	}
 
 	
-	// ===================
-    // 		 READ 
- 	// ===================
-	
-	// TODO: we likely want to retrieve all and let the UI handle filtering
-	//       All of these queries currently filter deleted answers
-	
-	
-	
+    /**
+     * Retrieves all answers from the database.
+	 * TODO: we likely want to retrieve all and let the UI handle filtering
+	 * All of these queries currently filter deleted answers
+     */	
 	@Override
 	public List<Answer> getAll() throws SQLException {
 		List<Answer> allAnswers = new ArrayList<>();
@@ -104,6 +106,9 @@ public class AnswerRepository implements IAnswerRepository {
 		return allAnswers;
 	}
 	
+    /**
+     * Retrieves all answers for a given question ID.
+     */
 	@Override
 	public List<Answer> getAnswersByQuestionId(int questionId) throws SQLException {
 		List<Answer> allAnswersForQuestion = new ArrayList<>();
@@ -122,6 +127,10 @@ public class AnswerRepository implements IAnswerRepository {
 		}
 		return allAnswersForQuestion;
 	}
+	
+    /**
+     * Retrieves all replies to a given parent answer ID.
+     */
 	@Override
 	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
 		List<Answer> repliesToAnswerById = new ArrayList<>();
@@ -139,7 +148,9 @@ public class AnswerRepository implements IAnswerRepository {
 		return repliesToAnswerById;
 	}
 	
-	
+    /**
+     * Retrieves a single answer by its ID.
+     */
 	@Override
 	public Answer getAnswerById(int answerId) throws SQLException {
 		String getAnswerById = String.format("SELECT * FROM %s WHERE id = ?", Answer.tableName);
@@ -155,6 +166,9 @@ public class AnswerRepository implements IAnswerRepository {
 		return null; // Answer not found
 	}
 	
+    /**
+     * Retrieves all answers marked as correct.
+     */
 	@Override
 	public List<Answer> getCorrectAnswers() throws SQLException {
 		List<Answer> correctAnswers = new ArrayList<>();
@@ -170,6 +184,9 @@ public class AnswerRepository implements IAnswerRepository {
     	return correctAnswers;
     }
     
+    /**
+     * Retrieves answers that match a search string in their body text.
+     */
 	@Override
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException {
     	List<Answer> answersBySearch = new ArrayList<>();
@@ -186,11 +203,9 @@ public class AnswerRepository implements IAnswerRepository {
     	return answersBySearch;
     }
     
-	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-    
+    /**
+     * Updates the text and correctness flag of an answer by its ID.
+     */
 	@Override
     public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException {
 		String updateAnswer = String.format("UPDATE %s SET body = ?, isCorrect = ? WHERE id = ?", Answer.tableName);
@@ -208,10 +223,9 @@ public class AnswerRepository implements IAnswerRepository {
 		return true;
 	}
 	
-	// ===================
-    // 		 DESTROY 
- 	// ===================
-	
+    /**
+     * Marks an answer as deleted by its ID.
+     */
 	@Override
 	public boolean deleteAnswerById(int id) throws SQLException {
 		String deleteAnswerById = String.format("UPDATE %s SET isDeleted = TRUE WHERE id = ?", Answer.tableName);
@@ -227,6 +241,9 @@ public class AnswerRepository implements IAnswerRepository {
 		return true;
 	}
 	
+    /**
+     * Marks all answers for a given question ID as deleted.
+     */
 	@Override
 	public boolean deleteByQuestionId(int questionId) throws SQLException {
 		String deleteByQuestionId = String.format("UPDATE %s SET isDeleted = TRUE WHERE questionId = ?", Answer.tableName);
@@ -242,9 +259,6 @@ public class AnswerRepository implements IAnswerRepository {
 		return true;
 	}
 	
-	// ===================
-    // 		HELPERS
- 	// ===================
 	
 	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
 		return new Answer(
@@ -263,6 +277,9 @@ public class AnswerRepository implements IAnswerRepository {
 		);
 	}
 
+	/**
+	 * Gets all answers from user id.
+	 */
 	@Override
 	public List<Answer> getAnswersByUser(int userId) throws SQLException {
 		// TODO Auto-generated method stub

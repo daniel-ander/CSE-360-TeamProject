@@ -12,6 +12,10 @@ import Database.Repositories.Interfaces.IInvitationRepository;
 import Models.Invitation;
 import Utils.Debug;
 
+/**
+ * The InvitationRepository class provides database operations for Invitation objects.
+ * It implements methods to create, read, update, and print invitation codes.
+ */
 public class InvitationRepository implements IInvitationRepository {
 	
 	private final IGeneralDBManager generalDBManager;
@@ -20,10 +24,9 @@ public class InvitationRepository implements IInvitationRepository {
 		this.generalDBManager = generalDBManager;
 	}
 	
-	// ===================
-    // 		 CREATE 
- 	// ===================
-	
+    /**
+     * Generates a new invitation code and inserts it into the database.
+     */
 	@Override
 	// Generates a new invitation code and inserts it into the database.
 	public boolean insertInvitationCode(String code) throws SQLException {
@@ -41,10 +44,10 @@ public class InvitationRepository implements IInvitationRepository {
 	    return true;
 	}
 	
-	// ===================
-    // 		 READ 
- 	// ===================
-	
+    /**
+     * Retrieves the roles associated with an invitation code.
+     * Decodes the role bits from the code into role names.
+     */
 	@Override
 	public String getRoleFromInviteCode(String code) throws SQLException {
 		// TODO: - Something definitely missing here
@@ -61,8 +64,11 @@ public class InvitationRepository implements IInvitationRepository {
 		return rolesStr;
 	}
 	
+    /**
+     * Validates an invitation code to check if it is unused and valid.
+     * Marks the code as used if validation succeeds.
+     */
 	@Override
-	// Validates an invitation code to check if it is unused and valid.
 	public boolean validateInvitationCode(String code) throws SQLException {
 	    String query = String.format("SELECT * FROM %s WHERE code = ? AND isUsed = FALSE", Invitation.tableName);
 	    
@@ -82,12 +88,10 @@ public class InvitationRepository implements IInvitationRepository {
 	    return false;
 	}
 	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-	
+    /**
+     * Marks the invitation code as used in the database.
+     */
 	@Override
-	// Marks the invitation code as used in the database.
 	public void markInvitationCodeAsUsed(String code) throws SQLException {
 	    String query = String.format("UPDATE %s SET isUsed = TRUE WHERE code = ?", Invitation.tableName);
 	    try (Connection connection = generalDBManager.getConnection();
@@ -96,15 +100,10 @@ public class InvitationRepository implements IInvitationRepository {
 	        pstmt.executeUpdate();
 	    }
 	}
-	
-	// ===================
-    // 		 DESTROY 
- 	// ===================
-	
-	// ===================
-    // 		 OTHER 
- 	// ===================
 
+    /**
+     * Prints all invitation codes and their usage status to the console.
+     */
 	@Override
 	public void printInvitationCodesTable() throws SQLException {
 	    String query = String.format("SELECT code, isUsed FROM %s", Invitation.tableName);
