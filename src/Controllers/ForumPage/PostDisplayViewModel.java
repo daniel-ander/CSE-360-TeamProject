@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import Database.Services.UserService;
 import Database.Services.Interfaces.IUserService;
+import Exceptions.DBExceptions.DataAccessException;
 import Models.Answer;
 import Models.IPost;
 import Models.IPost.Type;
@@ -35,13 +36,14 @@ public class PostDisplayViewModel {
 	private BooleanProperty isFavoredReviewerProperty = new SimpleBooleanProperty(false);
 	private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
 	private BooleanProperty isReviewingProperty = new SimpleBooleanProperty(false);
+	private BooleanProperty shouldDisplayFavoredReviewerButtonProperty = new SimpleBooleanProperty(false);
 	private ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
 
 	private StringProperty labelTextProperty = new SimpleStringProperty();
 	private StringProperty bodyTextProperty = new SimpleStringProperty();
 
 	private int depthLevel;
-
+	
 	private final Consumer<Integer> deleteCallback;
 	private final Consumer<IPost> addCallBack;
 	private final TriConsumer<Integer, String, String> updateCallBack;
@@ -74,6 +76,20 @@ public class PostDisplayViewModel {
 
 		if (isQuestion()) {
 			labelTextProperty.set(((Question) post).getTitleText());
+		}
+		
+		try {
+			if(!(post.getPostType() == Type.Review)) return;
+			
+			int currentUserId = userSession.getCurrentUserId();
+			int postUserId = post.getAuthorId();
+			
+			boolean favoredReviewerStatus = userService.checkIfFavoredReviewerExists(currentUserId, postUserId);
+			setIsFavoredReviewerProperty(favoredReviewerStatus);
+			
+			setShouldDisplayFavoredReviewerButton();
+		} catch (DataAccessException e) {
+			System.out.println(e.getLocalizedMessage());
 		}
 
 	}
@@ -108,6 +124,14 @@ public class PostDisplayViewModel {
 
 	public BooleanProperty getIsCommentingProperty() {
 		return isCommentingProperty;
+	}
+	
+	public BooleanProperty getIsFavoredReviewerProperty() {
+		return isFavoredReviewerProperty;
+	}
+	
+	public BooleanProperty getShouldDisplayFavoredReviewerButtonProperty() {
+		return shouldDisplayFavoredReviewerButtonProperty;
 	}
 
 	public BooleanProperty getDoesHaveChildren() {
@@ -145,12 +169,7 @@ public class PostDisplayViewModel {
 	public boolean isExpandButtonPressed() {
 		return isExpandedProperty.get();
 	}
-	
-	public boolean shouldDisplayFavoredReviewerButton() {
-		return getPost().getPostType() == Type.Review 
-				&& userSession.getCurrentUserId() != getPost().getAuthorId();
-	}
-	
+
 	// Properties that cannot be active at once
 	private List<BooleanProperty> nonConcurrentProperties() {
 		return new ArrayList<BooleanProperty>(List.of(isReviewingProperty, isCommentingProperty));
@@ -162,6 +181,16 @@ public class PostDisplayViewModel {
 
 	public void setDoesHaveChildrenProperty(boolean doesHaveChildren) {
 		this.doesHaveChildrenProperty.set(doesHaveChildren);
+	}
+	
+	public void setShouldDisplayFavoredReviewerButton() {
+		boolean isReviewType = post.getPostType() == Type.Review;
+		boolean isCurrentUserAuthor = userSession.getCurrentUserId() == post.getAuthorId();
+		
+	    if (!isReviewType) shouldDisplayFavoredReviewerButtonProperty.set(false);
+	    if (isCurrentUserAuthor) shouldDisplayFavoredReviewerButtonProperty.set(false);
+	    
+	    shouldDisplayFavoredReviewerButtonProperty.set(true);
 	}
 
 	public void setFilterType(FilterType newFilterType) {
@@ -188,6 +217,10 @@ public class PostDisplayViewModel {
 
 	public void setIsDeletedProperty(boolean isDeleted) {
 		this.isDeletedProperty.set(isDeleted);
+	}
+	
+	public void setIsFavoredReviewerProperty(boolean isFavored) {
+		this.isFavoredReviewerProperty.set(isFavored);
 	}
 
 	// Displaying children elements
@@ -266,6 +299,16 @@ public class PostDisplayViewModel {
 	// ===================
 	// HELPERS
 	// ===================
+	
+	public void toggleFavoredReviewerStatus(boolean newStatus) {
+		try {
+			userService.toggleIsFavoredReviewer(userSession.getCurrentUserId(), post.getAuthorId());
+		} catch(DataAccessException e) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		
+		setIsFavoredReviewerProperty(newStatus);
+	}
 	
 	// Properties that cannot be active at the same time. 
 	// IE: Commenting and Reviewing windows cannot both be open at once

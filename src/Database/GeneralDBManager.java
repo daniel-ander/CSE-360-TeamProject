@@ -180,9 +180,10 @@ public class GeneralDBManager implements IGeneralDBManager {
 
 	private void seedData() throws SQLException {
 		String populateUserTable = String.format("INSERT INTO %s (userName, password, role) VALUES"
-				+ "('student', 'Password1!', 'student')," + "('student2', 'Password1!', 'student'),"
-				+ "('student3', 'Password1!', 'student')," + "('instructor', 'Password1!', 'instructor'),"
-				+ "('reviewer', 'Password1!', 'reviewer')," + "('reviewer2', 'Password1!', 'reviewer'),"
+				+ "('student', 'Password1!', 'student')," + "('student2', 'Password1!', 'student')," 
+				+ "('student3', 'Password1!', 'student')," + "('reviewer', 'Password1!', 'reviewer')," 
+				+ "('instructor', 'Password1!', 'instructor'),"
+				+ "('reviewer2', 'Password1!', 'reviewer'),"
 				+ "('reviewer3', 'Password1!', 'reviewer')," + "('admin1', 'Password1!', 'admin'),"
 				+ "('staff', 'Password1!', 'staff');", userTableName);
 
@@ -261,10 +262,10 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (16, 19, 4, 'admin1', 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, FALSE, 2),
 			    (17, 20, 1, 'student', 'Save tokens or use Java Preferences API.', FALSE, FALSE, 3),
 
-			    (2, NULL, 3, 'reviewer', 'Additional reviewer insight for question 2.', FALSE, TRUE, 3),
-			    (2, 3, 3, 'reviewer', 'Second review attached to answer 3 of question 2.', FALSE, TRUE, 2),
-			    (3, NULL, 3, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),
-			    (3, NULL, 3, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
+			    (2, NULL, 4, 'reviewer', 'Additional reviewer insight for question 2.', FALSE, TRUE, 3),
+			    (2, 3, 4, 'reviewer', 'Second review attached to answer 3 of question 2.', FALSE, TRUE, 2),
+			    (3, NULL, 4, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),
+			    (3, NULL, 4, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
 			    """, answerTableName);
 		
 		String populateMessagesTable = String.format("""
