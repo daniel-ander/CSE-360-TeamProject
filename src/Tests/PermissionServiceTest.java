@@ -45,7 +45,7 @@ public class PermissionServiceTest {
 
     /** ensures getEffectivePermissions handles SQLException and throws DataAccessException */
     @Test
-    public void testGetEffectivePermissions_ThrowsDataAccessException_OnSQLException() throws Exception {
+    public void GetEffectivePermissions_WhenSQLException_ThrowsDataAccessException() throws Exception {
         int userId = 1;
         int postId = 1;
         when(mockRepo.getEffectivePermissions(userId, postId, false))
@@ -61,7 +61,7 @@ public class PermissionServiceTest {
 
     /** ensures togglePermissionException successfully touches repository */
     @Test
-    public void testTogglePermissionException_CallsRepository() throws Exception {
+    public void TogglePermissionException_SuccessfullyCallsRepository() throws Exception {
         int userId = 3;
         int postId = 1;
         String permission = "permission";
@@ -74,7 +74,7 @@ public class PermissionServiceTest {
 
     /** ensures togglePermissionException handles SQLException and throws DataAccessException */
     @Test
-    public void testTogglePermissionException_ThrowsDataAccessException_OnSQLException() throws Exception {
+    public void TogglePermissionException_WhenSQLException_ThrowsDataAccessException() throws Exception {
         int userId = 1;
         int postId = 1;
         String permission = "permission";
@@ -91,7 +91,7 @@ public class PermissionServiceTest {
 
     /** ensures seedRolePermissions handles SQLException */
     @Test
-    public void testSeedRolePermissions_CatchesSQLException() throws Exception {
+    public void SeedRolePermissions_HandlesSQLException() throws Exception {
         doThrow(new SQLException("Seed failed")).when(mockRepo).seedRolePermissions();
 
         assertDoesNotThrow(() -> permissionService.seedRolePermissions());
