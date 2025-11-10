@@ -4,6 +4,11 @@ import UI.Elements.MenuBarBuilder;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 
+/**
+ * The MenuBarBuilderController class manages the actions for a menu bar.
+ * It provides functionality for exit, about, and logout menu items.
+ * It is currently unimplemented
+ */
 public class MenuBarBuilderController {
 	
 	//TODO: Had this idea for a menu bar at the top, we'll have to update all of the pages/controllers

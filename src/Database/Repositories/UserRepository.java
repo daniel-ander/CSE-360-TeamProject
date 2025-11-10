@@ -16,18 +16,26 @@ import java.sql.Connection;
 import Models.User;
 import Models.DBModels.FavoredReviewer;
 
+/**
+ * The UserRepository class provides database operations for User objects.
+ * It implements CRUD functionality (create, read) and helper methods
+ * to interact with the users table in the database.
+ */
 public class UserRepository implements IUserRepository {
 	
 	private final IGeneralDBManager generalDBManager;
 	
+    /**
+     * Creates a new UserRepository with the given database manager.
+     */
 	public UserRepository(IGeneralDBManager generalDBManager) {
 		this.generalDBManager = generalDBManager;
 	}
 	
-	// ===================
-    // 		 CREATE 
- 	// ===================
-	
+    /**
+     * Inserts a new user into the database and returns the generated user ID.
+     * Also sets the ID in the provided User object.
+     */
 	@Override
 	public int insertNewUser(User user) throws SQLException {
 		String insertUser = String.format("INSERT INTO %s (userName, password, role) VALUES (?, ?, ?)", User.tableName);
@@ -53,10 +61,9 @@ public class UserRepository implements IUserRepository {
 		}
 	}
 	
-	// ===================
-    // 		 READ
- 	// ===================
-	
+    /**
+     * Checks if a user exists in the database by matching username, password, and role.
+     */
 	@Override
 	public boolean doesUserExist(User user) throws SQLException {
 		String query = String.format("SELECT * FROM %s WHERE userName = ? AND password = ? AND role = ?", User.tableName);
@@ -71,6 +78,9 @@ public class UserRepository implements IUserRepository {
 		}
 	}
 	
+    /**
+     * Checks if a user exists in the database by username only.
+     */
 	@Override
 	public boolean doesUserExistByName(String userName) throws SQLException {
 		String query = String.format("SELECT COUNT(*) FROM %s WHERE userName = ?", User.tableName);
@@ -88,6 +98,9 @@ public class UserRepository implements IUserRepository {
 	    return false; // If an error occurs, assume user doesn't exist
 	}
 	
+    /**
+     * Retrieves the role of a user by their username.
+     */
 	@Override
 	public String getUserRole(String userName) throws SQLException {
 		String query = String.format("SELECT role FROM %s WHERE userName = ?", User.tableName);
@@ -103,6 +116,9 @@ public class UserRepository implements IUserRepository {
 	    return null; // If no user exists or an error occurs
 	}
 	
+    /**
+     * Retrieves all usernames from the database.
+     */
 	@Override
 	public List<String> getAllUsernames() throws SQLException {
 		List<String> usernames = new ArrayList<>();
@@ -117,6 +133,10 @@ public class UserRepository implements IUserRepository {
 		return usernames;
 	}
 	
+    /**
+     * Retrieves a user by their username and password.
+     * Returns a User object if found, otherwise null.
+     */
 	@Override
 	public User getUserByNameAndPassword(String userName, String password) throws SQLException {
 	    String query = String.format("SELECT * FROM %s WHERE userName = ? AND password = ?", User.tableName);
@@ -140,6 +160,10 @@ public class UserRepository implements IUserRepository {
 	    return null; // If no user exists or an error occurs
 	}
 
+    /**
+     * Retrieves the user ID for a given username.
+     * Returns -1 if the user does not exist.
+     */
 	@Override
 	public int getUserIdByName(String userName) throws SQLException {
 		String query = String.format("SELECT id FROM %s WHERE userName = ?", User.tableName);
@@ -155,6 +179,9 @@ public class UserRepository implements IUserRepository {
 		return -1; // If no user exists or an error occurs
 	}
 	
+    /**
+     * Retrieves a list of other users sorted by recent interaction.
+     */
 	@Override
 	public List<String> getUsersSortedByRecentInteraction(String userName) throws SQLException {
         List<String> usersByInteraction = new ArrayList<>();
@@ -172,12 +199,9 @@ public class UserRepository implements IUserRepository {
         return usersByInteraction;
     }
 
-
-	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-	
+    /**
+     * Updates the role of a user in the database.
+     */
 	@Override
 	public void updateUserRole(String userName, String roleString) throws SQLException {
         String query = String.format("UPDATE %s SET role = ? WHERE userName = ?", User.tableName);
@@ -189,6 +213,10 @@ public class UserRepository implements IUserRepository {
         }
     }
 
+    /**
+     * Updates the password for a user in the database.
+     * Returns the new password string.
+     */
     @Override
     public String updatePasswordForUser(String userName, String newPassword) throws SQLException {
         String sql = String.format("UPDATE %s SET password = ? WHERE userName = ?", User.tableName);
@@ -201,10 +229,9 @@ public class UserRepository implements IUserRepository {
         return newPassword;
     }
 
-    // ===================
-    // 		 DESTROY 
- 	// ===================
-
+    /**
+     * Deletes a user from the database by username.
+     */
     @Override
     public boolean deleteUser(String targetUser) throws SQLException {
         String query = String.format("DELETE FROM %s WHERE userName = ?", User.tableName);
@@ -216,10 +243,9 @@ public class UserRepository implements IUserRepository {
         }
     }
     
-    // ===================
-    // 		 OTHER 
- 	// ===================
-
+    /**
+     * Prints all rows from the users table to the console.
+     */
     @Override
     public void printAllRows() throws SQLException {
         String query = String.format("SELECT id, userName, password, role FROM %s", User.tableName);
@@ -242,6 +268,10 @@ public class UserRepository implements IUserRepository {
         } 
     }
 
+    /**
+     * Get user by name
+     * @param userName
+     */
     @Override
     public User getUserByName(String userName) throws SQLException {
         String query = String.format("SELECT * FROM %s WHERE userName = ?", User.tableName);
@@ -263,6 +293,10 @@ public class UserRepository implements IUserRepository {
         return null;
     }
 
+    /**
+     * Get user by id
+     * @param id
+     */
     @Override
     public User getUserById(int id) throws SQLException {
         String query = String.format("SELECT * FROM %s WHERE id = ?", User.tableName);

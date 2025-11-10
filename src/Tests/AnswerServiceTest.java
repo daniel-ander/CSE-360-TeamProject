@@ -16,20 +16,26 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the AnswerService class.
+ */
 public class AnswerServiceTest {
 
     private IAnswerRepository mockRepo;
     private AnswerService answerService;
 
+    /**
+     * Sets up a mocked repository and initializes the AnswerService before each test.
+     */
     @BeforeEach
     public void setUp() {
         mockRepo = mock(IAnswerRepository.class);
         answerService = new AnswerService(mockRepo);
     }
 
-    // =====================
-    //       CREATE
-    // =====================
+    /**
+     * Tests adding a valid answer returns success and calls the repository once.
+     */
     @Test
     public void AddAnswer_WithValidAnswer_ReturnsSuccess() throws Exception {
         Answer a = new Answer(1, 1, "Author", "Mock Answer");
@@ -41,7 +47,10 @@ public class AnswerServiceTest {
         assertNotNull(result);
         verify(mockRepo, times(1)).insertAnswer(a);
     }
-
+    
+    /**
+     * Tests adding an answer when a SQLException occurs throws a DataAccessException.
+     */
     @Test
     public void AddAnswer_WhenSQLException_ThrowsDataAccessException() throws Exception {
         Answer a = new Answer(1, 1, "Author", "Mock Answer");
@@ -54,9 +63,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).insertAnswer(a);
     }
 
-    // =====================
-    //        READ
-    // =====================
+    /**
+     * Tests retrieving all answers returns a list of answers.
+     */
     @Test
     public void GetAllAnswers_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
@@ -71,6 +80,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).getAll();
     }
 
+    /**
+     * Tests retrieving all answers for a specific question returns the correct list.
+     */
     @Test
     public void GetAllAnswersForQuestion_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
@@ -84,6 +96,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).getAnswersByQuestionId(1);
     }
 
+    /**
+     * Tests retrieving correct answers returns only answers marked as correct.
+     */
     @Test
     public void GetCorrectAnswers_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
@@ -97,6 +112,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).getCorrectAnswers();
     }
 
+    /**
+     * Tests searching for answers by text returns the correct list.
+     */
     @Test
     public void GetAnswersBySearch_ReturnsList() throws Exception {
         List<Answer> answers = Arrays.asList(
@@ -110,6 +128,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).getAnswersBySearch("A1");
     }
 
+    /**
+     * Tests retrieving an answer by ID returns the correct answer.
+     */
     @Test
     public void GetAnswerById_ReturnsAnswer() throws Exception {
         Answer a = new Answer(1, 1, 0, 1, "Author", "A1", new Timestamp(0), new Timestamp(0), 0, true, false, false);
@@ -122,9 +143,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).getAnswerById(1);
     }
 
-    // =====================
-    //        UPDATE
-    // =====================
+    /**
+     * Tests updating an answer returns true and updates the answer content and correctness.
+     */
     @Test
     public void UpdateAnswer_ReturnsTrue() throws Exception {
         Answer a = new Answer(1, 1, 0, 1, "Author", "Old", new Timestamp(0), new Timestamp(0), 0, false, false, false);
@@ -139,6 +160,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).updateAnswer(1, "New", true);
     }
 
+    /**
+     * Tests updating an answer with empty text throws IllegalArgumentException.
+     */
     @Test
     public void UpdateAnswer_WithEmptyText_ThrowsIllegalArgument() throws Exception {
         Answer a = new Answer(1, 1, 0, 1, "Author", "Old", new Timestamp(0), new Timestamp(0), 0, false, false, false);
@@ -149,6 +173,9 @@ public class AnswerServiceTest {
         });
     }
 
+    /**
+     * Tests updating a non-existent answer returns false.
+     */
     @Test
     public void UpdateAnswer_Nonexistent_ReturnsFalse() throws Exception {
         when(mockRepo.getAnswerById(999)).thenReturn(null);
@@ -157,9 +184,9 @@ public class AnswerServiceTest {
         assertFalse(result);
     }
 
-    // =====================
-    //       DELETE
-    // =====================
+    /**
+     * Tests deleting an answer by ID returns true.
+     */
     @Test
     public void DeleteAnswer_ReturnsTrue() throws Exception {
         when(mockRepo.deleteAnswerById(1)).thenReturn(true);
@@ -170,6 +197,9 @@ public class AnswerServiceTest {
         verify(mockRepo, times(1)).deleteAnswerById(1);
     }
 
+    /**
+     * Tests deleting answers by question ID returns true.
+     */
     @Test
     public void DeleteByQuestionId_ReturnsTrue() throws Exception {
         when(mockRepo.deleteByQuestionId(1)).thenReturn(true);

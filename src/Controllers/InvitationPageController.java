@@ -13,21 +13,18 @@ import javafx.stage.Stage;
  * InvitePage class represents the page where an admin can generate an invitation code.
  * The invitation code is displayed upon clicking a button.
  */
-
 public class InvitationPageController {
 
-	/**
-     * Displays the Invite Page in the provided primary stage.
-     * 
-     * @param generalDBManager An instance of DatabaseHelper to handle database operations.
-     * @param primaryStage   The primary stage where the scene will be displayed.
-     */
 	
-	// Reference to the DatabaseHelper for database interactions
+	/** Reference to the DatabaseHelper for database interactions */
 	private final IInvitationService invitationService;
 	private final Stage primaryStage;
 	private final InvitationPage view;
 		
+    /**
+     * Creates a new InvitationPageController.
+     * Initializes the layout and sets up the button action for generating codes.
+     */
 	public InvitationPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, InvitationPage view) {
 		this.invitationService = dBConnectionStore.getInvitationService();
 	    this.primaryStage = primaryStage;
@@ -42,10 +39,18 @@ public class InvitationPageController {
     // 		 SETTERS 
  	// ===================
     
+    /**
+     * Sets up the initial layout of the invitation page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
     
+    /**
+     * Configures the action for the "Show Code" button.
+     * Builds a role string based on selected checkboxes, generates an invitation code,
+     * and displays it in the view.
+     */
     private void setShowCodeButtonAction() {
 		view.getShowCodeButton().setOnAction(_ -> {
 			StringBuilder selectedRoles = new StringBuilder();

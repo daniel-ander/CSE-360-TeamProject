@@ -20,7 +20,9 @@ import javafx.scene.control.ButtonType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// instructor requests page controller
+/**
+ *  instructor requests page controller
+ */
 public class InstructorRequestsPageController {
     private final DBConnectionStore store;
     private final Stage primaryStage;
@@ -34,6 +36,10 @@ public class InstructorRequestsPageController {
     // currently selected student username from the requests list
     private String selectedStudentUserName = null;
 
+    /**
+     * Creates a new InstructorRequestsPageController.
+     * Initializes services and wires UI actions.
+     */
     public InstructorRequestsPageController(DBConnectionStore store, Stage primaryStage, UserSession userSession, InstructorRequestsPage view) {
         this.store = store;
         this.primaryStage = primaryStage;
@@ -48,11 +54,18 @@ public class InstructorRequestsPageController {
         wireActions();
     }
 
+    /**
+     * Displays the instructor requests page layout and refreshes the list of requests.
+     */
     public void show() {
         view.setInitialLayout(primaryStage);
         refreshRequests();
     }
 
+    /**
+     * Wires all UI actions for buttons and list selections.
+     * Handles navigation, approving/denying requests, and loading student performance.
+     */
     private void wireActions() {
         view.getBackButton().setOnAction(_evt -> {
             // go back to instructor home
@@ -177,7 +190,10 @@ public class InstructorRequestsPageController {
 
     }
 
-    // load both questions + answers authored by the student into list
+    /**
+     *  load both questions + answers authored by the student into list
+     *  @param studentUserName
+     */
     private void loadPerformanceForStudent(String studentUserName) {
         try {
             int userId = userService.getUserIdByName(studentUserName);
@@ -197,6 +213,7 @@ public class InstructorRequestsPageController {
 
             // answers authored by the student + show the question title they answered
             List<Answer> authored = answerService.getAnswersByUser(userId);
+            if (authored == null) authored = java.util.Collections.emptyList();
             List<String> aStrings = authored.stream().map(a -> {
                 String qTitle = "(unknown question)";
                 try {
@@ -212,7 +229,7 @@ public class InstructorRequestsPageController {
 
             // show questions first then answers
             List<String> combined = new java.util.ArrayList<>();
-            combined.addAll(qStrings);
+            if (qStrings != null) combined.addAll(qStrings);
             combined.addAll(aStrings);
             view.setQuestions(combined);
             view.setAnswers(List.of()); // clear details
@@ -221,8 +238,11 @@ public class InstructorRequestsPageController {
         }
     }
 
-    // load answers for specific question into the details view
-    //mark which answer is by the selected student
+    /**
+     *  load answers for specific question into the details view
+     *  mark which answer is by the selected student
+     *  @param questionId
+     */
     private void loadAnswersForQuestion(int questionId) {
         try {
             List<Answer> answers = answerService.getAnswersByQuestionID(questionId);
@@ -242,7 +262,11 @@ public class InstructorRequestsPageController {
         }
     }
 
-    // answer id from strings that start with 'A<id>'
+    /**
+     *  answer id from strings that start with 'A<id>'
+     * @param s
+     * @return
+     */
     private int parseAnswerIdPrefix(String s) {
         try {
             if (!s.startsWith("[A")) return -1;
@@ -254,7 +278,11 @@ public class InstructorRequestsPageController {
             return -1;
         }
     }
-    // generic id from strings that start with '<id>'
+    /**
+     *  generic id from strings that start with '<id>'
+     * @param s
+     * @return
+     */
     private int parseIdPrefix(String s) {
         try {
             int end = s.indexOf(']');
@@ -270,7 +298,9 @@ public class InstructorRequestsPageController {
          } catch (NumberFormatException ignore) {}
          return -1;
      }
-    // refresh pending requests list
+    /**
+     *  refresh pending requests list
+     */
     private void refreshRequests() {
         try {
             // get all pending requests

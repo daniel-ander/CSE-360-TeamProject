@@ -9,17 +9,23 @@ import Exceptions.DBExceptions.*;
 import Models.Message;
 import java.sql.SQLException;
 
+/**
+ * The MessageService class provides business logic for managing Message objects.
+ */
 public class MessageService implements IMessageService {
 
     private final IMessageRepository messageRepository;
 
+    /**
+     * Creates a new MessageService with the given repository.
+     */
     public MessageService(IMessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
-    // ===================
-    //       CREATE
-    // ===================
+    /**
+     * Inserts a new message into the database.
+     */
     @Override
     public Message insertMessage(Message message) throws DataAccessException {
         try {
@@ -29,9 +35,9 @@ public class MessageService implements IMessageService {
         }
     }
 
-    // ===================
-    //       READ
-    // ===================
+    /**
+     * Retrieves all messages for a given username.
+     */
     @Override
     public List<Message> getMessagesForUsername(String username) throws DataAccessException {
         try {
@@ -41,6 +47,9 @@ public class MessageService implements IMessageService {
         }
     }
 
+    /**
+     * Retrieves all messages associated with a specific review ID.
+     */
     @Override
     public List<Message> getMessagesByReviewId(int reviewId) throws DataAccessException {
         try {
@@ -50,9 +59,9 @@ public class MessageService implements IMessageService {
         }
     }
 
-    // ===================
-    //       UPDATE
-    // ===================
+    /**
+     * Updates the content of a message by its ID.
+     */
     @Override
     public boolean updateMessage(int messageId, String newContent) throws DataAccessException {
         if (newContent == null || newContent.trim().isEmpty()) {
@@ -65,9 +74,9 @@ public class MessageService implements IMessageService {
         }
     }
 
-    // ===================
-    //       DELETE
-    // ===================
+    /**
+     * Deletes a message by its ID.
+     */
     @Override
     public boolean deleteMessage(int messageId) throws DataAccessException {
         try {
