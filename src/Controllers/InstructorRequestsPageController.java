@@ -213,6 +213,7 @@ public class InstructorRequestsPageController {
 
             // answers authored by the student + show the question title they answered
             List<Answer> authored = answerService.getAnswersByUser(userId);
+            if (authored == null) authored = java.util.Collections.emptyList();
             List<String> aStrings = authored.stream().map(a -> {
                 String qTitle = "(unknown question)";
                 try {
@@ -228,7 +229,7 @@ public class InstructorRequestsPageController {
 
             // show questions first then answers
             List<String> combined = new java.util.ArrayList<>();
-            combined.addAll(qStrings);
+            if (qStrings != null) combined.addAll(qStrings);
             combined.addAll(aStrings);
             view.setQuestions(combined);
             view.setAnswers(List.of()); // clear details

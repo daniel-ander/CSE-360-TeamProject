@@ -282,8 +282,18 @@ public class AnswerRepository implements IAnswerRepository {
 	 */
 	@Override
 	public List<Answer> getAnswersByUser(int userId) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        List<Answer> answersByUser = new ArrayList<>();
+        String getAnswersByUser = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(getAnswersByUser)){
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Answer a = filledAnswerModel(rs);
+                answersByUser.add(a);
+            }
+        }
+        return answersByUser;
+    }
 
 }
