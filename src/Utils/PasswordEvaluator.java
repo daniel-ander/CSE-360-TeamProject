@@ -114,16 +114,16 @@ public class PasswordEvaluator {
 			// The cascading if statement sequentially tries the current character against all of the
 			// valid transitions
 			if (currentChar >= 'A' && currentChar <= 'Z') {
-				if (Debug.isEnabled) System.out.println("Upper case letter found");
+				Debug.write("Upper case letter found");
 				foundUpperCase = true;
 			} else if (currentChar >= 'a' && currentChar <= 'z') {
-				if (Debug.isEnabled) System.out.println("Lower case letter found");
+				Debug.write("Lower case letter found");
 				foundLowerCase = true;
 			} else if (currentChar >= '0' && currentChar <= '9') {
-				if (Debug.isEnabled) System.out.println("Digit found");
+				Debug.write("Digit found");
 				foundNumericDigit = true;
 			} else if ("~`!@#$%^&*()_-+{}[]|:,.?/".indexOf(currentChar) >= 0) { // changed allowed special characters to those found on the FSM
-				if (Debug.isEnabled) System.out.println("Special character found");
+				Debug.write("Special character found");
 				foundSpecialChar = true;
 			} else {
 				passwordIndexofError = currentCharNdx;
@@ -131,7 +131,7 @@ public class PasswordEvaluator {
 				return false; 													// changed to allow for boolean since its much easier
 			}
 			if (currentCharNdx >= 7) {
-				if (Debug.isEnabled) System.out.println("At least 8 characters found");
+				Debug.write("At least 8 characters found");
 				foundLongEnough = true;
 			}
 			

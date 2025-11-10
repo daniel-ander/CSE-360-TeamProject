@@ -17,6 +17,10 @@ import javafx.stage.Stage;
 
 import UI.Pages.AdminHomePage;
 
+/**
+ * The AdminHomePageController class handles tasks 
+ * This is intended to be used by the first user to initialize the system with admin credentials.
+ */
 public class AdminHomePageController {
 	private final IUserService userService;
 	private final AdminHomePage view;
@@ -25,12 +29,11 @@ public class AdminHomePageController {
 	private String selectedDropdownUser = null;
 	
 	List<String> users;
-
-	/**
-	 * The AdminHomePageController class handles tasks 
-	 * This is intended to be used by the first user to initialize the system with admin credentials.
-	 */
 	
+    /**
+     * Creates a new AdminHomePageController.
+     * Initializes the layout and sets up button actions for user management.
+     */
 	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminHomePage view) {
 		this.view = view;
 		this.userService = dBConnectionStore.getUserService();
@@ -50,6 +53,10 @@ public class AdminHomePageController {
     // 		 SETTERS 
  	// ===================
 	
+    /**
+     * Sets up the initial layout of the admin home page.
+     * Loads all usernames into the dropdown menu.
+     */
 	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
 		
@@ -63,37 +70,41 @@ public class AdminHomePageController {
         }
 	}
 	
-	
+    /**
+     * Configures the action for updating user roles.
+     * Collects selected roles from checkboxes and updates them in the database.
+     */
 	private void setUpdateRolesButtonAction() {
 		view.getSaveRolesButton().setOnAction(_ -> {
 			selectedDropdownUser = view.getUserDropdown().getValue();
 			if (selectedDropdownUser == null) {
 				return;
 			}
-			List<User.Role> roles = new ArrayList<>();
-			if (view.isAdminCheckBoxSelected())
-				roles.add(User.Role.admin);
-			if (view.isStudentCheckBoxSelected())
-				roles.add(User.Role.student);
-			if (view.isInstructorCheckBoxSelected())
-				roles.add(User.Role.instructor);
-			if (view.isStaffCheckBoxSelected())
-				roles.add(User.Role.staff);
-			if (view.isReviewerCheckBoxSelected())
-				roles.add(User.Role.reviewer);
+			List<String> roles = new ArrayList<>();
+			if (view.isAdminCheckBoxSelected()) roles.add("admin");
+			if (view.isStudentCheckBoxSelected()) roles.add("student");
+			if (view.isInstructorCheckBoxSelected()) roles.add("instructor");
+			if (view.isStaffCheckBoxSelected()) roles.add("staff");
+			if (view.isReviewerCheckBoxSelected()) roles.add("reviewer");
 
-			// TODO :- Need to figure out what we're doing with roles
+			String roleStr = String.join(",", roles);
+
 			try {
-				userService.updateUserRole(selectedDropdownUser, User.Role.admin);
-				System.out.println("Updates Roles for " + selectedDropdownUser + ": " + roles);
+				userService.updateUserRoles(selectedDropdownUser, roleStr);
+				System.out.println("Updated Roles for " + selectedDropdownUser + ": " + roleStr);
+				// refresh dropdown or user details
+				view.setUserDetailsLabel("User: " + selectedDropdownUser + "\nRoles: " + (roleStr.isEmpty() ? "None" : roleStr));
 			} catch (DataAccessException e) {
-				// TODO: - Handle the case if user role can't be updated
 				System.err.println(e.getMessage());
-	            e.printStackTrace();
-	        }
+				e.printStackTrace();
+			}
 		});
 	}
 	
+    /**
+     * Configures the action for setting a temporary password.
+     * Updates the selected user's password and displays it in the view.
+     */
 	private void setSetTempPasswordButtonAction() {
 		view.getSetTempPasswordButton().setOnAction(_ -> {
             String selectedUserName = view.getUserDropdown().getValue();
@@ -117,16 +128,20 @@ public class AdminHomePageController {
         });
 	}
 	
+    /**
+     * Configures the action for when a user is selected from the dropdown.
+     * Loads the user's roles and updates the checkboxes and details section.
+     */
 	private void setOnUserDropdownAction() {
 		view.getUserDropdown().setOnAction(_ -> {
             String selectedUserName = view.getUserDropdown().getValue();
             if (selectedUserName == null) return;
             
-            User.Role role;
+            String roleStr;
             int userId;
             
             try {
-            	role = userService.getUserRole(selectedUserName);
+            	roleStr = userService.getUserRolesString(selectedUserName);
             	userId = userService.getUserIdByName(selectedUserName);
             } catch (DataAccessException e) {
             	// TODO: - Handle the case if user role can't be fetched
@@ -143,36 +158,36 @@ public class AdminHomePageController {
             view.setStaffCheckBox(false);
             view.setReviewerCheckBox(false);
 
-            // NOTE :- Again, it seems like only one role should be available
-//            if (roleStr != null && !roleStr.isEmpty()) {
-//                Set<String> roles = new HashSet<>();
-//                for (String r : roleStr.split(",")) {
-//                    roles.add(r.trim().toLowerCase(Locale.ROOT));
-//                }
-//                if (roles.contains("admin")) view.setAdminCheckBox(true);
-//                if (roles.contains("student")) view.setStudentCheckBox(true);
-//                if (roles.contains("instructor")) view.setInstructorCheckBox(true);
-//                if (roles.contains("staff")) view.setStaffCheckBox(true);
-//                if (roles.contains("reviewer")) view.setReviewerCheckBox(true);
-//            }
-            
-            if (role.name().equals("admin")) view.setAdminCheckBox(true);
-            if (role.name().equals("student")) view.setStudentCheckBox(true);
-            if (role.name().equals("instructor")) view.setInstructorCheckBox(true);
-            if (role.name().equals("staff")) view.setStaffCheckBox(true);
-            if (role.name().equals("reviewer")) view.setReviewerCheckBox(true);
+            if (roleStr != null && !roleStr.trim().isEmpty()) {
+                String[] parts = roleStr.split(",");
+                for (String r : parts) {
+                    String v = r.trim().toLowerCase();
+                    switch (v) {
+                        case "admin": view.setAdminCheckBox(true); break;
+                        case "student": view.setStudentCheckBox(true); break;
+                        case "instructor": view.setInstructorCheckBox(true); break;
+                        case "staff": view.setStaffCheckBox(true); break;
+                        case "reviewer": view.setReviewerCheckBox(true); break;
+                        default: break;
+                    }
+                }
+            }
 
             // Update details section
             view.setUserDetailsLabel(
                 "User: " + selectedUserName + "\n" +
                 "User ID: " + userId + "\n" +
-                "Roles: " + role.name() + "\n" +
+                "Roles: " + (roleStr == null || roleStr.isEmpty() ? "None" : roleStr) + "\n" +
                 "Other info: (e.g., last login, email, etc.)"
             );
         });
 
 	}
 	
+    /**
+     * Configures the action for deleting a user.
+     * Prevents deleting the current admin's own account and confirms deletion before proceeding.
+     */
 	private void setUserDeleteButtonAction() {
 		view.getDeleteUserButton().setOnAction(_ -> {
             String selectedUserName = view.getUserDropdown().getValue();
@@ -220,6 +235,10 @@ public class AdminHomePageController {
         });
 	}
 	
+    /**
+     * Configures the action for saving user roles.
+     * Updates the roles in the database and refreshes the details view.
+     */
 	private void setSaveRolesButtonAction() {
 
         String selectedUserName = view.getUserDropdown().getValue();
@@ -243,11 +262,10 @@ public class AdminHomePageController {
 
         // Save roles in database
         try {
-	        userService.updateUserRole(selectedUserName, User.Role.admin);
-	        System.out.println("Updated Roles for " + selectedUserName + ": " + roles);
+	        userService.updateUserRoles(selectedUserName, roleStr);
+	        System.out.println("Updated Roles for " + selectedUserName + ": " + roleStr);
 	        userService.printUsersTable();
         } catch (DataAccessException e) {
-        	// TODO: - Handle the case if user role couldn't be updated or user table printed
         	System.err.println(e.getMessage());
             e.printStackTrace();
         }

@@ -4,6 +4,7 @@ import Models.User;
 
 import javafx.stage.Stage;
 
+import Config.PreLoader;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 
@@ -19,6 +20,10 @@ import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 
+/**
+ * The UserLoginPageController class manages the user login page.
+ * It handles login validation
+ */
 public class UserLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
@@ -31,6 +36,10 @@ public class UserLoginPageController {
     private String userNameFieldText = "";
     private String passwordFieldText = "";
 
+    /**
+     * Creates a new UserLoginPageController.
+     * Initializes the layout, sets up login and reset password actions.
+     */
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
@@ -46,6 +55,11 @@ public class UserLoginPageController {
         }
     }
 
+    /**
+     * Configures the login button action.
+     * Validates username and password, initializes user session,
+     * and navigates to the appropriate page depending on login type.
+     */
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(_ -> {
 	        userNameFieldText = view.getUsernameField().getText();
@@ -58,7 +72,8 @@ public class UserLoginPageController {
 	        	view.setErrorLabelText("Invalid Username format: " + UserNameRecognizer.userNameRecognizerErrorMessage);
 	            return;
 	        }
-
+	        
+	        
 	        // --- Validate password ---
 	        if (!PasswordEvaluator.evaluatePassword(passwordFieldText)) {
 	            view.setErrorLabelText("Invalid Password format: " + PasswordEvaluator.passwordErrorMessage);
@@ -66,7 +81,7 @@ public class UserLoginPageController {
 	        }
 
 	        try {
-	            // ✅ Pull the actual user from the DB
+	            // Pull the actual user from the DB
 	        	System.out.println(String.format("%s", userNameFieldText));
 	        	System.out.println(String.format("%s", passwordFieldText));
 
@@ -76,13 +91,12 @@ public class UserLoginPageController {
 	                return;
 	            }
 
-	            // ✅ Ensure we have the DB ID
-	            if (Debug.isEnabled) {
-	                System.out.println("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
-	            }
+	            // Ensure we have the DB ID
+	            Debug.write("Login successful for userId: " + user.getId() + " (" + user.getUserName() + ")");
 
 	            // --- Initialize user session ---
 	            UserSession userSession = new UserSession(user);
+	            PreLoader.getInstance(dBConnectionStore, userSession).preload();
 	            userSession.setLoggedStatus(true);
 
 	            // --- Handle reset or normal login flow ---
@@ -100,6 +114,10 @@ public class UserLoginPageController {
 	    });
 	}
 
+    /**
+     * Configures the submit button action for the reset password popup.
+     * Validates the new password and updates it in the database.
+     */
     private void setSubmitButtonResetPasswordPopupAction() {
     	resetPasswordPopupView.getSubmitButton().setOnAction(_ -> {
     		userNameFieldText = view.getUsernameField().getText();
@@ -120,10 +138,17 @@ public class UserLoginPageController {
         });
     }
 
+    /**
+     * Sets up the initial layout of the login page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
 
+    /**
+     * Configures the debug environment.
+     * Provides autofill buttons for student, admin, and reviewer credentials.
+     */
     private void setDebugEnvironment() {
     	view.studentInfoAutoFillButton().setText("AutoFill Student Info (Debug)");
     	view.studentInfoAutoFillButton().setOnAction(_ -> {
@@ -134,6 +159,12 @@ public class UserLoginPageController {
     	view.getAdminInfoAutoFillButton().setText("AutoFill Admin Info (Debug)");
  		view.getAdminInfoAutoFillButton().setOnAction(_ -> {
  			view.getUsernameField().setText("admin");
+ 			view.getPasswordField().setText("Password1!");
+ 		});
+ 		
+ 		view.getReviewerInfoAutoFillButton().setText("AutoFill Reviewer Info (Debug)");
+ 		view.getReviewerInfoAutoFillButton().setOnAction(_ -> {
+ 			view.getUsernameField().setText("reviewer");
  			view.getPasswordField().setText("Password1!");
  		});
     }

@@ -1,190 +1,352 @@
 package UI.Elements;
 
-import Controllers.PostDisplayViewModel;
-import Models.Answer;
-import Models.Question;
-
+import Controllers.ForumPage.PostDisplayViewModel;
+import Models.IPost;
+import Models.IPost.Type;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
+
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-
+import javafx.scene.text.Text;
 
 public class PostCell extends ListCell<PostDisplayViewModel> {
 	private final HBox outerMostContainer = new HBox();
+	private PostDisplayViewModel currentVm;
 	private final Region spacer = new Region();
 	private final VBox layout = new VBox();
 
 	private final Label titleLabel = new Label();
-	private TextField titleTextField = new TextField();
+	private final TextField titleTextField = new TextField();
 
-	private final Label bodyTextLabel = new Label();
-	private TextField bodyTextField = new TextField();
+	private final StackPane bodyStackPane = new StackPane();
 
-	private TextField newCommentTextField = new TextField();
+	private final Text bodyText = new Text();
+	private final TextArea bodyTextField = new TextArea();
+
+	private final TextArea newCommentTextField = new TextArea();
+
+	private final TextArea newReviewTextField = new TextArea();
+	
+	private final Button favorReviewerButton = new Button();
 
 	private final Label statusLabel = new Label();
-	private final Label permissionLabel = new Label(); // This is for illustrative purposes
+	private final Label permissionLabel = new Label();
 	private final HBox actionsContainer = new HBox();
-	
-	private StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
-	private final Button updateButton = new Button("Edit");
+	private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
 	public PostCell() {
-		titleLabel.setWrapText(true);
-		titleTextField.setVisible(false);
-		bodyTextField.setVisible(false);
-		
-		titleStackPane.setAlignment(Pos.CENTER_LEFT);
+		setInitialProperties();
+		setInitialListeners();
 
-		StackPane bodyStackPane = new StackPane(bodyTextLabel, bodyTextField);
-		bodyStackPane.setAlignment(Pos.CENTER_LEFT);
-
-		bodyTextLabel.setWrapText(true);
-		permissionLabel.setWrapText(true);
-
-		newCommentTextField.setVisible(false);
-		newCommentTextField.setManaged(false);
-
-		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, statusLabel, actionsContainer);
-		layout.setFillWidth(true);
-		layout.setMaxWidth(Double.MAX_VALUE);
-
-		// Attach stylesheet
-		layout.getStylesheets().add(getClass().getResource("/Styles/styles.css").toExternalForm());
-
-		// Assign style classes
-		layout.getStyleClass().add("question-cell");
-		titleLabel.getStyleClass().add("question-title");
-		bodyTextLabel.getStyleClass().add("question-body");
-		statusLabel.getStyleClass().add("question-status");
-		
+		bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
+		layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField, newReviewTextField, statusLabel,
+				actionsContainer);
 		outerMostContainer.getChildren().addAll(spacer, layout);
+
 		setGraphic(outerMostContainer);
 	}
 
 	@Override
 	protected void updateItem(PostDisplayViewModel vm, boolean empty) {
-	    super.updateItem(vm, empty);
+		super.updateItem(vm, empty);
+		
+		// Clean up old bindings, listeners and state
+		if (currentVm != null) {
+			titleLabel.textProperty().unbind();
+			bodyText.textProperty().unbind();
 
-	    if (empty || vm.getPost() == null) {
-	        setGraphic(null);
-	        return;
-	    }
+			currentVm.getIsEditingPostProperty().removeListener(editingListener);
+		}
 
-	    actionsContainer.getChildren().clear();
+		if (empty || vm == null || vm.getPost() == null) {
+			setGraphic(null);
+			currentVm = null;
+			return;
+		}
 
-	    newCommentTextField.setVisible(false);
-	    newCommentTextField.setManaged(false);
+		// Assign current ViewModel
+		currentVm = vm;
+		
+		favorReviewerButton.textProperty()
+		.bind(Bindings.when(currentVm.getIsFavoredReviewerProperty()).then("Unfavor This Reviewer").otherwise("Favor This Reviewer"));
+		
+		favorReviewerButton.setOnMouseClicked(_ -> {
+    		vm.toggleFavoredReviewerStatus(!vm.getIsFavoredReviewerProperty().get());
+    	});
+		
+		setStyles(currentVm);
 
-	    newCommentTextField.clear();
+		populateTextFields(currentVm);
+		populateActionsContainer(currentVm);
+		setUpBindings(currentVm);
 
-	    if (vm.isQuestion()) {
-	        titleLabel.setText(vm.getPost().getTitleText());
-	        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-	        statusLabel.setText(formatStatus((Question) vm.getPost()));
+		currentVm.getIsEditingPostProperty().addListener(editingListener);
 
-	        titleLabel.setVisible(true);
-	        titleLabel.setManaged(true);
-
-	        statusLabel.setVisible(true);
-	        statusLabel.setManaged(true);
-	        
-	        spacer.setPrefWidth(0);
-	    } else {
-	    	int leftPadding = (((Answer) vm.getPost()).getReplyDepth() + 1) * 40;
-	    	spacer.setPrefWidth(leftPadding);
-	        
-	    	layout.getChildren().remove(titleStackPane);
-	        titleLabel.setVisible(false);
-	        titleLabel.setManaged(false);
-
-	        statusLabel.setVisible(false);
-	        statusLabel.setManaged(false);
-	    }
-	    
-	    if((vm.getIsDeleted())) {
-	    	System.out.println("Haha");
-    		bodyTextLabel.setText("This message was deleted");
-    	} else {
-    		bodyTextLabel.setText(Utils.StringUtils.truncate(vm.getPost().getBodyText(), 150));
-    	}
-
-	    for (String permission : vm.getPermissionList()) {
-	        switch (permission) {
-	            case "DELETE":
-	                Button deleteBtn = new Button("Delete");
-	                deleteBtn.setOnAction(_ -> vm.deletePost());
-	                actionsContainer.getChildren().add(deleteBtn);
-	                break;
-	            case "COMMENT":
-	                Button commentBtn = new Button("Comment");
-	                commentBtn.setOnAction(_ -> {
-	                    if (!vm.getIsCommenting().get()) {
-	                        vm.setIsCommenting(true);
-	                        newCommentTextField.setVisible(true);
-	                        newCommentTextField.setManaged(true);
-	                        commentBtn.setText("Post");
-	                    } else {
-	                        String newCommentText = newCommentTextField.getText().trim();
-	                        if (!newCommentText.isEmpty()) {
-	                            vm.addAnswer(null, newCommentText);
-	                            newCommentTextField.clear();
-	                            newCommentTextField.setVisible(false);
-	                            newCommentTextField.setManaged(false);
-	                            commentBtn.setText("Comment");
-	                            vm.setIsCommenting(false);
-	                        } else {
-	                            System.out.println("Comment is empty!");
-	                        }
-	                    }
-	                });
-	                actionsContainer.getChildren().add(commentBtn);
-	                break;
-	            case "EDIT":
-	                updateButton.setText("Edit");
-	                updateButton.setOnMouseClicked(_ -> {
-	                    boolean nowEditing = !vm.getIsEditingQuestion();
-	                    vm.setIsEditing(nowEditing);
-
-	                    if (nowEditing) {
-	                        updateButton.setText("Commit Edit");
-	                        titleTextField.setText(vm.getPost().getTitleText());
-	                        bodyTextField.setText(vm.getPost().getBodyText());
-	                        titleLabel.setVisible(false);
-	                        titleTextField.setVisible(true);
-	                        bodyTextLabel.setVisible(false);
-	                        bodyTextField.setVisible(true);
-	                    } else {
-	                        updateButton.setText("Edit");
-	                        String newTitle = titleTextField.getText();
-	                        String newBody = bodyTextField.getText();
-	                        vm.updatePost(newTitle, newBody);
-	                        titleLabel.setText(newTitle);
-	                        bodyTextLabel.setText(newBody);
-	                        titleLabel.setVisible(true);
-	                        titleTextField.setVisible(false);
-	                        bodyTextLabel.setVisible(true);
-	                        bodyTextField.setVisible(false);
-	                    }
-	                });
-	                actionsContainer.getChildren().add(updateButton);
-	                break;
-	        }
-	    }
-	    
-	    setGraphic(outerMostContainer);
+		setGraphic(outerMostContainer);
 	}
 
-	private String formatStatus(Question q) {
-		var parts = new java.util.ArrayList<String>();
-		if (q.getAnsweredStatus())
-			parts.add("Answered");
-		if (q.getResolvedStatus())
-			parts.add("Resolved");
-		parts.add("Upvotes: " + q.getUpvoteCount());
-		return String.join(" • ", parts);
+	private void setStyles(PostDisplayViewModel vm) {
+		// Apply style sheet
+		layout.getStylesheets().add(getClass().getResource("/Styles/styles.css").toExternalForm());
+
+		// Style classes
+		layout.getStyleClass().add("question-cell");
+		titleLabel.getStyleClass().add("question-title");
+		bodyText.getStyleClass().add("question-body");
+		statusLabel.getStyleClass().add("question-status");
+		
+		if (vm.getPost().getPostType() == Type.Review) {
+			outerMostContainer.setStyle("-fx-background-color: #5189A1; -fx-text-fill: white;");
+		} else {
+			outerMostContainer.setStyle("");
+		}
 	}
+
+	private void populateTextFields(PostDisplayViewModel vm) {
+		// Reset fields
+		titleTextField.clear();
+		bodyTextField.clear();
+		titleLabel.setText("");
+		bodyText.setText("");
+
+		// Load text values manually
+		String title = vm.getLabelTextProperty().get();
+		String body = vm.getBodyTextProperty().get();
+
+		if (vm.isQuestion()) {
+			if (title == null || title.isEmpty()) {
+				title = vm.getMainLabelText();
+			}
+		}
+
+		if (body == null || body.isEmpty()) {
+			body = vm.getPost().getBodyText();
+		}
+
+		// Set text fields and display labels
+		titleTextField.setText(title);
+		bodyTextField.setText(body);
+		titleLabel.setText(title);
+		bodyText.setText(body);
+
+		newCommentTextField.clear();
+		newReviewTextField.clear();
+
+		// Configure layout depending on post type
+		if (vm.isQuestion()) {
+			titleStackPane.setVisible(true);
+			titleStackPane.setManaged(true);
+			statusLabel.setVisible(true);
+			statusLabel.setManaged(true);
+			spacer.setPrefWidth(0);
+		} else {
+			titleStackPane.setVisible(false);
+			titleStackPane.setManaged(false);
+			statusLabel.setVisible(false);
+			statusLabel.setManaged(false);
+			spacer.setPrefWidth(vm.getDepthLevel() * 40);
+		}
+
+		// Get deleted status from database and display body text accordingly
+		if (vm.getIsDeleted()) {
+			bodyText.setText("This message was deleted");
+			bodyTextField.setText("This message was deleted");
+		} else {
+			bodyText.setText(vm.getPost().getBodyText());
+			bodyTextField.setText(vm.getPost().getBodyText());
+		}
+		
+//		vm.getShouldDisplayFavoredReviewerButtonProperty().addListener((_, _, shouldDisplay) -> {
+//		    if (shouldDisplay) {
+//		        System.out.println("Should add");
+//		        actionsContainer.getChildren().add(new Button("Review stuff"));
+//		    }
+//		});
+//
+//		// Manually trigger if already true when binding is added
+//		if (vm.getShouldDisplayFavoredReviewerButtonProperty().get()) {
+//		    System.out.println("Should add (initial)");
+//		    actionsContainer.getChildren().add(new Button("Review stuff"));
+//		}
+	}
+
+	private void populateActionsContainer(PostDisplayViewModel vm) {
+		// Build actions
+		actionsContainer.getChildren().clear();
+
+		for (String permission : vm.getPermissionList()) {
+			switch (permission) {
+			case "DELETE":
+				Button deleteButton = new Button("Delete");
+				deleteButton.setOnAction(_ -> {
+					vm.deletePost();
+
+					if (vm.getIsDeletedProperty().get()) {
+						bodyText.setText("This message was deleted");
+						bodyTextField.setText("This message was deleted");
+					}
+				});
+
+				actionsContainer.getChildren().add(deleteButton);
+				break;
+
+			case "COMMENT":
+				Button commentButton = new Button("Comment");
+				commentButton.textProperty()
+						.bind(Bindings.when(vm.getIsCommentingProperty()).then("Post").otherwise("Comment"));
+
+				commentButton.setOnAction(_ -> {
+					if (!vm.getIsCommentingProperty().get()) {
+						vm.setIsCommentingProperty(true);
+					} else {
+						String newCommentText = newCommentTextField.getText().trim();
+						if (!newCommentText.isEmpty()) {
+							vm.addAnswer(null, newCommentText, IPost.Type.Answer);
+							newCommentTextField.clear();
+							vm.setIsCommentingProperty(false);
+						} else {
+							System.out.println("Comment is empty!");
+						}
+					}
+				});
+				actionsContainer.getChildren().add(commentButton);
+				break;
+
+			case "REVIEW":
+				Button reviewButton = new Button("Review");
+				reviewButton.textProperty()
+						.bind(Bindings.when(vm.getIsReviewingProperty()).then("Post Review").otherwise("Review"));
+				reviewButton.setOnAction(_ -> {
+					if (!vm.getIsReviewingProperty().get()) {
+						// Commit review
+						vm.setIsReviewingProperty(true);
+					} else {
+						String newReviewText = newReviewTextField.getText().trim();
+						if (!newReviewText.isEmpty()) {
+							vm.addAnswer(null, newReviewText, IPost.Type.Review);
+							newReviewTextField.clear();
+							vm.setIsReviewingProperty(false);
+						} else {
+							System.out.println("Review is empty!");
+						}
+					}
+
+				});
+				actionsContainer.getChildren().add(reviewButton);
+				break;
+
+			case "EDIT":
+				Button updateButton = new Button("Edit");
+				updateButton.textProperty()
+						.bind(Bindings.when(vm.getIsEditingPostProperty()).then("Commit Edit").otherwise("Edit"));
+
+				updateButton.setOnAction(_ -> {
+					if (vm.getIsEditingPostProperty().get()) {
+						// Commit manually, then exit edit mode
+						vm.updatePost(titleTextField.getText(), bodyTextField.getText());
+						vm.setIsEditingProperty(false);
+					} else {
+						vm.setIsEditingProperty(true);
+					}
+				});
+				actionsContainer.getChildren().add(updateButton);
+				break;
+
+			}
+		}
+
+		// Expand / Collapse button
+		Button toggleExpandButton = new Button();
+
+		toggleExpandButton.textProperty()
+				.bind(Bindings.when(vm.getExpandedProperty()).then("Collapse").otherwise("Expand"));
+		toggleExpandButton.visibleProperty().bind(vm.getDoesHaveChildren());
+		toggleExpandButton.managedProperty().bind(vm.getDoesHaveChildren());
+		toggleExpandButton.setOnAction(_ -> vm.toggleExpand());
+		actionsContainer.getChildren().add(toggleExpandButton);
+	}
+
+	// Keeping track of the listener to add and remove it to adhere to cell reuse
+	// logic
+	private final ChangeListener<Boolean> editingListener = (_, _, isEditing) -> {
+		if (currentVm == null)
+			return;
+
+		if (isEditing) {
+			titleTextField.setText(currentVm.getLabelTextProperty().get());
+			bodyTextField.setText(currentVm.getBodyTextProperty().get());
+		} else {
+			currentVm.setLabelTextProperty(titleTextField.getText());
+			currentVm.setBodyTextProperty(bodyTextField.getText());
+			titleLabel.setText(titleTextField.getText());
+			bodyText.setText(bodyTextField.getText());
+		}
+	};
+
+	// Needed to dynamically allocate the height of the body text
+	private final ChangeListener<String> bodyTextHeightChangeListener = (_, _, newText) -> {
+		Text text = new Text(newText);
+		text.setFont(bodyTextField.getFont());
+		double height = text.getLayoutBounds().getHeight() + 20; // add padding
+		bodyTextField.setPrefHeight(height);
+	};
+
+	private void setInitialProperties() {
+		// Setup wrapping and alignment
+		bodyTextField.setWrapText(true);
+		bodyTextField.setPrefRowCount(1); // start as one line
+		bodyTextField.setVisible(false);
+		bodyTextField.setWrapText(true);
+
+		bodyText.setFont(bodyTextField.getFont());
+		bodyText.wrappingWidthProperty().bind(bodyTextField.widthProperty().subtract(20));
+
+		titleLabel.setWrapText(true);
+
+		titleTextField.setVisible(false);
+
+		titleStackPane.setAlignment(Pos.CENTER_LEFT);
+
+		permissionLabel.setWrapText(true);
+
+		newCommentTextField.setVisible(false);
+		newCommentTextField.setManaged(false);
+
+		newReviewTextField.setVisible(false);
+		newReviewTextField.setManaged(false);
+
+		layout.setFillWidth(true);
+		layout.setMaxWidth(Double.MAX_VALUE);
+
+		bodyStackPane.setAlignment(Pos.CENTER_LEFT);
+	}
+
+	private void setUpBindings(PostDisplayViewModel vm) {
+		// Comment field visibility
+		newCommentTextField.visibleProperty().bind(vm.getIsCommentingProperty());
+		newCommentTextField.managedProperty().bind(vm.getIsCommentingProperty());
+
+		// Review field visibility
+		newReviewTextField.visibleProperty().bind(vm.getIsReviewingProperty());
+		newReviewTextField.managedProperty().bind(vm.getIsReviewingProperty());
+
+		// Manage visibility for edit vs view mode
+		titleLabel.visibleProperty().bind(vm.getIsEditingPostProperty().not());
+		titleTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
+
+		bodyText.visibleProperty().bind(vm.getIsEditingPostProperty().not());
+		bodyTextField.visibleProperty().bind(vm.getIsEditingPostProperty());
+		
+		favorReviewerButton.visibleProperty().bind(vm.getShouldDisplayFavoredReviewerButtonProperty());
+		favorReviewerButton.managedProperty().bind(vm.getShouldDisplayFavoredReviewerButtonProperty());
+		actionsContainer.getChildren().add(favorReviewerButton);
+	}
+
+	private void setInitialListeners() {
+		bodyTextField.textProperty().addListener(bodyTextHeightChangeListener);
+	}
+
 }

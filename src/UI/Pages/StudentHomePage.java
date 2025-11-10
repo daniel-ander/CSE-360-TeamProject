@@ -1,6 +1,5 @@
 package UI.Pages;
 
-
 import UI.Interfaces.IInitializable;
 import javafx.scene.*;
 import javafx.scene.control.Button;
@@ -21,6 +20,7 @@ public class StudentHomePage implements IInitializable {
 	private final Button changeRolesButton = new Button("Change Roles");
 	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
 	private final Button enterForumButton = new Button("Enter Forum");
+	private final Button requestReviewerButton = new Button("Request to Become a Reviewer");
 	
 	public StudentHomePage() {
     	// import stylesheet
@@ -32,25 +32,29 @@ public class StudentHomePage implements IInitializable {
 	// ===================
     // 		 GETTERS 
  	// ===================
-    
     public VBox getLayout() {
-    	return layout;
+        return layout;
     }
-    
+
     public Button getLogoutButton() {
-    	return logoutButton;
+        return logoutButton;
     }
-    
+
     public Button getChangeRolesButton() {
-    	return changeRolesButton;
+        return changeRolesButton;
     }
-    
+
     public Label getDebugLabel() {
-    	return debugLabel;
+        return debugLabel;
     }
+
     public Button getEnterForumButton() {
-		return enterForumButton;
-	}
+        return enterForumButton;
+    }
+
+    public Button getRequestReviewerButton() {
+        return requestReviewerButton;  // request reviewer button
+    }
     
     // ===================
     // 		 SETTERS 
@@ -67,7 +71,7 @@ public class StudentHomePage implements IInitializable {
 	   
 	    // Add all elements to layout
 
-	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton, enterForumButton);
+	    layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton, enterForumButton, requestReviewerButton);
 	    
 	    // Set the scene to primary stage
 	    primaryStage.setScene(scene);
@@ -75,8 +79,27 @@ public class StudentHomePage implements IInitializable {
 
     }
     
+    //request reviewer button error and success messages
     public void addDebugLabel() {
     	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
     	layout.getChildren().add(debugLabel);
+    }
+
+    public void showSuccessMessage(String message) {
+    // Show success message (simple alert or dialog)
+    showAlert("Success", message);
+}
+
+    public void showErrorMessage(String message) {
+    // Show error message (simple alert or dialog)
+    showAlert("Error", message);
+}
+
+    private void showAlert(String title, String message) {
+    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(message);
+    alert.showAndWait();
     }
 }

@@ -15,18 +15,25 @@ import Utils.Debug;
 import javafx.stage.Stage;
 
 /**
- * FirstPage class represents the initial screen for the first user.
- * It prompts the user to set up administrator access and navigate to the setup screen.
+ * The StaffHomePageController class manages the staff home page.
+ * It handles navigation actions such as logging out and changing roles,
+ * initializes the layout, and provides debug options when enabled.
  */
 public class StaffHomePageController {
 	
-	// Reference to the DatabaseHelper for database interactions
+	/**
+	 *  Reference to the DatabaseHelper for database interactions
+	 */
 	private final DBConnectionStore dBConnectionStore;
 	
 	private final Stage primaryStage;
 	private final StaffHomePage view;
 	private final UserSession userSession;
 	
+    /**
+     * Creates a new StaffHomePageController.
+     * Initializes the layout, sets up button actions, and configures debug environment if enabled.
+     */
 	public StaffHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, StaffHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.view = view;
@@ -47,6 +54,10 @@ public class StaffHomePageController {
     // 		 SETTERS 
  	// ===================
     
+    /**
+     * Configures the logout button action.
+     * Navigates back to the login page.
+     */
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(_ -> {
 	        // Return to login page
@@ -54,6 +65,12 @@ public class StaffHomePageController {
 	    });
     }
     
+    /**
+     * Configures the change roles button action.
+     * Intended to update user roles in the database and return to the welcome page.
+     * Currently includes placeholder logic for future SQL and UI updates.
+     * TODO: implement this!!!
+     */
     private void setChangeToRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(_ -> {
     		try {
@@ -70,6 +87,9 @@ public class StaffHomePageController {
 	    });
     }
     
+    /**
+     * Sets up the initial layout of the staff home page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     	view.setUserLabel(userSession.getCurrentUserName());

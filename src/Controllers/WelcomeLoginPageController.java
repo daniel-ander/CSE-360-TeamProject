@@ -9,6 +9,9 @@ import javafx.application.Platform;
 
 import java.util.ArrayList;
 
+import Controllers.ForumPage.ForumHeaderViewModel;
+import Controllers.ForumPage.PostListViewModel;
+import Controllers.ForumPage.QuestionPaneViewModel;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 
@@ -23,8 +26,9 @@ import UI.Pages.StudentHomePage;
 import UI.Pages.WelcomeLoginPage;
 
 /**
- * The UserLoginPage class provides a login interface for users to access their accounts.
- * It validates the user's credentials and navigates to the appropriate page upon successful login.
+ * The WelcomeLoginPageController class manages the welcome page after user login.
+ * It validates user roles, allows role selection if multiple exist,
+ * and navigates to the appropriate home page based on the chosen role.
  */
 public class WelcomeLoginPageController {
 	
@@ -38,8 +42,12 @@ public class WelcomeLoginPageController {
     String roleString;
     ArrayList<String> roles = new ArrayList<String>();
 
+    /**
+     * Creates a new WelcomeLoginPageController.
+     * Initializes layout, assigns roles, and sets up button actions.
+     */
     public WelcomeLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, WelcomeLoginPage view) {
-    	this.dBConnectionStore = dBConnectionStore;
+     this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
         this.userSession = userSession;
         
@@ -53,81 +61,105 @@ public class WelcomeLoginPageController {
         setContinueButtonAction();
         setQuitButtonAction();
     }
-    
+
     // ===================
-    // 		 SETTERS 
- 	// ===================
+    // 		SETTERS 
+    // ===================
     
+    /**
+     * Configures the continue button action.
+     * If the user has multiple roles, prompts them to select one.
+     * Navigates to the appropriate page based on the chosen role.
+     */
     private void setContinueButtonAction() {
-    	// 🎯 Continue button → routes user into their page
+     
         view.getContinueButton().setOnAction(_ -> {
-//            if (roles.isEmpty()) {
-//                System.out.println("No roles found for user: " + user.getUserName());
-//                return;
-//            }
-//            System.out.println("No page mapped for role: " + roles.size());
-//            if (roles.size() == 1) {
-//                // ✅ CASE 1: Only one role → jump straight in
-                navigateToPage(primaryStage, userSession.currentUser().getRole(), user.getUserName());
-//            } else {
-//                // ✅ CASE 2: Multiple roles → ask which to use
-//                ChoiceDialog<String> dialog = new ChoiceDialog<>(roles.get(0), roles);
-//                dialog.setTitle("Select Role");
-//                dialog.setHeaderText("You have multiple roles");
-//                dialog.setContentText("Choose the role to continue with:");
-//
-//                dialog.showAndWait().ifPresent(selectedRole -> {
-//                    navigateToPage(primaryStage, selectedRole, user.getUserName());
-//                });
-//            }
+            if (roles.isEmpty()) {
+                System.out.println("No roles found for user: " + user.getUserName());
+                return;
+            }
+            if (roles.size() == 1) {
+                navigateToPage(primaryStage, roles.get(0), user.getUserName());
+            } else {
+                javafx.scene.control.ChoiceDialog<String> dialog = new javafx.scene.control.ChoiceDialog<>(roles.get(0), roles);
+                dialog.setTitle("Select Role");
+                dialog.setHeaderText("You have multiple roles");
+                dialog.setContentText("Choose the role to continue with:");
+
+                dialog.showAndWait().ifPresent(selectedRole -> {
+                    navigateToPage(primaryStage, selectedRole, user.getUserName());
+                });
+            }
         });
-	}
+ 	}
     
+    /**
+     * Configures the quit button action.
+     * Exits the JavaFX application.
+     */
     private void setQuitButtonAction() {
     	view.getQuitButton().setOnAction(_ -> {
             Platform.exit(); // Exit the JavaFX application
         });
     }
     
+    /**
+     * Configures the invite button action.
+     */
     private void setInviteButtonAction() {
     	view.getInviteButton().setOnAction(_ -> {
             new InvitationPageController(dBConnectionStore, primaryStage, new InvitationPage());
         });
-    	
-    	view.getLayout().getChildren().add(view.getInviteButton());
+     	
+     	view.getLayout().getChildren().add(view.getInviteButton());
     }
     
+    /**
+     * Sets up the initial layout of the welcome login page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
     
+    /**
+     * Assigns roles to the current user by querying the database.
+     * Adds the invite button if the user has the admin role.
+     */
     private void assignRoles(User user) {
-    	try {
-    		User.Role role = userService.getUserRole(user.getUserName());
-    		
-    		if(role == User.Role.admin) {
-    	    	setInviteButtonAction();
-    	    }
-    	} catch(DataAccessException e) {
-    		System.err.println(e.getMessage());
-            e.printStackTrace();
-    	}
-    }
+     try {
+         String roleStr = userService.getUserRolesString(user.getUserName());
+         roles.clear();
+         if (roleStr == null || roleStr.trim().isEmpty()) {
+             // fallback to single role lookup
+             try {
+                 User.Role role = userService.getUserRole(user.getUserName());
+                 if (role != null) roles.add(role.name());
+             } catch (DataAccessException ignore) {}
+         } else {
+             for (String r : roleStr.split(",")) {
+                 String v = r.trim();
+                 if (!v.isEmpty()) roles.add(v);
+             }
+         }
+         
+         if (roles.contains("admin")) {
+             setInviteButtonAction();
+         }
+     } catch(DataAccessException e) {
+         System.err.println(e.getMessage());
+             e.printStackTrace();
+     }
+ }
     
     /**
-     * 🔀 Central branching method:
-     * Based on role, decide which HomePage to launch.
-     *
-     * ✨ Where to look if you want to add a new role:
-     * 1. Add it to your DB (users can be assigned).
-     * 2. Add checkbox in AdminHomePage if needed.
-     * 3. Add a case here → launch NewRoleHomePage.
+     * Central branching method.
+     * Based on role, decides which home page to launch.
+     * Extend this method to add new roles in the future.
      */
-    private void navigateToPage(Stage stage, User.Role role, String username) {
-        switch (role.name()) {
+    private void navigateToPage(Stage stage, String roleName, String username) {
+        switch (roleName) {
             case "admin":
-                //new AdminHomePageController(databaseHelper, username).show(stage);
-            	new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
+                new AdminHomePageController(dBConnectionStore, stage, userSession, new AdminHomePage());
                 break;
             case "student":
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
@@ -139,22 +171,23 @@ public class WelcomeLoginPageController {
                 new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage());
                 break;
             case "reviewer":
-                new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage());
+                PostListViewModel postListViewModel = new PostListViewModel(
+                        dBConnectionStore.getQuestionService(), 
+                        dBConnectionStore.getAnswerService(),
+                        dBConnectionStore.getUserService(),
+                        userSession
+                );
+                Controllers.ForumPage.ForumHeaderViewModel forumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(userSession); 
+                Controllers.ForumPage.QuestionPaneViewModel questionPaneViewModel = new Controllers.ForumPage.QuestionPaneViewModel();
+                new ReviewerHomePageController(dBConnectionStore, stage, userSession, new ReviewerHomePage(forumHeaderViewModel, questionPaneViewModel), postListViewModel, forumHeaderViewModel, questionPaneViewModel);
                 break;
             case "user":
-            	// TODO: - Fix Roles
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
-            // Add more roles here as needed, following the same pattern.
-                
-            
-            // since this isnt dynamic youll have to update other places too
             default:
-                // 👀 Fallback if role has no page mapped yet
-                System.out.println("No page mapped for role: " + role);
+                System.out.println("No page mapped for role: " + roleName);
                 break;
         }
     }
 
 }
-

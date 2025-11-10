@@ -5,7 +5,7 @@ import Models.Question;
 
 import Sessions.UserSession;
 
-import UI.Elements.QuestionListView;
+
 import UI.Elements.AnswerListView;
 import Utils.Debug;
 
@@ -20,14 +20,23 @@ import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * The AnswerListViewController class manages the display and interaction
+ * with answers for a specific question. It handles adding, editing, deleting,
+ * replying, searching, and refreshing answers, as well as marking questions resolved.
+ */
 public class AnswerListViewController {
-    private final DBConnectionStore dbConnectionStore;
+
 	private final AnswerListView view;
     private final Question question;
     private final IAnswerService answerService;
-    private final Stage primaryStage;
+
     private final UserSession userSession;
 
+    /**
+     * Creates a new AnswerListViewController.
+     * Initializes the layout, sets up actions, and loads answers for the given question.
+     */
     public AnswerListViewController(
             DBConnectionStore dBConnectionStore,
             Stage primaryStage, 
@@ -35,10 +44,8 @@ public class AnswerListViewController {
             UserSession userSession,
             AnswerListView view
     ) {
-        this.dbConnectionStore = dBConnectionStore;
         this.answerService = dBConnectionStore.getAnswerService();
         
-        this.primaryStage = primaryStage;
 		this.view = view;
         this.question = question;
 
@@ -53,6 +60,10 @@ public class AnswerListViewController {
     // 		 SETTERS 
  	  // ===================
     
+    /**
+     * Refreshes the list of answers for the current question.
+     * Filters out deleted answers if the checkbox is not selected.
+     */
     private void refreshAnswers() {
     	try {
     		List<Answer> allAnswers = answerService.getAllAnswersForQuestion(question.getId());
@@ -68,7 +79,7 @@ public class AnswerListViewController {
     		calculateDepths(allAnswers);
     		view.getAnswerList().setItems(
     				FXCollections.observableArrayList(allAnswers));
-    		if (Debug.isEnabled) System.out.println("Answers refreshed.");
+    		Debug.write("Answers refreshed.");
     	} catch (DataAccessException exception) {
     		// TODO: - Deal with answer not being able to be fetched
     		System.err.println("Database error: " + exception.getMessage());
@@ -76,6 +87,10 @@ public class AnswerListViewController {
     	}
     }
     
+    /**
+     * Configures the search button action.
+     * Allows searching answers by text and updates the list view.
+     */
     private void setSearchAnswersButtonAction() {
     	view.getSearchAnswersButton().setOnAction(_ -> {
     		String searchTerm = view.getSearchAnswersTextField().getText().toLowerCase();
@@ -93,7 +108,7 @@ public class AnswerListViewController {
 				calculateDepths(searchResults);
 				view.getAnswerList().setItems(
 						FXCollections.observableArrayList(searchResults));
-				if (Debug.isEnabled) System.out.println("Answers searched with term: " + searchTerm);
+				Debug.write("Answers searched with term: " + searchTerm);
 			} catch (DataAccessException exception) {
 				System.err.println("Database error: " + exception.getMessage());
 				exception.printStackTrace();
@@ -101,10 +116,14 @@ public class AnswerListViewController {
     	});
     }
     
+    /**
+     * Configures the add answer button action.
+     * Validates input and adds a new answer to the database.
+     */
     private void setAddAnswerButtonAction() {
         // Add answer
         view.getAddAnswerButton().setOnAction(_ -> {
-        	if (Debug.isEnabled) System.out.println("Add Answer button clicked.");
+        	Debug.write("Add Answer button clicked.");
         	String text = view.getTextInputArea().getText();
         	if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
         		System.out.println("Answer text cannot be empty or placeholder.");
@@ -114,7 +133,7 @@ public class AnswerListViewController {
         	try {
         		answerService.addAnswer(a);
                 refreshAnswers();
-                if (Debug.isEnabled) System.out.println("Added answer: " + text);
+                Debug.write("Added answer: " + text);
         	} catch (DataAccessException dataAccessException) {
         		// TODO: - Deal with answer not being able to be added
                 System.err.println("Database error: " + dataAccessException.getMessage());
@@ -124,20 +143,25 @@ public class AnswerListViewController {
 		
 	}
     
+    /**
+     * Configures the checkbox action for showing deleted answers.
+     * Refreshes the list when toggled.
+     */
     private void setShowDeletedAnswersCheckboxAction() {
 		view.getShowDeletedAnswersCheckbox().setOnAction(_ -> {
+			
 			refreshAnswers();
 		});
 	}
     
-    //TODO: - We're gonna need to figure out how to organize the replies to answers visually
-    //      - Whether a nested list view or a tree view or something else. 
-    // 		- For now this just adds a reply as a normal answer with a parentAnswerId set.
-    
+    /**TODO: - We're gonna need to figure out how to organize the replies to answers visually
+    *      - Whether a nested list view or a tree view or something else. 
+    * 		- For now this just adds a reply as a normal answer with a parentAnswerId set.
+    */
     private void setReplyToAnswerButtonAction() {
     	// Reply to an answer
     	view.getReplyToAnswerButton().setOnAction(_-> {
-    		if (Debug.isEnabled) System.out.println("Reply to Answer button clicked.");
+    		Debug.write("Reply to Answer button clicked.");
     		String text = view.getTextInputArea().getText();
     		if (text == null || text.trim().isEmpty() || text.length() > 500 || text.equals("Input text here...")) {
 				System.out.println("Answer text cannot be empty or placeholder.");
@@ -153,7 +177,7 @@ public class AnswerListViewController {
 			try {
 				answerService.addAnswer(reply);
 				refreshAnswers();
-				if (Debug.isEnabled) System.out.println("Added reply Id#" + reply.getId() + "with parentAnswerId#" + reply.getParentAnswerId() + ": " + text);
+				Debug.write("Added reply Id#" + reply.getId() + "with parentAnswerId#" + reply.getParentAnswerId() + ": " + text);
 				
 			} catch (DataAccessException dataAccessException) {
 				
@@ -162,6 +186,11 @@ public class AnswerListViewController {
     	});
     	
     }
+    
+    /**
+     * Configures the edit button action.
+     * Updates the selected answer text.
+     */
     private void setEditAnswerButtonAction() {
         // Edit answer
         view.getEditAnswerButton().setOnAction(_ -> {
@@ -173,6 +202,11 @@ public class AnswerListViewController {
         });
     	
     }
+    
+    /**
+     * Configures the delete button action.
+     * Deletes the selected answer from the database.
+     */
     private void setDeleteAnswerButtonAction() {
         // Delete answer
         view.getDeleteAnswerButton().setOnAction(_ -> {
@@ -191,19 +225,33 @@ public class AnswerListViewController {
         });
     }
   
+    /**
+     * Configures the back button action.
+     * Intended to navigate back to the forum view.
+     */
     private void setBackButtonAction() {
         // Back to ForumListView (new scene, same as other buttons)
         view.getBackButton().setOnAction(_ -> {
-            QuestionListView forumView = new QuestionListView();
-
-            new QuestionListViewController(dbConnectionStore, primaryStage, userSession, forumView);
-
-            Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
-            primaryStage.setScene(forumScene);
-            primaryStage.setTitle("Forum Page");
+//            QuestionListView forumView = new QuestionListView();
+//
+//            new QuestionListViewController(
+//            		dbConnectionStore, 
+//            		primaryStage, 
+//            		userSession, 
+//            		new PostListViewModel(dbConnectionStore.getQuestionService(), answerService, userSession), 
+//            		forumView
+//            );
+//
+//            Scene forumScene = new Scene(forumView.getLayout(), 800, 600);
+//            primaryStage.setScene(forumScene);
+//            primaryStage.setTitle("Forum Page");
         });
     }
   
+    /**
+     * Configures the resolve button action.
+     * Marks the current question as resolved and updates the label.
+     */
     private void setResolveButtonAction() {
         // Mark question as resolved
         view.getResolveButton().setOnAction(_ -> {
@@ -214,22 +262,22 @@ public class AnswerListViewController {
 		
 	  }
     
+    /**
+     * Calculates the depth of replies for each answer.
+     * Helps organize nested replies visually.
+     */
     private void calculateDepths(List<Answer> answers) {
         Map<Integer, Integer> depthMap = new HashMap<>();
         Map<Integer, Answer> answerById = new HashMap<>();
         for (Answer a : answers) {
         	answerById.put(a.getId(), a);
-        	if (Debug.isEnabled) {
-        		System.out.println("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
-        	}
+        	Debug.write("Answer ID " + a.getId() + " with parent ID " + a.getParentAnswerId());
         }
 
         for (Answer answer : answers) {
             int depth = 0;
             int parentId = answer.getParentAnswerId();
-            if (Debug.isEnabled) {
-				System.out.println("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
-			}
+            Debug.write("Calculating depth for answer ID " + answer.getId() + " with parent ID " + parentId);
 
             while (parentId > 0 && depth < 10) { // Prevent infinite loops
                 depth++;
@@ -244,15 +292,15 @@ public class AnswerListViewController {
             }
             depthMap.put(answer.getId(), depth);
             answer.setReplyDepth(depth);
-            if (Debug.isEnabled) {
-                System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
-            }
+            System.out.println("replyDepth for answer ID " + answer.getId() + " set to " + depth);
         }
     }
 
     
     
-    
+    /**
+     * Sets up all button and checkbox actions for the view.
+     */
     private void setUpAction() {
     	setAddAnswerButtonAction();
     	setEditAnswerButtonAction();
@@ -264,6 +312,9 @@ public class AnswerListViewController {
     	setSearchAnswersButtonAction();
     }
     
+    /**
+     * Sets up initial layout for the page
+     */
     private void setInitialLayout() {
     	// Show selected question at the top
     	view.getQuestionLabel().setText("[" + question.getId() + "] " + question.getBodyText());

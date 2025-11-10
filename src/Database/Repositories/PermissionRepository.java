@@ -1,8 +1,7 @@
 package Database.Repositories;
 
-import Config.DefaultRolePermissions;
-
 import Models.User;
+import Utils.RolePermissions;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,7 +26,10 @@ public class PermissionRepository implements IPermissionRepository {
 		this.generalDBManager = generalDBManager;
 	}
 	
-	// Get permissions for a post(question/answer) in relation to a user
+	/**
+	 *  Get permissions for a post(question/answer) in relation to a user
+	 *  Not fully implemented
+	 */
 	public Map<Integer, List<String>> getEffectivePermissions(int userId, List<Integer> postIds, boolean isQuestion) throws SQLException {
 		// TODO: - This will be the actual query to get permissions
 		
@@ -124,7 +126,9 @@ public class PermissionRepository implements IPermissionRepository {
 	    return new HashMap<>();
 	}
 
-	// Get permissions for a post(question/answer) in relation to a user
+	/**
+	 *  Get permissions for a post(question/answer) in relation to a user
+	 */
     public List<String> getEffectivePermissions(int userId, int postId, boolean isQuestion) throws SQLException {
     	// TODO:- This is an inefficient way of doing this. The query above, once figured out, is the right approach
 		String type = isQuestion ? "question" : "answer";
@@ -200,7 +204,9 @@ public class PermissionRepository implements IPermissionRepository {
     }
 
     
-    // Adding or removing custom permissions between a user and post(question/answer)
+    /**
+     *  Adding or removing custom permissions between a user and post(question/answer)
+     */
     public void togglePermissionException(int userId, int postId, String permission, boolean isQuestion) throws SQLException {
         String type = isQuestion ? "question" : "answer";
 
@@ -237,6 +243,12 @@ public class PermissionRepository implements IPermissionRepository {
         }
     }
     
+    /**
+     * Checks if permission table is empty
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
 	public boolean isPermissionTableEmpty(Connection conn) throws SQLException {
 		String query = "SELECT COUNT(*) FROM question_permissions";
 		try (Connection connection = generalDBManager.getConnection();
@@ -251,12 +263,14 @@ public class PermissionRepository implements IPermissionRepository {
     
 
     
-    // Set default permissions for each type of user in relation to a regular post(question/answer)
+    /**
+     *  Set default permissions for each type of user in relation to a regular post(question/answer)
+     */
     public void seedRolePermissions() throws SQLException {
 		Map<String, List<String>> questionRolePermissions = new HashMap<>();
 		
 		for(User.Role role : User.Role.values()) {
-			questionRolePermissions.put(role.name(), DefaultRolePermissions.QuestionPermissions.getDefaultPermissionsForRole(role));
+			questionRolePermissions.put(role.name(), RolePermissions.QuestionPermissions.getDefaultPermissionsForRole(role));
 		}
 
 		String query = "MERGE INTO question_permissions (role, permission) VALUES (?, ?)";
@@ -279,7 +293,7 @@ public class PermissionRepository implements IPermissionRepository {
 		Map<String, List<String>> answerRolePermissions = new HashMap<>();
 
 		for(User.Role role : User.Role.values()) {
-			answerRolePermissions.put(role.name(), DefaultRolePermissions.AnswerPermissions.getDefaultPermissionsForRole(role));
+			answerRolePermissions.put(role.name(), RolePermissions.AnswerPermissions.getDefaultPermissionsForRole(role));
 		}
 
 
