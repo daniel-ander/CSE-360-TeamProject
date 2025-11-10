@@ -14,7 +14,9 @@ import Database.Repositories.Interfaces.*;
 import Database.Services.Interfaces.*;
 import Database.Services.*;
 
-// An object that holds every connection service
+/**
+ *  An object that holds every connection service
+ */
 public class DBConnectionStore {
 	private final IGeneralDBManager generalDBManager;
 	private final IUserService userService;
@@ -78,7 +80,11 @@ public class DBConnectionStore {
     // 		FACTORY 
  	// ===================
 	
-	// Factory method for creating a repository provider
+	/**
+	 *  Factory method for creating a repository provider
+	 * @return
+	 * @throws SQLException
+	 */
 	public static DBConnectionStore createInstance() throws SQLException {
 		IGeneralDBManager dbHelper = new GeneralDBManager();
 		
