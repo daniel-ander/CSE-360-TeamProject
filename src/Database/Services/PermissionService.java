@@ -8,15 +8,20 @@ import Database.Services.Interfaces.IPermissionService;
 import Exceptions.DBExceptions.DataAccessException;
 import Models.IPost;
 
-
+/**
+ * Service for managing user permissions.
+ */
 public class PermissionService implements IPermissionService {
     private final IPermissionRepository permissionRepository;
 
+    /**
+     * Creates a new PermissionService with the given repository.
+     */
     public PermissionService(IPermissionRepository permissionRepository) {
         this.permissionRepository = permissionRepository;
     }
     
-    // We get the list of permissions a user has in relation to a post. IE: ["CREATE", "UPVOTE", "EDIT"]
+    /** We get the list of permissions a user has in relation to a post. IE: ["CREATE", "UPVOTE", "EDIT"] */
     public List<String> getEffectivePermissions(int userId, int postId, IPost.Type type) throws DataAccessException {
     	try {
 			return permissionRepository.getEffectivePermissions(userId, postId, type == IPost.Type.Question);
@@ -25,7 +30,7 @@ public class PermissionService implements IPermissionService {
 		}
     }
 
-    // Adding or removing custom permissions between a user and post(question/answer)
+    /** Adding or removing custom permissions between a user and post(question/answer) */
     public void togglePermissionException(int userId, int postId, String permission, boolean isQuestion) throws DataAccessException {
     	try {
     		permissionRepository.togglePermissionException(userId, postId, permission, isQuestion);
@@ -34,7 +39,7 @@ public class PermissionService implements IPermissionService {
     	}
     }
     
-    // We seed the table with relevant permissions
+    /** We seed the table with relevant permissions */
     public void seedRolePermissions() throws DataAccessException {
     	try {
     		permissionRepository.seedRolePermissions();

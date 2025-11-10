@@ -13,19 +13,23 @@ import Database.Services.Interfaces.IQuestionService;
 
 import Exceptions.DBExceptions.*;
 
-
+/**
+ * Manages question objects.
+ */
 public class QuestionService implements IQuestionService {
 	
 	private final IQuestionRepository questionRepository;
 	
+    /**
+     * Creates a new QuestionService with the given repository.
+     */
 	public QuestionService(IQuestionRepository questionRepository) {
 		this.questionRepository = questionRepository;
 	}
 	
-	// ===================
-    // 		 CREATE 
- 	// ===================
-	
+    /**
+     * Adds a new question to the database.
+     */
 	@Override
 	public boolean addQuestion(Question q) throws DataAccessException, DuplicateRecordIDException {
 		try {
@@ -38,10 +42,9 @@ public class QuestionService implements IQuestionService {
 		return true;
 	}
 	
-	// ===================
-    // 		 READ 
- 	// ===================
-	
+    /**
+     * Retrieves all questions from the database.
+     */
 	@Override
 	public List<Question> getAllQuestions(){
 		try {			
@@ -53,6 +56,9 @@ public class QuestionService implements IQuestionService {
 		}
 	}
 	
+    /**
+     * Retrieves a limited number of questions from the database.
+     */
 	@Override
 	public List<Question> getLimitedAmountOfQuestions(int amount) {
 		try {			
@@ -64,6 +70,9 @@ public class QuestionService implements IQuestionService {
 		}
 	}
 	
+    /**
+     * Retrieves a single question by its ID.
+     */
 	@Override
 	public Question getQuestionById(int targetId) throws DataAccessException {
 		try {
@@ -73,10 +82,9 @@ public class QuestionService implements IQuestionService {
 		}
 	}
 	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-	
+    /**
+     * Updates the title and text of a question by its ID.
+     */
 	@Override
 	public boolean updateQuestion(int id, String newTitle, String newText) throws DataAccessException, IllegalArgumentException {
 		// TODO: - May want to place some safeguards here before a question can be updated
@@ -92,10 +100,9 @@ public class QuestionService implements IQuestionService {
 		}
 	}
 	
-	// ===================
-    // 		 DESTROY 
- 	// ===================
-	
+    /**
+     * Deletes a question by its ID.
+     */
 	@Override
 	public boolean deleteQuestion(int id) throws DataAccessException {
 		// TODO: - May want to place some safeguards here before a question can be deleted
@@ -107,7 +114,9 @@ public class QuestionService implements IQuestionService {
 		}
 	}
 
-	// Implement missing method required by IQuestionService
+    /**
+     * Retrieves all questions created by a specific user.
+     */
 	@Override
 	public List<Question> getQuestionsFromUser(int userId) throws DataAccessException {
 		try {

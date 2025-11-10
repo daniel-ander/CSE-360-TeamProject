@@ -9,14 +9,25 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The MessageRepository class provides database operations for Message objects.
+ * It implements CRUD functionality (create, read, update, delete) and helper methods
+ * to interact with the messages table in the database.
+ */
 public class MessageRepository implements IMessageRepository {
 
     private final IGeneralDBManager generalDBManager;
 
+    /**
+     * Creates a new MessageRepository with the given database manager.
+     */
     public MessageRepository(IGeneralDBManager generalDBManager) {
         this.generalDBManager = generalDBManager;
     }
 
+    /**
+     * Inserts a new message into the database and returns the populated Message object.
+     */
     @Override
     public Message insertMessage(Message m) throws SQLException {
         String insertSql = "INSERT INTO " + Message.tableName +
@@ -55,6 +66,9 @@ public class MessageRepository implements IMessageRepository {
         }
     }
 
+    /**
+     * Retrieves all messages for a given review ID, ordered by timestamp.
+     */
     @Override
     public List<Message> getMessagesByReviewId(int reviewId) throws SQLException {
         // include usernames where available
@@ -74,6 +88,9 @@ public class MessageRepository implements IMessageRepository {
         }
     }
 
+    /**
+     * Retrieves all messages for a given username, ordered by timestamp.
+     */
     @Override
     public List<Message> getMessagesForUsername(String username) throws SQLException {
         // return sender/receiver usernames as well
@@ -94,6 +111,9 @@ public class MessageRepository implements IMessageRepository {
         }
     }
 
+    /**
+     * Updates the content of a message by its ID.
+     */
     @Override
     public boolean updateMessage(int messageId, String newContent) throws SQLException {
         String sql = "UPDATE " + Message.tableName + " SET message_text = ? WHERE message_id = ?";
@@ -105,6 +125,9 @@ public class MessageRepository implements IMessageRepository {
         }
     }
 
+    /**
+     * Deletes a message from the database by its ID.
+     */
     @Override
     public boolean deleteMessageById(int messageId) throws SQLException {
         String sql = "DELETE FROM " + Message.tableName + " WHERE message_id = ?";
@@ -115,6 +138,9 @@ public class MessageRepository implements IMessageRepository {
         }
     }
 
+    /**
+     * Retrieves a single message by its ID.
+     */
     @Override
     public Message getMessageById(int messageId) throws SQLException {
         String sql = "SELECT m.*, s.username AS sender_username, r.username AS receiver_username FROM " + Message.tableName +

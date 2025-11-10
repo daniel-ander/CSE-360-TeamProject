@@ -17,15 +17,16 @@ import Utils.StringUtils;
  * The GeneralDBManager class is responsible for managing the connection to the
  * database, and general actions related to the meta functions of the database
  */
-
 public class GeneralDBManager implements IGeneralDBManager {
 
-	// JDBC driver name and database URL
+	/** JDBC driver name and database URL*/
 	static final String JDBC_DRIVER = "org.h2.Driver";
+	/** JDBC driver name and database URL*/
 	static final String DB_URL = "jdbc:h2:./database/FoundationDatabase";
 
-	// Database credentials
+	/** Database credentials */
 	static final String USER = "sa";
+	/** Database credentials */
 	static final String PASS = "";
 	
 	// CRUD-related
@@ -280,7 +281,9 @@ public class GeneralDBManager implements IGeneralDBManager {
 	// ===================
 
 	@Override
-	// Check if the database is empty
+	/**
+	 *  Check if the database is empty
+	 */
 	public boolean isDatabaseEmpty() throws SQLException {
 		String query = String.format("SELECT COUNT(*) AS count FROM %s", userTableName);
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {

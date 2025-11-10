@@ -47,6 +47,10 @@ public class MessagesPageController {
 	private final PostListViewModel messageListViewModel;
 	private final IUserService userService;
 
+    /**
+     * Creates a new MessagesPageController.
+     * Initializes layout, sets up actions, and configures search functionality.
+     */
 	public MessagesPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, MessagesPage view, 
 			PostListViewModel postListViewModel, ForumHeaderViewModel messagesHeaderViewModel, QuestionPaneViewModel questionPaneViewModel) {
 		this.dBConnectionStore = dBConnectionStore;
@@ -74,18 +78,30 @@ public class MessagesPageController {
         }
 	}
 
+	   /**
+     * Configures the logout button action.
+     * Navigates back to the login page.
+     */
 	private void setLogoutButtonAction() {
 		view.getLogoutButton().setOnAction(_ -> {
 	        new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 		});
 	}
 
+    /**
+     * Configures the change roles button action.
+     * Navigates back to the welcome page.
+     */
 	private void setChangeRolesButtonAction() {
 		view.getChangeRolesButton().setOnAction(_ -> {
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 		});
 	}
 
+    /**
+     * Configures the enter forum button action.
+     * Navigates to the forum page.
+     */
 	private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(_ -> {
 			PostListViewModel postListViewModel = new PostListViewModel(
@@ -109,6 +125,11 @@ public class MessagesPageController {
 		});
 	}
 
+    /**
+     * Configures the send message button action.
+     * Validates input, creates a new message, inserts it into the database,
+     * and reloads the current thread.
+     */
 	private void setSendMessageButtonAction() {
 	    view.getSendMessageButton().setOnAction(_ -> {
 	        String text = view.getMessageTextArea().getText().trim();
@@ -149,6 +170,10 @@ public class MessagesPageController {
 	    });
 	}
 
+    /**
+     * Reloads messages for the current thread.
+     * Updates the list view with refreshed messages.
+     */
 	private void reloadMessagesForCurrentThread(int reviewId) {
 	    try {
 	        List<Message> refreshed = messageService.getMessagesByReviewId(reviewId);
@@ -163,6 +188,10 @@ public class MessagesPageController {
 	    }
 	}
 
+    /**
+     * Sets up the initial layout of the messages page.
+     * Loads messages, organizes recent interactions, and wires conversation filters.
+     */
 	private void setInitialLayout() {
 	    view.setInitialLayout(primaryStage);
 
@@ -248,14 +277,18 @@ public class MessagesPageController {
 	}
 
     
+	/**
+	 *  TODO: implement sending/updating/deleting messages using messageService
+	 */
     private void setMessageListActions() {
-		// TODO: implement sending/updating/deleting messages using messageService
 	}
 
+    /**
+     *  place for additional listeners (e.g., double-click to open conversation details)
+     */
 	private void initializeMessageListListeners() {
-		// place for additional listeners (e.g., double-click to open conversation details)
 	}
-
+	
 	private final void setUpDebugEnvironment() {
     	//view.addDebugLabel();
     }

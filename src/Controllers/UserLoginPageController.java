@@ -20,6 +20,10 @@ import Utils.Debug;
 import Utils.PasswordEvaluator;
 import Utils.UserNameRecognizer;
 
+/**
+ * The UserLoginPageController class manages the user login page.
+ * It handles login validation
+ */
 public class UserLoginPageController {
 	
 	private final DBConnectionStore dBConnectionStore;
@@ -32,6 +36,10 @@ public class UserLoginPageController {
     private String userNameFieldText = "";
     private String passwordFieldText = "";
 
+    /**
+     * Creates a new UserLoginPageController.
+     * Initializes the layout, sets up login and reset password actions.
+     */
     public UserLoginPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserLoginPage view) {
     	this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
@@ -47,6 +55,11 @@ public class UserLoginPageController {
         }
     }
 
+    /**
+     * Configures the login button action.
+     * Validates username and password, initializes user session,
+     * and navigates to the appropriate page depending on login type.
+     */
     private void setLoginButtonAction() {
     	view.getLoginButton().setOnAction(_ -> {
 	        userNameFieldText = view.getUsernameField().getText();
@@ -101,6 +114,10 @@ public class UserLoginPageController {
 	    });
 	}
 
+    /**
+     * Configures the submit button action for the reset password popup.
+     * Validates the new password and updates it in the database.
+     */
     private void setSubmitButtonResetPasswordPopupAction() {
     	resetPasswordPopupView.getSubmitButton().setOnAction(_ -> {
     		userNameFieldText = view.getUsernameField().getText();
@@ -121,10 +138,17 @@ public class UserLoginPageController {
         });
     }
 
+    /**
+     * Sets up the initial layout of the login page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
 
+    /**
+     * Configures the debug environment.
+     * Provides autofill buttons for student, admin, and reviewer credentials.
+     */
     private void setDebugEnvironment() {
     	view.studentInfoAutoFillButton().setText("AutoFill Student Info (Debug)");
     	view.studentInfoAutoFillButton().setOnAction(_ -> {

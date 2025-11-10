@@ -17,20 +17,15 @@ import Utils.Debug;
 import javafx.stage.Stage;
 
 /**
- * InvitePage class represents the page where an admin can generate an invitation code.
- * The invitation code is displayed upon clicking a button.
+ * The ReviewerHomePageController class manages the reviewer's home page.
+ * It handles navigation actions such as logging out, changing roles,
+ * entering the forum, and accessing the messages page.
  */
-
 public class ReviewerHomePageController {
-
-	/**
-     * Displays the Invite Page in the provided primary stage.
-     * 
-     * @param databaseHelper An instance of DatabaseHelper to handle database operations.
-     * @param primaryStage   The primary stage where the scene will be displayed.
-     */
 	
-	// Reference to the DatabaseHelper for database interactions
+	/**
+	 *  Reference to the DatabaseHelper for database interactions
+	 */
 	private final DBConnectionStore dBConnectionStore;
 	private final UserSession userSession;
 	private final IQuestionService questionService;
@@ -41,7 +36,10 @@ public class ReviewerHomePageController {
 	private final ForumHeaderViewModel reviewerHeaderViewModel;
 	private final QuestionPaneViewModel questionPaneViewModel;
 	
-		
+    /**
+     * Creates a new ReviewerHomePageController.
+     * Initializes the layout, sets up button actions, and configures search functionality.
+     */
 	public ReviewerHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, ReviewerHomePage view, 
 			PostListViewModel postListViewModel, ForumHeaderViewModel reviewerHeaderViewModel, QuestionPaneViewModel questionPaneViewModel) {
 		this.dBConnectionStore = dBConnectionStore;
@@ -74,6 +72,10 @@ public class ReviewerHomePageController {
     // 		 SETTERS 
  	// ===================
 	
+    /**
+     * Configures the logout button action.
+     * Navigates back to the login page.
+     */
 	private void setLogoutButtonAction() {
 		view.getLogoutButton().setOnAction(_ -> {
 			// Return to login page
@@ -82,6 +84,10 @@ public class ReviewerHomePageController {
 		});
 	}
 	
+    /**
+     * Configures the change roles button action.
+     * Navigates back to the welcome page.
+     */
 	private void setChangeRolesButtonAction() {
 		view.getChangeRolesButton().setOnAction(_ -> {
 			// Return to welcome page
@@ -89,6 +95,11 @@ public class ReviewerHomePageController {
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 		});
 	}
+	
+    /**
+     * Configures the enter forum button action.
+     * Navigates to the forum page.
+     */
 	private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(_ -> {
 			// Enter the forum page
@@ -113,6 +124,10 @@ public class ReviewerHomePageController {
 		});
 	}
 	
+    /**
+     * Configures the enter messages page button action.
+     * Navigates to the messages page.
+     */
 	private void setEnterMessagesPageButtonAction() {
 		view.getEnterMessagesPageButton().setOnAction(_ -> {
 			// Enter the messages page
@@ -137,6 +152,9 @@ public class ReviewerHomePageController {
 		});
 	}
     
+    /**
+     * Sets up the initial layout of the reviewer home page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }

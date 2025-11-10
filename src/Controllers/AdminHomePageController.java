@@ -17,6 +17,10 @@ import javafx.stage.Stage;
 
 import UI.Pages.AdminHomePage;
 
+/**
+ * The AdminHomePageController class handles tasks 
+ * This is intended to be used by the first user to initialize the system with admin credentials.
+ */
 public class AdminHomePageController {
 	private final IUserService userService;
 	private final AdminHomePage view;
@@ -25,12 +29,11 @@ public class AdminHomePageController {
 	private String selectedDropdownUser = null;
 	
 	List<String> users;
-
-	/**
-	 * The AdminHomePageController class handles tasks 
-	 * This is intended to be used by the first user to initialize the system with admin credentials.
-	 */
 	
+    /**
+     * Creates a new AdminHomePageController.
+     * Initializes the layout and sets up button actions for user management.
+     */
 	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminHomePage view) {
 		this.view = view;
 		this.userService = dBConnectionStore.getUserService();
@@ -50,6 +53,10 @@ public class AdminHomePageController {
     // 		 SETTERS 
  	// ===================
 	
+    /**
+     * Sets up the initial layout of the admin home page.
+     * Loads all usernames into the dropdown menu.
+     */
 	private void setInitialLayout() {
 		view.setInitialLayout(primaryStage);
 		
@@ -63,7 +70,10 @@ public class AdminHomePageController {
         }
 	}
 	
-	
+    /**
+     * Configures the action for updating user roles.
+     * Collects selected roles from checkboxes and updates them in the database.
+     */
 	private void setUpdateRolesButtonAction() {
 		view.getSaveRolesButton().setOnAction(_ -> {
 			selectedDropdownUser = view.getUserDropdown().getValue();
@@ -91,6 +101,10 @@ public class AdminHomePageController {
 		});
 	}
 	
+    /**
+     * Configures the action for setting a temporary password.
+     * Updates the selected user's password and displays it in the view.
+     */
 	private void setSetTempPasswordButtonAction() {
 		view.getSetTempPasswordButton().setOnAction(_ -> {
             String selectedUserName = view.getUserDropdown().getValue();
@@ -114,6 +128,10 @@ public class AdminHomePageController {
         });
 	}
 	
+    /**
+     * Configures the action for when a user is selected from the dropdown.
+     * Loads the user's roles and updates the checkboxes and details section.
+     */
 	private void setOnUserDropdownAction() {
 		view.getUserDropdown().setOnAction(_ -> {
             String selectedUserName = view.getUserDropdown().getValue();
@@ -166,6 +184,10 @@ public class AdminHomePageController {
 
 	}
 	
+    /**
+     * Configures the action for deleting a user.
+     * Prevents deleting the current admin's own account and confirms deletion before proceeding.
+     */
 	private void setUserDeleteButtonAction() {
 		view.getDeleteUserButton().setOnAction(_ -> {
             String selectedUserName = view.getUserDropdown().getValue();
@@ -213,6 +235,10 @@ public class AdminHomePageController {
         });
 	}
 	
+    /**
+     * Configures the action for saving user roles.
+     * Updates the roles in the database and refreshes the details view.
+     */
 	private void setSaveRolesButtonAction() {
 
         String selectedUserName = view.getUserDropdown().getValue();

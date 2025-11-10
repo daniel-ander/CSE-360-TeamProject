@@ -9,17 +9,24 @@ import UI.Pages.UserLoginPage;
 import javafx.stage.Stage;
 
 /**
- * FirstPage class represents the initial screen for the first user.
- * It prompts the user to set up administrator access and navigate to the setup screen.
+ * The SetupLoginSelectionPageController class manages the setup/login selection page.
+ * It allows the user to either set up a new account or navigate to the login page.
+ * It also initializes the layout for the page.
  */
 public class SetupLoginSelectionPageController {
 	
-	// Reference to the DatabaseHelper for database interactions
+	/**
+	 *  Reference to the DatabaseHelper for database interactions
+	 */
 	private final DBConnectionStore dBConnectionStore;
 	
 	private final Stage primaryStage;
 	private final SetupLoginSelectionPage view;
 	
+    /**
+     * Creates a new SetupLoginSelectionPageController.
+     * Initializes the layout and sets up button actions for setup and login.
+     */
 	public SetupLoginSelectionPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, SetupLoginSelectionPage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.primaryStage = primaryStage;
@@ -36,13 +43,21 @@ public class SetupLoginSelectionPageController {
     // 		 SETTERS 
  	// ===================
     
+    /**
+     * Configures the setup button action.
+     * Navigates to the account setup page.
+     */
     private void setSetupButtonAction() {
 		view.getSetupButton().setOnAction(_ -> {
 			new SetupAccountPageController(dBConnectionStore, primaryStage, new SetupAccountPage());
 		});
 	}
     
-    // TODO: -- Fix how user works
+    /**
+     *  TODO: -- Fix how user works
+     *  Configures the login button action.
+     *  Navigates to the user login page.
+     */
     private void setLoginButtonAction() {
 		view.getLoginButton().setOnAction(_ -> {
 			
@@ -50,6 +65,9 @@ public class SetupLoginSelectionPageController {
 		});
 	}
     
+    /**
+     * Sets up the initial layout of the setup/login selection page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
