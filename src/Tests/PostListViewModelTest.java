@@ -21,6 +21,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+/**
+ * Unit tests for PostListViewModel
+ */
 public class PostListViewModelTest {
 
     private IQuestionService questionService;

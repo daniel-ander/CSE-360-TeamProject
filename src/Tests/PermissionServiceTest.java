@@ -14,6 +14,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for Permission Service 
+ */
 public class PermissionServiceTest {
 
     private IPermissionRepository mockRepo;

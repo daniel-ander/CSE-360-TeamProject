@@ -19,6 +19,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for Request Service
+ */
 class RequestServiceTest {
 	
     private DBConnectionStore mockStore;

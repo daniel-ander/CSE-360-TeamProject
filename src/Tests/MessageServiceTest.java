@@ -17,6 +17,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the Message Service.
+ */
 public class MessageServiceTest {
 
     /** A mock {@link IMessageRepository} repository */

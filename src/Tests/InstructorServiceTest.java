@@ -17,6 +17,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for Instructor Service
+ */
 public class InstructorServiceTest {
 
     /** A mock {@link IReviewerRequestRepository} repository for creating the instructor service */
