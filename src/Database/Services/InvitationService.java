@@ -11,18 +11,25 @@ import Database.Services.Interfaces.IInvitationService;
 
 import Exceptions.DBExceptions.*;
 
+/**
+ * Manages invitation codes
+ */
 public class InvitationService implements IInvitationService {
 	
 	private final IInvitationRepository invitationRepository;
 	
+	/**
+	 * Creates a new InvitationService with the given repository
+	 * @param invitationRepository
+	 * @throws SQLException
+	 */
 	public InvitationService(IInvitationRepository invitationRepository) throws SQLException {
 		this.invitationRepository = invitationRepository;
 	}
 	
-	// ===================
-    // 		 CREATE 
- 	// ===================
-	
+    /**
+     * Generates a new invitation code based on role bits and a random suffix.
+     */
 	@Override
 	public String generateInvitationCode(String roles) throws DataAccessException {
 		try {
@@ -37,10 +44,9 @@ public class InvitationService implements IInvitationService {
 		}
 	}
 	
-	// ===================
-    // 		 READ 
- 	// ===================
-	
+    /**
+     * Decodes the roles from an invitation code string.
+     */
 	@Override
 	public String getRoleFromInviteCode(String code) throws DataAccessException {
 		// TODO :- Write the SQL and implement
@@ -57,6 +63,9 @@ public class InvitationService implements IInvitationService {
 		return rolesStr;
 	}
 	
+    /**
+     * Prints all invitation codes and their usage status from the database.
+     */
 	@Override
 	public void printInvitationCodesTable() throws DataAccessException {
 		try {
@@ -66,6 +75,9 @@ public class InvitationService implements IInvitationService {
 		}
 	}
 	
+    /**
+     * Validates whether an invitation code exists and is unused.
+     */
 	@Override
 	public boolean validateInvitationCode(String code) throws DataAccessException {
 		try {
@@ -75,10 +87,9 @@ public class InvitationService implements IInvitationService {
 		}
 	}
 	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-	
+    /**
+     * Marks an invitation code as used in the database.
+     */
 	@Override
 	public void markInvitationCodeAsUsed(String code) throws DataAccessException {
 		try {
@@ -87,9 +98,4 @@ public class InvitationService implements IInvitationService {
 			throw new DataAccessException("Could not mark used invitation code in the database code due to: " + e);
 		}
 	}
-	
-	// ===================
-    // 		 DESTROY 
- 	// ===================
-	
 }

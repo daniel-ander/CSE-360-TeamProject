@@ -8,10 +8,15 @@ import Database.Services.Interfaces.IPermissionService;
 import Exceptions.DBExceptions.DataAccessException;
 import Models.IPost;
 
-
+/**
+ * Service for managing user permissions.
+ */
 public class PermissionService implements IPermissionService {
     private final IPermissionRepository permissionRepository;
 
+    /**
+     * Creates a new PermissionService with the given repository.
+     */
     public PermissionService(IPermissionRepository permissionRepository) {
         this.permissionRepository = permissionRepository;
     }

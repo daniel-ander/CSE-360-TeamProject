@@ -16,27 +16,36 @@ import Database.Repositories.Interfaces.IUserRepository;
 import Database.Repositories.Interfaces.IReviewerRequestRepository;
 import Database.Services.Interfaces.IUserService;
 
-
+/**
+ * Manages User accounts
+ */
 public class UserService implements IUserService {
 
 	private final IUserRepository userRepository;
     private final IReviewerRequestRepository reviewerRequestRepository;
     
+    /**
+     * Creates a new UserService with the given user and reviewer request repository
+     * @param userRepository
+     * @param reviewerRequestRepository
+     */
     public UserService(IUserRepository userRepository, IReviewerRequestRepository reviewerRequestRepository) {
         this.userRepository = userRepository;
         this.reviewerRequestRepository = reviewerRequestRepository;
     }
 	
+    /**
+     * Creates a new UserService with the given repository
+     * @param userRepository
+     */
     public UserService(IUserRepository userRepository) {
         this(userRepository, null);
     }
 
-	// ===================
-    // 		 CREATE 
- 	// ===================
-	
+    /**
+     * Registers a new user
+     */
 	@Override
-	
 	public void register(User user) throws DataAccessException, DuplicateRecordIDException {
 		if(doesUserExistByName(user.getUserName())) {
 			throw new DuplicateRecordIDException("A user by this user name already exists.");
@@ -48,10 +57,6 @@ public class UserService implements IUserService {
 			throw new DataAccessException("Could not register user by username: " + user.getUserName() + " from the database due to: " + e);
 		}
 	}
-	
-	// ===================
-    // 		 READ 
- 	// ===================
 
 	/** Validates a user's login credentials. */
 	@Override
@@ -74,6 +79,8 @@ public class UserService implements IUserService {
 			throw new DataAccessException("Could not log in due to: " + e);
 		}
 	}
+	
+	/** Gets a user by name and password */
 	@Override
 	public User getUserByNameAndPassword(String userName, String password) throws DataAccessException {
 		try {
@@ -83,6 +90,7 @@ public class UserService implements IUserService {
 			throw new DataAccessException("Could not log in due to: " + e);
 		}
 	}
+	/** Gets user Id by name */
 	@Override
 	public int getUserIdByName(String userName) throws DataAccessException {
 		try {
@@ -93,6 +101,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
+	/** Gets Users sorted by the timestamps of their interactions */
 	public List<String> getUsersSortedByRecentInteraction(String userName) throws DataAccessException {
 		try {
 			return userRepository.getUsersSortedByRecentInteraction(userName);
@@ -102,10 +111,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
-	// ===================
-    // 		 UPDATE 
- 	// ===================
-	
+	/** Gets a users role */
 	@Override
 	public User.Role getUserRole(String userName) throws DataAccessException {
 		try {
@@ -128,6 +134,7 @@ public class UserService implements IUserService {
         }
     }
 	
+    /** Updates a users role */
 	@Override
 	public void updateUserRole(String userName, User.Role newRole) throws DataAccessException {
 		// Normalize, de-dup, and join
@@ -233,6 +240,7 @@ public class UserService implements IUserService {
         }
     }
 	
+    /** Gets all usernames */
 	@Override
 	public List<String> getAllUsernames() throws DataAccessException {
 		try {
@@ -243,6 +251,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
+	/** Gets a users name by Id */
 	@Override
     public String getUserNameById(int id) throws DataAccessException {
         try {
@@ -254,6 +263,7 @@ public class UserService implements IUserService {
         }
     }
 
+	/** Gets users role as a string */
     @Override
     public String getUserRolesString(String userName) throws DataAccessException {
         try {
@@ -263,8 +273,7 @@ public class UserService implements IUserService {
         }
     }
 	
-	
-	
+	/** Updates a users password */
 	@Override
 	public String updatePasswordForUser(String userName) throws DataAccessException {
 		Random rand = new Random();
@@ -297,10 +306,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
-	// ===================
-    // 		 DELETE 
- 	// ===================
-
+    /** Delete a user */
 	@Override
 	public boolean deleteUser(String currentUserName, String targetUserName) throws DataAccessException {
 	    // Prevent an admin from deleting their own account
@@ -322,6 +328,7 @@ public class UserService implements IUserService {
 		}
 	}
 	
+	/** Prints the Users Table */
 	@Override
 	public void printUsersTable() throws DataAccessException {
 		try {

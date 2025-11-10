@@ -23,7 +23,11 @@ import Database.Services.Interfaces.IUserService;
 public class RequestService {
     private final DBConnectionStore store;
     private final IUserService userService;
-
+    
+    /**
+     * Creates a new RequestService with the given DBConnectionStore
+     * @param store
+     */
     public RequestService(DBConnectionStore store) {
         this.store = store;
         this.userService = store.getUserService();
@@ -95,7 +99,7 @@ public class RequestService {
             }
         } catch (SQLException | DataAccessException e) { // handle both SQL and data access exceptions
             System.err.println("Error submitting reviewer request: " + e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace();
             return false;
         }
     }

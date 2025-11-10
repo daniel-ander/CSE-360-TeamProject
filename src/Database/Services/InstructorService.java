@@ -5,10 +5,18 @@ import java.util.List;
 import Models.ReviewerRequest;
 import Database.Repositories.Interfaces.IReviewerRequestRepository;
 
+/** 
+ * Gives Instructors capability of adding reviewers
+ */
 public class InstructorService {
     private final IReviewerRequestRepository requestRepo;
     private final UserService userService;
 
+    /**
+     * Creates a new InstructorService
+     * @param requestRepo
+     * @param userService
+     */
     public InstructorService(IReviewerRequestRepository requestRepo, UserService userService) {
         this.requestRepo = requestRepo;
         this.userService = userService;
