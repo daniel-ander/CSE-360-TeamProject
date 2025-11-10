@@ -456,10 +456,14 @@ public class PostListViewModel {
 				// DELETE callback
 				postId -> {
 					try {
-						if (postType == IPost.Type.Question)
+						if (postType == IPost.Type.Question) {
 							questionService.deleteQuestion(postId);
-						else
+							System.out.println("Deleted Question By Id: " + postId);
+						}
+						else {
 							answerService.deleteAnswer(postId);
+							System.out.println("Deleted Answer By Id: " + postId);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -471,6 +475,8 @@ public class PostListViewModel {
 						Answer postToAdd = (Answer) newPost;
 						Answer addedPost = answerService.addAnswer(postToAdd);
 						addAnswerToVisibleList(addedPost);
+						
+						System.out.println("Added Answer By Id: " + postToAdd.getId());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -481,8 +487,12 @@ public class PostListViewModel {
 					try {
 						if (postType == IPost.Type.Question) {
 							questionService.updateQuestion(id, mainText, secondaryText);
+							
+							System.out.println("Updated Question By Id: " + id);
 						} else {
 							answerService.updateAnswer(id, mainText, secondaryText.equals("yes"));
+							
+							System.out.println("Updated Answer By Id: " + id);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

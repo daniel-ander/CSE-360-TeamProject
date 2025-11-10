@@ -1,5 +1,5 @@
 // language: java
-package Controllers;
+package Controllers.Messages;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Controllers.UserLoginPageController;
+import Controllers.WelcomeLoginPageController;
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
-import Controllers.Messages.MessagesViewModel;
-import Controllers.Messages.RecentInteractionsViewModel;
 import Database.*;
 import Database.Services.Interfaces.IMessageService;
 

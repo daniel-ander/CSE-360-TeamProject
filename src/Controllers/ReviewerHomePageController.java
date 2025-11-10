@@ -4,6 +4,7 @@ import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.ForumPageController;
 import Controllers.ForumPage.PostListViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.Messages.MessagesPageController;
 import Database.*;
 import Database.Services.Interfaces.IQuestionService;
 import Sessions.UserSession;
