@@ -168,6 +168,8 @@ public class MessagesPageController {
 
 	    initializeMessageListListeners();
 	    setMessageListActions();
+	    
+	    
 
 	    // Only load data if lists are empty — prevents full refresh on every reopen
 	    if (!view.getMessagesListView().getItems().isEmpty()
