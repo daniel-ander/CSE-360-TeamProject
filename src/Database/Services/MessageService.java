@@ -85,4 +85,10 @@ public class MessageService implements IMessageService {
             throw new DataAccessException("Failed to delete message id: " + messageId + " due to: " + e);
         }
     }
+
+	@Override
+	public List<Message> getAllMessages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
