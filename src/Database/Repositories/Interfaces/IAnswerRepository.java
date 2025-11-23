@@ -1,9 +1,11 @@
 package Database.Repositories.Interfaces;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
 import Models.Answer;
+import Utils.AnswerRatingInfo;
 
 public interface IAnswerRepository {
 	
@@ -21,5 +23,13 @@ public interface IAnswerRepository {
 	public boolean deleteByQuestionId(int questionId) throws SQLException;
 	
 	public Answer getAnswerById(int answerId) throws SQLException;
+
+	public void deleteRating(int answerId, int userId) throws SQLException;
+
+	public void addRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+	public void updateRatingInfo(int answerId) throws SQLException;
+
+	public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException;
+	public void updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;
 	
 }

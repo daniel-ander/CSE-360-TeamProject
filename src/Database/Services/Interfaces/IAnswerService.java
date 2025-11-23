@@ -2,7 +2,8 @@ package Database.Services.Interfaces;
 
 import Models.Answer;
 
-import java.sql.SQLException;
+import java.math.BigDecimal;
+
 import java.util.List;
 
 import Exceptions.DBExceptions.DataAccessException;
@@ -21,4 +22,8 @@ public interface IAnswerService {
 	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws DataAccessException;
 	public boolean deleteAnswer(int id) throws DataAccessException;
 	public boolean deleteByQuestionId(int questionId) throws DataAccessException;
+	public void removeRating(int answerId, int userId) throws DataAccessException;
+	public BigDecimal getAverageRating(int answerId) throws DataAccessException;
+	public void addRating(int answerId, int userId, BigDecimal rating) throws DataAccessException;
+	public void updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException;
 }

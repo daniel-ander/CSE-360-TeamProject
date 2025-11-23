@@ -1,9 +1,11 @@
 package Database.Repositories;
 
 import Models.Answer;
-
+import Models.DBModels.Rating;
+import Utils.AnswerRatingInfo;
 import Utils.Debug;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,13 +37,13 @@ public class AnswerRepository implements IAnswerRepository {
      */
 	@Override
 	public Answer insertAnswer(Answer a) throws SQLException {
-	    String insertSQL = String.format(
+	    String insertAnswerQuery = String.format(
 	        "INSERT INTO %s (questionId, parentAnswerId, userId, body, isReview) VALUES (?, ?, ?, ?, ?)",
 	        Answer.tableName
 	    );
 
 	    try (Connection connection = generalDBManager.getConnection();
-	         PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+	         PreparedStatement pstmt = connection.prepareStatement(insertAnswerQuery, Statement.RETURN_GENERATED_KEYS)) {
 
 	        pstmt.setInt(1, a.getQuestionId());
 	        if (a.getParentAnswerId() == null)
@@ -93,9 +95,9 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getAll() throws SQLException {
 		List<Answer> allAnswers = new ArrayList<>();
-		String getAllAnswers = String.format("SELECT * FROM %s", Answer.tableName);
+		String getAllAnswersQuery = String.format("SELECT * FROM %s", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getAllAnswers)){
+				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersQuery)){
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				Answer a = filledAnswerModel(rs);
@@ -106,6 +108,25 @@ public class AnswerRepository implements IAnswerRepository {
 		return allAnswers;
 	}
 	
+	/**
+	 * Gets all answers from user id.
+	 */
+	@Override
+	public List<Answer> getAnswersByUser(int userId) throws SQLException {
+        List<Answer> answersByUser = new ArrayList<>();
+        String getAnswersByUserQuery = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
+        try (Connection connection = generalDBManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(getAnswersByUserQuery)){
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Answer a = filledAnswerModel(rs);
+                answersByUser.add(a);
+            }
+        }
+        return answersByUser;
+    }
+	
     /**
      * Retrieves all answers for a given question ID.
      */
@@ -114,9 +135,9 @@ public class AnswerRepository implements IAnswerRepository {
 		List<Answer> allAnswersForQuestion = new ArrayList<>();
 		//TODO: we might need this to check parentId depending on how we want to display answers
 		//		for now we will just get all answers for a question
-		String getAllAnswersForQuestion = String.format("SELECT * FROM %s WHERE questionId = ?", Answer.tableName);
+		String getAllAnswersForQuestionQuery = String.format("SELECT * FROM %s WHERE questionId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestion)){
+				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestionQuery)){
 			pstmt.setInt(1, questionId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
@@ -134,9 +155,9 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
 		List<Answer> repliesToAnswerById = new ArrayList<>();
-		String getRepliesToAnswerById = String.format("SELECT * FROM %s WHERE parentAnswerId = ?", Answer.tableName);
+		String getRepliesToAnswerByIdQuery = String.format("SELECT * FROM %s WHERE parentAnswerId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getRepliesToAnswerById)){
+				PreparedStatement pstmt = connection.prepareStatement(getRepliesToAnswerByIdQuery)){
 			pstmt.setInt(1, parentAnswerId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
@@ -153,9 +174,9 @@ public class AnswerRepository implements IAnswerRepository {
      */
 	@Override
 	public Answer getAnswerById(int answerId) throws SQLException {
-		String getAnswerById = String.format("SELECT * FROM %s WHERE id = ?", Answer.tableName);
+		String getAnswerByIdQuery = String.format("SELECT * FROM %s WHERE id = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getAnswerById)){
+				PreparedStatement pstmt = connection.prepareStatement(getAnswerByIdQuery)){
 			pstmt.setInt(1, answerId);
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.next()) {
@@ -172,9 +193,9 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getCorrectAnswers() throws SQLException {
 		List<Answer> correctAnswers = new ArrayList<>();
-    	String getCorrectAnswers = String.format("SELECT * FROM %s WHERE isCorrect = TRUE", Answer.tableName);
+    	String getCorrectAnswersQuery = String.format("SELECT * FROM %s WHERE isCorrect = TRUE", Answer.tableName);
     	try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswers)){
+				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswersQuery)){
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				Answer a = filledAnswerModel(rs);
@@ -190,9 +211,9 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException {
     	List<Answer> answersBySearch = new ArrayList<>();
-    	String getAnswersBySearch = String.format("SELECT * FROM %s WHERE body LIKE ?", Answer.tableName);
+    	String getAnswersBySearchQuery = String.format("SELECT * FROM %s WHERE body LIKE ?", Answer.tableName);
     	try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(getAnswersBySearch)){
+				PreparedStatement pstmt = connection.prepareStatement(getAnswersBySearchQuery)){
 			pstmt.setString(1, "%" + searchString + "%");
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
@@ -208,9 +229,9 @@ public class AnswerRepository implements IAnswerRepository {
      */
 	@Override
     public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException {
-		String updateAnswer = String.format("UPDATE %s SET body = ?, isCorrect = ? WHERE id = ?", Answer.tableName);
+		String updateAnswerQuery = String.format("UPDATE %s SET body = ?, isCorrect = ? WHERE id = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(updateAnswer)){
+				PreparedStatement pstmt = connection.prepareStatement(updateAnswerQuery)){
 			pstmt.setString(1, newText);
 			pstmt.setBoolean(2, newCorrect);
 			pstmt.setInt(3, id);
@@ -228,9 +249,9 @@ public class AnswerRepository implements IAnswerRepository {
      */
 	@Override
 	public boolean deleteAnswerById(int id) throws SQLException {
-		String deleteAnswerById = String.format("UPDATE %s SET isDeleted = TRUE WHERE id = ?", Answer.tableName);
+		String deleteAnswerByIdQuery = String.format("UPDATE %s SET isDeleted = TRUE WHERE id = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(deleteAnswerById)){
+				PreparedStatement pstmt = connection.prepareStatement(deleteAnswerByIdQuery)){
 			pstmt.setInt(1, id);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected == 0) {
@@ -246,9 +267,9 @@ public class AnswerRepository implements IAnswerRepository {
      */
 	@Override
 	public boolean deleteByQuestionId(int questionId) throws SQLException {
-		String deleteByQuestionId = String.format("UPDATE %s SET isDeleted = TRUE WHERE questionId = ?", Answer.tableName);
+		String deleteByQuestionIdQuery = String.format("UPDATE %s SET isDeleted = TRUE WHERE questionId = ?", Answer.tableName);
 		try (Connection connection = generalDBManager.getConnection();
-				PreparedStatement pstmt = connection.prepareStatement(deleteByQuestionId)){
+				PreparedStatement pstmt = connection.prepareStatement(deleteByQuestionIdQuery)){
 			pstmt.setInt(1, questionId);
 			int rowsAffected = pstmt.executeUpdate();
 			if (rowsAffected == 0) {
@@ -259,8 +280,132 @@ public class AnswerRepository implements IAnswerRepository {
 		return true;
 	}
 	
+	/**
+     * Adds a row to the ratings table for particular answer and user
+     */
+	@Override
+	public void addRating(int answerId, int userId, BigDecimal rating) throws SQLException {
+		String addRatingQuery  = String.format("INSERT INTO %s (userId, answerId, rating) VALUES (?, ?, ?)", Rating.tableName);
+		
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(addRatingQuery)){
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, answerId);
+			pstmt.setBigDecimal(3, rating); 
+
+			pstmt.executeUpdate();
+			
+			updateRatingInfo(answerId);
+		}
+	}
 	
-	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
+	/**
+     * Adds a row to the ratings table for particular answer and user
+     */
+	@Override
+	public void updateRating(int answerId, int userId, BigDecimal rating) throws SQLException {
+	    // Update the existing rating for this user and answer
+	    String updateRatingQuery = String.format(
+	        "UPDATE %s SET rating = ? WHERE userId = ? AND answerId = ?",
+	        Rating.tableName
+	    );
+
+	    try (Connection connection = generalDBManager.getConnection();
+	         PreparedStatement pstmt = connection.prepareStatement(updateRatingQuery)) {
+
+	        pstmt.setBigDecimal(1, rating);
+	        pstmt.setInt(2, userId);
+	        pstmt.setInt(3, answerId);
+
+	        if(pstmt.executeUpdate() == 0) { // If for some reason the rating didn't already exist
+	        	addRating(answerId, userId, rating);
+	        }
+	        
+	        updateRatingInfo(answerId);
+	    }
+	}
+
+	
+	/**
+     * Updates the average rating and upvoteCount fields on the answer
+     */
+	@Override
+	public void updateRatingInfo(int answerId) throws SQLException {
+		String addRatingQuery  = String.format("UPDATE %s SET averageRating = ?, upvoteCount = ? WHERE id = ?", Answer.tableName);
+		AnswerRatingInfo averageRatingAndCount = getAnswerRatingInfo(answerId); 
+		
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(addRatingQuery)){
+			pstmt.setBigDecimal(1, averageRatingAndCount.getAverageRating());
+			pstmt.setInt(2, averageRatingAndCount.getUpvoteCount());
+			pstmt.setInt(3, answerId);
+
+			pstmt.executeUpdate();
+		}
+	}
+	
+	/**
+     * Deletes a row from the ratings table for particular answer and user
+     */
+	@Override
+	public void deleteRating(int answerId, int userId) throws SQLException {
+		String deleteRatingQuery  = String.format("DELETE FROM %s WHERE userId = ? AND answerId = ?", Rating.tableName);
+		
+		try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(deleteRatingQuery)){
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, answerId);
+
+			if(pstmt.executeUpdate() > 0) {
+				Debug.write("Rating removed");
+			} else {
+				Debug.write("No such rating to modify");
+			}
+		}
+	}
+	
+	/**
+     * Gets the average rating info for answer - which includes the rating and the upvote count
+     */
+	@Override
+	public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException {
+		String query = String.format(
+			    "SELECT a.id AS answerId, " +
+			    "COALESCE(AVG(r.rating), 0) AS averageRating, " +
+			    "COUNT(r.rating) AS upvoteCount " + 
+			    "FROM %s a " +
+			    "LEFT JOIN %s r ON a.id = r.answerId " +
+			    "WHERE a.id = ? " +
+			    "GROUP BY a.id",
+			    Answer.tableName, Rating.tableName
+			);
+
+	    try (Connection connection = generalDBManager.getConnection();
+	         PreparedStatement pstmt = connection.prepareStatement(query)) {
+
+	        pstmt.setInt(1, answerId);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                BigDecimal avg = rs.getBigDecimal("averageRating");
+	                int upvotes = rs.getInt("upvoteCount");
+
+	                Debug.write("Fetched average rating and upvotes for answer: " + answerId);
+	                
+	                return new AnswerRatingInfo(
+	                    avg != null ? avg : BigDecimal.ZERO,
+	                    upvotes
+	                );
+	            } else {
+	                Debug.write("Answer not found, returning defaults for answer: " + answerId);
+	                return new AnswerRatingInfo(BigDecimal.ZERO, 0);
+	            }
+	        }
+	    }
+	}
+	
+	
+	private Answer filledAnswerModel(ResultSet rs) throws SQLException {		
 		return new Answer(
 				rs.getInt("id"),
 				rs.getInt("questionId"),
@@ -270,30 +415,12 @@ public class AnswerRepository implements IAnswerRepository {
 				rs.getString("body"),
 				rs.getTimestamp("created"),
 				rs.getTimestamp("lastUpdated"),
+				rs.getBigDecimal("averageRating"),
 				rs.getInt("upvoteCount"),
 				rs.getBoolean("isCorrect"),
 				rs.getBoolean("isDeleted"),
 				rs.getBoolean("isReview")
 		);
 	}
-
-	/**
-	 * Gets all answers from user id.
-	 */
-	@Override
-	public List<Answer> getAnswersByUser(int userId) throws SQLException {
-        List<Answer> answersByUser = new ArrayList<>();
-        String getAnswersByUser = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
-        try (Connection connection = generalDBManager.getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(getAnswersByUser)){
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Answer a = filledAnswerModel(rs);
-                answersByUser.add(a);
-            }
-        }
-        return answersByUser;
-    }
 
 }

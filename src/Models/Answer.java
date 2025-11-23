@@ -1,5 +1,6 @@
 package Models;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public class Answer implements IPost {
@@ -32,7 +33,7 @@ public class Answer implements IPost {
 
 	// New constructor that accepts a review flag
 	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText, boolean isReview) {
-		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, null, false, false, isReview);
+		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, BigDecimal.valueOf(0), 0, false, false, isReview);
 	}
 	
 	// Constructor for pulling from DB with all fields (new full signature)
@@ -45,7 +46,8 @@ public class Answer implements IPost {
 			String bodyText,
 			Timestamp createdTimestamp,
 			Timestamp lastUpdatedTimestamp, 
-			Integer upvoteCount, 
+			BigDecimal averageRating,
+			int upvoteCount,
 			boolean isCorrect, 
 			boolean isDeleted,
 			boolean isReview
@@ -62,7 +64,6 @@ public class Answer implements IPost {
 		this.bodyText = bodyText;
 		this.createdTimestamp = createdTimestamp;
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
-		this.upvoteCount = upvoteCount;
 		
 		this.isCorrect = isCorrect;
 		this.isDeleted = isDeleted;

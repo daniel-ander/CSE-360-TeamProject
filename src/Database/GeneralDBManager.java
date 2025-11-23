@@ -10,6 +10,7 @@ import Models.Question;
 import Models.User;
 import Models.DBModels.FavoredReviewer;
 import Models.DBModels.Permission;
+import Models.DBModels.Rating;
 import Utils.RolePermissions;
 import Utils.StringUtils;
 
@@ -38,9 +39,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 	private final String invitationTableName = Invitation.tableName;
 	private final String permissionTableName = Permission.tableName;
 	private final String favoredReviewerTableName = FavoredReviewer.tableName;
-
-	// TODO: - Not entirely sure what this is.
-	private static int forumPostIdNumber = 0;
+	private final String ratingTableName = Rating.tableName;
 
 	// ===================
 	// CREATE
@@ -86,7 +85,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "authorName TEXT, " + "body TEXT, "
 				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "isReview BOOLEAN DEFAULT FALSE, " + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "upvoteCount INT DEFAULT 0, "
+				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "averageRating DECIMAL(3,2) DEFAULT 0.0, ", "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (userId) REFERENCES %s(id))", answerTableName, questionTableName, answerTableName, userTableName);
@@ -160,6 +159,22 @@ public class GeneralDBManager implements IGeneralDBManager {
 			  + "UNIQUE (userId, favoredReviewerId))",
 			  favoredReviewerTableName, userTableName, userTableName
 			);
+		
+		String answerRatingsTableQuery = String.format(
+			    "CREATE TABLE IF NOT EXISTS %s ("
+			  + "id IDENTITY PRIMARY KEY, "
+			  + "userId INT NOT NULL, "
+			  + "answerId INT NOT NULL, "
+			  + "rating DECIMAL(3,2) NOT NULL, "
+			  + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+			  + "CHECK (rating BETWEEN 0 AND 1), " 
+			  + "FOREIGN KEY (userId) REFERENCES %s(id) ON DELETE CASCADE, "
+			  + "FOREIGN KEY (answerId) REFERENCES %s(id) ON DELETE CASCADE, "
+			  + "UNIQUE (userId, answerId))",
+			    ratingTableName, userTableName, answerTableName
+			);
+
+		
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -175,6 +190,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(messageTableQuery);
 			stmt.execute(reviewerRequestsTableQuery);
 			stmt.execute(favoredReviewerTableQuery);
+			stmt.execute(answerRatingsTableQuery);
 		}
 
 	}
