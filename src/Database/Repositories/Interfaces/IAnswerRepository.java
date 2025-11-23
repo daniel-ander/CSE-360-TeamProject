@@ -27,7 +27,7 @@ public interface IAnswerRepository {
 	public void deleteRating(int answerId, int userId) throws SQLException;
 
 	public void addRating(int answerId, int userId, BigDecimal rating) throws SQLException;
-	public void updateRatingInfo(int answerId) throws SQLException;
+	public void updateAnswerRatingInfo(int answerId) throws SQLException;
 
 	public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException;
 	public void updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;

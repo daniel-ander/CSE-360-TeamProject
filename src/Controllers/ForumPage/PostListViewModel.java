@@ -451,7 +451,13 @@ public class PostListViewModel {
 		
 		SharedForumState sharedForumState = new SharedForumState();
 
-		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession, userService, sharedForumState,
+		PostDisplayViewModel vm = new PostDisplayViewModel(
+				post, 
+				permissions, 
+				userSession, 
+				userService, 
+				answerService, 
+				sharedForumState,
 
 				// DELETE callback
 				postId -> {

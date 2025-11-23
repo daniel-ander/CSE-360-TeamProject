@@ -1,9 +1,12 @@
 package Controllers.ForumPage;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IUserService;
 import Exceptions.DBExceptions.DataAccessException;
 import Models.Answer;
@@ -15,8 +18,10 @@ import Utils.TriConsumer;
 
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -28,14 +33,17 @@ public class PostDisplayViewModel {
 	private final BooleanProperty isEditingPostProperty = new SimpleBooleanProperty(false);
 	
 	private final IUserService userService;
+	private final IAnswerService answerService;
 
-	private BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
-	private BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
-	private BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
-	private BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
-	private BooleanProperty isReviewingProperty = new SimpleBooleanProperty(false);
-	private BooleanProperty shouldDisplayFavoredReviewerButtonProperty = new SimpleBooleanProperty(false);
-	private ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
+	private final BooleanProperty isExpandedProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty isCommentingProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty isDeletedProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty doesHaveChildrenProperty = new SimpleBooleanProperty(true);
+	private final BooleanProperty isReviewingProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty shouldDisplayFavoredReviewerButtonProperty = new SimpleBooleanProperty(false);
+	private final ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
+	private final ObjectProperty<BigDecimal> ratingProperty = new SimpleObjectProperty<>(BigDecimal.ZERO);
+	private final IntegerProperty upvoteCountProperty = new SimpleIntegerProperty(0);
 
 	private StringProperty labelTextProperty = new SimpleStringProperty();
 	private StringProperty bodyTextProperty = new SimpleStringProperty();
@@ -48,6 +56,8 @@ public class PostDisplayViewModel {
 	private final Consumer<IPost> addCallBack;
 	private final TriConsumer<Integer, String, String> updateCallBack;
 	private final Runnable toggleExpandCallback;
+	
+	private final int ratingStarCount = 5;
 
 	public enum FilterType {
 		TIME
@@ -58,6 +68,7 @@ public class PostDisplayViewModel {
 			List<String> permissionList, 
 			UserSession userSession,
 			IUserService userService,
+			IAnswerService answerService,
 			SharedForumState sharedForumState,
 			Consumer<Integer> deleteCallBack, 
 			Consumer<IPost> addCallBack,
@@ -68,6 +79,7 @@ public class PostDisplayViewModel {
 		this.permissionList = permissionList;
 		this.userSession = userSession;
 		this.userService = userService;
+		this.answerService = answerService;
 		this.sharedForumState = sharedForumState;
 		this.deleteCallback = deleteCallBack;
 		this.addCallBack = addCallBack;
@@ -78,20 +90,23 @@ public class PostDisplayViewModel {
 
 		if (isQuestion()) {
 			labelTextProperty.set(((Question) post).getTitleText());
+		} else {
+			setRatingProperty(((Answer)post).getAverageRating());
+			setUpvoteCountProperty(((Answer)post).getUpvoteCount());
 		}
 		
 		try {
-			if(!(post.getPostType() == Type.Review)) return;
-			
-			int currentUserId = userSession.getCurrentUserId();
-			int postUserId = post.getAuthorId();
-			
-			boolean favoredReviewerStatus = userService.checkIfFavoredReviewerExists(currentUserId, postUserId);
-			setIsFavoredReviewerProperty(favoredReviewerStatus);
-			
-			setShouldDisplayFavoredReviewerButton();
+		    if (post.getPostType() == Type.Review) {
+		        int currentUserId = userSession.getCurrentUserId();
+		        int postUserId = post.getAuthorId();
+		        
+		        boolean favoredReviewerStatus = userService.checkIfFavoredReviewerExists(currentUserId, postUserId);
+		        setIsFavoredReviewerProperty(favoredReviewerStatus);
+		        
+		        setShouldDisplayFavoredReviewerButton();
+		    }
 		} catch (DataAccessException e) {
-			System.out.println(e.getLocalizedMessage());
+		    System.out.println(e.getLocalizedMessage());
 		}
 
 	}
@@ -102,6 +117,10 @@ public class PostDisplayViewModel {
 
 	public IPost getPost() {
 		return post;
+	}
+	
+	public int getNumberOfRatingStars() {
+		return ratingStarCount;
 	}
 
 	public List<String> getPermissionList() {
@@ -176,6 +195,14 @@ public class PostDisplayViewModel {
 	private List<BooleanProperty> nonConcurrentProperties() {
 		return new ArrayList<BooleanProperty>(List.of(isReviewingProperty, isCommentingProperty));
 	}
+	
+	public ObjectProperty<BigDecimal> getRatingProperty() {
+	    return ratingProperty;
+	}
+	
+	public IntegerProperty getUpvoteCountProperty() {
+	    return upvoteCountProperty;
+	}
 
 	// ===================
 	// SETTERS
@@ -239,6 +266,19 @@ public class PostDisplayViewModel {
 	public BooleanProperty getExpandedProperty() {
 		return isExpandedProperty;
 	}
+	
+	public void setRatingProperty(BigDecimal newRating) {
+	    ratingProperty.set(newRating);
+	}
+	
+	public void setRatingProperty(int starSelected) {
+		BigDecimal adjustedRating = BigDecimal.valueOf(starSelected).divide(BigDecimal.valueOf(ratingStarCount), 2, RoundingMode.HALF_UP);
+		setRatingProperty(adjustedRating);
+	}
+	
+	public void setUpvoteCountProperty(int upvoteCount) {
+		upvoteCountProperty.set(upvoteCount);
+	}
 
 	// ===================
 	// CRUD
@@ -263,6 +303,10 @@ public class PostDisplayViewModel {
 		}
 	}
 
+	public void setRating(int newRating) {
+		
+	}
+	
 	public void addAnswer(String newTitleText, String newBodyText, IPost.Type answerType) {
 		IPost.Type currentPostType = post.getPostType();
 		

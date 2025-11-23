@@ -295,7 +295,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 			pstmt.executeUpdate();
 			
-			updateRatingInfo(answerId);
+			updateAnswerRatingInfo(answerId);
 		}
 	}
 	
@@ -321,7 +321,7 @@ public class AnswerRepository implements IAnswerRepository {
 	        	addRating(answerId, userId, rating);
 	        }
 	        
-	        updateRatingInfo(answerId);
+	        updateAnswerRatingInfo(answerId);
 	    }
 	}
 
@@ -330,7 +330,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Updates the average rating and upvoteCount fields on the answer
      */
 	@Override
-	public void updateRatingInfo(int answerId) throws SQLException {
+	public void updateAnswerRatingInfo(int answerId) throws SQLException {
 		String addRatingQuery  = String.format("UPDATE %s SET averageRating = ?, upvoteCount = ? WHERE id = ?", Answer.tableName);
 		AnswerRatingInfo averageRatingAndCount = getAnswerRatingInfo(answerId); 
 		
@@ -405,7 +405,8 @@ public class AnswerRepository implements IAnswerRepository {
 	}
 	
 	
-	private Answer filledAnswerModel(ResultSet rs) throws SQLException {		
+	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
+//		System.out.println("The average for: " + rs.getInt("id") + " is: " + rs.getBigDecimal("averageRating"));
 		return new Answer(
 				rs.getInt("id"),
 				rs.getInt("questionId"),

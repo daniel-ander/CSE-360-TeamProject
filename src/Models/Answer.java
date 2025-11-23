@@ -15,6 +15,7 @@ public class Answer implements IPost {
 	private Integer parentAnswerId;
 	private Timestamp createdTimestamp;
 	private Timestamp lastUpdatedTimestamp;
+	private BigDecimal averageRating;
 	private boolean isDeleted;
 	private Integer upvoteCount;
 	private int replyDepth;
@@ -22,17 +23,34 @@ public class Answer implements IPost {
 	
 
 	// Constructor for creating a new answer (not yet in DB)
-	public Answer(int questionId, int authorId, String authorName, String bodyText) {
+	public Answer(
+			int questionId, 
+			int authorId, 
+			String authorName, 
+			String bodyText
+	) {
 		this(questionId, null, authorId, authorName, bodyText);
 	}
 	
 	// Constructor for creating a new nested answer (not yet in DB)
-	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText) {
+	public Answer(
+			int questionId, 
+			Integer parentAnswerId, 
+			int authorId, 
+			String authorName, 
+			String bodyText
+	) {
 		this(questionId, parentAnswerId, authorId, authorName, bodyText, false);
 	}
 
 	// New constructor that accepts a review flag
-	public Answer(int questionId, Integer parentAnswerId, int authorId, String authorName, String bodyText, boolean isReview) {
+	public Answer(int questionId, 
+			Integer parentAnswerId, 
+			int authorId, 
+			String authorName, 
+			String bodyText, 
+			boolean isReview
+	) {
 		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, BigDecimal.valueOf(0), 0, false, false, isReview);
 	}
 	
@@ -55,7 +73,8 @@ public class Answer implements IPost {
 		if (bodyText == null || bodyText.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
 		}
-		
+//		System.out.println("The average for: " + id + " is: " + averageRating);
+
 		this.id = id;
 		this.questionId = questionId; 
 		this.parentAnswerId = parentAnswerId; 
@@ -64,19 +83,13 @@ public class Answer implements IPost {
 		this.bodyText = bodyText;
 		this.createdTimestamp = createdTimestamp;
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
-		
+		this.averageRating = averageRating;
+		this.upvoteCount = upvoteCount;
 		this.isCorrect = isCorrect;
 		this.isDeleted = isDeleted;
 		this.isReview = isReview;
 
 	}
-
-	// Backwards-compatible constructor matching existing repository calls (no isReview param)
-//	public Answer(Integer id, Integer questionId, Integer parentAnswerId, Integer authorId, String authorName,
-//			String bodyText, Timestamp createdTimestamp, Timestamp lastUpdatedTimestamp, Integer upvoteCount,
-//			boolean isCorrect, boolean isDeleted, int replyDepth) {
-//		this(id, questionId, parentAnswerId, authorId, authorName, bodyText, createdTimestamp, lastUpdatedTimestamp, upvoteCount, isCorrect, isDeleted, false);
-//	}
 	
 	// ===================
     // 		 GETTERS 
@@ -92,6 +105,7 @@ public class Answer implements IPost {
 	public Timestamp getLastUpdatedTimestamp() {return lastUpdatedTimestamp;}
 	public boolean getIsDeleted() {return isDeleted;}
 	public boolean getIsReview() {return isReview;}
+	public BigDecimal getAverageRating() {return averageRating;}
 	public Integer getUpvoteCount() {return upvoteCount;}
 	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
@@ -103,13 +117,11 @@ public class Answer implements IPost {
 	@Override
 	public Type getPostType() {return isReview ? Type.Review : Type.Answer;}
 	
-	// new getter to expose review flag
-	public void setIsReview(boolean isReview) { this.isReview = isReview; }
-	
 	// ===================
     // 		 SETTERS 
  	// ===================
 	
+	public void setIsReview(boolean isReview) { this.isReview = isReview; }
 	public void setQuestionId(int givenId) {questionId = givenId;}
 	public void setIsCorrect(boolean correct) { isCorrect = correct;}
 	public void setIsDeleted(boolean deleted) { isDeleted = deleted;}

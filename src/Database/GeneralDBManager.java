@@ -68,60 +68,100 @@ public class GeneralDBManager implements IGeneralDBManager {
 		String questionPermissionSQL = StringUtils.listToSQLString(RolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
 		String answerPermissionSQL = StringUtils.listToSQLString(RolePermissions.AnswerPermissions.getAllPermissions());
 
-		String userTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "userName VARCHAR(255) UNIQUE, " + "password VARCHAR(255), " + "role VARCHAR(225))", userTableName);
+		String userTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s (" 
+				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "userName VARCHAR(255) UNIQUE, " 
+				+ "password VARCHAR(255), " 
+				+ "role VARCHAR(225))", 
+				userTableName
+		);
 
-		String invitationCodesTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ("
-				+ "code VARCHAR(10) PRIMARY KEY, " + "isUsed BOOLEAN DEFAULT FALSE)", invitationTableName);
+		String invitationCodesTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s ("
+				+ "code VARCHAR(10) PRIMARY KEY, " 
+				+ "isUsed BOOLEAN DEFAULT FALSE)", 
+				invitationTableName
+		);
 
-		String forumQuestionsTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
-				+ "userId INT, " + "title VARCHAR(255), " + "body TEXT, "
+		String forumQuestionsTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
+				+ "userId INT, " 
+				+ "title VARCHAR(255), " 
+				+ "body TEXT, "
 				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "answered BOOLEAN DEFAULT FALSE, "
-				+ "resolved BOOLEAN DEFAULT FALSE, " + "isDeleted BOOLEAN DEFAULT FALSE, "
-				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES %s(id))", questionTableName, userTableName);
+				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " 
+				+ "answered BOOLEAN DEFAULT FALSE, "
+				+ "resolved BOOLEAN DEFAULT FALSE, " 
+				+ "isDeleted BOOLEAN DEFAULT FALSE, "
+				+ "upvoteCount INT DEFAULT 0, " 
+				+ "FOREIGN KEY (userId) REFERENCES %s(id))", 
+				questionTableName, userTableName
+		);
 
-		String forumAnswersTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
-				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "authorName TEXT, " + "body TEXT, "
-				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "isReview BOOLEAN DEFAULT FALSE, " + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+		String forumAnswersTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
+				+ "questionId INT, " 
+				+ "parentAnswerId INT DEFAULT NULL, " 
+				+ "userId INT, " + "authorName TEXT, " 
+				+ "body TEXT, "
+				+ "isCorrect BOOLEAN DEFAULT FALSE, " 
+				+ "isReview BOOLEAN DEFAULT FALSE, " 
+				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "averageRating DECIMAL(3,2) DEFAULT 0.0, ", "upvoteCount INT DEFAULT 0, "
+				+ "isDeleted BOOLEAN DEFAULT FALSE, " 
+				+ "averageRating DECIMAL(3,2) DEFAULT 0.0, " 
+				+ "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
-				+ "FOREIGN KEY (userId) REFERENCES %s(id))", answerTableName, questionTableName, answerTableName, userTableName);
+				+ "FOREIGN KEY (userId) REFERENCES %s(id))", 
+				answerTableName, questionTableName, answerTableName, userTableName
+		);
 
-		String permissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ( " + "id SERIAL PRIMARY KEY, "
-				+ "name VARCHAR(20) UNIQUE NOT NULL)", permissionTableName);
+		String permissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s ( " 
+				+ "id SERIAL PRIMARY KEY, "
+				+ "name VARCHAR(20) UNIQUE NOT NULL)", 
+				permissionTableName
+		);
 
-		String questionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS question_permissions ( "
+		String questionPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS question_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN (%s)), "
 				+ "CHECK (permission IN (%s)))", 
-					userRolesSQL, questionPermissionSQL);
+					userRolesSQL, questionPermissionSQL
+		);
 
-		String answerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS answer_permissions ( "
+		String answerPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS answer_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN (%s)), "
 				+ "CHECK (permission IN (%s)))", 
-					userRolesSQL, answerPermissionSQL);
+					userRolesSQL, answerPermissionSQL
+		);
 
-		String userQuestionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_question_permissions ( "
+		String userQuestionPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS user_question_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
 				+ "post_id INTEGER REFERENCES %s(id) ON DELETE CASCADE, "
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
-					questionTableName, questionPermissionSQL);
+					questionTableName, questionPermissionSQL
+		);
 
-		String userAnswerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_answer_permissions ( "
+		String userAnswerPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS user_answer_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
 				+ "post_id INTEGER REFERENCES %s(id) ON DELETE CASCADE, "
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
-					answerTableName, answerPermissionSQL);
+				answerTableName, answerPermissionSQL
+		);
 		
 		String messageTableQuery = String.format(
 			    "CREATE TABLE IF NOT EXISTS %s ("
@@ -140,7 +180,8 @@ public class GeneralDBManager implements IGeneralDBManager {
 			);
 		
 		// reviewer requests table for students requesting reviewer role
-		String reviewerRequestsTableQuery = "CREATE TABLE IF NOT EXISTS reviewer_requests ("
+		String reviewerRequestsTableQuery = 
+			  "CREATE TABLE IF NOT EXISTS reviewer_requests ("
 			+ "request_id IDENTITY PRIMARY KEY, "
 			+ "student_id INT, "
 			+ "instructor_id INT, "
@@ -158,7 +199,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			  + "FOREIGN KEY (favoredReviewerId) REFERENCES %s(id) ON DELETE CASCADE, "
 			  + "UNIQUE (userId, favoredReviewerId))",
 			  favoredReviewerTableName, userTableName, userTableName
-			);
+		);
 		
 		String answerRatingsTableQuery = String.format(
 			    "CREATE TABLE IF NOT EXISTS %s ("
@@ -172,7 +213,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			  + "FOREIGN KEY (answerId) REFERENCES %s(id) ON DELETE CASCADE, "
 			  + "UNIQUE (userId, answerId))",
 			    ratingTableName, userTableName, answerTableName
-			);
+		);
 
 		
 
@@ -296,6 +337,52 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (4, 5, 1, NULL, 'Feedback: your review of ExecutorService was clear.', '2023-11-04 08:40:00'),
 			    (4, 1, 5, 7, 'Appreciate it! Glad it helped.', '2023-11-04 08:45:00');
 			    """, interactionTableName);
+		
+		String populateAnswerRatingsTable = String.format("""
+			    INSERT INTO %s (userId, answerId, rating) VALUES
+			    (1, 1, 0.8),
+			    (2, 1, 0.9),
+			    (3, 1, 0.7),
+			    (1, 2, 0.6),
+			    (2, 2, 0.95),
+			    (3, 2, 0.85),
+			    (4, 3, 0.9),
+			    (5, 4, 0.7),
+			    (1, 5, 0.5),
+			    (2, 6, 0.8),
+			    (3, 7, 0.6),
+			    (4, 8, 0.75),
+			    (5, 9, 0.85),
+			    (1, 10, 0.9),
+			    (2, 11, 0.7),
+			    (3, 12, 0.65),
+			    (4, 13, 0.8),
+			    (5, 14, 0.95),
+			    (1, 15, 0.9),
+			    (2, 16, 0.85),
+			    (3, 17, 0.7),
+			    (4, 18, 0.6),
+			    (5, 19, 0.75),
+			    (1, 20, 0.8);
+			""", ratingTableName);
+		
+		String updateAverageRating = String.format("""
+		    UPDATE %s a
+		    SET averageRating = (
+		        SELECT ROUND(AVG(r.rating), 2)
+		        FROM %s r
+		        WHERE r.answerId = a.id
+		    );
+		""", answerTableName, ratingTableName);
+
+		String updateUpvoteCount = String.format("""
+		    UPDATE %s a
+		    SET upvoteCount = (
+		        SELECT COUNT(*)
+		        FROM %s r
+		        WHERE r.answerId = a.id
+		    );
+		""", answerTableName, ratingTableName);
 
 	
 
@@ -305,6 +392,9 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(populateQuestionTable);
 			stmt.execute(populateAnswersTable);
 			stmt.execute(populateMessagesTable);
+			stmt.execute(populateAnswerRatingsTable);
+			stmt.execute(updateAverageRating);
+			stmt.execute(updateUpvoteCount);
 		}
 
 	}
