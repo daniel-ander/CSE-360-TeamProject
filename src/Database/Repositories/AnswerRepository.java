@@ -406,7 +406,6 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	
 	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
-//		System.out.println("The average for: " + rs.getInt("id") + " is: " + rs.getBigDecimal("averageRating"));
 		return new Answer(
 				rs.getInt("id"),
 				rs.getInt("questionId"),

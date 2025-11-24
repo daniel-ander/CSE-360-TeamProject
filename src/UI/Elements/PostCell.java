@@ -50,6 +50,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     private final HBox actionsContainer = new HBox();
 
     private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
+    
+    private Integer currentlyHoveredOnStarIndex = null;
 
     public PostCell() {
         setInitialProperties();
@@ -85,7 +87,15 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
         currentVm = vm;
 
-        ratingsLabel.textProperty().bind(vm.getRatingProperty().asString("%.2f"));
+        ratingsLabel.textProperty().bind(
+        	    Bindings.createStringBinding(() -> {
+        	        BigDecimal rating = vm.getRatingProperty().get();
+        	        if (rating == null) return "-";
+        	        double stars = rating.doubleValue() * vm.getNumberOfRatingStars();
+        	        return String.format("%.2f", stars);
+        	    }, vm.getRatingProperty())
+        	);
+
 
         buildInteractiveStarRow(vm);
 
@@ -382,7 +392,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         Rectangle clip = new Rectangle();
         fill.setClip(clip);
 
-        // Fix: Use layoutBounds listener to set initial clip correctly
         fill.layoutBoundsProperty().addListener((obs, oldVal, newVal) -> {
             clip.setX(0);
             clip.setY(0);
@@ -404,37 +413,43 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     private void refreshStarFills(PostDisplayViewModel vm) {
         if (interactiveStars.isEmpty()) return;
 
-        BigDecimal rating = vm.getRatingProperty().get();
+        BigDecimal rating = vm.getStarRating();
         if (rating == null) rating = BigDecimal.ZERO;
 
         int totalStars = vm.getNumberOfRatingStars();
         double starsFilled = rating.doubleValue();
+        
+        System.out.println(vm.getPost().getId() + "______________");
 
         for (int i = 1; i <= totalStars; i++) {
-            StackPane star = interactiveStars.get(i - 1);
+            StackPane starStackPane = interactiveStars.get(i - 1);
 
             double fillAmount;
             if (hoveredStarIndex != null) {
                 fillAmount = (i <= hoveredStarIndex) ? 1.0 : 0.0;
+                ((Polygon)starStackPane.getChildren().get(1)).setFill(Color.BURLYWOOD);
             } else {
                 fillAmount = Math.min(Math.max(starsFilled - (i - 1), 0), 1);
+                ((Polygon)starStackPane.getChildren().get(1)).setFill(Color.GOLD);
             }
-
-            applyFillToStar(star, fillAmount);
+            applyFillToStar(starStackPane, fillAmount);
         }
+        
+        System.out.println(vm.getPost().getId() + "______________");
     }
 
-    private void applyFillToStar(StackPane star, double fillFraction) {
-        Polygon fillShape = (Polygon) star.getChildren().get(1);
-        Rectangle clip = (Rectangle) fillShape.getClip();
+    private void applyFillToStar(StackPane starStackPane, double fillFraction) {
+        Polygon starFill = (Polygon) starStackPane.getChildren().get(1);
+        Rectangle clip = (Rectangle) starFill.getClip();
 
-        Bounds lb = fillShape.getLayoutBounds();
-
-        clip.setX(0);
-        clip.setY(0);
+        Bounds lb = starFill.getLayoutBounds();
+        
+        clip.setX(lb.getMinX());
+        clip.setY(lb.getMinY());
         clip.setWidth(lb.getWidth() * fillFraction);
         clip.setHeight(lb.getHeight());
     }
+
 
     private Polygon buildStarPolygon() {
         Polygon star = new Polygon();

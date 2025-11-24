@@ -100,17 +100,19 @@ public class GeneralDBManager implements IGeneralDBManager {
 		);
 
 		String forumAnswersTableQuery = String.format(
-				  "CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
+				  "CREATE TABLE IF NOT EXISTS %s (" 
+				+ "id IDENTITY PRIMARY KEY, "
 				+ "questionId INT, " 
 				+ "parentAnswerId INT DEFAULT NULL, " 
-				+ "userId INT, " + "authorName TEXT, " 
+				+ "userId INT, " 
+				+ "authorName TEXT, " 
 				+ "body TEXT, "
 				+ "isCorrect BOOLEAN DEFAULT FALSE, " 
 				+ "isReview BOOLEAN DEFAULT FALSE, " 
 				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "isDeleted BOOLEAN DEFAULT FALSE, " 
-				+ "averageRating DECIMAL(3,2) DEFAULT 0.0, " 
+				+ "averageRating DECIMAL(3,2) NOT NULL DEFAULT 0, " 
 				+ "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
@@ -367,22 +369,22 @@ public class GeneralDBManager implements IGeneralDBManager {
 			""", ratingTableName);
 		
 		String updateAverageRating = String.format("""
-		    UPDATE %s a
-		    SET averageRating = (
-		        SELECT ROUND(AVG(r.rating), 2)
-		        FROM %s r
-		        WHERE r.answerId = a.id
-		    );
-		""", answerTableName, ratingTableName);
+			    UPDATE %s a
+			    SET averageRating = (
+			        SELECT COALESCE(ROUND(AVG(r.rating), 2), 0)
+			        FROM %s r
+			        WHERE r.answerId = a.id
+			    );
+			""", answerTableName, ratingTableName);
 
-		String updateUpvoteCount = String.format("""
-		    UPDATE %s a
-		    SET upvoteCount = (
-		        SELECT COUNT(*)
-		        FROM %s r
-		        WHERE r.answerId = a.id
-		    );
-		""", answerTableName, ratingTableName);
+			String updateUpvoteCount = String.format("""
+			    UPDATE %s a
+			    SET upvoteCount = (
+			        SELECT COALESCE(COUNT(*), 0)
+			        FROM %s r
+			        WHERE r.answerId = a.id
+			    );
+			""", answerTableName, ratingTableName);
 
 	
 

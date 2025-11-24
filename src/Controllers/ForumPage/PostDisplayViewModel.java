@@ -200,6 +200,10 @@ public class PostDisplayViewModel {
 	    return ratingProperty;
 	}
 	
+	public BigDecimal getStarRating() {
+		return ratingProperty.get().multiply(new BigDecimal(ratingStarCount));
+	}
+	
 	public IntegerProperty getUpvoteCountProperty() {
 	    return upvoteCountProperty;
 	}
@@ -267,10 +271,12 @@ public class PostDisplayViewModel {
 		return isExpandedProperty;
 	}
 	
+	// Building rating staight from the database-style rating 0.0-1.0
 	public void setRatingProperty(BigDecimal newRating) {
 	    ratingProperty.set(newRating);
 	}
 	
+	// Building rating from the UI Style, IE: 1-5 for stars
 	public void setRatingProperty(int starSelected) {
 		BigDecimal adjustedRating = BigDecimal.valueOf(starSelected).divide(BigDecimal.valueOf(ratingStarCount), 2, RoundingMode.HALF_UP);
 		setRatingProperty(adjustedRating);
@@ -278,6 +284,10 @@ public class PostDisplayViewModel {
 	
 	public void setUpvoteCountProperty(int upvoteCount) {
 		upvoteCountProperty.set(upvoteCount);
+	}
+	
+	public void resetRating() {
+		setRatingProperty(((Answer)post).getAverageRating());
 	}
 
 	// ===================
