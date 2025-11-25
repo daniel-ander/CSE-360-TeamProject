@@ -112,10 +112,14 @@ public class StaffHomePage implements IInitializable {
 		VBox centerActivityVBox = new VBox(10);
 		centerActivityVBox.setPadding(new Insets(10));
 		TabPane activityTabPane = new TabPane();
+
 		
 		Tab questionsTab = new Tab("Questions", questionsListView);
+		questionsTab.setClosable(false);
 		Tab answersTab = new Tab("Answers", answersListView);
+		answersTab.setClosable(false);
 		Tab messagesTab = new Tab("Messages", messagesListView);
+		messagesTab.setClosable(false);
 		
 		// Staff notes
 		VBox staffNotesVBox = new VBox(10);
@@ -124,9 +128,13 @@ public class StaffHomePage implements IInitializable {
 		noteInputHBox.getChildren().addAll(noteInputField, addNoteButton);
 		staffNotesVBox.getChildren().addAll(notesListView, noteInputHBox);
 		Tab notesTab = new Tab("Staff Notes", staffNotesVBox);
+		notesTab.setClosable(false);
 		
 		activityTabPane.getTabs().addAll(questionsTab, answersTab, messagesTab, notesTab);
 		centerActivityVBox.getChildren().addAll(selectedUserLabel, activityTabPane);
+	
+		activityTabPane.setTabMinWidth(79);
+		activityTabPane.setTabMaxWidth(79);
 		
 		// RIGHT SIDE
 		VBox rightSideVBox = new VBox(10);
