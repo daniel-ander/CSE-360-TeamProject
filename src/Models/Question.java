@@ -74,7 +74,6 @@ public class Question implements IPost {
 		return text;
 	}
 
-
 	@Override
 	public String getTitleText() {
 		return title;
