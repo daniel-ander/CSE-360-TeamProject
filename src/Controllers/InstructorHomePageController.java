@@ -1,19 +1,23 @@
 package Controllers;
 
 import Models.User;
-
+import Controllers.ForumPage.ForumHeaderViewModel;
+import Controllers.ForumPage.ForumPageController;
+import Controllers.ForumPage.PostListViewModel;
+import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.Messages.MessagesPageController;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 
 import Exceptions.DBExceptions.DataAccessException;
 
 import Sessions.UserSession;
-
+import UI.Pages.ForumPage;
 import UI.Pages.InstructorHomePage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 import UI.Pages.InstructorRequestsPage;
-
+import UI.Pages.MessagesPage;
 import Utils.Debug;
 
 import javafx.stage.Stage;
@@ -45,17 +49,79 @@ public class InstructorHomePageController {
         setInitialLayout();
         
         setLogoutButtonAction();
+        setEnterForumButtonAction();
+        setEnterMessagesPageButtonAction();
         setChangeRolesButtonAction();
         setManageRequestsButtonAction();
-        
-        if(Debug.isEnabled) {
-        	setUpDebugEnvironment();
-        }
+		if (Debug.isEnabled) {
+			// Additional debug setup can be added here
+		}
+		
+		
 	}
 	
 	// ===================
     // 		 SETTERS 
  	// ===================
+	
+	/**
+	 * Configures the enter forum button action.
+	 * Navigates to the forum page.
+	 */
+	private void setEnterForumButtonAction() {
+		view.getEnterForumButton().setOnAction(_ -> {
+			PostListViewModel postListViewModel = new PostListViewModel(
+					dBConnectionStore.getQuestionService(),
+					dBConnectionStore.getAnswerService(),
+					dBConnectionStore.getUserService(),
+					userSession
+			);
+			
+			ForumHeaderViewModel forumHeaderViewModel = new ForumHeaderViewModel(userSession);
+			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
+			
+			new ForumPageController(
+					dBConnectionStore,
+					primaryStage,
+					userSession,
+					new ForumPage(forumHeaderViewModel, questionPaneViewModel),
+					postListViewModel,
+					forum_header_view_model_safe(forumHeaderViewModel),
+					questionPaneViewModel
+			);
+		});
+	}
+	
+	
+	/**
+	 * Configures the enter messages page button action.
+	 * Navigates to the messages page.
+	 */
+	private void setEnterMessagesPageButtonAction() {
+		view.getEnterMessagesPageButton().setOnAction(_ -> {
+			PostListViewModel postListViewModel = new PostListViewModel(
+					dBConnectionStore.getQuestionService(),
+					dBConnectionStore.getAnswerService(),
+					dBConnectionStore.getUserService(),
+					userSession
+			);
+			
+			ForumHeaderViewModel messagesHeaderViewModel = new ForumHeaderViewModel(userSession);
+			QuestionPaneViewModel questionPaneViewModel = new QuestionPaneViewModel();
+			
+			new MessagesPageController(
+					dBConnectionStore,
+					primaryStage,
+					userSession,
+					new MessagesPage(messagesHeaderViewModel, questionPaneViewModel),
+					postListViewModel,
+					messagesHeaderViewModel,
+					questionPaneViewModel
+			);
+		});
+	}
+	
+	
     
     /**
      * Configures the logout button action.
@@ -105,13 +171,9 @@ public class InstructorHomePageController {
      */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
-    	view.setUserLabel(userSession.getCurrentUserName());
     }
+
+	// small helper to avoid accidental refactor break in posted snippet
+	private ForumHeaderViewModel forum_header_view_model_safe(ForumHeaderViewModel vm) { return vm; }
     
-    /**
-     * Adds a debug label to the view when debugging is enabled.
-     */
-    private void setUpDebugEnvironment() {
-    	view.addDebugLabel();
-    }
 }

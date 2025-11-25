@@ -69,7 +69,8 @@ public class InstructorRequestsPageController {
     private void wireActions() {
         view.getBackButton().setOnAction(_evt -> {
             // go back to instructor home
-            new InstructorHomePageController(store, primaryStage, userSession, new InstructorHomePage());
+        	Controllers.ForumPage.ForumHeaderViewModel instructorForumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(userSession);
+            new InstructorHomePageController(store, primaryStage, userSession, new InstructorHomePage(instructorForumHeaderViewModel));
         });
         //instructor selects a student request + load their performance
         view.getRequestsList().getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {

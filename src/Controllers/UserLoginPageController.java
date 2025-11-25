@@ -173,5 +173,11 @@ public class UserLoginPageController {
  			view.getUsernameField().setText("staff");
  			view.getPasswordField().setText("Password1!");
  		});
+ 		
+ 		view.getInstructorInfoAutoFillButton().setText("AutoFill Instructor Info (Debug)");
+ 		view.getInstructorInfoAutoFillButton().setOnAction(_ -> {
+ 			view.getUsernameField().setText("instructor");
+ 			view.getPasswordField().setText("Password1!");
+ 		});
     }
 }

@@ -1,12 +1,29 @@
+
 package UI.Pages;
 
-
+import UI.Elements.PostCell;
 import UI.Interfaces.IInitializable;
-import javafx.scene.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import Controllers.ForumPage.ForumHeaderViewModel;
+import Controllers.ForumPage.QuestionPaneViewModel;
+import Controllers.ForumPage.PostDisplayViewModel;
+import Models.User;
+import Models.Question;
+import Models.Answer;
+import Models.Message;
+
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.skin.ListViewSkin;
+import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.util.function.Consumer;
 
 /**
  * This page displays a simple welcome message for the user.
@@ -14,20 +31,44 @@ import javafx.stage.Stage;
 
 public class InstructorHomePage implements IInitializable {
 	
+	private final BorderPane root = new BorderPane();
+	
 	private final VBox layout = new VBox();
-	private final Scene scene = new Scene(layout, 800, 400);
-
-	private final Label userLabel = new Label(); // "Hello, " + currentUser + "!"
-	private final Label debugLabel = new Label("DEBUG MODE: No interactive elements on this page.");
+	private final ForumHeaderViewModel instructorHeaderViewModel;
+	private final Label userLabel = new Label();
 	private final Button logoutButton = new Button("Logout");
 	private final Button changeRolesButton = new Button("Change Roles");
 	private final Button manageRequestsButton = new Button("Manage Reviewer Requests");
+	private final Button enterForumButton = new Button("Enter Forum");
+	private final Button enterMessagesButton = new Button("Messages Page");
 	
-	public InstructorHomePage() {
+	
+	
+	public InstructorHomePage(ForumHeaderViewModel instructorHeaderViewModel) {
     	// import stylesheet
-    	scene.getStylesheets().add(
-    		getClass().getResource("/Styles/styles.css").toExternalForm()
-    	);
+		this.instructorHeaderViewModel = instructorHeaderViewModel;
+    	
+    }
+	
+    public void setInitialLayout(Stage primaryStage) {
+    	
+		Region spacer = new Region();
+		HBox header = new HBox();
+		HBox.setHgrow(spacer, Priority.ALWAYS);
+		
+		header.getChildren().addAll(logoutButton, changeRolesButton, enterMessagesButton, enterForumButton, manageRequestsButton, spacer);
+		header.setStyle("-fx-padding: 10; -fx-alignment: center-left;");
+		root.setTop(header);
+    	
+    	root.getStyleClass().add("layout");
+    
+	    
+	    // Set the scene to primary stage
+    	Scene scene = new Scene(root, 800, 400);
+	    primaryStage.setScene(scene);
+	    primaryStage.setTitle("Instructor Home Page");
+	    primaryStage.show();
+    	
     }
     
 	// ===================
@@ -46,36 +87,17 @@ public class InstructorHomePage implements IInitializable {
         return manageRequestsButton;
     }
     
-    public Label getDebugLabel() {
-    	return debugLabel;
-    }
-    
-    public VBox getLayout() {
-    	return layout;
-    }
+	public Button getEnterForumButton() {
+		return enterForumButton;
+	}
+	
+	public Button getEnterMessagesPageButton() {
+		return enterMessagesButton;
+	}
+
     
     // ===================
     // 		 SETTERS 
  	// ===================
     
-    public void setUserLabel(String text) {
-    	userLabel.setText("Hello, " + text + "!");
-    }
-    
-    public void setInitialLayout(Stage primaryStage) {
-    	layout.getStyleClass().add("layout");
-    	userLabel.getStyleClass().add("main-label");
-    	
-    	layout.getChildren().addAll(userLabel, logoutButton, changeRolesButton, manageRequestsButton);
-	    
-	    // Set the scene to primary stage
-	    primaryStage.setScene(scene);
-	    primaryStage.setTitle("Instructor Home Page");
-    	
-    }
-    
-    public void addDebugLabel() {
-    	debugLabel.getStyleClass().addAll("auxilary-label", "info-label");
-    	layout.getChildren().add(debugLabel);
-    }
 }
