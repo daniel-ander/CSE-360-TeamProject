@@ -264,7 +264,6 @@ public class PostListViewModel {
 	 */
 	public void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair,
 			IPost.Type postType) {
-
 		PostDisplayViewModel selectedPostVM = getVisiblePostByID(postIdToToggle, postType);
 		if (selectedPostVM == null)
 			return;
@@ -376,7 +375,7 @@ public class PostListViewModel {
 	 */
 	private void expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
 			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
-
+	
 		List<PostDisplayViewModel> children = null;
 
 		switch (currentFilterMode) {
@@ -387,7 +386,7 @@ public class PostListViewModel {
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
 			break;
 		}
-
+		System.out.println("Toggled" + children);
 		if (children == null)
 			return;
 
@@ -402,11 +401,13 @@ public class PostListViewModel {
 
 		// Refresh children
 		visiblePosts.removeAll(postParentMap.get(questionAnswerIDKeyPair));
-
+		
 		for (int i = children.size() - 1; i >= 0; i--) {
 			PostDisplayViewModel child = children.get(i);
+			child.setUserDefinedRating();
 			
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
+			System.out.println("Child");
 			visiblePosts.add(visibleParentPostIndex + 1, child);
 
 			KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(((Answer) child.getPost()).getQuestionId(),

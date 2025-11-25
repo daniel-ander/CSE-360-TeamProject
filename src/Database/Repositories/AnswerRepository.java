@@ -280,6 +280,26 @@ public class AnswerRepository implements IAnswerRepository {
 		return true;
 	}
 	
+	@Override
+	public BigDecimal getRating(int answerId, int userId) throws SQLException {
+	    String getRatingQuery = "SELECT rating FROM " + Rating.tableName + 
+	                 " WHERE userId = ? AND answerId = ?";
+
+	    try (Connection connection = generalDBManager.getConnection();
+				PreparedStatement pstmt = connection.prepareStatement(getRatingQuery)){
+	    	pstmt.setInt(1, userId);
+	    	pstmt.setInt(2, answerId);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getBigDecimal("rating");  
+	            } else {
+	                return null;
+	            }
+	        }
+	    }
+	}
+	
 	/**
      * Adds a row to the ratings table for particular answer and user
      */
@@ -319,9 +339,9 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        if(pstmt.executeUpdate() == 0) { // If for some reason the rating didn't already exist
 	        	addRating(answerId, userId, rating);
+	        } else {
+	        	updateAnswerRatingInfo(answerId);
 	        }
-	        
-	        updateAnswerRatingInfo(answerId);
 	    }
 	}
 

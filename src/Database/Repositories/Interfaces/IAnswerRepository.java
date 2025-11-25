@@ -31,5 +31,6 @@ public interface IAnswerRepository {
 
 	public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException;
 	public void updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+	public BigDecimal getRating(int userId, int answerId) throws SQLException;
 	
 }

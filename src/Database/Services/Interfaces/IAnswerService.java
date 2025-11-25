@@ -26,4 +26,5 @@ public interface IAnswerService {
 	public BigDecimal getAverageRating(int answerId) throws DataAccessException;
 	public void addRating(int answerId, int userId, BigDecimal rating) throws DataAccessException;
 	public void updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException;
+	public BigDecimal getRating(int answerId, int userId) throws DataAccessException;
 }

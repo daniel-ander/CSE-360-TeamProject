@@ -364,6 +364,11 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
                 hoveredStarIndex = null;
                 refreshStarFills(vm);
             });
+            
+            star.setOnMouseClicked(e -> {
+            	vm.setRatingProperty(starIndex);
+            	refreshStarFills(vm);
+            });
 
             interactiveStars.add(star);
             starsLayout.getChildren().add(star);
@@ -413,13 +418,14 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     private void refreshStarFills(PostDisplayViewModel vm) {
         if (interactiveStars.isEmpty()) return;
 
-        BigDecimal rating = vm.getStarRating();
+        BigDecimal rating =  vm.getStarRating();
+
         if (rating == null) rating = BigDecimal.ZERO;
 
         int totalStars = vm.getNumberOfRatingStars();
         double starsFilled = rating.doubleValue();
         
-        System.out.println(vm.getPost().getId() + "______________");
+        System.out. println(vm.getPost().getId() + "______________");
 
         for (int i = 1; i <= totalStars; i++) {
             StackPane starStackPane = interactiveStars.get(i - 1);
@@ -428,9 +434,11 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             if (hoveredStarIndex != null) {
                 fillAmount = (i <= hoveredStarIndex) ? 1.0 : 0.0;
                 ((Polygon)starStackPane.getChildren().get(1)).setFill(Color.BURLYWOOD);
-            } else {
+            } 
+            else {
                 fillAmount = Math.min(Math.max(starsFilled - (i - 1), 0), 1);
-                ((Polygon)starStackPane.getChildren().get(1)).setFill(Color.GOLD);
+                Color starColor = vm.isRatedByUser() ? Color.GOLDENROD : Color.GOLD;
+                ((Polygon)starStackPane.getChildren().get(1)).setFill(starColor);
             }
             applyFillToStar(starStackPane, fillAmount);
         }

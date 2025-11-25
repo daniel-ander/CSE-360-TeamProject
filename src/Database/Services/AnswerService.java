@@ -181,6 +181,15 @@ public class AnswerService implements IAnswerService {
 	}
 	
 	@Override
+	public BigDecimal getRating(int answerId, int userId) throws DataAccessException {
+		try {
+			return answerRepository.getRating(answerId, userId);
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to fetch rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
 	public void addRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
 		try {
 			answerRepository.addRating(answerId, userId, rating);

@@ -1,5 +1,6 @@
 package Config;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -101,6 +102,8 @@ public class PreLoader {
 			for (Question question : remainingQuestions) {
 				cacheAnswersForQuestion(question, executor);
 			}
+
+//			cacheRatingForAnswers(executor);
 			
 			executor.shutdown();
 		});
@@ -113,9 +116,25 @@ public class PreLoader {
 			for (Answer a : answers) {
 				List<String> permissions = permissionService.getEffectivePermissions(userSession.getCurrentUserId(),
 						a.getId(), IPost.Type.Answer);
+				
+				BigDecimal answerRating = answerService.getRating(a.getId(), userSession.getCurrentUserId());
+				AppCache.getInstance().setRatingForAnswer(a.getId(), answerRating);
+				
 				answersWithPermissions.add(new PostWithPermissions(a, permissions));
 			}
 			AppCache.getInstance().setAnswersDataProperty(answersWithPermissions);
 		});
 	}
+	
+	//TODO:- Make proper rating caching
+	
+//	private void cacheRatingForAnswers(ExecutorService executor) {
+//		executor.submit(() -> {
+//			for(Answer answer : AppCache.getInstance().getAnswerList()) {
+//				BigDecimal answerRating = answerService.getRating(answer.getId(), userSession.getCurrentUserId());
+//				AppCache.getInstance().setRatingForAnswer(answer.getId(), answerRating);
+//			}
+//		});
+//	}
+
 }

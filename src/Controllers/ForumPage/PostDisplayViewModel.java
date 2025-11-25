@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import Config.AppCache;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IUserService;
 import Exceptions.DBExceptions.DataAccessException;
@@ -43,7 +44,9 @@ public class PostDisplayViewModel {
 	private final BooleanProperty shouldDisplayFavoredReviewerButtonProperty = new SimpleBooleanProperty(false);
 	private final ObjectProperty<FilterType> filterProperty = new SimpleObjectProperty<>(FilterType.TIME);
 	private final ObjectProperty<BigDecimal> ratingProperty = new SimpleObjectProperty<>(BigDecimal.ZERO);
+	
 	private final IntegerProperty upvoteCountProperty = new SimpleIntegerProperty(0);
+	private final ObjectProperty<BigDecimal> currentUserRatingProperty = new SimpleObjectProperty<>(null);
 
 	private StringProperty labelTextProperty = new SimpleStringProperty();
 	private StringProperty bodyTextProperty = new SimpleStringProperty();
@@ -201,11 +204,23 @@ public class PostDisplayViewModel {
 	}
 	
 	public BigDecimal getStarRating() {
-		return ratingProperty.get().multiply(new BigDecimal(ratingStarCount));
+ 		BigDecimal starsToFillRating = getCurrentUserRating() != null ? currentUserRatingProperty.get() : ratingProperty.get();
+
+		return starsToFillRating.multiply(new BigDecimal(ratingStarCount));
 	}
 	
 	public IntegerProperty getUpvoteCountProperty() {
 	    return upvoteCountProperty;
+	}
+	
+	public BigDecimal getCurrentUserRating() {
+		System.out.println("Post ID: " + post.getId());
+		System.out.println("Current user rating: " + currentUserRatingProperty.get());
+		return currentUserRatingProperty.get();
+	}
+	
+	public boolean isRatedByUser() {
+		return getCurrentUserRating() != null;
 	}
 
 	// ===================
@@ -278,8 +293,21 @@ public class PostDisplayViewModel {
 	
 	// Building rating from the UI Style, IE: 1-5 for stars
 	public void setRatingProperty(int starSelected) {
-		BigDecimal adjustedRating = BigDecimal.valueOf(starSelected).divide(BigDecimal.valueOf(ratingStarCount), 2, RoundingMode.HALF_UP);
-		setRatingProperty(adjustedRating);
+		BigDecimal newRating = BigDecimal.valueOf(starSelected).divide(BigDecimal.valueOf(ratingStarCount), 2, RoundingMode.HALF_UP);
+		BigDecimal currentRating = currentUserRatingProperty.get();
+		
+		try {
+			if(newRating == currentRating) {
+				answerService.removeRating(post.getId(), userSession.getCurrentUserId());
+			} else {
+				answerService.updateRating(post.getId(), userSession.getCurrentUserId(), newRating);
+				setRatingProperty(newRating);
+				currentUserRatingProperty.set(newRating);
+			}
+		} catch(DataAccessException e) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		setRatingProperty(newRating);
 	}
 	
 	public void setUpvoteCountProperty(int upvoteCount) {
@@ -288,6 +316,19 @@ public class PostDisplayViewModel {
 	
 	public void resetRating() {
 		setRatingProperty(((Answer)post).getAverageRating());
+	}
+	
+	public void setUserDefinedRating() {		
+		int answerId = post.getId();
+		BigDecimal cachedRating = AppCache.getInstance().getRatingForAnswer(answerId);
+		
+		if(cachedRating == null) {
+			BigDecimal retrievedRating = answerService.getRating(answerId, userSession.getCurrentUserId());
+			AppCache.getInstance().setRatingForAnswer(answerId, retrievedRating);
+			currentUserRatingProperty.set(retrievedRating);
+		} else {
+			currentUserRatingProperty.set(cachedRating);
+		}
 	}
 
 	// ===================
