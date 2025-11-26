@@ -339,9 +339,9 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        if(pstmt.executeUpdate() == 0) { // If for some reason the rating didn't already exist
 	        	addRating(answerId, userId, rating);
-	        } else {
-	        	updateAnswerRatingInfo(answerId);
-	        }
+	        } 
+	        
+	        updateAnswerRatingInfo(answerId);
 	    }
 	}
 
@@ -381,6 +381,8 @@ public class AnswerRepository implements IAnswerRepository {
 			} else {
 				Debug.write("No such rating to modify");
 			}
+			
+			updateAnswerRatingInfo(answerId);
 		}
 	}
 	

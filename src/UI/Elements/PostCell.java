@@ -345,8 +345,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         interactiveStars.clear();
         starsLayout.setAlignment(Pos.CENTER_LEFT);
 
-        ObjectProperty<BigDecimal> ratingProperty = vm.getRatingProperty();
-
         for (int i = 1; i <= vm.getNumberOfRatingStars(); i++) {
             final int starIndex = i;
 
@@ -364,17 +362,11 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
                 hoveredStarIndex = null;
                 refreshStarFills(vm);
             });
-            
-            star.setOnMouseClicked(e -> {
-            	vm.setRatingProperty(starIndex);
-            	refreshStarFills(vm);
-            });
 
             interactiveStars.add(star);
             starsLayout.getChildren().add(star);
         }
 
-        ratingProperty.addListener((obs, oldV, newV) -> refreshStarFills(vm));
         refreshStarFills(vm);
 
         return starsLayout;
@@ -387,7 +379,15 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     ) {
         Polygon outline = buildStarPolygon();
         Polygon fill = buildStarPolygon();
-
+        Button button = new Button();
+        button.setPrefHeight(outline.getLayoutBounds().getHeight());
+        button.setPrefWidth(outline.getLayoutBounds().getWidth());
+        button.setBackground(Background.EMPTY);
+        button.setOnMouseClicked(e -> {
+        	vm.setRatingProperty(starIndex);
+        	refreshStarFills(vm);
+        });
+        
         outline.setFill(Color.TRANSPARENT);
         outline.setStroke(Color.GOLD);
         outline.setStrokeWidth(2);
@@ -404,13 +404,13 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             clip.setHeight(newVal.getHeight());
         });
 
-        StackPane pane = new StackPane(outline, fill);
+        StackPane pane = new StackPane(outline, fill, button);
         pane.setBackground(Background.EMPTY);
 
         pane.setScaleX(0.5);
         pane.setScaleY(0.5);
 
-        pane.setOnMouseClicked(e -> onClick.run());
+//        pane.setOnMouseClicked(e -> onClick.run());
 
         return pane;
     }
@@ -424,8 +424,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
         int totalStars = vm.getNumberOfRatingStars();
         double starsFilled = rating.doubleValue();
-        
-        System.out. println(vm.getPost().getId() + "______________");
 
         for (int i = 1; i <= totalStars; i++) {
             StackPane starStackPane = interactiveStars.get(i - 1);
@@ -442,8 +440,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             }
             applyFillToStar(starStackPane, fillAmount);
         }
-        
-        System.out.println(vm.getPost().getId() + "______________");
     }
 
     private void applyFillToStar(StackPane starStackPane, double fillFraction) {
