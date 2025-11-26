@@ -1,4 +1,4 @@
-
+// java
 package UI.Pages;
 
 import UI.Elements.PostCell;
@@ -6,7 +6,6 @@ import UI.Interfaces.IInitializable;
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
 import Controllers.ForumPage.PostDisplayViewModel;
-import Models.User;
 import Models.Question;
 import Models.Answer;
 import Models.Message;
@@ -48,6 +47,18 @@ public class InstructorHomePage implements IInitializable {
 	private final Button createRequestButton = new Button("Create Request");
 	private final TextArea reopenDescription = new TextArea();
 	private final Button reopenButton = new Button("Reopen Selected");
+	
+	// Reviews tab UI
+	
+	private final ObservableList<PostDisplayViewModel> viewModels = FXCollections.observableArrayList();
+	private final ListView<PostDisplayViewModel> instructorReviewListView = new ListView<>(viewModels);
+	
+	// changed to String to match InstructorReviewViewModel.getUsers()
+	public final ListView<String> userListView = new ListView<>();
+	public final ListView<Question> questionsListView = new ListView<>();
+	public final ListView<Answer> answersListView = new ListView<>();
+	public final ListView<Message> messagesListView = new ListView<>();
+	public final TextArea contentViewer = new TextArea();
 	
 	public InstructorHomePage(ForumHeaderViewModel instructorHeaderViewModel) {
 		this.instructorHeaderViewModel = instructorHeaderViewModel;
@@ -111,9 +122,53 @@ public class InstructorHomePage implements IInitializable {
     	requestsTab.setClosable(false);
     	Tab reviewerScoreCardTab = new Tab("Reviewer Scorecards");
     	reviewerScoreCardTab.setClosable(false);
-    	Tab ReviewTab = new Tab("Reviews");
-    	
-    	tabPane.getTabs().addAll(homeTab, requestsTab, reviewerScoreCardTab);
+
+    	// Reviews tab layout (left: users, center: activity tabs, right: content viewer)
+    	VBox leftUsersBox = new VBox(10);
+    	leftUsersBox.setPadding(new Insets(10));
+    	Label usersLabel = new Label("Users");
+    	leftUsersBox.getChildren().addAll(usersLabel, userListView);
+    	leftUsersBox.setPrefWidth(200);
+
+    	// Center activity tabs for Reviews
+    	VBox centerActivityBox = new VBox(10);
+    	centerActivityBox.setPadding(new Insets(10));
+    	TabPane activityTabPane = new TabPane();
+    	Tab questionsTabR = new Tab("Questions", questionsListView);
+    	questionsTabR.setClosable(false);
+    	Tab answersTabR = new Tab("Answers", answersListView);
+    	answersTabR.setClosable(false);
+    	Tab messagesTabR = new Tab("Messages", messagesListView);
+    	messagesTabR.setClosable(false);
+    	activityTabPane.getTabs().addAll(questionsTabR, answersTabR, messagesTabR);
+    	activityTabPane.setTabMinWidth(79);
+    	activityTabPane.setTabMaxWidth(79);
+    	centerActivityBox.getChildren().add(activityTabPane);
+
+    	// Right content viewer
+    	VBox rightContentBox = new VBox(10);
+    	rightContentBox.setPadding(new Insets(10));
+    	rightContentBox.setPrefWidth(300);
+    	Label contentLabel = new Label("Content Viewer");
+    	contentViewer.setWrapText(true);
+    	contentViewer.setEditable(false);
+    	rightContentBox.getChildren().addAll(contentLabel, contentViewer);
+
+    	// Combine into a BorderPane for the Reviews tab
+    	BorderPane reviewsPane = new BorderPane();
+    	reviewsPane.setLeft(leftUsersBox);
+    	reviewsPane.setCenter(centerActivityBox);
+    	reviewsPane.setRight(rightContentBox);
+
+    	// Create and add the Reviews tab
+    	Tab reviewsTab = new Tab("Reviews", reviewsPane);
+    	reviewsTab.setClosable(false);
+
+    	// Add tabs to tabPane (ensure Reviews tab is included)
+    	tabPane.getTabs().clear();
+    	tabPane.getTabs().addAll(homeTab, requestsTab, reviewerScoreCardTab, reviewsTab);
+
+    	// Set center and show stage
     	root.setCenter(tabPane);
     
 	    Scene scene = new Scene(root, 900, 500);
@@ -139,6 +194,15 @@ public class InstructorHomePage implements IInitializable {
 	public Button getCreateRequestButton() { return createRequestButton; }
 	public TextArea getReopenDescriptionArea() { return reopenDescription; }
 	public Button getReopenButton() { return reopenButton; }
+	
+	// Reviews tab getters for controller binding
+	// return type updated to match view model (String usernames)
+	public ListView<String> getUserListView() { return userListView; }
+	public ListView<Question> getQuestionsListView() { return questionsListView; }
+	public ListView<Answer> getAnswersListView() { return answersListView; }
+	public ListView<Message> getMessagesListView() { return messagesListView; }
+	public TextArea getContentViewerTextArea() { return contentViewer; }
+	
     
     // ===================
     // 		 SETTERS 
