@@ -109,8 +109,11 @@ public class InstructorHomePage implements IInitializable {
     	homeTab.setClosable(false);
     	Tab requestsTab = new Tab("Requests", requestsGrid);
     	requestsTab.setClosable(false);
+    	Tab reviewerScoreCardTab = new Tab("Reviewer Scorecards");
+    	reviewerScoreCardTab.setClosable(false);
+    	Tab ReviewTab = new Tab("Reviews");
     	
-    	tabPane.getTabs().addAll(homeTab, requestsTab);
+    	tabPane.getTabs().addAll(homeTab, requestsTab, reviewerScoreCardTab);
     	root.setCenter(tabPane);
     
 	    Scene scene = new Scene(root, 900, 500);
