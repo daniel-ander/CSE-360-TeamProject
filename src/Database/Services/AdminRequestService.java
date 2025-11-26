@@ -4,8 +4,8 @@ import Database.Repositories.Interfaces.IAdminRequestRepository;
 import Database.Services.Interfaces.IAdminRequestService;
 import Models.AdminRequest;
 
+import java.util.ArrayList;
 import java.util.List;
-
 
 
 public class AdminRequestService implements IAdminRequestService {
@@ -18,31 +18,57 @@ public class AdminRequestService implements IAdminRequestService {
 
     @Override
     public List<AdminRequest> getOpenRequests() {
-        return adminRequestRepository.getOpenRequests();
+        List<AdminRequest> adminRequests  = adminRequestRepository.getAllRequests();
+        List<AdminRequest> openRequests = new ArrayList<AdminRequest>();
+        
+        for(AdminRequest request : adminRequests){
+        	if (!request.isClosed()) {
+        		openRequests.add(request);
+        	}
+        }
+        return openRequests;
     }
 
     @Override
     public List<AdminRequest> getClosedRequests() {
-        return adminRequestRepository.getClosedRequests();
+        List<AdminRequest> adminRequests  = adminRequestRepository.getAllRequests();
+        List<AdminRequest> openRequests = new ArrayList<AdminRequest>();
+        
+        for(AdminRequest request : adminRequests){
+        	if (request.isClosed()) {
+        		openRequests.add(request);
+        	}
+        }
+        return openRequests;
     }
 
     @Override
     public void createRequest(String description) {
-        adminRequestRepository.createRequest(description);
+    	AdminRequest request = new AdminRequest(0, description, false, null);
+        adminRequestRepository.insert(request);
     }
-
+    
     @Override
     public void closeRequest(int id) {
-    	adminRequestRepository.closeRequest(id);
+    	AdminRequest oldRequest = adminRequestRepository.getById(id);
+    	if (oldRequest == null || oldRequest.isClosed()) return;
+    	
+    	oldRequest.setClosed(true);
+    	adminRequestRepository.update(oldRequest);    	
     }
 
     @Override
     public void reopen(int id, String newDescription) {
-    	adminRequestRepository.reopen(id, newDescription);
-    }
-
-    @Override
-    public AdminRequest find(int id) {
-    	return adminRequestRepository.find(id);
+    	AdminRequest oldRequest = adminRequestRepository.getById(id);
+    	if (oldRequest == null || oldRequest.isClosed()) return;
+    	
+    	AdminRequest newRequest = new AdminRequest(
+    		0,
+    		newDescription,
+    		false,
+    		oldRequest.getOriginalRequestId()
+		);
+    	
+    	adminRequestRepository.update(newRequest);
     }
 }

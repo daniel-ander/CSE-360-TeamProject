@@ -9,16 +9,10 @@ import java.util.List;
  * Defines basic CRUD operations used by services/controllers.
  */
 public interface IAdminRequestRepository {
+    List<AdminRequest> getAllRequests();
+    AdminRequest getById(int id);
 
-    List<AdminRequest> getOpenRequests();
+    void insert(AdminRequest request);
 
-    List<AdminRequest> getClosedRequests();
-
-    void createRequest(String description);
-
-    void closeRequest(int id);
-
-    void reopen(int id, String newDescription);
-    
-    AdminRequest find(int id);
+    void update(AdminRequest request);    
 }
