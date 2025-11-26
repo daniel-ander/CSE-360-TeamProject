@@ -12,4 +12,6 @@ public interface IAdminRequestService {
 
     void closeRequest(int id);                 // optional
     void reopen(int id, String newDescription);
+    
+    AdminRequest find(int id);
 }

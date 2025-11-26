@@ -1,6 +1,7 @@
 package Database.Repositories.Interfaces;
 
 import Models.AdminRequest;
+
 import java.util.List;
 
 /**
@@ -18,4 +19,6 @@ public interface IAdminRequestRepository {
     void closeRequest(int id);
 
     void reopen(int id, String newDescription);
+    
+    AdminRequest find(int id);
 }
