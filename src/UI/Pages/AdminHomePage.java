@@ -38,6 +38,7 @@ public class AdminHomePage implements IInitializable {
 	
 	private final Button saveRolesButton = new Button("Save");
 	private final Button setTempPasswordButton = new Button("Set Temp Password");
+	private final Button goToNotificationsButton = new Button("See Notifications");
 	private final Button deleteUserButton = new Button("Delete User");
 	
 	private final Alert warningAlert = new Alert(Alert.AlertType.WARNING);
@@ -84,6 +85,10 @@ public class AdminHomePage implements IInitializable {
 	
 	public Button getSetTempPasswordButton() {
 		return setTempPasswordButton;
+	}
+	
+	public Button getGoToNotificationsButton() {
+		return goToNotificationsButton;
 	}
 	
 	public Button getSaveRolesButton() {
@@ -155,7 +160,7 @@ public class AdminHomePage implements IInitializable {
 		
 		setUserRoleDropdownLayout();
 		
-		layout.getChildren().addAll(adminLabel, roleBox, userDetailsLabel, deleteUserButton, setTempPasswordButton, tempPasswordInfoLabel);
+		layout.getChildren().addAll(adminLabel, roleBox, userDetailsLabel, deleteUserButton, setTempPasswordButton, tempPasswordInfoLabel, goToNotificationsButton);
 		
 		// Set the scene to primary stage
 		primaryStage.setScene(scene);

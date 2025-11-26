@@ -50,6 +50,14 @@ public class AdminRequestsViewModel {
         reopenDescription.set("");
         refresh();
     }
+    
+    public void closeSelected() {
+    	AdminRequest r = selectedOpen.get();
+    	if (r == null || r.isClosed()) return;
+    	
+    	service.closeRequest(r.getId());
+    	refresh();
+    }
 
     // getters
     public ObservableList<AdminRequest> getOpenRequests() { return openRequests; }

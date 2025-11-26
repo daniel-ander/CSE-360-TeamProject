@@ -60,15 +60,16 @@ public class AdminRequestService implements IAdminRequestService {
     @Override
     public void reopen(int id, String newDescription) {
     	AdminRequest oldRequest = adminRequestRepository.getById(id);
-    	if (oldRequest == null || oldRequest.isClosed()) return;
+    	if (oldRequest == null || !oldRequest.isClosed()) return;
+    	
     	
     	AdminRequest newRequest = new AdminRequest(
     		0,
     		newDescription,
     		false,
-    		oldRequest.getOriginalRequestId()
+    		oldRequest.getId()
 		);
     	
-    	adminRequestRepository.update(newRequest);
+    	adminRequestRepository.insert(newRequest);
     }
 }

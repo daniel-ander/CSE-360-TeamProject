@@ -23,6 +23,7 @@ import UI.Pages.AdminHomePage;
  */
 public class AdminHomePageController {
 	private final IUserService userService;
+	private final DBConnectionStore dBConnectionStore;
 	private final AdminHomePage view;
 	private final Stage primaryStage;
 	private final UserSession userSession;
@@ -37,6 +38,7 @@ public class AdminHomePageController {
 	public AdminHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminHomePage view) {
 		this.view = view;
 		this.userService = dBConnectionStore.getUserService();
+		this.dBConnectionStore = dBConnectionStore;
 		this.primaryStage = primaryStage;
 		this.userSession = userSession;
 		
@@ -47,6 +49,7 @@ public class AdminHomePageController {
 		setOnUserDropdownAction();
 		setUserDeleteButtonAction();
 		setSaveRolesButtonAction();
+		setGoToNotificationsButton();
 	}
 	
 	// ===================
@@ -269,6 +272,11 @@ public class AdminHomePageController {
         	System.err.println(e.getMessage());
             e.printStackTrace();
         }
-    
 	}
+	
+    private void setGoToNotificationsButton() {
+    	view.getGoToNotificationsButton().setOnAction(_ -> {
+    		new AdminNotificationsPageController(dBConnectionStore, primaryStage, userSession, new UI.Pages.AdminNotificationsPage());
+	    });
+    }
 }
