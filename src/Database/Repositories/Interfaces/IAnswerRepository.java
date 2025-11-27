@@ -24,13 +24,13 @@ public interface IAnswerRepository {
 	
 	public Answer getAnswerById(int answerId) throws SQLException;
 
-	public void deleteRating(int answerId, int userId) throws SQLException;
+	public AnswerRatingInfo deleteRating(int answerId, int userId) throws SQLException;
 
-	public void addRating(int answerId, int userId, BigDecimal rating) throws SQLException;
-	public void updateAnswerRatingInfo(int answerId) throws SQLException;
+	public AnswerRatingInfo addRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+	public AnswerRatingInfo updateAnswerRatingInfo(int answerId) throws SQLException;
 
 	public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException;
-	public void updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;
 	public BigDecimal getRating(int userId, int answerId) throws SQLException;
 	
 }

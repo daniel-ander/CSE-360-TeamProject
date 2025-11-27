@@ -50,8 +50,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     private final HBox actionsContainer = new HBox();
 
     private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
-    
-    private Integer currentlyHoveredOnStarIndex = null;
 
     public PostCell() {
         setInitialProperties();
@@ -92,12 +90,14 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         	        BigDecimal rating = vm.getRatingProperty().get();
         	        if (rating == null) return "-";
         	        double stars = rating.doubleValue() * vm.getNumberOfRatingStars();
-        	        return String.format("%.2f", stars);
+        	        int ratingCount = vm.getUpvoteCountProperty().get();
+        	        return String.format("%.2f(%d)", stars, ratingCount);
         	    }, vm.getRatingProperty())
         	);
 
 
         buildInteractiveStarRow(vm);
+        refreshStarFills(currentVm);
 
         favorReviewerButton.textProperty().bind(
                 Bindings.when(vm.getIsFavoredReviewerProperty())
@@ -367,6 +367,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             starsLayout.getChildren().add(star);
         }
 
+        
         refreshStarFills(vm);
 
         return starsLayout;
@@ -384,7 +385,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         button.setPrefWidth(outline.getLayoutBounds().getWidth());
         button.setBackground(Background.EMPTY);
         button.setOnMouseClicked(e -> {
-        	vm.setRatingProperty(starIndex);
+        	vm.setPersonalRatingProperty(starIndex);
         	refreshStarFills(vm);
         });
         
@@ -410,20 +411,19 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         pane.setScaleX(0.5);
         pane.setScaleY(0.5);
 
-//        pane.setOnMouseClicked(e -> onClick.run());
-
         return pane;
     }
 
     private void refreshStarFills(PostDisplayViewModel vm) {
         if (interactiveStars.isEmpty()) return;
 
-        BigDecimal rating =  vm.getStarRating();
-
-        if (rating == null) rating = BigDecimal.ZERO;
-
+        BigDecimal currentUserRating =  vm.getCurrentUserStarRating();
+        BigDecimal postAverageRating = vm.getRatingProperty().get().multiply(BigDecimal.valueOf(vm.getNumberOfRatingStars()));
+        BigDecimal ratingToDisplay = (currentUserRating != BigDecimal.ZERO) ? currentUserRating
+        	       : (postAverageRating != BigDecimal.ZERO) ? postAverageRating
+        	    	       : BigDecimal.ZERO;;
         int totalStars = vm.getNumberOfRatingStars();
-        double starsFilled = rating.doubleValue();
+        double starsFilled = ratingToDisplay.doubleValue();
 
         for (int i = 1; i <= totalStars; i++) {
             StackPane starStackPane = interactiveStars.get(i - 1);

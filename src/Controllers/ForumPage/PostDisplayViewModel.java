@@ -217,7 +217,7 @@ public class PostDisplayViewModel {
 	    return ratingProperty;
 	}
 	
-	public BigDecimal getStarRating() {
+	public BigDecimal getCurrentUserStarRating() {
  		BigDecimal starsToFillRating = getCurrentUserRating() != null ? currentUserRatingProperty.get() : ratingProperty.get();
 
 		return starsToFillRating.multiply(new BigDecimal(ratingStarCount));
@@ -232,7 +232,7 @@ public class PostDisplayViewModel {
 	}
 	
 	public boolean isRatedByUser() {
-		return getCurrentUserRating() != null;
+		return getCurrentUserRating() != null && getCurrentUserRating() != BigDecimal.ZERO;
 	}
 
 	// ===================
@@ -300,49 +300,34 @@ public class PostDisplayViewModel {
 	}
 	
 	// Building rating from the UI Style, IE: 1-5 for stars
-	public void setRatingProperty(int starSelected) {
+	public void setPersonalRatingProperty(int starSelected) {
 	    // Normalize new rating to 0–1 scale
-	    BigDecimal newRating = BigDecimal.valueOf(starSelected - 1)
-	            .divide(BigDecimal.valueOf(ratingStarCount - 1), 2, RoundingMode.HALF_UP);
-	    
-	    BigDecimal starRating = BigDecimal.valueOf(starSelected)
+	    BigDecimal selectedStarRating = BigDecimal.valueOf(starSelected)
 			    .divide(BigDecimal.valueOf(ratingStarCount), 2, RoundingMode.HALF_UP);
 
-	    // Normalize old rating if it exists
 	    BigDecimal oldRating = currentUserRatingProperty.get();
-//	    System.out.println("New rating: " + newRating);
-//	    System.out.println("Old rating: " + oldRating);
-
-	    BigDecimal currentAverage = ((Answer) post).getAverageRating();
-	    int currentCount = ((Answer) post).getUpvoteCount();
 
 	    AnswerRatingInfo newAvgRatingAndUpvoteCount;
 	    
 	    Answer answer = ((Answer)post);
 
 	    try {
-	        if (oldRating != null && starRating.compareTo(oldRating) == 0) {
-	            // User is removing their rating
-	            newAvgRatingAndUpvoteCount = applyRatingChange(currentAverage, currentCount, oldRating, null);
-
-	            updateRatingInBackground(null, oldRating, currentCount, RatingUpdateType.DELETE);
-	            
-	            answer.setUpvoteCount(currentCount - 1);
-	            currentUserRatingProperty.set(getRatingProperty().get());
+	        if (oldRating != null && selectedStarRating.compareTo(oldRating) == 0) {
+	        	newAvgRatingAndUpvoteCount = answerService.removeRating(post.getId(), userSession.getCurrentUserId());
+	              
+	            currentUserRatingProperty.set(null);
 
 	        } else {
-	            // User is adding or changing a rating
-	            newAvgRatingAndUpvoteCount = applyRatingChange(currentAverage, currentCount, oldRating, newRating);
+	            newAvgRatingAndUpvoteCount = answerService.updateRating(post.getId(), userSession.getCurrentUserId(), selectedStarRating);
 
-	            updateRatingInBackground(newRating, oldRating, currentCount, RatingUpdateType.UPDATE);
-	            
-	            answer.setUpvoteCount(currentCount + 1);
-	            currentUserRatingProperty.set(starRating);
+	            currentUserRatingProperty.set(selectedStarRating);
 	        }
+	        
+	        answer.setUpvoteCount(newAvgRatingAndUpvoteCount.getUpvoteCount());
+	        setUpvoteCountProperty(newAvgRatingAndUpvoteCount.getUpvoteCount());
+            answer.setAverageRating(newAvgRatingAndUpvoteCount.getAverageRating());
 
-	        // Update UI immediately
 	        setRatingProperty(newAvgRatingAndUpvoteCount.getAverageRating());
-	        upvoteCountProperty.set(newAvgRatingAndUpvoteCount.getUpvoteCount());
 
 	    } catch (Exception e) {
 	        System.out.println(e.getLocalizedMessage());
@@ -363,19 +348,13 @@ public class PostDisplayViewModel {
 		BigDecimal cachedRating = AppCache.getInstance().getRatingForAnswer(answerId);
 		
 		if(cachedRating == null) {
-			BigDecimal retrievedRating = answerService.getRating(answerId, userSession.getCurrentUserId());
-			BigDecimal converted;
+			BigDecimal retrievedPersonalRating = answerService.getRating(answerId, userSession.getCurrentUserId());
 			
-			System.out.println("Retrieved: " + retrievedRating);
-			if(retrievedRating == null) {
-				retrievedRating = BigDecimal.ZERO;
-				converted = BigDecimal.ZERO;
-			} else {
-				converted = retrievedRating.multiply(BigDecimal.valueOf(0.8)).add(BigDecimal.valueOf(0.2));
-			}
-			System.out.println("Converted: " + converted);
-			AppCache.getInstance().setRatingForAnswer(answerId, retrievedRating);
-			currentUserRatingProperty.set(converted);
+			
+			retrievedPersonalRating = retrievedPersonalRating == null ? BigDecimal.ZERO : retrievedPersonalRating;
+			System.out.println("Retrieved RatingL: " + retrievedPersonalRating);
+			AppCache.getInstance().setRatingForAnswer(answerId, retrievedPersonalRating);
+			currentUserRatingProperty.set(retrievedPersonalRating);
 		} else {
 			currentUserRatingProperty.set(cachedRating);
 		}
@@ -463,37 +442,37 @@ public class PostDisplayViewModel {
 		});
 	}
 	
-	private AnswerRatingInfo applyRatingChange(
-	        BigDecimal avg,
-	        int count,
-	        BigDecimal oldRating,
-	        BigDecimal newRating)
-	{
-		System.out.println("Average: " + avg);
-		System.out.println("Count: " + count);
-	    BigDecimal total = avg.multiply(BigDecimal.valueOf(count));
-
-	    // Remove old rating
-	    if (oldRating != null) {
-	        total = total.subtract(oldRating);
-	        count--;
-	    }
-
-	    // Add new rating
-	    if (newRating != null) {
-	        total = total.add(newRating);
-	        count++;
-	    }
-
-	    if (count == 0) {
-	        return new AnswerRatingInfo(BigDecimal.ZERO, 0);
-	    }
-
-	    BigDecimal newAverage =
-	        total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
-
-	    return new AnswerRatingInfo(newAverage, count);
-	}
+//	private AnswerRatingInfo applyRatingChange(
+//	        BigDecimal avg,
+//	        int count,
+//	        BigDecimal oldRating,
+//	        BigDecimal newRating)
+//	{
+//		System.out.println("Average: " + avg);
+//		System.out.println("Count: " + count);
+//	    BigDecimal total = avg.multiply(BigDecimal.valueOf(count));
+//
+//	    // Remove old rating
+//	    if (oldRating != null) {
+//	        total = total.subtract(oldRating);
+//	        count--;
+//	    }
+//
+//	    // Add new rating
+//	    if (newRating != null) {
+//	        total = total.add(newRating);
+//	        count++;
+//	    }
+//
+//	    if (count == 0) {
+//	        return new AnswerRatingInfo(BigDecimal.ZERO, 0);
+//	    }
+//
+//	    BigDecimal newAverage =
+//	        total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
+//
+//	    return new AnswerRatingInfo(newAverage, count);
+//	}
 
 	
 	private void updateRatingInBackground(BigDecimal newRating, BigDecimal oldRating, int oldUpvoteCount, RatingUpdateType updateType) {
@@ -502,9 +481,7 @@ public class PostDisplayViewModel {
 			protected Void call() throws Exception {
 				if(updateType == RatingUpdateType.DELETE) {
 					answerService.removeRating(post.getId(), userSession.getCurrentUserId());
-					System.out.println("Removed");
 				} else {
-					System.out.println("New Rating: " + newRating);
 					answerService.updateRating(post.getId(), userSession.getCurrentUserId(), newRating);
 				}
 				return null;

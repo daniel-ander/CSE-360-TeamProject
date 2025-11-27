@@ -304,7 +304,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Adds a row to the ratings table for particular answer and user
      */
 	@Override
-	public void addRating(int answerId, int userId, BigDecimal rating) throws SQLException {
+	public AnswerRatingInfo addRating(int answerId, int userId, BigDecimal rating) throws SQLException {
 		String addRatingQuery  = String.format("INSERT INTO %s (userId, answerId, rating) VALUES (?, ?, ?)", Rating.tableName);
 		
 		try (Connection connection = generalDBManager.getConnection();
@@ -315,7 +315,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 			pstmt.executeUpdate();
 			
-			updateAnswerRatingInfo(answerId);
+			return updateAnswerRatingInfo(answerId);
 		}
 	}
 	
@@ -323,7 +323,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Adds a row to the ratings table for particular answer and user
      */
 	@Override
-	public void updateRating(int answerId, int userId, BigDecimal rating) throws SQLException {
+	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws SQLException {
 	    // Update the existing rating for this user and answer
 	    String updateRatingQuery = String.format(
 	        "UPDATE %s SET rating = ? WHERE userId = ? AND answerId = ?",
@@ -341,7 +341,7 @@ public class AnswerRepository implements IAnswerRepository {
 	        	addRating(answerId, userId, rating);
 	        } 
 	        
-	        updateAnswerRatingInfo(answerId);
+	        return updateAnswerRatingInfo(answerId);
 	    }
 	}
 
@@ -350,7 +350,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Updates the average rating and upvoteCount fields on the answer
      */
 	@Override
-	public void updateAnswerRatingInfo(int answerId) throws SQLException {
+	public AnswerRatingInfo updateAnswerRatingInfo(int answerId) throws SQLException {
 		String addRatingQuery  = String.format("UPDATE %s SET averageRating = ?, upvoteCount = ? WHERE id = ?", Answer.tableName);
 		AnswerRatingInfo averageRatingAndCount = getAnswerRatingInfo(answerId); 
 		
@@ -362,14 +362,17 @@ public class AnswerRepository implements IAnswerRepository {
 
 			pstmt.executeUpdate();
 		}
+		
+		return averageRatingAndCount;
 	}
 	
 	/**
      * Deletes a row from the ratings table for particular answer and user
      */
 	@Override
-	public void deleteRating(int answerId, int userId) throws SQLException {
+	public AnswerRatingInfo deleteRating(int answerId, int userId) throws SQLException {
 		String deleteRatingQuery  = String.format("DELETE FROM %s WHERE userId = ? AND answerId = ?", Rating.tableName);
+		AnswerRatingInfo averageRatingAndCount = getAnswerRatingInfo(answerId); 
 		
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(deleteRatingQuery)){
@@ -382,7 +385,7 @@ public class AnswerRepository implements IAnswerRepository {
 				Debug.write("No such rating to modify");
 			}
 			
-			updateAnswerRatingInfo(answerId);
+			return updateAnswerRatingInfo(answerId);
 		}
 	}
 	

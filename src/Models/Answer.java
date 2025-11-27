@@ -128,6 +128,7 @@ public class Answer implements IPost {
 	public void setUpvoteCount(int newCount) { upvoteCount = newCount;}
 	public void setParentAnswerId(int givenId) {parentAnswerId = givenId;}
 	public void setCreatedTimestamp(Timestamp newTimestamp) { createdTimestamp = newTimestamp; }
+	public void setAverageRating(BigDecimal averageRating) {this.averageRating = averageRating;}
 	public void setLastUpdatedTimestamp(Timestamp newTimestamp) { lastUpdatedTimestamp = newTimestamp; }
 	public void setReplyDepth(int depth) { replyDepth = depth; }
 	public void setUserId(int newUserId) { authorId = newUserId; }

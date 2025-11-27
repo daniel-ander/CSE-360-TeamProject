@@ -2,6 +2,7 @@ package Database.Services;
 
 import Models.Answer;
 import Models.DBModels.Rating;
+import Utils.AnswerRatingInfo;
 import Utils.Debug;
 
 import java.math.BigDecimal;
@@ -199,18 +200,18 @@ public class AnswerService implements IAnswerService {
 	}
 	
 	@Override
-	public void updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
+	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
 		try {
-			answerRepository.updateRating(answerId, userId, rating);
+			return answerRepository.updateRating(answerId, userId, rating);
 		} catch(SQLException e) {
 			throw new DataAccessException("Failed to add rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
 		}
 	}
 	
 	@Override
-	public void removeRating(int answerId, int userId) throws DataAccessException {
+	public AnswerRatingInfo removeRating(int answerId, int userId) throws DataAccessException {
 		try {
-			answerRepository.deleteRating(answerId, userId);
+			return answerRepository.deleteRating(answerId, userId);
 		} catch(SQLException e) {
 			throw new DataAccessException("Failed to delete rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
 		}
