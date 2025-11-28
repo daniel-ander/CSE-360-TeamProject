@@ -2,6 +2,7 @@ package Tests;
 
 
 import Models.Question;
+import Models.DBModels.UserDTO;
 import Database.Repositories.Interfaces.IQuestionRepository;
 import Database.Services.QuestionService;
 import Exceptions.DBExceptions.*;
@@ -15,6 +16,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
+import Tests.Utils.*;
+
 
 /**
  * Unit tests for the QuestionService class.
@@ -23,6 +26,7 @@ public class QuestionServiceTest {
 	
     private IQuestionRepository questionRepo;
     private QuestionService questionService;
+    private UserDTO userDTOModel = Utils.getUserDTOModel();
 
     /**
      * Sets up a mocked repository and initializes the QuestionService before each test.
@@ -38,7 +42,7 @@ public class QuestionServiceTest {
      */
     @Test
     public void AddQuestion_WithValidQuestion_AddsSuccessfully() throws SQLException {
-        Question q = new Question(1, "Title", "Text");
+        Question q = new Question(userDTOModel, "Title", "Text");
 //        q.setId(-1);
         when(questionRepo.insertQuestion(q)).thenReturn(true);
 
@@ -54,7 +58,7 @@ public class QuestionServiceTest {
      */
     @Test
     public void AddQuestion_WhenSQLException_ThrowsDataAccessException() throws Exception {
-        Question q = new Question(1, "Title", "Text");
+        Question q = new Question(userDTOModel, "Title", "Text");
         q.setId(-1);
         when(questionRepo.getQuestionById(q.getId())).thenReturn(null);
         doThrow(new SQLException("DB Error")).when(questionRepo).insertQuestion(any());
@@ -68,14 +72,14 @@ public class QuestionServiceTest {
      */
     @Test
     public void GetById_WithValidQuestionId_ReturnsQuestion() throws SQLException {
-        Question q = new Question(1, "HelloTitle?", "HelloText?");
+        Question q = new Question(userDTOModel, "HelloTitle?", "HelloText?");
         when(questionRepo.getQuestionById(1)).thenReturn(q);
         
         Question result = questionService.getQuestionById(1);
 
         assertNotNull(result);
         assertNull(result.getId());
-        assertEquals(1, result.getAuthorId());
+        assertEquals(1, result.getAuthor().getId());
         assertEquals("HelloTitle?", result.getTitleText());
         assertEquals("HelloText?", result.getBodyText());
         verify(questionRepo, times(1)).getQuestionById(1);
@@ -108,7 +112,7 @@ public class QuestionServiceTest {
     @Test
     public void GetAllQuestions_ReturnsList() throws Exception {
         List<Question> sampleList = new ArrayList<>();
-        sampleList.add(new Question(1, 1, "T", "B", null, null, false, false, false, 0));
+        sampleList.add(new Question(1, userDTOModel, "T", "B", null, null, false, false, false, 0));
         when(questionRepo.getAllQuestions()).thenReturn(sampleList);
 
         List<Question> result = questionService.getAllQuestions();

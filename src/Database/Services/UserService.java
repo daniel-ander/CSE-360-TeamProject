@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import Models.Interfaces.*;
 
 import Exceptions.DBExceptions.*;
 
@@ -116,7 +117,7 @@ public class UserService implements IUserService {
 	public User.Role getUserRole(String userName) throws DataAccessException {
 		try {
 			String roleString = userRepository.getUserRole(userName);
-			return User.roleFromString(roleString);
+			return ISharedUser.roleFromString(roleString);
 			
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not get user by user name: " + userName + " due to: " + e);

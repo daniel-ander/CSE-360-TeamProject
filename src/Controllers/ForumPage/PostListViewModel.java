@@ -108,7 +108,7 @@ public class PostListViewModel {
 		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {			
 			for (PostDisplayViewModel answerVM : postVMs) {
 				boolean postIsReviewType = ((Answer) answerVM.getPost()).getIsReview();
-				boolean postBelongsToUser = reviewersToShow.contains(((Answer) answerVM.getPost()).getAuthorId());
+				boolean postBelongsToUser = reviewersToShow.contains(answerVM.getPost().getAuthor().getId());
 
 				if (postIsReviewType && postBelongsToUser) {
 					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;

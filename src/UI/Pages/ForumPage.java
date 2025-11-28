@@ -19,7 +19,8 @@ import java.util.function.Consumer;
 import Controllers.ForumPage.ForumHeaderViewModel;
 import Controllers.ForumPage.QuestionPaneViewModel;
 import Models.User;
-import Models.User.Role;
+import Models.Interfaces.ISharedUser.Role;
+
 import Controllers.ForumPage.PostDisplayViewModel;
 
 public class ForumPage implements IInitializable {

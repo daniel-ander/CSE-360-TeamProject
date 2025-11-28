@@ -3,6 +3,8 @@ package Models;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import Models.DBModels.UserDTO;
+
 public class Answer implements IPost {
 	public static String tableName = "answers";
 	
@@ -10,8 +12,7 @@ public class Answer implements IPost {
 	private String bodyText;
 	private boolean isCorrect;
 	private Integer questionId;
-	private Integer authorId;
-	private String authorName;
+	private UserDTO user;
 	private Integer parentAnswerId;
 	private Timestamp createdTimestamp;
 	private Timestamp lastUpdatedTimestamp;
@@ -19,39 +20,36 @@ public class Answer implements IPost {
 	private boolean isDeleted;
 	private Integer upvoteCount;
 	private int replyDepth;
-	private boolean isReview; // new flag to indicate review-type post
+	private boolean isReview; // indicates review-type post
 	
 
 	// Constructor for creating a new answer (not yet in DB)
 	public Answer(
 			int questionId, 
 			int authorId, 
-			String authorName, 
 			String bodyText
 	) {
-		this(questionId, null, authorId, authorName, bodyText);
+		this(questionId, null, null, bodyText);
 	}
 	
 	// Constructor for creating a new nested answer (not yet in DB)
 	public Answer(
 			int questionId, 
 			Integer parentAnswerId, 
-			int authorId, 
-			String authorName, 
+			UserDTO user, 
 			String bodyText
 	) {
-		this(questionId, parentAnswerId, authorId, authorName, bodyText, false);
+		this(questionId, parentAnswerId, user, bodyText, false);
 	}
 
 	// New constructor that accepts a review flag
 	public Answer(int questionId, 
 			Integer parentAnswerId, 
-			int authorId, 
-			String authorName, 
+			UserDTO user, 
 			String bodyText, 
 			boolean isReview
 	) {
-		this(null, questionId, parentAnswerId, authorId, authorName, bodyText, null, null, BigDecimal.valueOf(0), 0, false, false, isReview);
+		this(null, questionId, parentAnswerId, user, bodyText, null, null, BigDecimal.valueOf(0), 0, false, false, isReview);
 	}
 	
 	// Constructor for pulling from DB with all fields (new full signature)
@@ -59,8 +57,7 @@ public class Answer implements IPost {
 			Integer id, 
 			Integer questionId, 
 			Integer parentAnswerId, 
-			Integer authorId, 
-			String authorName, 
+			UserDTO user, 
 			String bodyText,
 			Timestamp createdTimestamp,
 			Timestamp lastUpdatedTimestamp, 
@@ -78,8 +75,7 @@ public class Answer implements IPost {
 		this.id = id;
 		this.questionId = questionId; 
 		this.parentAnswerId = parentAnswerId; 
-		this.authorId = authorId;
-		this.authorName = authorName;
+		this.user = user;
 		this.bodyText = bodyText;
 		this.createdTimestamp = createdTimestamp;
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
@@ -96,7 +92,7 @@ public class Answer implements IPost {
  	// ===================
 	@Override
 	public Integer getId() {return id;}
-	public Integer getAuthorId() {return authorId;}
+	public UserDTO getAuthor() {return user;}
 	public Integer getQuestionId() {return questionId;}
 	public Integer getParentAnswerId() {return parentAnswerId;}
 	@Override
@@ -107,7 +103,6 @@ public class Answer implements IPost {
 	public boolean getIsReview() {return isReview;}
 	public BigDecimal getAverageRating() {return averageRating;}
 	public Integer getUpvoteCount() {return upvoteCount;}
-	public String getAuthorName() {return authorName;}
 	public boolean isCorrect() {return isCorrect;}
 	public int getReplyDepth() {return replyDepth;}
 	@Override
@@ -131,9 +126,8 @@ public class Answer implements IPost {
 	public void setAverageRating(BigDecimal averageRating) {this.averageRating = averageRating;}
 	public void setLastUpdatedTimestamp(Timestamp newTimestamp) { lastUpdatedTimestamp = newTimestamp; }
 	public void setReplyDepth(int depth) { replyDepth = depth; }
-	public void setUserId(int newUserId) { authorId = newUserId; }
+	public void setUserId(UserDTO newUser) { this.user = newUser; }
 	public void setId(int newId) { id = newId; }
-	public void setAuthorName(String name) { authorName = name; }
 	public void setText(String newText) {
 		if (newText == null || newText.strip().isEmpty()) {
 			throw new IllegalArgumentException("Text is empty");
@@ -153,4 +147,5 @@ public class Answer implements IPost {
                  ", parentAnswerId=" + parentAnswerId +
                  '}';
     }
+
 }

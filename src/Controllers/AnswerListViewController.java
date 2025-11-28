@@ -129,7 +129,7 @@ public class AnswerListViewController {
         		System.out.println("Answer text cannot be empty or placeholder.");
         		return;
         	}
-        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), userSession.currentUser().getUserName(), text);
+        	Answer a = new Answer(question.getId(), userSession.currentUser().getId(), text);
         	try {
         		answerService.addAnswer(a);
                 refreshAnswers();
@@ -172,7 +172,7 @@ public class AnswerListViewController {
 				System.out.println("Select an answer to reply to.");
 				return;
 			}
-			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), userSession.currentUser().getUserName(), text);
+			Answer reply = new Answer(question.getId(), userSession.currentUser().getId(), text);
 			reply.setParentAnswerId(selectedAnswer.getId());
 			try {
 				answerService.addAnswer(reply);

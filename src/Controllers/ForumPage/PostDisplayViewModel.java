@@ -108,7 +108,7 @@ public class PostDisplayViewModel {
 		try {
 		    if (post.getPostType() == Type.Review) {
 		        int currentUserId = userSession.getCurrentUserId();
-		        int postUserId = post.getAuthorId();
+		        int postUserId = post.getAuthor().getId();
 		        
 		        boolean favoredReviewerStatus = userService.checkIfFavoredReviewerExists(currentUserId, postUserId);
 		        setIsFavoredReviewerProperty(favoredReviewerStatus);
@@ -245,7 +245,7 @@ public class PostDisplayViewModel {
 	
 	public void setShouldDisplayFavoredReviewerButton() {
 	    boolean isReviewType = post.getPostType() == Type.Review;
-	    boolean isCurrentUserAuthor = userSession.getCurrentUserId() == post.getAuthorId();
+	    boolean isCurrentUserAuthor = userSession.getCurrentUserId() == post.getAuthor().getId();
 
 	    boolean shouldDisplay = isReviewType && !isCurrentUserAuthor;
 	    shouldDisplayFavoredReviewerButtonProperty.set(shouldDisplay);
@@ -411,8 +411,7 @@ public class PostDisplayViewModel {
 		Answer newAnswer = new Answer(
 				questionId, 
 				parentAnswerId, 
-				userSession.getCurrentUserId(),
-				userSession.getCurrentUserName(), 
+				userSession.getDTOModel(),
 				newBodyText,
 				isReview
 		);
@@ -426,7 +425,7 @@ public class PostDisplayViewModel {
 	
 	public void toggleFavoredReviewerStatus(boolean newStatus) {
 		try {
-			userService.toggleIsFavoredReviewer(userSession.getCurrentUserId(), post.getAuthorId());
+			userService.toggleIsFavoredReviewer(userSession.getCurrentUserId(), post.getAuthor().getId());
 		} catch(DataAccessException e) {
 			System.out.println(e.getLocalizedMessage());
 		}
@@ -475,27 +474,27 @@ public class PostDisplayViewModel {
 //	}
 
 	
-	private void updateRatingInBackground(BigDecimal newRating, BigDecimal oldRating, int oldUpvoteCount, RatingUpdateType updateType) {
-		Task<Void> updateTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				if(updateType == RatingUpdateType.DELETE) {
-					answerService.removeRating(post.getId(), userSession.getCurrentUserId());
-				} else {
-					answerService.updateRating(post.getId(), userSession.getCurrentUserId(), newRating);
-				}
-				return null;
-			}
-
-			@Override
-			protected void failed() {
-				currentUserRatingProperty.set(oldRating);
-				upvoteCountProperty.set(oldUpvoteCount);
-			}
-		};
-
-		new Thread(updateTask).start();
-	}
+//	private void updateRatingInBackground(BigDecimal newRating, BigDecimal oldRating, int oldUpvoteCount, RatingUpdateType updateType) {
+//		Task<Void> updateTask = new Task<>() {
+//			@Override
+//			protected Void call() throws Exception {
+//				if(updateType == RatingUpdateType.DELETE) {
+//					answerService.removeRating(post.getId(), userSession.getCurrentUserId());
+//				} else {
+//					answerService.updateRating(post.getId(), userSession.getCurrentUserId(), newRating);
+//				}
+//				return null;
+//			}
+//
+//			@Override
+//			protected void failed() {
+//				currentUserRatingProperty.set(oldRating);
+//				upvoteCountProperty.set(oldUpvoteCount);
+//			}
+//		};
+//
+//		new Thread(updateTask).start();
+//	}
 }
 
 

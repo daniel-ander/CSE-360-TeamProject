@@ -1,6 +1,7 @@
 package Database.Repositories;
 
 import Models.Answer;
+import Models.User;
 import Models.DBModels.Rating;
 import Utils.AnswerRatingInfo;
 import Utils.Debug;
@@ -13,7 +14,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
+import Models.DBModels.UserDTO;
+import Models.Interfaces.ISharedUser;
 import Database.IGeneralDBManager;
 import Database.Repositories.Interfaces.IAnswerRepository;
 
@@ -51,7 +53,7 @@ public class AnswerRepository implements IAnswerRepository {
 	        else
 	            pstmt.setInt(2, a.getParentAnswerId());
 
-	        pstmt.setInt(3, a.getAuthorId());
+	        pstmt.setInt(3, a.getAuthor().getId());
 	        pstmt.setString(4, a.getBodyText());
 	        pstmt.setBoolean(5, a.getIsReview());
 	        pstmt.executeUpdate();
@@ -95,7 +97,16 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getAll() throws SQLException {
 		List<Answer> allAnswers = new ArrayList<>();
-		String getAllAnswersQuery = String.format("SELECT * FROM %s", Answer.tableName);
+		String getAllAnswersQuery = String.format(
+			    "SELECT a.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s a " +
+			    "JOIN %s u ON a.userId = u.id",
+			    Answer.tableName,
+			    User.tableName
+			);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersQuery)){
 			ResultSet rs = pstmt.executeQuery();
@@ -114,7 +125,17 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getAnswersByUser(int userId) throws SQLException {
         List<Answer> answersByUser = new ArrayList<>();
-        String getAnswersByUserQuery = String.format("SELECT * FROM %s WHERE userId = ?", Answer.tableName);
+        String getAnswersByUserQuery = String.format(
+        	    "SELECT a.*, " +
+        	    "u.id AS user_id, " +
+        	    "u.userName AS user_name, " +
+        	    "u.role AS user_role " +
+        	    "FROM %s a " +
+        	    "JOIN %s u ON a.userId = u.id " +
+        	    "WHERE a.userId = ?",
+        	    Answer.tableName,
+        	    User.tableName
+        	);
         try (Connection connection = generalDBManager.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(getAnswersByUserQuery)){
             pstmt.setInt(1, userId);
@@ -135,7 +156,17 @@ public class AnswerRepository implements IAnswerRepository {
 		List<Answer> allAnswersForQuestion = new ArrayList<>();
 		//TODO: we might need this to check parentId depending on how we want to display answers
 		//		for now we will just get all answers for a question
-		String getAllAnswersForQuestionQuery = String.format("SELECT * FROM %s WHERE questionId = ?", Answer.tableName);
+		String getAllAnswersForQuestionQuery = String.format(
+			    "SELECT a.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s a " +
+			    "JOIN %s u ON a.userId = u.id " +
+			    "WHERE a.questionId = ?",
+			    Answer.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllAnswersForQuestionQuery)){
 			pstmt.setInt(1, questionId);
@@ -155,7 +186,17 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getRepliesToAnswerById(int parentAnswerId) throws SQLException {
 		List<Answer> repliesToAnswerById = new ArrayList<>();
-		String getRepliesToAnswerByIdQuery = String.format("SELECT * FROM %s WHERE parentAnswerId = ?", Answer.tableName);
+		String getRepliesToAnswerByIdQuery = String.format(
+			    "SELECT a.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s a " +
+			    "JOIN %s u ON a.userId = u.id " +
+			    "WHERE a.parentAnswerId = ?",
+			    Answer.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getRepliesToAnswerByIdQuery)){
 			pstmt.setInt(1, parentAnswerId);
@@ -174,7 +215,18 @@ public class AnswerRepository implements IAnswerRepository {
      */
 	@Override
 	public Answer getAnswerById(int answerId) throws SQLException {
-		String getAnswerByIdQuery = String.format("SELECT * FROM %s WHERE id = ?", Answer.tableName);
+		String getAnswerByIdQuery = String.format(
+			    "SELECT a.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s a " +
+			    "JOIN %s u ON a.userId = u.id " +
+			    "WHERE a.id = ?",
+			    Answer.tableName,
+			    User.tableName
+			);
+
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnswerByIdQuery)){
 			pstmt.setInt(1, answerId);
@@ -193,7 +245,18 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public List<Answer> getCorrectAnswers() throws SQLException {
 		List<Answer> correctAnswers = new ArrayList<>();
-    	String getCorrectAnswersQuery = String.format("SELECT * FROM %s WHERE isCorrect = TRUE", Answer.tableName);
+		String getCorrectAnswersQuery = String.format(
+			    "SELECT a.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s a " +
+			    "JOIN %s u ON a.userId = u.id " +
+			    "WHERE a.isCorrect = TRUE",
+			    Answer.tableName,
+			    User.tableName
+			);
+
     	try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getCorrectAnswersQuery)){
 			ResultSet rs = pstmt.executeQuery();
@@ -211,7 +274,18 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
     public List<Answer> getAnswersBySearch(String searchString) throws SQLException {
     	List<Answer> answersBySearch = new ArrayList<>();
-    	String getAnswersBySearchQuery = String.format("SELECT * FROM %s WHERE body LIKE ?", Answer.tableName);
+    	String getAnswersBySearchQuery = String.format(
+    		    "SELECT a.*, " +
+    		    "u.id AS user_id, " +
+    		    "u.userName AS user_name, " +
+    		    "u.role AS user_role " +
+    		    "FROM %s a " +
+    		    "JOIN %s u ON a.userId = u.id " +
+    		    "WHERE a.body LIKE ?",
+    		    Answer.tableName,
+    		    User.tableName
+    		);
+
     	try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnswersBySearchQuery)){
 			pstmt.setString(1, "%" + searchString + "%");
@@ -372,7 +446,6 @@ public class AnswerRepository implements IAnswerRepository {
 	@Override
 	public AnswerRatingInfo deleteRating(int answerId, int userId) throws SQLException {
 		String deleteRatingQuery  = String.format("DELETE FROM %s WHERE userId = ? AND answerId = ?", Rating.tableName);
-		AnswerRatingInfo averageRatingAndCount = getAnswerRatingInfo(answerId); 
 		
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(deleteRatingQuery)){
@@ -431,12 +504,17 @@ public class AnswerRepository implements IAnswerRepository {
 	
 	
 	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
+		UserDTO user = new UserDTO(
+		        rs.getInt("user_id"),
+		        rs.getString("user_name"),
+		        ISharedUser.roleFromString(rs.getString("user_role"))
+		    );
+		
 		return new Answer(
 				rs.getInt("id"),
 				rs.getInt("questionId"),
 				rs.getInt("parentAnswerId") == 0 ? null : rs.getInt("parentAnswerId"),
-				rs.getInt("userId"),
-				rs.getString("authorName"),
+				user,
 				rs.getString("body"),
 				rs.getTimestamp("created"),
 				rs.getTimestamp("lastUpdated"),

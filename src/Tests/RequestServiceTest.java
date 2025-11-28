@@ -7,7 +7,7 @@ import Database.DBConnectionStore;
 import Database.IGeneralDBManager;
 import Database.Services.RequestService;
 import Database.Services.Interfaces.IUserService;
-import Models.User.Role;
+import Models.Interfaces.ISharedUser.Role;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -7,7 +7,9 @@ import DisplayModels.PostWithPermissions;
 import Models.Answer;
 import Models.IPost;
 import Models.Question;
+import Models.DBModels.UserDTO;
 import Sessions.UserSession;
+import Tests.Utils.Utils;
 import Utils.KeyPairHolder;
 import javafx.collections.ObservableList;
 
@@ -32,6 +34,7 @@ public class PostListViewModelTest {
     private IUserService userService;
     private UserSession userSession;
     private PostListViewModel viewModel;
+    private UserDTO userDTOModel = Utils.getUserDTOModel();
 
     @BeforeEach
     void setUp() {
@@ -49,7 +52,7 @@ public class PostListViewModelTest {
     @Test
     public void testPopulateQuestionsAddsQuestionsToVisiblePosts() {
         // Arrange
-        Question question = new Question(1, 1, "Title", "Content", null, null, false, false, false, 0);
+        Question question = new Question(1, userDTOModel, "Title", "Content", null, null, false, false, false, 0);
         PostWithPermissions pw = new PostWithPermissions(question, List.of("EDIT"));
 
         // Act
@@ -112,13 +115,13 @@ public class PostListViewModelTest {
     @Test
     public void testExpandChildrenMakesAnswersVisible() {
         // Arrange
-        Question q = new Question(1, "Q", "Content");
+        Question q = new Question(userDTOModel, "Q", "Content");
         q.setId(1);
         viewModel.populateQuestions(List.of(new PostWithPermissions(q, List.of("EDIT"))));
 
-        Answer a1 = new Answer(1, 1, "A1", "Text");
+        Answer a1 = new Answer(1, 1, "Text");
         a1.setId(10);
-        Answer a2 = new Answer(1, 1, "A2", "Text");
+        Answer a2 = new Answer(1, 1, "Text");
         a2.setId(11);
         viewModel.addToAnswerPool(List.of(
                 new PostWithPermissions(a1, List.of("EDIT")),
@@ -146,13 +149,13 @@ public class PostListViewModelTest {
     @Test
     public void testCollapseChildrenHidesAnswers() {
         // Arrange
-        Question q = new Question(1, "Q", "Content");
+        Question q = new Question(userDTOModel, "Q", "Content");
         q.setId(1);
         viewModel.populateQuestions(List.of(new PostWithPermissions(q, List.of("EDIT"))));
 
-        Answer a1 = new Answer(1, 1, "A1", "Text");
+        Answer a1 = new Answer(1, 1, "Text");
         a1.setId(10);
-        Answer a2 = new Answer(1, 1, "A2", "Text");
+        Answer a2 = new Answer(1, 1, "Text");
         a2.setId(11);
         viewModel.addToAnswerPool(List.of(
                 new PostWithPermissions(a1, List.of("EDIT")),

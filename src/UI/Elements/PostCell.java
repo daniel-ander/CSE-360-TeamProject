@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Controllers.ForumPage.PostDisplayViewModel;
+import Models.Answer;
 import Models.IPost;
 import Models.IPost.Type;
 import javafx.beans.binding.Bindings;
@@ -45,8 +46,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     private final Button favorReviewerButton = new Button();
     private final Label statusLabel = new Label();
     private final Label ratingsLabel = new Label();
+    private final StackPane timeStackPane = new StackPane();
+    private final Label createdTimestampLabel = new Label();
+    private final Label updatedTimestampLabel = new Label();
 
     private final Label permissionLabel = new Label();
+    private final Label userNameLabel = new Label();
     private final HBox actionsContainer = new HBox();
 
     private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
@@ -59,9 +64,19 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         ratingProperties.getChildren().addAll(starsLayout, ratingsLabel);
 
         bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
-
-        layout.getChildren().addAll(titleStackPane, bodyStackPane, newCommentTextField,
-                newReviewTextField, statusLabel, ratingProperties, actionsContainer);
+        timeStackPane.getChildren().addAll(createdTimestampLabel, updatedTimestampLabel);
+        
+        layout.getChildren().addAll(
+        		userNameLabel, 
+        		timeStackPane, 
+        		titleStackPane, 
+        		bodyStackPane, 
+        		newCommentTextField,
+                newReviewTextField, 
+                statusLabel, 
+                ratingProperties, 
+                actionsContainer
+        );
 
         outerMostContainer.getChildren().addAll(spacer, layout);
         setGraphic(outerMostContainer);
@@ -84,6 +99,11 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         }
 
         currentVm = vm;
+        
+        if(!vm.isQuestion()) {
+        	String authorName = vm.getPost().getAuthor().getUserName();
+        	userNameLabel.textProperty().set(authorName);
+        }
 
         ratingsLabel.textProperty().bind(
         	    Bindings.createStringBinding(() -> {
