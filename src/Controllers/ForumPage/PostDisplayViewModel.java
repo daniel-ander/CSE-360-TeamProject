@@ -68,6 +68,7 @@ public class PostDisplayViewModel {
 		TIME
 	}
 	
+	// TODO: Priority - low: Make updating rating take place in the background
 	public enum RatingUpdateType {
 		UPDATE,
 		DELETE
@@ -327,12 +328,11 @@ public class PostDisplayViewModel {
 	            currentUserRatingProperty.set(selectedStarRating);
 	        }
 	        
-	        answer.setUpvoteCount(newAvgRatingAndUpvoteCount.getUpvoteCount());
 	        setUpvoteCountProperty(newAvgRatingAndUpvoteCount.getUpvoteCount());
-            answer.setAverageRating(newAvgRatingAndUpvoteCount.getAverageRating());
-
 	        setRatingProperty(newAvgRatingAndUpvoteCount.getAverageRating());
-
+	        
+	        answer.setUpvoteCount(newAvgRatingAndUpvoteCount.getUpvoteCount());
+            answer.setAverageRating(newAvgRatingAndUpvoteCount.getAverageRating());
 	    } catch (Exception e) {
 	        System.out.println(e.getLocalizedMessage());
 	    }
@@ -347,12 +347,15 @@ public class PostDisplayViewModel {
 		setRatingProperty(((Answer)post).getAverageRating());
 	}
 	
+	/**
+     * This method sets the user rating property upon initial retrieval from the DB
+     */
 	public void setUserDefinedRating() {		
 		int answerId = post.getId();
 		BigDecimal cachedRating = AppCache.getInstance().getRatingForAnswer(answerId);
 		
 		if(cachedRating == null) {
-			BigDecimal retrievedPersonalRating = answerService.getRating(answerId, userSession.getCurrentUserId());
+			BigDecimal retrievedPersonalRating = answerService.getRatingForUser(answerId, userSession.getCurrentUserId());
 			
 			retrievedPersonalRating = retrievedPersonalRating == null ? BigDecimal.ZERO : retrievedPersonalRating;
 
@@ -384,10 +387,6 @@ public class PostDisplayViewModel {
 			// A bit hacky, but I didn't see a better option here
 			updateCallBack.accept(post.getId(), newBody, ((Answer) post).isCorrect() ? "yes" : "no");
 		}
-	}
-
-	public void setRating(int newRating) {
-		
 	}
 	
 	public void addAnswer(String newTitleText, String newBodyText, IPost.Type answerType) {
@@ -443,6 +442,8 @@ public class PostDisplayViewModel {
 			property.set(false);
 		});
 	}
+	
+	//TODO: - Related to async update of rating
 	
 //	private AnswerRatingInfo applyRatingChange(
 //	        BigDecimal avg,

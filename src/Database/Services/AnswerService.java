@@ -182,7 +182,7 @@ public class AnswerService implements IAnswerService {
 	}
 	
 	@Override
-	public BigDecimal getRating(int answerId, int userId) throws DataAccessException {
+	public BigDecimal getRatingForUser(int answerId, int userId) throws DataAccessException {
 		try {
 			return answerRepository.getRating(answerId, userId);
 		} catch(SQLException e) {

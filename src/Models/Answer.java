@@ -12,7 +12,7 @@ public class Answer implements IPost {
 	private String bodyText;
 	private boolean isCorrect;
 	private Integer questionId;
-	private UserDTO user;
+	private UserDTO author;
 	private Integer parentAnswerId;
 	private Timestamp createdTimestamp;
 	private Timestamp lastUpdatedTimestamp;
@@ -75,7 +75,7 @@ public class Answer implements IPost {
 		this.id = id;
 		this.questionId = questionId; 
 		this.parentAnswerId = parentAnswerId; 
-		this.user = user;
+		this.author = user;
 		this.bodyText = bodyText;
 		this.createdTimestamp = createdTimestamp;
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
@@ -92,7 +92,7 @@ public class Answer implements IPost {
  	// ===================
 	@Override
 	public Integer getId() {return id;}
-	public UserDTO getAuthor() {return user;}
+	public UserDTO getAuthor() {return author;}
 	public Integer getQuestionId() {return questionId;}
 	public Integer getParentAnswerId() {return parentAnswerId;}
 	@Override
@@ -126,7 +126,7 @@ public class Answer implements IPost {
 	public void setAverageRating(BigDecimal averageRating) {this.averageRating = averageRating;}
 	public void setLastUpdatedTimestamp(Timestamp newTimestamp) { lastUpdatedTimestamp = newTimestamp; }
 	public void setReplyDepth(int depth) { replyDepth = depth; }
-	public void setUserId(UserDTO newUser) { this.user = newUser; }
+	public void setAuthor(UserDTO newUser) { this.author = newUser; }
 	public void setId(int newId) { id = newId; }
 	public void setText(String newText) {
 		if (newText == null || newText.strip().isEmpty()) {

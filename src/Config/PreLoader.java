@@ -117,7 +117,7 @@ public class PreLoader {
 				List<String> permissions = permissionService.getEffectivePermissions(userSession.getCurrentUserId(),
 						a.getId(), IPost.Type.Answer);
 				
-				BigDecimal answerRating = answerService.getRating(a.getId(), userSession.getCurrentUserId());
+				BigDecimal answerRating = answerService.getRatingForUser(a.getId(), userSession.getCurrentUserId());
 				AppCache.getInstance().setRatingForAnswer(a.getId(), answerRating);
 				
 				answersWithPermissions.add(new PostWithPermissions(a, permissions));

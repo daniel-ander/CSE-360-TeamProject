@@ -386,7 +386,6 @@ public class PostListViewModel {
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
 			break;
 		}
-		System.out.println("Toggled" + children);
 		if (children == null)
 			return;
 
@@ -407,7 +406,6 @@ public class PostListViewModel {
 			child.setUserDefinedRating();
 			
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
-			System.out.println("Child");
 			visiblePosts.add(visibleParentPostIndex + 1, child);
 
 			KeyPairHolder<Integer, Integer> childKeys = new KeyPairHolder<>(((Answer) child.getPost()).getQuestionId(),

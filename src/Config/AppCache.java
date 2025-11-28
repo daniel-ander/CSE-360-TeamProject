@@ -23,6 +23,7 @@ public class AppCache {
     private final ObjectProperty<List<QuestionWithAnswersAndPermissions>> initialDataProperty = new SimpleObjectProperty<>(null);
     private final ObjectProperty<List<QuestionWithAnswersAndPermissions>> fullDataProperty = new SimpleObjectProperty<>(null);
     
+    // TODO: - Set up ratings cache
     private final Map<Integer, BigDecimal> ratings = new ConcurrentHashMap<>();
     
     private AppCache() {}
