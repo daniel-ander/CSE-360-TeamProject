@@ -65,7 +65,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	        // Fetch the full row from the database
 	        String selectSQL = String.format(
-	            "SELECT id, questionId, parentAnswerId, userId, authorName, body, isCorrect, created, lastUpdated, isDeleted, isReview, upvoteCount " +
+	            "SELECT id, questionId, parentAnswerId, userId, body, isCorrect, created, lastUpdated, isDeleted, isReview, upvoteCount " +
 	            "FROM %s WHERE id = ?",
 	            Answer.tableName
 	        );

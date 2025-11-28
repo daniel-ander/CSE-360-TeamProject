@@ -5,13 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Controllers.ForumPage.PostDisplayViewModel;
-import Models.Answer;
+
 import Models.IPost;
 import Models.IPost.Type;
+import Utils.Time;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
+
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.control.*;
@@ -46,13 +48,15 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     private final Button favorReviewerButton = new Button();
     private final Label statusLabel = new Label();
     private final Label ratingsLabel = new Label();
-    private final StackPane timeStackPane = new StackPane();
+    private final HBox timeHBox = new HBox();
+    private final HBox nameAndTimeHBox = new HBox();
     private final Label createdTimestampLabel = new Label();
     private final Label updatedTimestampLabel = new Label();
 
     private final Label permissionLabel = new Label();
-    private final Label userNameLabel = new Label();
+    private final Label authorNameLabel = new Label();
     private final HBox actionsContainer = new HBox();
+    private final HBox ratingProperties = new HBox();
 
     private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
@@ -60,21 +64,19 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         setInitialProperties();
         setInitialListeners();
 
-        HBox ratingProperties = new HBox();
         ratingProperties.getChildren().addAll(starsLayout, ratingsLabel);
 
         bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
-        timeStackPane.getChildren().addAll(createdTimestampLabel, updatedTimestampLabel);
+        timeHBox.getChildren().addAll(new Label(" • "), createdTimestampLabel, updatedTimestampLabel);
+        nameAndTimeHBox.getChildren().addAll(authorNameLabel, timeHBox);
         
         layout.getChildren().addAll(
-        		userNameLabel, 
-        		timeStackPane, 
+        		nameAndTimeHBox,
         		titleStackPane, 
         		bodyStackPane, 
         		newCommentTextField,
                 newReviewTextField, 
                 statusLabel, 
-                ratingProperties, 
                 actionsContainer
         );
 
@@ -100,10 +102,14 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
         currentVm = vm;
         
-        if(!vm.isQuestion()) {
-        	String authorName = vm.getPost().getAuthor().getUserName();
-        	userNameLabel.textProperty().set(authorName);
+        layout.getChildren().remove(ratingProperties);
+        if (!currentVm.isQuestion()) {
+            layout.getChildren().add(6, ratingProperties);
         }
+
+        
+        String authorName = vm.getPost().getAuthor().getUserName();
+        authorNameLabel.textProperty().set(authorName);
 
         ratingsLabel.textProperty().bind(
         	    Bindings.createStringBinding(() -> {
@@ -111,7 +117,7 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         	        if (rating == null) return "-";
         	        double stars = rating.doubleValue() * vm.getNumberOfRatingStars();
         	        int ratingCount = vm.getUpvoteCountProperty().get();
-        	        return String.format("%.2f(%d)", stars, ratingCount);
+        	        return String.format("%.2f average (%d ratings)", stars, ratingCount);
         	    }, vm.getRatingProperty())
         	);
 
@@ -160,9 +166,17 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         bodyTextField.clear();
         titleLabel.setText("");
         bodyText.setText("");
+        createdTimestampLabel.setText("");
+        updatedTimestampLabel.setText("");
 
         String title = vm.getLabelTextProperty().get();
         String body = vm.getBodyTextProperty().get();
+        String createdTimestamp = String.format("created %s ago", Time.timeAgoShort(vm.getPost().getCreatedTimestamp()));
+        String updatedTimestamp = "";
+        
+        if(vm.hasPostBeenUpdated()) {
+        	updatedTimestamp = String.format(" | updated %s ago", Time.timeAgoShort(vm.getPost().getLastUpdatedTimestamp())); 
+        }
 
         if (vm.isQuestion() && (title == null || title.isEmpty())) {
             title = vm.getMainLabelText();
@@ -175,6 +189,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         bodyTextField.setText(body);
         titleLabel.setText(title);
         bodyText.setText(body);
+        createdTimestampLabel.setText(createdTimestamp);
+        updatedTimestampLabel.setText(updatedTimestamp);
 
         newCommentTextField.clear();
         newReviewTextField.clear();
@@ -373,23 +389,23 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
                     starIndex,
                     vm);
 
-            star.setOnMouseEntered(e -> {
+            star.setOnMouseEntered(_ -> {
                 hoveredStarIndex = starIndex;
                 refreshStarFills(vm);
             });
 
-            star.setOnMouseExited(e -> {
+            star.setOnMouseExited(_ -> {
                 hoveredStarIndex = null;
                 refreshStarFills(vm);
             });
 
             interactiveStars.add(star);
             starsLayout.getChildren().add(star);
+            starsLayout.setSpacing(0);
         }
 
-        
         refreshStarFills(vm);
-
+        
         return starsLayout;
     }
 
@@ -398,13 +414,16 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
             int starIndex,
             PostDisplayViewModel vm
     ) {
-        Polygon outline = buildStarPolygon();
-        Polygon fill = buildStarPolygon();
-        Button button = new Button();
-        button.setPrefHeight(outline.getLayoutBounds().getHeight());
-        button.setPrefWidth(outline.getLayoutBounds().getWidth());
-        button.setBackground(Background.EMPTY);
-        button.setOnMouseClicked(e -> {
+        Polygon outline = buildStarPolygon(0.45);
+        Polygon fill = buildStarPolygon(0.45);
+        Button starActionButton = new Button();
+        
+        starActionButton.setPrefHeight(outline.getLayoutBounds().getHeight());
+        starActionButton.setPrefWidth(outline.getLayoutBounds().getWidth());
+        starActionButton.setPadding(Insets.EMPTY);
+        starActionButton.setBackground(Background.EMPTY);
+        
+        starActionButton.setOnMouseClicked(_ -> {
         	vm.setPersonalRatingProperty(starIndex);
         	refreshStarFills(vm);
         });
@@ -418,18 +437,19 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         Rectangle clip = new Rectangle();
         fill.setClip(clip);
 
-        fill.layoutBoundsProperty().addListener((obs, oldVal, newVal) -> {
+        fill.layoutBoundsProperty().addListener((_, _, newVal) -> {
             clip.setX(0);
             clip.setY(0);
             clip.setWidth(newVal.getWidth());
             clip.setHeight(newVal.getHeight());
         });
 
-        StackPane pane = new StackPane(outline, fill, button);
+        StackPane pane = new StackPane(outline, fill, starActionButton);
         pane.setBackground(Background.EMPTY);
+        pane.setPrefSize(8, 8);
 
-        pane.setScaleX(0.5);
-        pane.setScaleY(0.5);
+//        pane.setScaleX(0.40);
+//        pane.setScaleY(0.40);
 
         return pane;
     }
@@ -475,20 +495,31 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     }
 
 
-    private Polygon buildStarPolygon() {
+    private Polygon buildStarPolygon(double scale) {
         Polygon star = new Polygon();
-        star.getPoints().addAll(
-                0.0, -20.0,
-                6.0, -6.0,
-                20.0, -6.0,
-                9.0, 3.0,
-                12.0, 18.0,
-                0.0, 9.0,
-                -12.0, 18.0,
-                -9.0, 3.0,
-                -20.0, -6.0,
-                -6.0, -6.0
-        );
+        double[] points = new double[]{
+            0.0, -20.0,
+            6.0, -6.0,
+            20.0, -6.0,
+            9.0, 3.0,
+            12.0, 18.0,
+            0.0, 9.0,
+            -12.0, 18.0,
+            -9.0, 3.0,
+            -20.0, -6.0,
+            -6.0, -6.0
+        };
+
+        for (int i = 0; i < points.length; i++) {
+            points[i] *= scale;
+        }
+
+        star.getPoints().addAll(points[0], points[1], points[2], points[3],
+                                points[4], points[5], points[6], points[7],
+                                points[8], points[9], points[10], points[11],
+                                points[12], points[13], points[14], points[15],
+                                points[16], points[17], points[18], points[19]);
         return star;
     }
+
 }

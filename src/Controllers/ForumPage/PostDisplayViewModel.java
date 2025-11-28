@@ -16,6 +16,7 @@ import Models.IPost.Type;
 import Models.Question;
 import Sessions.UserSession;
 import Utils.AnswerRatingInfo;
+import Utils.Time;
 import Utils.TriConsumer;
 
 import javafx.beans.property.StringProperty;
@@ -26,7 +27,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
 
 public class PostDisplayViewModel {
 	private IPost post;
@@ -234,6 +234,10 @@ public class PostDisplayViewModel {
 	public boolean isRatedByUser() {
 		return getCurrentUserRating() != null && getCurrentUserRating() != BigDecimal.ZERO;
 	}
+	
+	public boolean hasPostBeenUpdated() {
+		 return post.getCreatedTimestamp().compareTo(post.getLastUpdatedTimestamp()) != 0;
+	}
 
 	// ===================
 	// SETTERS
@@ -350,9 +354,8 @@ public class PostDisplayViewModel {
 		if(cachedRating == null) {
 			BigDecimal retrievedPersonalRating = answerService.getRating(answerId, userSession.getCurrentUserId());
 			
-			
 			retrievedPersonalRating = retrievedPersonalRating == null ? BigDecimal.ZERO : retrievedPersonalRating;
-			System.out.println("Retrieved RatingL: " + retrievedPersonalRating);
+
 			AppCache.getInstance().setRatingForAnswer(answerId, retrievedPersonalRating);
 			currentUserRatingProperty.set(retrievedPersonalRating);
 		} else {
