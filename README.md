@@ -21,22 +21,28 @@ Team Project for CSE360 - ASU
 - Project Libs: ./libs/
 
 ### Project Phase3 Design Documents
-* Introduction - A comprehensive overview of the software design of the Reviewer role, brief updates in the Instructor and Student role in relation to the Reviewer role in the application.
+* Introduction - A comprehensive overview of the software design of the Staff role, brief updates to the Instructor abilities and Admin role in the application.
 * System Overview -
-  * Desktop-based application with added Reviewer role specifically to be able to post “review” posted questions and answers, communicating through a universal forum. Reviewers would have the same ability to only edit and delete their own posts, and would have their own profile to show all their review posts.
-  * Students will be able to private message reviewers related to their review posts to the student’s posts for clarification, etc. They can also  assign weightage values to reviewers so most trusted would appear top/only in the displayed forum list, utilized as a filter for the search bar and as a post hierarchy in forum threads. 
-  * Students will be able to request permission to users with an Instructor role to be granted abilities of being a Reviewer, while Instructors can manage Student users (granting/rejecting) who requested permission to become a Reviewer, being able to look through all their posts (posted questions and answers).
+  * Desktop-based application with added Staff and Instructor role specifically to monitor all activity of posted questions and answers, communicating through a universal Q&A forum.
+  * Instructors can send a request ticket to an admin, requesting to perform an only admin-action with a description for context/reasoning.
+  * Admin will be able to manage requests tickets sent from Instructors and choose to perform the “open” request or not, marking it “closed” moving ticket to archives when completed/rejected.
+  * Instructors, staff, and admin users will be able to view all archived “Closed” requests tickets, instructors being able to reopen a ticket with a description (for clarification).
+  * Staff can moderate content posted, private messages exchanged, and be able to send warnings or feedback to any user as a result.
+  * Instructors can establish and modify parameters for a Reviewer’s Scorecard to help adjust and calculate for more accuracy of a Reviewer user’s “credibility” score.
   * Developed using Java, JavaFX, H2 Database, MVC (Model-View-Controller) architecture.
-* Design Considerations - User-friendly interface for simple navigation to be able to easily view history posts of specific users, private viewing to messages sent to targeted users alike a universal communication feature, action to send messages, post, edit, delete, and have more specific search filters for questions/answers/reviews.
-* Data Integrity/Authentication - Only the original poster of the question/answer will be able to edit or delete their posts. Private messaging features will only be seen by the two communicating parties for each “conversation thread”. Differentiation feature to tell a part of a reviewer and student (question poster or answer response). Reviewer(s) will have their own specific profile for others to see all their posts history.
+* Design Considerations -
+  * User-friendly interface and simple navigation to be able to easily send, moderate, and view ticket requests, easy readability of a Reviewer’s scorecard, clear difference between “closed” ticket request and “open” ticket request with context given. 
+* Data Integrity/Authentication -
+  * Instructor, staff and admin roles will be able to see archived request tickets that are marked as “closed”, only instructors will be able to reopen the ticket request and add in a description. Admin user role only be able to review request tickets and grant them/deny them. Instructor users can only be able to adjust and add a set of parameters to a Reviewer’s Scorecard.
 * Specifications - 
-  * Reviewers will be able to view, create, delete, and modify posts of their posted reviews.
-  * Reviewers will be able to view the list of review posts they have written and check if they have private messages from the authors of questions/answers they reviewed.
-  * Students will be able to read reviews posts from the Reviewers and only the authors will have the ability to choose to private message the Reviewer for clarification, etc.
-  * Students will be able to create and modify a list of “trusted reviewers” and utilize it to filter searches and question threads that would prioritize showing specific reviewers posts.
-  * Students will be able to add a weightage value to each reviewer that can determine the order of multiple reviews displayed, having the most useful/trusting reviews shown first.
-  * Students will be able to request permission to also become a reviewer.
-  * Instructors will be able to review a specific student’s history post to determine whether to grant or deny their request to become a reviewer. 
+  * Admins will be able to review a page of request tickets from instructors.
+  * Admins will be able to see details of request tickets and mark them as “closed” if they decide to deny it or have already completed the task.
+  * Instructors will be able to submit request tickets for admin to perform specific admin-only actions with a description text for context.
+  * Instructors will be able to create and modify Reviewers user’s scorecard with set parameters.
+  * Staff will be able to moderate all user’s posts and private messages.
+  *  Staff, Instructors, and Administrators will be able to view a list of closed/achieved request tickets with their full context details.
+  * Instructors will be able to reopen a request ticket with add-on detail description.
+  * Admins will be able to review and decide again on reopened request tickets.
   
   
 # How to make eclipse work!

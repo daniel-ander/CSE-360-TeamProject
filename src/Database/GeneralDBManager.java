@@ -217,6 +217,18 @@ public class GeneralDBManager implements IGeneralDBManager {
 		);
 
 		
+			);
+		
+		String adminRequestsTableQuery =
+			    "CREATE TABLE IF NOT EXISTS admin_requests ("
+			  + "id IDENTITY PRIMARY KEY, "
+			  + "description VARCHAR(255) NOT NULL, "
+			  + "is_closed BOOLEAN DEFAULT FALSE, "
+			  + "original_request_id INT"
+			  + ")";
+
+
+
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -233,6 +245,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(reviewerRequestsTableQuery);
 			stmt.execute(favoredReviewerTableQuery);
 			stmt.execute(answerRatingsTableQuery);
+			stmt.execute(adminRequestsTableQuery);
 		}
 
 	}

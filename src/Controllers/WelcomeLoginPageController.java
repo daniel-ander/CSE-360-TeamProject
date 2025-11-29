@@ -165,11 +165,20 @@ public class WelcomeLoginPageController {
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
             case "instructor":
-                new InstructorHomePageController(dBConnectionStore, stage, userSession, new InstructorHomePage());
+            	Controllers.ForumPage.ForumHeaderViewModel instructorForumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(userSession);
+                new InstructorHomePageController(dBConnectionStore, stage, userSession, new InstructorHomePage(instructorForumHeaderViewModel));
                 break;
             case "staff":
-                new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage());
-                break;
+                PostListViewModel staffPostListViewModel = new PostListViewModel(
+						dBConnectionStore.getQuestionService(), 
+						dBConnectionStore.getAnswerService(),
+						dBConnectionStore.getUserService(),
+						userSession
+				);
+                Controllers.ForumPage.ForumHeaderViewModel staffForumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(userSession); 
+				Controllers.ForumPage.QuestionPaneViewModel staffQuestionPaneViewModel = new Controllers.ForumPage.QuestionPaneViewModel();
+				new StaffHomePageController(dBConnectionStore, stage, userSession, new StaffHomePage(staffForumHeaderViewModel, staffQuestionPaneViewModel), staffPostListViewModel, staffForumHeaderViewModel, 				staffQuestionPaneViewModel);
+				break;
             case "reviewer":
                 PostListViewModel postListViewModel = new PostListViewModel(
                         dBConnectionStore.getQuestionService(), 

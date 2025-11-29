@@ -19,4 +19,6 @@ public interface IMessageService {
 
     // DELETE
     boolean deleteMessage(int messageId) throws DataAccessException;
+
+	List<Message> getAllMessages();
 }
