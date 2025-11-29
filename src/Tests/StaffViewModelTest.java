@@ -8,7 +8,8 @@ package Tests;
 
 import Controllers.StaffPage.StaffViewModel; 
 import Database.Services.Interfaces.IUserService; 
-import Database.Services.Interfaces.IQuestionService; 
+import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IAdminRequestService;
 import Database.Services.Interfaces.IAnswerService; 
 import Database.Services.Interfaces.IMessageService; 
 import Models.Question; 
@@ -30,6 +31,7 @@ private IUserService mockUserService;
 private IQuestionService mockQuestionService;
 private IAnswerService mockAnswerService;
 private IMessageService mockMessageService;
+private IAdminRequestService mockAdminRequestService;
 private StaffViewModel vm;
 
 /*
@@ -42,6 +44,7 @@ public void setUp() throws Exception {
     mockQuestionService = Mockito.mock(IQuestionService.class);
     mockAnswerService = Mockito.mock(IAnswerService.class);
     mockMessageService = Mockito.mock(IMessageService.class);
+    mockAdminRequestService = Mockito.mock(IAdminRequestService.class);
 
     when(mockUserService.getAllUsernames()).thenReturn(List.of("alice", "bob"));
 
@@ -50,12 +53,15 @@ public void setUp() throws Exception {
     when(mockAnswerService.getAllAnswers()).thenReturn(List.of());
     when(mockMessageService.getMessagesForUsername(anyString())).thenReturn(List.of());
     when(mockMessageService.getAllMessages()).thenReturn(List.of());
+    when(mockAdminRequestService.getOpenRequests()).thenReturn(List.of());
+	when(mockAdminRequestService.getClosedRequests()).thenReturn(List.of());
 
     vm = new StaffViewModel(
         mockUserService,
         mockQuestionService,
         mockAnswerService,
-        mockMessageService
+        mockMessageService, 
+        mockAdminRequestService
     );
 }
 
