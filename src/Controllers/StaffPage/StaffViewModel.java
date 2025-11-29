@@ -1,10 +1,24 @@
 package Controllers.StaffPage;
 
-import Database.Services.Interfaces.IUserService; import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IUserService;
+import Database.Services.Interfaces.IQuestionService;
 import Database.Services.Interfaces.IAdminRequestService;
-import Database.Services.Interfaces.IAnswerService; import Database.Services.Interfaces.IMessageService; import Models.Answer; import Models.Message; import Models.Question; import Models.ReviewerRequest; import javafx.beans.property.ObjectProperty; import javafx.beans.property.SimpleObjectProperty; import javafx.collections.FXCollections; import javafx.collections.ObservableList;
+import Database.Services.Interfaces.IAnswerService;
+import Database.Services.Interfaces.IMessageService;
+import Models.Answer;
+import Models.Message;
+import Models.Question;
+import Models.ReviewerRequest;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.time.Instant; import java.util.HashMap; import java.util.List; import java.util.Map; import java.util.stream.Collectors;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StaffViewModel {
 
