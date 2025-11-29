@@ -16,6 +16,9 @@ public class AdminRequestService implements IAdminRequestService {
 		this.adminRequestRepository = adminRequestRepository;
 	}
 
+    /**
+     * Gets all opened requests
+     */
     @Override
     public List<AdminRequest> getOpenRequests() {
         List<AdminRequest> adminRequests  = adminRequestRepository.getAllRequests();
@@ -29,6 +32,9 @@ public class AdminRequestService implements IAdminRequestService {
         return openRequests;
     }
 
+    /**
+     * Gets all closed requests
+     */
     @Override
     public List<AdminRequest> getClosedRequests() {
         List<AdminRequest> adminRequests  = adminRequestRepository.getAllRequests();
@@ -42,12 +48,18 @@ public class AdminRequestService implements IAdminRequestService {
         return openRequests;
     }
 
+    /**
+     * Creates an admin request
+     */
     @Override
     public void createRequest(String description) {
     	AdminRequest request = new AdminRequest(0, description, false, null);
         adminRequestRepository.insert(request);
     }
     
+    /**
+     * Closes an admin request
+     */
     @Override
     public void closeRequest(int id) {
     	AdminRequest oldRequest = adminRequestRepository.getById(id);
@@ -57,6 +69,9 @@ public class AdminRequestService implements IAdminRequestService {
     	adminRequestRepository.update(oldRequest);    	
     }
 
+    /**
+     * Reopens an admin request
+     */
     @Override
     public void reopen(int id, String newDescription) {
     	AdminRequest oldRequest = adminRequestRepository.getById(id);

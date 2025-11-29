@@ -6,6 +6,9 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * ViewModel for managing admin requests inside Instructor page
+ */
 public class AdminRequestsViewModel {
 
     private final IAdminRequestService service;
@@ -23,16 +26,26 @@ public class AdminRequestsViewModel {
     private final ObjectProperty<AdminRequest> selectedClosed =
             new SimpleObjectProperty<>();
 
+    /**
+     * AdminRequestsViewModel constructor sets up service and refreshes requests list
+     * @param service
+     */
     public AdminRequestsViewModel(IAdminRequestService service) {
         this.service = service;
         refresh();
     }
 
+    /**
+     * Refreshes requests list
+     */
     public void refresh() {
         openRequests.setAll(service.getOpenRequests());
         closedRequests.setAll(service.getClosedRequests());
     }
 
+    /**
+     * Creates a new request
+     */
     public void createRequest() {
         if (newRequestText.get() == null || newRequestText.get().isBlank())
             return;
@@ -42,6 +55,9 @@ public class AdminRequestsViewModel {
         refresh();
     }
 
+    /**
+     * Reopens a closed request
+     */
     public void reopenSelected() {
         AdminRequest c = selectedClosed.get();
         if (c == null) return;
@@ -51,6 +67,9 @@ public class AdminRequestsViewModel {
         refresh();
     }
     
+    /**
+     * Closes an opened request
+     */
     public void closeSelected() {
     	AdminRequest r = selectedOpen.get();
     	if (r == null || r.isClosed()) return;

@@ -29,6 +29,13 @@ public class AdminNotificationsPageController {
 
 	private final AdminRequestsViewModel adminRequestsViewModel;
 	
+	/**
+	 * AdminNotificationsPageController Constructor
+	 * @param dBConnectionStore
+	 * @param primaryStage
+	 * @param userSession
+	 * @param view
+	 */
 	public AdminNotificationsPageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, AdminNotificationsPage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
@@ -36,7 +43,6 @@ public class AdminNotificationsPageController {
         this.primaryStage = primaryStage;
         this.userSession = userSession;
         
-        // create admin requests VM using store's service
         IAdminRequestService reqService = null;
         try {
             reqService = dBConnectionStore.getAdminRequestService();
@@ -49,7 +55,6 @@ public class AdminNotificationsPageController {
         setChangeRolesButtonAction();
         setBackButtonAction();
         
-        // bind the Requests tab UI to the viewmodel
         bindRequestsTab();
 		
 		if (Debug.isEnabled) {
@@ -57,15 +62,15 @@ public class AdminNotificationsPageController {
 		}
 	}
 	
+	/**
+	 * Binds the "Admin Requests" tab to the view model
+	 */
 	private void bindRequestsTab() {
-		// wire lists to VM observable lists
 		view.getOpenRequestsListView().setItems(adminRequestsViewModel.getOpenRequests());
 		view.getClosedRequestsListView().setItems(adminRequestsViewModel.getClosedRequests());
 		
-		// bind text inputs bidirectionally
 		view.getReopenDescriptionArea().textProperty().bindBidirectional(adminRequestsViewModel.reopenDescriptionProperty());
 		
-		// selection -> viewmodel properties
 		view.getOpenRequestsListView().getSelectionModel().selectedItemProperty().addListener((_, _, newV) -> {
 			adminRequestsViewModel.selectedOpenProperty().set(newV);
 		});
@@ -73,7 +78,6 @@ public class AdminNotificationsPageController {
 			adminRequestsViewModel.selectedClosedProperty().set(newV);
 		});
 		
-		// buttons invoke VM actions and refresh
 		view.getCloseButton().setOnAction(_ -> {
 			adminRequestsViewModel.closeSelected();
 		});
@@ -81,7 +85,6 @@ public class AdminNotificationsPageController {
 			adminRequestsViewModel.reopenSelected();
 		});
 		
-		// initial load
 		adminRequestsViewModel.refresh();
 	}
 	
@@ -89,12 +92,18 @@ public class AdminNotificationsPageController {
 	// 		 SETTERS 
 	// ===================
 	
+	/**
+	 * Configures logout button
+	 */
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(_ -> {
 	         new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
 	}
     
+    /**
+     * Configures change roles button
+     */
     private void setChangeRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(_ -> {
     		try {
@@ -107,6 +116,9 @@ public class AdminNotificationsPageController {
 	    });
     }
     
+    /**
+     * Configures back button
+     */
     private void setBackButtonAction() {
     	view.getBackButton().setOnAction(_ -> {
     		new AdminHomePageController(dBConnectionStore, primaryStage, userSession, new UI.Pages.AdminHomePage());

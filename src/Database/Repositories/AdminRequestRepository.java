@@ -25,6 +25,9 @@ public class AdminRequestRepository implements IAdminRequestRepository {
         this.dbManager = dbManager;
     }
     
+    /**
+     * Gets all admin requests
+     */
     @Override
     public synchronized List<AdminRequest> getAllRequests() {
     	String sql = "SELECT id, description, is_closed, original_request_id FROM admin_requests";
@@ -44,6 +47,9 @@ public class AdminRequestRepository implements IAdminRequestRepository {
     	return list;
     }
     
+    /**
+     * Gets an admin request by id
+     */
     @Override
     public AdminRequest getById(int id) {
     	String sql = "SELECT id, description, is_closed, original_request_id FROM admin_requests WHERE id = ?";
@@ -64,6 +70,9 @@ public class AdminRequestRepository implements IAdminRequestRepository {
     	return null;
     }
 
+    /**
+     * Inserts an admin request
+     */
     @Override
     public synchronized void insert(AdminRequest request) {
         String sql = "INSERT INTO admin_requests (description, is_closed, original_request_id) VALUES (?, ?, ?)";
@@ -86,6 +95,9 @@ public class AdminRequestRepository implements IAdminRequestRepository {
         }
     }
 
+    /**
+     * Updates an existing admin Request
+     */
     @Override
     public synchronized void update(AdminRequest request) {
         String sql = "UPDATE admin_requests SET description = ?, is_closed = ?, original_request_id = ? WHERE id = ?";
@@ -109,6 +121,12 @@ public class AdminRequestRepository implements IAdminRequestRepository {
         }
     }
     
+    /**
+     * Maps a row from database to an AdminRequest object
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
     private AdminRequest map(ResultSet rs) throws SQLException {
         return new AdminRequest(
                 rs.getInt("id"),
