@@ -39,6 +39,14 @@ public class InstructorHomePageController {
 
 	private final AdminRequestsViewModel adminRequestsViewModel;
 	
+	/**
+	 * Creates a new InstructorHomePage Controller.
+	 * Initializes layout, sets up button actions, and configures debug environment if needed
+	 * @param dBConnectionStore
+	 * @param primaryStage
+	 * @param userSession
+	 * @param view
+	 */
 	public InstructorHomePageController(DBConnectionStore dBConnectionStore, Stage primaryStage, UserSession userSession, InstructorHomePage view) {
 		this.dBConnectionStore = dBConnectionStore;
         this.userService = dBConnectionStore.getUserService();
@@ -69,6 +77,9 @@ public class InstructorHomePageController {
 		}
 	}
 	
+	/**
+	 * Binds admin requests tab to page
+	 */
 	private void bindRequestsTab() {
 		// wire lists to VM observable lists
 		view.getOpenRequestsListView().setItems(adminRequestsViewModel.getOpenRequests());
@@ -104,6 +115,9 @@ public class InstructorHomePageController {
 	// 		 SETTERS 
 	// ===================
 	
+	/**
+	 * Configures Enter forum button
+	 */
 	private void setEnterForumButtonAction() {
 		view.getEnterForumButton().setOnAction(_ -> {
 			PostListViewModel postListViewModel = new PostListViewModel(
@@ -128,6 +142,9 @@ public class InstructorHomePageController {
 		});
 	}
 	
+	/**
+	 * Configures enter messages page button
+	 */
 	private void setEnterMessagesPageButtonAction() {
 		view.getEnterMessagesPageButton().setOnAction(_ -> {
 			PostListViewModel postListViewModel = new PostListViewModel(
@@ -152,12 +169,18 @@ public class InstructorHomePageController {
 		});
 	}
 	
+	/**
+	 * Configures logout button
+	 */
     private void setLogoutButtonAction() {
     	view.getLogoutButton().setOnAction(_ -> {
 	         new UserLoginPageController(dBConnectionStore, primaryStage, new UserLoginPage());
 	    });
 	}
     
+    /**
+     * Configures change roles button
+     */
     private void setChangeRolesButtonAction() {
     	view.getChangeRolesButton().setOnAction(_ -> {
     		try {
@@ -170,6 +193,9 @@ public class InstructorHomePageController {
 	    });
 	}
 
+    /**
+     * Configures manage requests button
+     */
     private void setManageRequestsButtonAction() {
         view.getManageRequestsButton().setOnAction(_ -> {
             InstructorRequestsPageController reqController = new InstructorRequestsPageController(dBConnectionStore, primaryStage, userSession, new InstructorRequestsPage());
@@ -177,6 +203,9 @@ public class InstructorHomePageController {
         });
     }
     
+    /**
+     * Sets up the initial layout of the instructor home page.
+     */
     private void setInitialLayout() {
     	view.setInitialLayout(primaryStage);
     }
