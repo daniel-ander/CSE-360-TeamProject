@@ -1,19 +1,24 @@
 package Controllers.StaffPage;
 
-import Database.Services.Interfaces.IUserService; 
-import Database.Services.Interfaces.IQuestionService; 
-import Database.Services.Interfaces.IAnswerService; 
-import Database.Services.Interfaces.IMessageService; 
-import Models.Answer; 
-import Models.Message; 
-import Models.Question; 
-import Models.ReviewerRequest; 
-import javafx.beans.property.ObjectProperty; 
-import javafx.beans.property.SimpleObjectProperty; 
-import javafx.collections.FXCollections; 
+import Database.Services.Interfaces.IUserService;
+import Database.Services.Interfaces.IQuestionService;
+import Database.Services.Interfaces.IAdminRequestService;
+import Database.Services.Interfaces.IAnswerService;
+import Database.Services.Interfaces.IMessageService;
+import Models.Answer;
+import Models.Message;
+import Models.Question;
+import Models.ReviewerRequest;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.time.Instant; import java.util.HashMap; import java.util.List; import java.util.Map; import java.util.stream.Collectors;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StaffViewModel {
 
@@ -22,6 +27,7 @@ private final IQuestionService questionService;
 // private final IRequestService requestService;
 private final IAnswerService answerService;
 private final IMessageService messageService;
+private final IAdminRequestService adminRequestService;
 
 private final ObservableList<String> users = FXCollections.observableArrayList();
 private final ObservableList<Question> questions = FXCollections.observableArrayList();
@@ -45,12 +51,14 @@ public StaffViewModel(
     IQuestionService questionService,
     /*IRequestService requestService,*/
     IAnswerService answerService,
-    IMessageService messageService) {
+    IMessageService messageService, 
+    IAdminRequestService adminRequestService) {
     this.userService = userService;
     this.questionService = questionService;
     // this.requestService = requestService;
     this.answerService = answerService;
     this.messageService = messageService;
+    this.adminRequestService = adminRequestService;
 
     // start with an empty in-memory notes list
     staffNotes.clear();
@@ -246,13 +254,13 @@ public void flagCurrentContent() {
 
     if (currentContent instanceof Question) {
         Question q = (Question) currentContent;
-        // questionService.flagQuestion(q.getId());
+        adminRequestService.createRequest("Flagged Question ID: " + q.getId());
     } else if (currentContent instanceof Answer) {
         Answer a = (Answer) currentContent;
-        // answerService.flagAnswer(a.getId());
+        adminRequestService.createRequest("Flagged Answer ID: " + a.getId());
     } else if (currentContent instanceof Message) {
         Message m = (Message) currentContent;
-        // messageService.flagMessage(m.getId());
+        adminRequestService.createRequest("Flagged Message ID: " + m.getId());
     }
 }
 

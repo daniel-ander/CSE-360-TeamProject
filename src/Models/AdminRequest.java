@@ -3,9 +3,9 @@ package Models;
 public class AdminRequest {
 
     private final int id;
-    private final String description;
-    private final boolean isClosed;
-    private final Integer originalRequestId; // null unless reopened
+    private String description;
+    private boolean isClosed;
+    private final Integer originalRequestId;
 
     public AdminRequest(int id, String description, boolean isClosed, Integer originalRequestId) {
         this.id = id;
@@ -18,6 +18,14 @@ public class AdminRequest {
     public String getDescription() { return description; }
     public boolean isClosed() { return isClosed; }
     public Integer getOriginalRequestId() { return originalRequestId; }
+    
+    public void setClosed(boolean status) {
+    	this.isClosed = status;
+    }
+    
+    public void setDescription(String newDescription) {
+    	this.description = newDescription;
+    }
 
     @Override
     public String toString() {

@@ -7,62 +7,132 @@ import Models.AdminRequest;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.sql.SQLException;
+import java.sql.Types;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 /**
  * Simple repository for admin requests.
- * Currently uses an in-memory list for storage so it compiles and behaves like a repository-backed implementation.
- * Constructor accepts IGeneralDBManager for future DB wiring.
+ * Constructor accepts IGeneralDBManager.
  */
 public class AdminRequestRepository implements IAdminRequestRepository {
 
-    private final IGeneralDBManager dbManager; // reserved for future DB operations
-    private final List<AdminRequest> storage = new ArrayList<>();
-    private int nextId = 1;
+    private final IGeneralDBManager dbManager;
 
     public AdminRequestRepository(IGeneralDBManager dbManager) {
         this.dbManager = dbManager;
     }
-
+    
+    /**
+     * Gets all admin requests
+     */
     @Override
-    public synchronized List<AdminRequest> getOpenRequests() {
-        List<AdminRequest> result = new ArrayList<>();
-        for (AdminRequest r : storage) {
-            if (!r.isClosed()) result.add(r);
+    public synchronized List<AdminRequest> getAllRequests() {
+    	String sql = "SELECT id, description, is_closed, original_request_id FROM admin_requests";
+    	List<AdminRequest> list = new ArrayList<>();
+    	
+    	try (Connection conn = dbManager.getConnection();
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery()) {
+    		
+    		while (rs.next()) {
+    			list.add(map(rs));
+    		}
+    		
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    	return list;
+    }
+    
+    /**
+     * Gets an admin request by id
+     */
+    @Override
+    public AdminRequest getById(int id) {
+    	String sql = "SELECT id, description, is_closed, original_request_id FROM admin_requests WHERE id = ?";
+    	
+    	try (Connection conn = dbManager.getConnection();
+    			PreparedStatement stmt = conn.prepareStatement(sql)) {
+    		
+    		stmt.setInt(1, id);
+    		
+    		try (ResultSet rs = stmt.executeQuery()) {
+    			if (rs.next()) {
+    				return map(rs);
+    			}
+    		}
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    	return null;
+    }
+
+    /**
+     * Inserts an admin request
+     */
+    @Override
+    public synchronized void insert(AdminRequest request) {
+        String sql = "INSERT INTO admin_requests (description, is_closed, original_request_id) VALUES (?, ?, ?)";
+
+        try (Connection conn = dbManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, request.getDescription());
+            stmt.setBoolean(2, request.isClosed());
+            if (request.getOriginalRequestId() != null) {
+            	stmt.setInt(3, request.getOriginalRequestId());
+            } else {
+            	stmt.setNull(3, Types.INTEGER);
+            }
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return result;
     }
 
+    /**
+     * Updates an existing admin Request
+     */
     @Override
-    public synchronized List<AdminRequest> getClosedRequests() {
-        List<AdminRequest> result = new ArrayList<>();
-        for (AdminRequest r : storage) {
-            if (r.isClosed()) result.add(r);
+    public synchronized void update(AdminRequest request) {
+        String sql = "UPDATE admin_requests SET description = ?, is_closed = ?, original_request_id = ? WHERE id = ?";
+
+        try (Connection conn = dbManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, request.getDescription());
+            stmt.setBoolean(2, request.isClosed());
+            if (request.getOriginalRequestId() != null) {
+            	stmt.setInt(3, request.getOriginalRequestId());
+            } else {
+            	stmt.setNull(3, Types.INTEGER);
+            }
+            stmt.setInt(4, request.getId());
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return result;
     }
-
-    @Override
-    public synchronized void createRequest(String description) {
-        storage.add(new AdminRequest(nextId++, description, false, null));
-    }
-
-    @Override
-    public synchronized void closeRequest(int id) {
-        AdminRequest old = find(id);
-        if (old == null) return;
-        storage.remove(old);
-        storage.add(new AdminRequest(old.getId(), old.getDescription(), true, old.getOriginalRequestId()));
-    }
-
-    @Override
-    public synchronized void reopen(int id, String newDescription) {
-        AdminRequest old = find(id);
-        if (old == null || !old.isClosed()) return;
-        storage.remove(old);
-        storage.add(new AdminRequest(nextId++, newDescription, false, old.getId()));
-    }
-
-    private AdminRequest find(int id) {
-        for (AdminRequest r : storage) if (r.getId() == id) return r;
-        return null;
+    
+    /**
+     * Maps a row from database to an AdminRequest object
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private AdminRequest map(ResultSet rs) throws SQLException {
+        return new AdminRequest(
+                rs.getInt("id"),
+                rs.getString("description"),
+                rs.getBoolean("is_closed"),
+                rs.getObject("original_request_id") != null ? rs.getInt("original_request_id") : null
+        );
     }
 }

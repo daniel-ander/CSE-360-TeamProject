@@ -82,7 +82,8 @@ public class StaffHomePageController {
 				dBConnectionStore.getUserService(),
 				dBConnectionStore.getQuestionService(),
 				dBConnectionStore.getAnswerService(),
-				dBConnectionStore.getMessageService()
+				dBConnectionStore.getMessageService(), 
+				dBConnectionStore.getAdminRequestService()
 		);
 		
 		setInitialLayout();

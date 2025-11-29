@@ -10,6 +10,7 @@ public interface IAdminRequestService {
 
     void createRequest(String description);
 
-    void closeRequest(int id);                 // optional
+    void closeRequest(int id);
+    
     void reopen(int id, String newDescription);
 }
