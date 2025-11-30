@@ -93,16 +93,28 @@ public ObservableList<Message> getMessages() {
 public ObservableList<String> getStaffNotes() {
     return staffNotes;
 }
-
+/*
+ * Load all usernames from the user service into the users list
+ */
 public void loadAllUsers() {
-    users.setAll(userService.getAllUsernames());
-    // initialize per-user note lists so switching is immediate (optional)
-    for (String u : users) {
-        notesByUser.putIfAbsent(u, FXCollections.observableArrayList());
+    try {
+        List<String> fetched = userService.getAllUsernames();
+        users.setAll(fetched);
+
+        for (String u : users) {
+            notesByUser.putIfAbsent(u, FXCollections.observableArrayList());
+        }
+
+    } catch (Exception e) {
+        // added an error per gitcomments
+        System.err.println("Failed to load users: " + e.getMessage());
+
     }
 }
 
-// Accept username from UI and load related data
+/*
+ * Set the selected user by username; updates staffNotes and loads user data
+ */
 public void setSelectedUser(String selectedUsername) {
     // save current staffNotes into map for previous user
     String previous = selectedUserProperty.get();
@@ -125,6 +137,9 @@ public void setSelectedUser(String selectedUsername) {
     loadUserData(selectedUsername);
 }
 
+/*
+ * Load all content (questions, answers, reviews, messages) for the given username
+ */
 private void loadUserData(String username) {
     // Clear previous data
     questions.clear();
@@ -186,11 +201,16 @@ private static String safeString(String s) {
     return s == null ? "" : s;
 }
 
+/*
+ * Track the currently displayed content object for flagging	 
+ */
 public void setCurrentlyDisplayedContent(Object content) {
     this.currentContent = content;
 }
 
-// Adds a timestamped note to the in-memory list (per-user)
+/*
+ * Add a staff note for the current selected user
+ */
 public void addStaffNote(String noteText) {
     if (noteText == null) return;
     String trimmed = noteText.trim();
@@ -212,7 +232,9 @@ public void addStaffNote(String noteText) {
     staffNotes.add(timestamped);
 }
 
-// Remove a note by index (safe)
+/*
+ * Remove a staff note at the given index for the current selected user
+ */
 public void removeStaffNoteAt(int index) {
     if (index < 0 || index >= staffNotes.size()) return;
 
@@ -228,7 +250,9 @@ public void removeStaffNoteAt(int index) {
     }
 }
 
-// Clear all notes for current selection
+/*
+ * Clear all staff notes for the current selected user
+ */
 public void clearStaffNotes() {
     String currentUser = selectedUserProperty.get();
     if (currentUser == null) {
@@ -241,6 +265,9 @@ public void clearStaffNotes() {
     staffNotes.clear();
 }
 
+/*
+ * Flag the currently displayed content (question, answer, or message)
+ */
 public void flagCurrentContent() {
     if (currentContent == null) return;
 
