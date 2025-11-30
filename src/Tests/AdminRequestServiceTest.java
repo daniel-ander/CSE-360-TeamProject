@@ -13,18 +13,26 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for AdminRequestService
+ */
 public class AdminRequestServiceTest {
 
     private IAdminRequestRepository mockRepo;
     private AdminRequestService service;
 
+    /**
+     * Sets up mock repository and service before each test
+     */
     @BeforeEach
     public void setup() {
         mockRepo = mock(IAdminRequestRepository.class);
         service = new AdminRequestService(mockRepo);
     }
 
-
+    /**
+     * Tests that GetOpenRequests Returns Only Open Requests
+     */
     @Test
     public void GetOpenRequests_ReturnsOnlyOpenRequests() {
         AdminRequest r1 = new AdminRequest(1, "A", false, null);
@@ -40,6 +48,9 @@ public class AdminRequestServiceTest {
         assertFalse(result.contains(r2));
     }
 
+    /**
+     * Tests that GetClosedRequests Returns Only Closed Requests
+     */
     @Test
     public void GetClosedRequests_ReturnsOnlyClosedRequests() {
         AdminRequest r1 = new AdminRequest(1, "A", false, null);
@@ -52,6 +63,9 @@ public class AdminRequestServiceTest {
         assertEquals(r2, result.get(0));
     }
 
+    /**
+     * Tests that CreateRequest, With Valid Inputs, Inserts a New Request
+     */
     @Test
     public void CreateRequest_WithValidInputs_InsertsNewRequest() {
         ArgumentCaptor<AdminRequest> captor = ArgumentCaptor.forClass(AdminRequest.class);
@@ -66,6 +80,9 @@ public class AdminRequestServiceTest {
         assertNull(inserted.getOriginalRequestId());
     }
 
+    /**
+     * Tests that CloseRequest, When Request Does Not Exist, Does Nothing
+     */
     @Test
     public void CloseRequest_WhenRequestDoesNotExist_DoesNothing() {
         when(mockRepo.getById(5)).thenReturn(null);
@@ -75,6 +92,9 @@ public class AdminRequestServiceTest {
         verify(mockRepo, never()).update(any());
     }
 
+    /**
+     * Tests that CloseRequest, When Already Closed, Does Nothing
+     */
     @Test
     public void CloseRequest_WhenAlreadyClosed_DoesNothing() {
         AdminRequest closed = new AdminRequest(3, "Test Request", true, null);
@@ -85,6 +105,9 @@ public class AdminRequestServiceTest {
         verify(mockRepo, never()).update(any());
     }
 
+    /**
+     * Tests that CloseRequest, When request is Open, Closes Request
+     */
     @Test
     public void CloseRequest_WhenOpen_ClosesRequest() {
         AdminRequest open = new AdminRequest(1, "Test Request", false, null);
@@ -96,6 +119,9 @@ public class AdminRequestServiceTest {
         verify(mockRepo).update(open);
     }
 
+    /**
+     * Tests that ReopenRequest, When Does Not Exist, Does Nothing
+     */
     @Test
     public void ReopenRequest_WhenDoesNotExist_DoesNothing() {
         when(mockRepo.getById(10)).thenReturn(null);
@@ -105,6 +131,9 @@ public class AdminRequestServiceTest {
         verify(mockRepo, never()).insert(any());
     }
 
+    /**
+     * Tests that ReopenRequest, When Not Closed, Does Nothing
+     */
     @Test
     public void ReopenRequest_WhenNotClosed_DoesNothing() {
         AdminRequest open = new AdminRequest(2, "Test Request", false, null);
@@ -115,6 +144,9 @@ public class AdminRequestServiceTest {
         verify(mockRepo, never()).insert(any());
     }
 
+    /**
+     * Tests that ReopenRequest, When Closed, Inserts New Request
+     */
     @Test
     public void ReopenRequest_WhenClosed_InsertsNewRequest() {
         AdminRequest closed = new AdminRequest(7, "Old Description", true, null);
