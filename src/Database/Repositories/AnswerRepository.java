@@ -79,6 +79,46 @@ public class AnswerRepository implements IAnswerRepository {
 	                }
 	            }
 	        }
+	        if (a.getIsReview()) {
+	            try (Connection conn = generalDBManager.getConnection();
+	                 PreparedStatement ps = conn.prepareStatement(
+	                     "INSERT INTO messages (review_id, sender_id, receiver_id, message_text) VALUES (?, ?, ?, ?)"
+	                 )) {
+
+	                // review_id = this answer’s id
+	                ps.setInt(1, a.getId());
+	                ps.setInt(2, a.getAuthorId());
+
+	                // receiver = target user (question or parent answer’s author)
+	                Integer receiverId = null;
+
+	                if (a.getParentAnswerId() != null) {
+	                    // review is on another answer → send to that answer’s author
+	                    String q = "SELECT userId FROM " + Answer.tableName + " WHERE id = ?";
+	                    try (PreparedStatement find = conn.prepareStatement(q)) {
+	                        find.setInt(1, a.getParentAnswerId());
+	                        try (ResultSet r = find.executeQuery()) {
+	                            if (r.next()) receiverId = r.getInt("userId");
+	                        }
+	                    }
+	                } else {
+	                    // review is on a question → send to question’s author
+	                    String q = "SELECT userId FROM questions WHERE id = ?";
+	                    try (PreparedStatement find = conn.prepareStatement(q)) {
+	                        find.setInt(1, a.getQuestionId());
+	                        try (ResultSet r = find.executeQuery()) {
+	                            if (r.next()) receiverId = r.getInt("userId");
+	                        }
+	                    }
+	                }
+
+	                if (receiverId == null) return a; // skip if no valid receiver
+
+	                ps.setInt(3, receiverId);
+	                ps.setString(4, a.getBodyText());
+	                ps.executeUpdate();
+	            }
+	        }
 	    }
 
 	    return a;

@@ -165,6 +165,7 @@ public class WelcomeLoginPageController {
                 new StudentHomePageController(dBConnectionStore, stage, userSession, new StudentHomePage());
                 break;
             case "instructor":
+            	
             	Controllers.ForumPage.ForumHeaderViewModel instructorForumHeaderViewModel = new Controllers.ForumPage.ForumHeaderViewModel(userSession);
                 new InstructorHomePageController(dBConnectionStore, stage, userSession, new InstructorHomePage(instructorForumHeaderViewModel));
                 break;
