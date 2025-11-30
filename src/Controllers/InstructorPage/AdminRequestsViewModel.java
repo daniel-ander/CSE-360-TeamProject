@@ -58,13 +58,18 @@ public class AdminRequestsViewModel {
     /**
      * Reopens a closed request
      */
-    public void reopenSelected() {
+    public boolean reopenSelected() {
         AdminRequest c = selectedClosed.get();
-        if (c == null) return;
+        if (c == null) return false;
 
+        if (reopenDescription.get() == null || reopenDescription.get().isBlank()) {
+        	return false;
+        }
+        
         service.reopen(c.getId(), reopenDescription.get());
         reopenDescription.set("");
         refresh();
+        return true;
     }
     
     /**
