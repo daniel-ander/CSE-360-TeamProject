@@ -23,6 +23,9 @@ import Tests.Utils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link PostDisplayViewModel}.
+ */
 public class PostDisplayViewModelTest {
 
     private IUserService userService;
@@ -41,6 +44,9 @@ public class PostDisplayViewModelTest {
     private Answer answer;
     private UserDTO userDTO;
 
+    /**
+     * Initializes mocks, models, and view models before each test.
+     */
     @BeforeEach
     void setUp() {
         userService = mock(IUserService.class);
@@ -86,12 +92,18 @@ public class PostDisplayViewModelTest {
         );
     }
 
+    /**
+     * Tests that setting depth level updates the internal depth value.
+     */
     @Test
     void testSetAndGetDepthLevel() {
         questionVM.setDepthLevel(3);
         assertEquals(3, questionVM.getDepthLevel());
     }
 
+    /**
+     * Tests that toggling expand updates the boolean and triggers callback.
+     */
     @Test
     void testToggleExpand() {
         assertFalse(questionVM.isExpandButtonPressed());
@@ -100,6 +112,9 @@ public class PostDisplayViewModelTest {
         verify(toggleExpandCallback, times(1)).run();
     }
 
+    /**
+     * Tests that deleting a post marks it deleted and calls the callback.
+     */
     @Test
     void testDeletePostTriggersCallbackAndSetsDeleted() {
         questionVM.setIsDeletedProperty(false);
@@ -108,6 +123,9 @@ public class PostDisplayViewModelTest {
         verify(deleteCallback).accept(question.getId());
     }
 
+    /**
+     * Tests that updating a question's text triggers the provided update callback.
+     */
     @Test
     void testUpdatePostCallsCallbackForQuestion() {
         AtomicBoolean called = new AtomicBoolean(false);
@@ -127,12 +145,18 @@ public class PostDisplayViewModelTest {
         assertTrue(called.get());
     }
 
+    /**
+     * Tests that editing flag updates correctly.
+     */
     @Test
     void testSetIsEditingProperty() {
         questionVM.setIsEditingProperty(true);
         assertTrue(questionVM.getIsEditingPostProperty().get());
     }
 
+    /**
+     * Tests that commenting and reviewing states are mutually exclusive.
+     */
     @Test
     void testNonConcurrentProperties() {
         questionVM.setIsCommentingProperty(true);
@@ -141,6 +165,9 @@ public class PostDisplayViewModelTest {
         assertTrue(questionVM.getIsReviewingProperty().get());
     }
 
+    /**
+     * Tests that rating and vote count properties can be set and retrieved.
+     */
     @Test
     void testSetRatingPropertyAndUpvoteCount() {
         BigDecimal rating = new BigDecimal("0.8");
@@ -151,9 +178,11 @@ public class PostDisplayViewModelTest {
         assertEquals(5, answerVM.getUpvoteCountProperty().get());
     }
 
+    /**
+     * Tests that the button indicating whether a reviewer can be favored displays correctly.
+     */
     @Test
     void testSetShouldDisplayFavoredReviewerButton() {
-        // Setup a review post scenario
         when(userSession.getCurrentUserId()).thenReturn(2);
         Answer reviewAnswer = new Answer(1, 1, userDTO, "Review Content", true);
         PostDisplayViewModel reviewVM = new PostDisplayViewModel(
@@ -170,28 +199,32 @@ public class PostDisplayViewModelTest {
         );
 
         reviewVM.setShouldDisplayFavoredReviewerButton();
-        // Since current user is author (id 2) and reviewer role not set, button shouldn't display
         assertFalse(reviewVM.getShouldDisplayFavoredReviewerButtonProperty().get());
     }
 
+    /**
+     * Tests that setting the same rating removes the rating and updates stats accordingly.
+     */
     @Test
     void testSetPersonalRatingPropertyRemovesRatingWhenSame() throws Exception {
         BigDecimal oldRating = BigDecimal.valueOf(0.6);
         RatingStats newStats = new RatingStats(BigDecimal.valueOf(0.0), 0);
 
-        // Set initial user rating
         answerVM.setRatingProperty(oldRating);
         answerVM.setCurrentUserRatingProperty(oldRating);
 
         when(answerService.removeRating(answer.getId(), userSession.getCurrentUserId()))
                 .thenReturn(newStats);
 
-        answerVM.setPersonalRatingProperty(3); // 3/5 stars -> 0.6 same as old
+        answerVM.setPersonalRatingProperty(3);
         assertNull(answerVM.getCurrentUserRating());
         assertEquals(newStats.getAverageRating(), answerVM.getRatingProperty().get());
         assertEquals(newStats.getUpvoteCount(), answerVM.getUpvoteCountProperty().get());
     }
 
+    /**
+     * Tests conversion of personal rating value into number of stars.
+     */
     @Test
     void testGetCurrentUserStarRating() {
         BigDecimal personalRating = BigDecimal.valueOf(0.7);
@@ -201,6 +234,9 @@ public class PostDisplayViewModelTest {
         assertEquals(expectedStars, answerVM.getCurrentUserStarRating());
     }
 
+    /**
+     * Tests whether the view model correctly identifies whether the user rated the post.
+     */
     @Test
     void testIsRatedByUser() {
         answerVM.setCurrentUserRatingProperty(BigDecimal.valueOf(0.5));
@@ -213,17 +249,18 @@ public class PostDisplayViewModelTest {
         assertFalse(answerVM.isRatedByUser());
     }
 
+    /**
+     * Tests that resetting rating restores the original average rating stored in the post model.
+     */
     @Test
     void testResetRatingRestoresAnswerAverage() {
         BigDecimal oldAverage = BigDecimal.valueOf(0.6);
 
         ((Answer) answerVM.getPost()).setAverageRating(oldAverage);
-        
+
         answerVM.setRatingProperty(BigDecimal.valueOf(0.2));
         answerVM.resetRating();
 
         assertEquals(oldAverage, answerVM.getRatingProperty().get());
     }
-
-
 }
