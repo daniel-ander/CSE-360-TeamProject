@@ -1,5 +1,5 @@
 package Models.DBModels;
 
 public class FavoredReviewer {
-	public static String tableName = "favoredReviewer";
+	public static String tableName = "favoredReviewers";
 }

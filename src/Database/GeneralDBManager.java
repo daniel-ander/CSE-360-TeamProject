@@ -10,6 +10,7 @@ import Models.Question;
 import Models.User;
 import Models.DBModels.FavoredReviewer;
 import Models.DBModels.Permission;
+import Models.DBModels.Rating;
 import Utils.RolePermissions;
 import Utils.StringUtils;
 
@@ -38,9 +39,7 @@ public class GeneralDBManager implements IGeneralDBManager {
 	private final String invitationTableName = Invitation.tableName;
 	private final String permissionTableName = Permission.tableName;
 	private final String favoredReviewerTableName = FavoredReviewer.tableName;
-
-	// TODO: - Not entirely sure what this is.
-	private static int forumPostIdNumber = 0;
+	private final String ratingTableName = Rating.tableName;
 
 	// ===================
 	// CREATE
@@ -69,60 +68,101 @@ public class GeneralDBManager implements IGeneralDBManager {
 		String questionPermissionSQL = StringUtils.listToSQLString(RolePermissions.QuestionPermissions.getAllPermissions()); // ["APPROVE", "COMMENT"]
 		String answerPermissionSQL = StringUtils.listToSQLString(RolePermissions.AnswerPermissions.getAllPermissions());
 
-		String userTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "userName VARCHAR(255) UNIQUE, " + "password VARCHAR(255), " + "role VARCHAR(225))", userTableName);
+		String userTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s (" 
+				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "userName VARCHAR(255) UNIQUE, " 
+				+ "password VARCHAR(255), " 
+				+ "role VARCHAR(225))", 
+				userTableName
+		);
 
-		String invitationCodesTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ("
-				+ "code VARCHAR(10) PRIMARY KEY, " + "isUsed BOOLEAN DEFAULT FALSE)", invitationTableName);
+		String invitationCodesTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s ("
+				+ "code VARCHAR(10) PRIMARY KEY, " 
+				+ "isUsed BOOLEAN DEFAULT FALSE)", 
+				invitationTableName
+		);
 
-		String forumQuestionsTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
-				+ "userId INT, " + "title VARCHAR(255), " + "body TEXT, "
+		String forumQuestionsTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
+				+ "userId INT, " 
+				+ "title VARCHAR(255), " 
+				+ "body TEXT, "
 				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "answered BOOLEAN DEFAULT FALSE, "
-				+ "resolved BOOLEAN DEFAULT FALSE, " + "isDeleted BOOLEAN DEFAULT FALSE, "
-				+ "upvoteCount INT DEFAULT 0, " + "FOREIGN KEY (userId) REFERENCES %s(id))", questionTableName, userTableName);
+				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " 
+				+ "answered BOOLEAN DEFAULT FALSE, "
+				+ "resolved BOOLEAN DEFAULT FALSE, " 
+				+ "isDeleted BOOLEAN DEFAULT FALSE, "
+				+ "upvoteCount INT DEFAULT 0, " 
+				+ "FOREIGN KEY (userId) REFERENCES %s(id))", 
+				questionTableName, userTableName
+		);
 
-		String forumAnswersTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s (" + "id IDENTITY PRIMARY KEY, "
-				+ "questionId INT, " + "parentAnswerId INT DEFAULT NULL, " + "userId INT, " + "authorName TEXT, " + "body TEXT, "
-				+ "isCorrect BOOLEAN DEFAULT FALSE, " + "isReview BOOLEAN DEFAULT FALSE, " + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+		String forumAnswersTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s (" 
+				+ "id IDENTITY PRIMARY KEY, "
+				+ "questionId INT, " 
+				+ "parentAnswerId INT DEFAULT NULL, " 
+				+ "userId INT, " 
+				+ "body TEXT, "
+				+ "isCorrect BOOLEAN DEFAULT FALSE, " 
+				+ "isReview BOOLEAN DEFAULT FALSE, " 
+				+ "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 				+ "lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-				+ "isDeleted BOOLEAN DEFAULT FALSE, " + "upvoteCount INT DEFAULT 0, "
+				+ "isDeleted BOOLEAN DEFAULT FALSE, " 
+				+ "averageRating DECIMAL(3,2) NOT NULL DEFAULT 0, " 
+				+ "upvoteCount INT DEFAULT 0, "
 				+ "FOREIGN KEY (questionId) REFERENCES %s(id), "
 				+ "FOREIGN KEY (parentAnswerId) REFERENCES %s(id), "
-				+ "FOREIGN KEY (userId) REFERENCES %s(id))", answerTableName, questionTableName, answerTableName, userTableName);
+				+ "FOREIGN KEY (userId) REFERENCES %s(id))", 
+				answerTableName, questionTableName, answerTableName, userTableName
+		);
 
-		String permissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS %s ( " + "id SERIAL PRIMARY KEY, "
-				+ "name VARCHAR(20) UNIQUE NOT NULL)", permissionTableName);
+		String permissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS %s ( " 
+				+ "id SERIAL PRIMARY KEY, "
+				+ "name VARCHAR(20) UNIQUE NOT NULL)", 
+				permissionTableName
+		);
 
-		String questionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS question_permissions ( "
+		String questionPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS question_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN (%s)), "
 				+ "CHECK (permission IN (%s)))", 
-					userRolesSQL, questionPermissionSQL);
+					userRolesSQL, questionPermissionSQL
+		);
 
-		String answerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS answer_permissions ( "
+		String answerPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS answer_permissions ( "
 				+ "role VARCHAR(20) NOT NULL, " + "permission VARCHAR(20) NOT NULL, "
 				+ "PRIMARY KEY (role, permission), "
 				+ "CHECK (role IN (%s)), "
 				+ "CHECK (permission IN (%s)))", 
-					userRolesSQL, answerPermissionSQL);
+					userRolesSQL, answerPermissionSQL
+		);
 
-		String userQuestionPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_question_permissions ( "
+		String userQuestionPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS user_question_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
 				+ "post_id INTEGER REFERENCES %s(id) ON DELETE CASCADE, "
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
-					questionTableName, questionPermissionSQL);
+					questionTableName, questionPermissionSQL
+		);
 
-		String userAnswerPermissionTableQuery = String.format("CREATE TABLE IF NOT EXISTS user_answer_permissions ( "
+		String userAnswerPermissionTableQuery = String.format(
+				  "CREATE TABLE IF NOT EXISTS user_answer_permissions ( "
 				+ "user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, "
 				+ "post_id INTEGER REFERENCES %s(id) ON DELETE CASCADE, "
 				+ "permission VARCHAR(20) NOT NULL, " + "is_allowed BOOLEAN NOT NULL, "
 				+ "PRIMARY KEY (user_id, post_id, permission), "
 				+ "CHECK (permission IN (%s)))", 
-					answerTableName, answerPermissionSQL);
+				answerTableName, answerPermissionSQL
+		);
 		
 		String messageTableQuery = String.format(
 			    "CREATE TABLE IF NOT EXISTS %s ("
@@ -141,7 +181,8 @@ public class GeneralDBManager implements IGeneralDBManager {
 			);
 		
 		// reviewer requests table for students requesting reviewer role
-		String reviewerRequestsTableQuery = "CREATE TABLE IF NOT EXISTS reviewer_requests ("
+		String reviewerRequestsTableQuery = 
+			  "CREATE TABLE IF NOT EXISTS reviewer_requests ("
 			+ "request_id IDENTITY PRIMARY KEY, "
 			+ "student_id INT, "
 			+ "instructor_id INT, "
@@ -159,7 +200,32 @@ public class GeneralDBManager implements IGeneralDBManager {
 			  + "FOREIGN KEY (favoredReviewerId) REFERENCES %s(id) ON DELETE CASCADE, "
 			  + "UNIQUE (userId, favoredReviewerId))",
 			  favoredReviewerTableName, userTableName, userTableName
-			);
+		);
+		
+		String answerRatingsTableQuery = String.format(
+			    "CREATE TABLE IF NOT EXISTS %s ("
+			  + "id IDENTITY PRIMARY KEY, "
+			  + "userId INT NOT NULL, "
+			  + "answerId INT NOT NULL, "
+			  + "rating DECIMAL(3,2) NOT NULL, "
+			  + "created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+			  + "CHECK (rating BETWEEN 0 AND 1), " 
+			  + "FOREIGN KEY (userId) REFERENCES %s(id) ON DELETE CASCADE, "
+			  + "FOREIGN KEY (answerId) REFERENCES %s(id) ON DELETE CASCADE, "
+			  + "UNIQUE (userId, answerId))",
+			    ratingTableName, userTableName, answerTableName
+		);
+		
+		String adminRequestsTableQuery =
+			    "CREATE TABLE IF NOT EXISTS admin_requests ("
+			  + "id IDENTITY PRIMARY KEY, "
+			  + "description VARCHAR(255) NOT NULL, "
+			  + "is_closed BOOLEAN DEFAULT FALSE, "
+			  + "original_request_id INT"
+			  + ")";
+
+
+
 
 		try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
 
@@ -175,6 +241,8 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(messageTableQuery);
 			stmt.execute(reviewerRequestsTableQuery);
 			stmt.execute(favoredReviewerTableQuery);
+			stmt.execute(answerRatingsTableQuery);
+			stmt.execute(adminRequestsTableQuery);
 		}
 
 	}
@@ -215,58 +283,53 @@ public class GeneralDBManager implements IGeneralDBManager {
 				+ "(5, 'Dark mode toggle', 'Best approach for a dark/light theme switch in JavaFX?', FALSE, FALSE, FALSE, 7);", questionTableName);
 
 		String populateAnswersTable = String.format("""
-			    INSERT INTO %s (questionId, parentAnswerId, userId, authorName, body, isCorrect, isReview, upvoteCount) VALUES
-			    (1, NULL, 1, 'student', 'Polymorphism allows methods to behave differently based on the object.', FALSE, FALSE, 4),
-			    (1, NULL, 3, 'reviewer', 'Review.', FALSE, TRUE, 6),
-			    (1, NULL, 1, 'student', 'Polymorphism is very useful.', FALSE, FALSE, 4),
-			    (1, 1, 2, 'instructor', 'Great explanation! Could you give a code example?', FALSE, FALSE, 2),
-			    (1, 1, 2, 'instructor', 'Very nice!', FALSE, FALSE, 2),
-			    (1, 1, 3, 'reviewer', 'Interesting.', FALSE, FALSE, 2),
-			    (2, NULL, 3, 'reviewer', 'Use .equals() for content comparison, == for reference.', FALSE, FALSE, 5),
-			    (2, NULL, 3, 'reviewer', 'Review.', FALSE, TRUE, 6),
-			    (2, 3, 4, 'admin1', 'Thanks for clearing that up!', FALSE, FALSE, 1),
-			    (2, 6, 4, 'admin1', 'Second one!', FALSE, FALSE, 1),
-			    (3, NULL, 2, 'instructor', 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, FALSE, 3),
-			    (4, NULL, 5, 'staff', 'ExecutorService is a good way to manage threads.', FALSE, FALSE, 2),
-			    (4, 6, 1, 'student', 'Definitely agree, especially with fixed thread pool.', FALSE, FALSE, 1),
-			    (5, NULL, 2, 'instructor', 'Annotations can reduce boilerplate and improve readability.', FALSE, FALSE, 0),
-			    (6, NULL, 3, 'reviewer', 'Use a SceneManager class to manage switching.', FALSE, FALSE, 6),
-			    (7, NULL, 1, 'student', 'The Java Memory Model explains visibility and ordering of threads.', FALSE, FALSE, 3),
-			    (8, NULL, 5, 'staff', 'You can request GC, but you can’t force it.', FALSE, FALSE, 2),
-			    (9, NULL, 4, 'admin1', 'MVC fits well with JavaFX: model handles data, view is FXML.', FALSE, FALSE, 3),
-			    (10, NULL, 3, 'reviewer', 'Review.', FALSE, TRUE, 4),
-			    (11, NULL, 2, 'instructor', 'NPE occurs when referencing an object that’s null.', FALSE, FALSE, 5),
-			    (12, NULL, 1, 'student', 'ObservableList notifies listeners when data changes.', FALSE, FALSE, 2),
-			    (13, NULL, 5, 'staff', 'Use roles and guards to control admin-level actions.', FALSE, FALSE, 4),
-			    (14, NULL, 3, 'reviewer', 'Review.', FALSE, TRUE, 3),
-			    (15, NULL, 4, 'admin1', 'SQLite is lightweight, H2 has good tooling.', FALSE, FALSE, 2),
-			    (16, NULL, 1, 'student', 'Use Thread.setDefaultUncaughtExceptionHandler.', FALSE, FALSE, 1),
-			    (17, NULL, 2, 'instructor', 'Persist sessions using preferences API or local file.', FALSE, FALSE, 3),
-			    (18, NULL, 5, 'staff', 'MVVM is better for testability, but more complex.', FALSE, FALSE, 2),
-			    (19, NULL, 1, 'student', 'Use ResourceBundle for i18n.', FALSE, FALSE, 4),
-			    (20, NULL, 3, 'reviewer', 'Review.', FALSE, TRUE, 5),
-			    (1, 2, 4, 'admin1', 'Example: Dog extends Animal and overrides speak().', FALSE, FALSE, 1),
-			    (2, 4, 1, 'student', 'Code: if(a.equals(b)) instead of if(a == b)', FALSE, FALSE, 0),
-			    (3, 5, 3, 'reviewer', 'Iterating backwards also helps avoid issues.', FALSE, FALSE, 2),
-			    (4, 7, 5, 'staff', 'CachedThreadPool can scale well.', FALSE, FALSE, 1),
-			    (5, 8, 2, 'instructor', '@Override and @FunctionalInterface are helpful ones.', FALSE, FALSE, 2),
-			    (6, 9, 4, 'admin1', 'Use FXMLLoader.load and setController manually if needed.', FALSE, FALSE, 1),
-			    (7, 10, 1, 'student', 'Volatile helps with visibility between threads.', FALSE, FALSE, 0),
-			    (8, 11, 3, 'reviewer', 'GC runs on its own schedule. Avoid calling System.gc().', FALSE, FALSE, 2),
-			    (9, 12, 5, 'staff', 'MVC: Controller acts as middle layer.', FALSE, FALSE, 3),
-			    (10, 13, 2, 'instructor', 'Simple DAO example: interface + JDBC implementation.', FALSE, FALSE, 2),
-			    (11, 14, 4, 'admin1', 'Always check for null before accessing objects.', FALSE, FALSE, 2),
-			    (12, 15, 1, 'student', 'ObservableList makes TableView updates automatic.', FALSE, FALSE, 1),
-			    (13, 16, 5, 'staff', 'Admin can be assigned via roles at login.', FALSE, FALSE, 4),
-			    (14, 17, 2, 'instructor', 'Use BCrypt to hash passwords.', FALSE, FALSE, 3),
-			    (15, 18, 3, 'reviewer', 'SQLite is good for fast prototyping.', FALSE, FALSE, 2),
-			    (16, 19, 4, 'admin1', 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, FALSE, 2),
-			    (17, 20, 1, 'student', 'Save tokens or use Java Preferences API.', FALSE, FALSE, 3),
+			    INSERT INTO %s (questionId, parentAnswerId, userId, body, isCorrect, isReview) VALUES
+			    (1, NULL, 1, 'Polymorphism allows methods to behave differently based on the object.', FALSE, FALSE),
+			    (1, NULL, 1, 'Polymorphism is very useful.', FALSE, FALSE),
+			    (1, 1, 2, 'Great explanation! Could you give a code example?', FALSE, FALSE),
+			    (1, 1, 2, 'Very nice!', FALSE, FALSE),
+			    (1, 1, 3, 'Interesting.', FALSE, FALSE),
+			    (2, NULL, 3, 'Use .equals() for content comparison, == for reference.', FALSE, FALSE),
+			    (2, 3, 4, 'Thanks for clearing that up!', FALSE, FALSE),
+			    (2, 6, 4, 'Second one!', FALSE, FALSE),
+			    (3, NULL, 2, 'You can use Iterator.remove() to avoid ConcurrentModificationException.', FALSE, FALSE),
+			    (4, NULL, 5, 'ExecutorService is a good way to manage threads.', FALSE, FALSE),
+			    (4, 6, 1, 'Definitely agree, especially with fixed thread pool.', FALSE, FALSE),
+			    (5, NULL, 2, 'Annotations can reduce boilerplate and improve readability.', FALSE, FALSE),
+			    (6, NULL, 3, 'Use a SceneManager class to manage switching.', FALSE, FALSE),
+			    (7, NULL, 1, 'The Java Memory Model explains visibility and ordering of threads.', FALSE, FALSE),
+			    (8, NULL, 5, 'You can request GC, but you can’t force it.', FALSE, FALSE),
+			    (9, NULL, 4, 'MVC fits well with JavaFX: model handles data, view is FXML.', FALSE, FALSE),
+			    (11, NULL, 2, 'NPE occurs when referencing an object that’s null.', FALSE, FALSE),
+			    (12, NULL, 1, 'ObservableList notifies listeners when data changes.', FALSE, FALSE),
+			    (13, NULL, 5, 'Use roles and guards to control admin-level actions.', FALSE, FALSE),
+			    (15, NULL, 4, 'SQLite is lightweight, H2 has good tooling.', FALSE, FALSE),
+			    (16, NULL, 1, 'Use Thread.setDefaultUncaughtExceptionHandler.', FALSE, FALSE),
+			    (17, NULL, 2, 'Persist sessions using preferences API or local file.', FALSE, FALSE),
+			    (18, NULL, 5, 'MVVM is better for testability, but more complex.', FALSE, FALSE),
+			    (19, NULL, 1, 'Use ResourceBundle for i18n.', FALSE, FALSE),
+			    (1, 2, 4, 'Example: Dog extends Animal and overrides speak().', FALSE, FALSE),
+			    (2, 4, 1, 'Code: if(a.equals(b)) instead of if(a == b)', FALSE, FALSE),
+			    (3, 5, 3, 'Iterating backwards also helps avoid issues.', FALSE, FALSE),
+			    (4, 7, 5, 'CachedThreadPool can scale well.', FALSE, FALSE),
+			    (5, 8, 2, '@Override and @FunctionalInterface are helpful ones.', FALSE, FALSE),
+			    (6, 9, 4, 'Use FXMLLoader.load and setController manually if needed.', FALSE, FALSE),
+			    (7, 10, 1, 'Volatile helps with visibility between threads.', FALSE, FALSE),
+			    (8, 11, 3, 'GC runs on its own schedule. Avoid calling System.gc().', FALSE, FALSE),
+			    (9, 12, 5, 'MVC: Controller acts as middle layer.', FALSE, FALSE),
+			    (10, 13, 2, 'Simple DAO example: interface + JDBC implementation.', FALSE, FALSE),
+			    (11, 14, 4, 'Always check for null before accessing objects.', FALSE, FALSE),
+			    (12, 15, 1, 'ObservableList makes TableView updates automatic.', FALSE, FALSE),
+			    (13, 16, 5, 'Admin can be assigned via roles at login.', FALSE, FALSE),
+			    (14, 17, 2, 'Use BCrypt to hash passwords.', FALSE, FALSE),
+			    (15, 18, 3, 'SQLite is good for fast prototyping.', FALSE, FALSE),
+			    (16, 19, 4, 'Use Platform.runLater inside uncaughtExceptionHandler.', FALSE, FALSE),
+			    (17, 20, 1, 'Save tokens or use Java Preferences API.', FALSE, FALSE),
 
-			    (2, NULL, 4, 'reviewer', 'Additional reviewer insight for question 2.', FALSE, TRUE, 3),
-			    (2, 3, 4, 'reviewer', 'Second review attached to answer 3 of question 2.', FALSE, TRUE, 2),
-			    (3, NULL, 4, 'reviewer', 'First review for question 3.', FALSE, TRUE, 4),
-			    (3, NULL, 4, 'reviewer', 'Second review for question 3.', FALSE, TRUE, 2);
+			    (2, NULL, 4, 'Additional reviewer insight for question 2.', FALSE, TRUE),
+			    (2, 3, 4, 'Second review attached to answer 3 of question 2.', FALSE, TRUE),
+			    (3, NULL, 4, 'First review for question 3.', FALSE, TRUE),
+			    (3, NULL, 4, 'Second review for question 3.', FALSE, TRUE);
 			    """, answerTableName);
 		
 		String populateMessagesTable = String.format("""
@@ -280,6 +343,52 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (4, 5, 1, NULL, 'Feedback: your review of ExecutorService was clear.', '2023-11-04 08:40:00'),
 			    (4, 1, 5, 7, 'Appreciate it! Glad it helped.', '2023-11-04 08:45:00');
 			    """, interactionTableName);
+		
+		String populateAnswerRatingsTable = String.format("""
+			    INSERT INTO %s (userId, answerId, rating) VALUES
+			    (1, 1, 0.8),
+			    (2, 1, 0.9),
+			    (3, 1, 0.7),
+			    (1, 2, 0.6),
+			    (2, 2, 0.95),
+			    (3, 2, 0.85),
+			    (4, 3, 0.9),
+			    (5, 4, 0.7),
+			    (1, 5, 0.5),
+			    (2, 6, 0.8),
+			    (3, 7, 0.6),
+			    (4, 8, 0.75),
+			    (5, 9, 0.85),
+			    (1, 10, 0.9),
+			    (2, 11, 0.7),
+			    (3, 12, 0.65),
+			    (4, 13, 0.8),
+			    (5, 14, 0.95),
+			    (1, 15, 0.9),
+			    (2, 16, 0.85),
+			    (3, 17, 0.7),
+			    (4, 18, 0.6),
+			    (5, 19, 0.75),
+			    (1, 20, 0.8);
+			""", ratingTableName);
+		
+		String updateAverageRating = String.format("""
+			    UPDATE %s a
+			    SET averageRating = (
+			        SELECT COALESCE(ROUND(AVG(r.rating), 2), 0)
+			        FROM %s r
+			        WHERE r.answerId = a.id
+			    );
+			""", answerTableName, ratingTableName);
+
+			String updateUpvoteCount = String.format("""
+			    UPDATE %s a
+			    SET upvoteCount = (
+			        SELECT COALESCE(COUNT(*), 0)
+			        FROM %s r
+			        WHERE r.answerId = a.id
+			    );
+			""", answerTableName, ratingTableName);
 
 	
 
@@ -289,6 +398,9 @@ public class GeneralDBManager implements IGeneralDBManager {
 			stmt.execute(populateQuestionTable);
 			stmt.execute(populateAnswersTable);
 			stmt.execute(populateMessagesTable);
+			stmt.execute(populateAnswerRatingsTable);
+			stmt.execute(updateAverageRating);
+			stmt.execute(updateUpvoteCount);
 		}
 
 	}

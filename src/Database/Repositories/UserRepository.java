@@ -15,6 +15,7 @@ import java.sql.Connection;
 
 import Models.User;
 import Models.DBModels.FavoredReviewer;
+import Models.Interfaces.ISharedUser;
 
 /**
  * The UserRepository class provides database operations for User objects.
@@ -151,7 +152,7 @@ public class UserRepository implements IUserRepository {
 	            String dbUserName = rs.getString("userName");
 	            String dbPassword = rs.getString("password");
 	            String roleString = rs.getString("role");
-	            User.Role role = User.roleFromString(roleString);
+	            User.Role role = ISharedUser.roleFromString(roleString);
 
 	            User user = new User(id, dbUserName, dbPassword, role);
 	            return user;
@@ -284,7 +285,7 @@ public class UserRepository implements IUserRepository {
                     String dbUserName = rs.getString("userName");
                     String dbPassword = rs.getString("password");
                     String roleString = rs.getString("role");
-                    User.Role role = User.roleFromString(roleString);
+                    User.Role role = ISharedUser.roleFromString(roleString);
 
                     return new User(id, dbUserName, dbPassword, role);
                 }
@@ -309,7 +310,7 @@ public class UserRepository implements IUserRepository {
                     String dbUserName = rs.getString("userName");
                     String dbPassword = rs.getString("password");
                     String roleString = rs.getString("role");
-                    User.Role role = User.roleFromString(roleString);
+                    User.Role role = ISharedUser.roleFromString(roleString);
 
                     return new User(userId, dbUserName, dbPassword, role);
                 }

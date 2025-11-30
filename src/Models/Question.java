@@ -2,13 +2,15 @@ package Models;
 
 import java.sql.Timestamp;
 
+import Models.DBModels.UserDTO;
+
 public class Question implements IPost {
 	public static String tableName = "questions";
 	
 	private Integer id;
 	private String text;
 	private String title;
-	private int authorId;
+	private UserDTO author;
 	
 	private Timestamp createdTimestamp;
 	private Timestamp lastUpdatedTimestamp;
@@ -25,20 +27,20 @@ public class Question implements IPost {
  * */
 	
 	// Non-DB constructor
-	public Question(int authorId, String title, String text) {
-		this(null, authorId, title, text, null, null, false, false, false, 0);
+	public Question(UserDTO author, String title, String text) {
+		this(null, author, title, text, null, null, false, false, false, 0);
 	}
 		
 	// Constructor for when we have all the data (e.g., when retrieving from DB)
 	public Question(
 			Integer id, 
-			int authorId, 
+			UserDTO author, 
 			String title, 
 			String text, 
 			Timestamp createdTimestamp,
 			Timestamp lastUpdatedTimestamp, 
 			boolean answered, 
-			boolean resolved, 
+			boolean resolved,
 			boolean deleted, 
 			int upvoteCount
 	) {
@@ -51,7 +53,7 @@ public class Question implements IPost {
 		this.createdTimestamp = createdTimestamp;
 		this.lastUpdatedTimestamp = lastUpdatedTimestamp;
 		this.upvoteCount = upvoteCount;
-		this.authorId = authorId;
+		this.author = author;
 		this.isAnswered = answered;
 		this.isResolved = resolved;
 		this.isDeleted = deleted;
@@ -63,7 +65,7 @@ public class Question implements IPost {
 	
 	public Integer getId() {return id;}
 
-	public Integer getAuthorId() {return authorId;}
+	public UserDTO getAuthor() {return author;}
 	public boolean getAnsweredStatus() {return isAnswered;}
 	public boolean getResolvedStatus() {return isResolved;}
 	public boolean getIsDeleted() {return isDeleted;}
@@ -73,7 +75,6 @@ public class Question implements IPost {
 	public String getBodyText() {
 		return text;
 	}
-
 
 	@Override
 	public String getTitleText() {
@@ -111,6 +112,7 @@ public class Question implements IPost {
 	public void setResolved(boolean resolvedStatus) {isResolved = resolvedStatus;}
 	public void setAnswered(boolean answeredStatus) {isAnswered = answeredStatus;}
 	public void setDeleted(boolean deletedStatus) {isDeleted = deletedStatus;}
+	public void setAuthor(UserDTO author) {this.author = author;}
 	public void setTitle(String newTitle) { this.title = newTitle; }
 	public void setUpvoteCount(int newCount) { this.upvoteCount = newCount; }
 	

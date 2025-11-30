@@ -9,6 +9,7 @@ import Database.Repositories.QuestionRepository;
 import Database.Repositories.ReviewerRequestRepository;
 import Database.Repositories.UserRepository;
 import Database.Repositories.PermissionRepository;
+import Database.Repositories.AdminRequestRepository;
 import Database.Repositories.Interfaces.IInvitationRepository;
 import Database.Repositories.Interfaces.*;
 import Database.Services.Interfaces.*;
@@ -25,6 +26,7 @@ public class DBConnectionStore {
 	private final IAnswerService answerService;
 	private final IPermissionService permissionService;
 	private final IMessageService messageService;
+	private final IAdminRequestService adminRequestService;
 	
 	public DBConnectionStore(
 			IGeneralDBManager generalDBManager, 
@@ -33,7 +35,8 @@ public class DBConnectionStore {
 			IQuestionService questionService,
 			IMessageService messageService,
 			IAnswerService answerService,
-			IPermissionService permissionService
+			IPermissionService permissionService, 
+			IAdminRequestService adminRequestService
 	) {
 		this.generalDBManager = generalDBManager;
 		this.userService = userService;
@@ -42,6 +45,7 @@ public class DBConnectionStore {
 		this.messageService = messageService;
 		this.answerService = answerService;
 		this.permissionService = permissionService;
+		this.adminRequestService = adminRequestService;
 	}
 	
 	// ===================
@@ -76,6 +80,10 @@ public class DBConnectionStore {
 		return permissionService;
 	}
 	
+	public IAdminRequestService getAdminRequestService() {
+		return adminRequestService;
+	}
+	
 	// ===================
     // 		FACTORY 
  	// ===================
@@ -107,8 +115,11 @@ public class DBConnectionStore {
 		IMessageRepository messageRepository = new MessageRepository(dbHelper);
 		IMessageService messageService = new MessageService(messageRepository);
 		
+		IAdminRequestRepository adminRequestRepository = new AdminRequestRepository(dbHelper);
+		IAdminRequestService adminRequestService = new AdminRequestService(adminRequestRepository);
 		
 		
-		return new DBConnectionStore(dbHelper, userService, invitationService, questionService, messageService, answerService, permissionService);
+		
+		return new DBConnectionStore(dbHelper, userService, invitationService, questionService, messageService, answerService, permissionService, adminRequestService);
 	}
 }

@@ -1,6 +1,7 @@
 package Sessions;
 
 import Models.User;
+import Models.DBModels.UserDTO;
 
 public class UserSession {
 	private final User user;
@@ -40,6 +41,10 @@ public class UserSession {
     
     public void setLoggedStatus(boolean isLoggedIn) {
     	this.isLoggedIn = isLoggedIn;
+    }
+    
+    public UserDTO getDTOModel() {
+    	return new UserDTO(user.getId(), user.getUserName(), user.getRole());
     }
     
 }
