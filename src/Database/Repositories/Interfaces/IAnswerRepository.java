@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import Models.Answer;
-import Utils.AnswerRatingInfo;
+import Utils.RatingStats;
 
 public interface IAnswerRepository {
 	
@@ -15,7 +15,7 @@ public interface IAnswerRepository {
 	
 	public Answer insertAnswer(Answer a) throws SQLException;
 	
-	public AnswerRatingInfo addRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+	public RatingStats addRating(int answerId, int userId, BigDecimal rating) throws SQLException;
 	
 	// ===================
     // 		READ
@@ -30,7 +30,8 @@ public interface IAnswerRepository {
     
     public Answer getAnswerById(int answerId) throws SQLException;
     
-    public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException;
+    public RatingStats getAnswerRatingInfo(int answerId) throws SQLException;
+    public RatingStats getReviewerStats(int reviewerId) throws SQLException;
     
     public BigDecimal getRating(int userId, int answerId) throws SQLException;
 	
@@ -40,8 +41,9 @@ public interface IAnswerRepository {
     
     public boolean updateAnswer(int id, String newText, boolean newCorrect) throws SQLException;
     
-    public AnswerRatingInfo updateAnswerRatingInfo(int answerId) throws SQLException;
-    public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+    public RatingStats updateAnswerRatingInfo(int answerId) throws SQLException;
+    public RatingStats updateRating(int answerId, int userId, BigDecimal rating) throws SQLException;
+    
 	
 	// ===================
     // 		DESTROY
@@ -50,6 +52,6 @@ public interface IAnswerRepository {
 	public boolean deleteAnswerById(int id) throws SQLException;
 	public boolean deleteByQuestionId(int questionId) throws SQLException;
 	
-	public AnswerRatingInfo deleteRating(int answerId, int userId) throws SQLException;
+	public RatingStats deleteRating(int answerId, int userId) throws SQLException;
 	
 }

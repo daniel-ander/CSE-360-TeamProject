@@ -2,7 +2,7 @@ package Database.Services;
 
 import Models.Answer;
 import Models.DBModels.Rating;
-import Utils.AnswerRatingInfo;
+import Utils.RatingStats;
 import Utils.Debug;
 
 import java.math.BigDecimal;
@@ -200,7 +200,7 @@ public class AnswerService implements IAnswerService {
 	}
 	
 	@Override
-	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
+	public RatingStats updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
 		try {
 			return answerRepository.updateRating(answerId, userId, rating);
 		} catch(SQLException e) {
@@ -209,7 +209,7 @@ public class AnswerService implements IAnswerService {
 	}
 	
 	@Override
-	public AnswerRatingInfo removeRating(int answerId, int userId) throws DataAccessException {
+	public RatingStats removeRating(int answerId, int userId) throws DataAccessException {
 		try {
 			return answerRepository.deleteRating(answerId, userId);
 		} catch(SQLException e) {
@@ -223,6 +223,15 @@ public class AnswerService implements IAnswerService {
 			return answerRepository.getAnswerRatingInfo(answerId).getAverageRating();
 		} catch(SQLException e) {
 			throw new DataAccessException("Failed to get average raing for answer " + answerId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
+	public RatingStats getReviewerStats(int reviewerId) throws DataAccessException {
+		try {
+			return answerRepository.getReviewerStats(reviewerId);
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to get stats for reviewer by id: " + reviewerId + " from database due to: " + e);
 		}
 	}
 
