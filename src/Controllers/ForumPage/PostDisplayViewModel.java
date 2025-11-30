@@ -329,6 +329,10 @@ public class PostDisplayViewModel {
 	    ratingProperty.set(newRating);
 	}
 	
+	public void setCurrentUserRatingProperty(BigDecimal rating) {
+		currentUserRatingProperty.set(rating);
+	}
+	
 	// Building rating from the UI Style, IE: 1-5 for stars
 	public void setPersonalRatingProperty(int starSelected) {
 	    // Normalize new rating to 0–1 scale
