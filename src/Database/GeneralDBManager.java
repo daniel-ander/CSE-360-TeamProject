@@ -300,7 +300,6 @@ public class GeneralDBManager implements IGeneralDBManager {
 			    (7, NULL, 1, 'The Java Memory Model explains visibility and ordering of threads.', FALSE, FALSE),
 			    (8, NULL, 5, 'You can request GC, but you can’t force it.', FALSE, FALSE),
 			    (9, NULL, 4, 'MVC fits well with JavaFX: model handles data, view is FXML.', FALSE, FALSE),
-			    (10, NULL, 3, 'Review.', FALSE, TRUE),
 			    (11, NULL, 2, 'NPE occurs when referencing an object that’s null.', FALSE, FALSE),
 			    (12, NULL, 1, 'ObservableList notifies listeners when data changes.', FALSE, FALSE),
 			    (13, NULL, 5, 'Use roles and guards to control admin-level actions.', FALSE, FALSE),
