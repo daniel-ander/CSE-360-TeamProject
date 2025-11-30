@@ -1,11 +1,15 @@
 package Controllers;
 
+import Models.Answer;
+import Models.Message;
+import Models.Question;
 import Models.User;
 import Database.*;
 import Database.Services.Interfaces.IUserService;
 import Database.Services.Interfaces.IAdminRequestService;
+import Controllers.AdminPage.AdminReviewViewModel;
 import Controllers.InstructorPage.AdminRequestsViewModel;
-
+import Controllers.InstructorPage.InstructorReviewViewModel;
 import Exceptions.DBExceptions.DataAccessException;
 
 import Sessions.UserSession;
@@ -28,6 +32,7 @@ public class AdminNotificationsPageController {
 	private final UserSession userSession;
 
 	private final AdminRequestsViewModel adminRequestsViewModel;
+	private final AdminReviewViewModel adminReviewViewModel;
 	
 	/**
 	 * AdminNotificationsPageController Constructor
@@ -48,6 +53,12 @@ public class AdminNotificationsPageController {
             reqService = dBConnectionStore.getAdminRequestService();
         } catch (Throwable ignore) { }
         this.adminRequestsViewModel = new AdminRequestsViewModel(reqService);
+		this.adminReviewViewModel = new AdminReviewViewModel(
+				dBConnectionStore.getUserService(),
+				dBConnectionStore.getQuestionService(),
+				dBConnectionStore.getAnswerService(),
+				dBConnectionStore.getMessageService()
+		);
         
         setInitialLayout();
         
@@ -56,6 +67,7 @@ public class AdminNotificationsPageController {
         setBackButtonAction();
         
         bindRequestsTab();
+        bindAdminReviewTab();
 		
 		if (Debug.isEnabled) {
 			// Additional debug setup can be added here
@@ -96,6 +108,7 @@ public class AdminNotificationsPageController {
 			adminRequestsViewModel.refresh();
 		});
 		
+		
 		adminRequestsViewModel.refresh();
 	}
 	
@@ -126,6 +139,98 @@ public class AdminNotificationsPageController {
 	    	new WelcomeLoginPageController(dBConnectionStore, primaryStage, userSession, new WelcomeLoginPage());
 	    });
     }
+    
+	private void bindAdminReviewTab() {
+	    // bind lists to viewmodel observable lists
+	    view.getUserListView().setItems(adminReviewViewModel.getUsers());
+	    view.getQuestionsListView().setItems(adminReviewViewModel.getQuestions());
+	    view.getAnswersListView().setItems(adminReviewViewModel.getAnswers());
+	    view.getMessagesListView().setItems(adminReviewViewModel.getMessages());
+
+	    // Selecting a user -> update view model
+	    view.getUserListView().getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+	        if (newVal != null) {
+	            adminReviewViewModel.setSelectedUser(newVal);
+	            // no selected-user label on InstructorHomePage, so we don't update UI label here
+	        } else {
+	            adminReviewViewModel.setSelectedUser(null);
+	            view.getContentViewerTextArea().clear();
+	        }
+	    });
+
+	    // Selecting a question -> display formatted question in the content viewer
+	    view.getQuestionsListView().setOnMouseClicked(e -> {
+	        Question q = view.getQuestionsListView().getSelectionModel().getSelectedItem();
+	        if (q != null) {
+	            adminReviewViewModel.setCurrentlyDisplayedContent(q);
+	            view.getContentViewerTextArea().setText(formatQuestion(q));
+	        }
+	    });
+
+	    // Selecting an answer -> display formatted answer in the content viewer
+	    view.getAnswersListView().setOnMouseClicked(e -> {
+	        Answer a = view.getAnswersListView().getSelectionModel().getSelectedItem();
+	        if (a != null) {
+	            adminReviewViewModel.setCurrentlyDisplayedContent(a);
+	            view.getContentViewerTextArea().setText(formatAnswer(a));
+	        }
+	    });
+
+	    // Selecting a message -> display formatted message in the content viewer
+	    view.getMessagesListView().setOnMouseClicked(e -> {
+	        Message m = view.getMessagesListView().getSelectionModel().getSelectedItem();
+	        if (m != null) {
+	            adminReviewViewModel.setCurrentlyDisplayedContent(m);
+	            view.getContentViewerTextArea().setText(formatMessage(m));
+	        }
+	    });
+
+	    // initial load from viewmodel
+	    // (viewmodel constructor already calls loadAllUsers; ensure lists are up-to-date)
+	    // No extra UI elements like notes/flag buttons assumed on InstructorHomePage.
+	}
+	
+	private String formatQuestion(Question q) {
+	    try {
+	        String author = userService.getUserNameById(q.getAuthorId());
+	        if (author == null || author.trim().isEmpty()) author = "(unknown)";
+	        return "Question by " + author + "\n"
+	                + "Posted: " + q.getCreatedTimestamp() + "\n\n"
+	                + safe(q.getBodyText());
+	    } catch (Exception ignore) {
+	        return safe(q.getBodyText());
+	    }
+	}
+
+	private String formatAnswer(Answer a) {
+	    try {
+	        String author = a.getAuthorName();
+	        try { String resolved = userService.getUserNameById(a.getAuthorId()); if (resolved != null && !resolved.trim().isEmpty()) author = resolved; } catch (Exception ignored) {}
+	        if (author == null || author.trim().isEmpty()) author = "(unknown)";
+	        return "Answer by " + author + "\n"
+	                + "Posted: " + a.getCreatedTimestamp() + "\n\n"
+	                + safe(a.getBodyText());
+	    } catch (Exception ignore) {
+	        return safe(a.getBodyText());
+	    }
+	}
+
+	private String formatMessage(Message m) {
+	    try {
+	        return "Message\n"
+	                + "From: " + safe(m.getSenderUsername()) + "\n"
+	                + "To: " + safe(m.getReceiverUsername()) + "\n"
+	                + "Sent: " + m.getSentTimestamp() + "\n\n"
+	                + safe(m.getContent());
+	    } catch (Exception ignore) {
+	        return safe(m == null ? null : m.getContent());
+	    }
+	}
+	
+
+	private static String safe(String s) {
+	    return s == null ? "" : s;
+	}
     
     /**
      * Configures back button
