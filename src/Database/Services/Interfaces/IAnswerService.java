@@ -1,7 +1,7 @@
 package Database.Services.Interfaces;
 
 import Models.Answer;
-import Utils.AnswerRatingInfo;
+import Utils.RatingStats;
 
 import java.math.BigDecimal;
 
@@ -38,6 +38,8 @@ public interface IAnswerService {
 	public BigDecimal getAverageRating(int answerId) throws DataAccessException;
 	public BigDecimal getRatingForUser(int answerId, int userId) throws DataAccessException;
 	
+	public RatingStats getReviewerStats(int reviewerId) throws DataAccessException;
+	
 	// ===================
     // 		UPDATE
  	// ===================
@@ -46,7 +48,7 @@ public interface IAnswerService {
 	public boolean updateAnswer(int id, String newText, boolean newCorrect) throws DataAccessException;
 	
 	// Ratings
-	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException;
+	public RatingStats updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException;
 	
 	// ===================
     // 		DESTROY
@@ -57,5 +59,5 @@ public interface IAnswerService {
 	public boolean deleteByQuestionId(int questionId) throws DataAccessException;
 	
 	// Ratings
-	public AnswerRatingInfo removeRating(int answerId, int userId) throws DataAccessException;
+	public RatingStats removeRating(int answerId, int userId) throws DataAccessException;
 }

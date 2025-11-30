@@ -3,7 +3,7 @@ package Database.Repositories;
 import Models.Answer;
 import Models.User;
 import Models.DBModels.Rating;
-import Utils.AnswerRatingInfo;
+import Utils.RatingStats;
 import Utils.Debug;
 
 import java.math.BigDecimal;
@@ -418,7 +418,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Adds a row to the ratings table for particular answer and user
      */
 	@Override
-	public AnswerRatingInfo addRating(int answerId, int userId, BigDecimal rating) throws SQLException {
+	public RatingStats addRating(int answerId, int userId, BigDecimal rating) throws SQLException {
 		String addRatingQuery  = String.format("INSERT INTO %s (userId, answerId, rating) VALUES (?, ?, ?)", Rating.tableName);
 		
 		try (Connection connection = generalDBManager.getConnection();
@@ -437,7 +437,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Adds a row to the ratings table for particular answer and user
      */
 	@Override
-	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws SQLException {
+	public RatingStats updateRating(int answerId, int userId, BigDecimal rating) throws SQLException {
 	    // Update the existing rating for this user and answer
 	    String updateRatingQuery = String.format(
 	        "UPDATE %s SET rating = ? WHERE userId = ? AND answerId = ?",
@@ -464,9 +464,9 @@ public class AnswerRepository implements IAnswerRepository {
      * Updates the average rating and upvoteCount fields on the answer
      */
 	@Override
-	public AnswerRatingInfo updateAnswerRatingInfo(int answerId) throws SQLException {
+	public RatingStats updateAnswerRatingInfo(int answerId) throws SQLException {
 		String addRatingQuery  = String.format("UPDATE %s SET averageRating = ?, upvoteCount = ? WHERE id = ?", Answer.tableName);
-		AnswerRatingInfo averageRatingAndCount = getAnswerRatingInfo(answerId); 
+		RatingStats averageRatingAndCount = getAnswerRatingInfo(answerId); 
 		
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(addRatingQuery)){
@@ -484,7 +484,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Deletes a row from the ratings table for particular answer and user
      */
 	@Override
-	public AnswerRatingInfo deleteRating(int answerId, int userId) throws SQLException {
+	public RatingStats deleteRating(int answerId, int userId) throws SQLException {
 		String deleteRatingQuery  = String.format("DELETE FROM %s WHERE userId = ? AND answerId = ?", Rating.tableName);
 		
 		try (Connection connection = generalDBManager.getConnection();
@@ -506,7 +506,7 @@ public class AnswerRepository implements IAnswerRepository {
      * Gets the average rating info for answer - which includes the rating and the upvote count
      */
 	@Override
-	public AnswerRatingInfo getAnswerRatingInfo(int answerId) throws SQLException {
+	public RatingStats getAnswerRatingInfo(int answerId) throws SQLException {
 		String query = String.format(
 			    "SELECT a.id AS answerId, " +
 			    "COALESCE(AVG(r.rating), 0) AS averageRating, " +
@@ -530,19 +530,54 @@ public class AnswerRepository implements IAnswerRepository {
 
 	                Debug.write("Fetched average rating and upvotes for answer: " + answerId);
 	                
-	                return new AnswerRatingInfo(
+	                return new RatingStats(
 	                    avg != null ? avg : BigDecimal.ZERO,
 	                    upvotes
 	                );
 	            } else {
 	                Debug.write("Answer not found, returning defaults for answer: " + answerId);
-	                return new AnswerRatingInfo(BigDecimal.ZERO, 0);
+	                return new RatingStats(BigDecimal.ZERO, 0);
 	            }
 	        }
 	    }
 	}
 	
-	
+	@Override
+	public RatingStats getReviewerStats(int reviewerId) throws SQLException {
+		String reviewerStatsQuery = String.format(
+			    "SELECT AVG(r.rating) AS avgRating, " +
+			    "       COUNT(r.id) AS totalVotes " +
+			    "FROM %s r " +
+			    "JOIN %s a ON a.id = r.answerId " +
+			    "WHERE a.isReview = TRUE " +
+			    "  AND a.userId = ?",
+			    Rating.tableName,
+			    Answer.tableName
+			);
+
+	    try (Connection connection = generalDBManager.getConnection();
+	         PreparedStatement pstmt = connection.prepareStatement(reviewerStatsQuery)) {
+
+	        pstmt.setInt(1, reviewerId);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                BigDecimal averageRating = rs.getBigDecimal("avgRating");
+	                int totalVotes = rs.getInt("totalVotes");
+
+	                if (averageRating == null) {
+	                    averageRating = BigDecimal.ZERO;
+	                }
+
+	                return new RatingStats(averageRating, totalVotes);
+	            }
+	        }
+	    }
+
+	    return new RatingStats(BigDecimal.ZERO, 0);
+	}
+
+
 	private Answer filledAnswerModel(ResultSet rs) throws SQLException {
 		UserDTO user = new UserDTO(
 		        rs.getInt("user_id"),

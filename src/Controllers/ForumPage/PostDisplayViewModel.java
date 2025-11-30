@@ -14,12 +14,15 @@ import Models.Answer;
 import Models.IPost;
 import Models.IPost.Type;
 import Models.Question;
+import Models.Interfaces.ISharedUser.Role;
 import Sessions.UserSession;
-import Utils.AnswerRatingInfo;
+import Utils.Debug;
+import Utils.RatingStats;
 import Utils.Time;
 import Utils.TriConsumer;
 
 import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -49,6 +52,8 @@ public class PostDisplayViewModel {
 	
 	private final IntegerProperty upvoteCountProperty = new SimpleIntegerProperty(0);
 	private final ObjectProperty<BigDecimal> currentUserRatingProperty = new SimpleObjectProperty<>(null);
+	
+	private final ObjectProperty<RatingStats> reviewerStatsProperty = new SimpleObjectProperty<>(null);
 
 	private StringProperty labelTextProperty = new SimpleStringProperty();
 	private StringProperty bodyTextProperty = new SimpleStringProperty();
@@ -113,6 +118,7 @@ public class PostDisplayViewModel {
 		        
 		        boolean favoredReviewerStatus = userService.checkIfFavoredReviewerExists(currentUserId, postUserId);
 		        setIsFavoredReviewerProperty(favoredReviewerStatus);
+		        loadReviewerStatsAsync(post.getAuthor().getId());
 		        
 		        setShouldDisplayFavoredReviewerButton();
 		    }
@@ -239,6 +245,24 @@ public class PostDisplayViewModel {
 	public boolean hasPostBeenUpdated() {
 		 return post.getCreatedTimestamp().compareTo(post.getLastUpdatedTimestamp()) != 0;
 	}
+	
+	public BigDecimal getPostRatingToDisplay() {
+		BigDecimal currentUserRating =  getCurrentUserStarRating();
+        BigDecimal postAverageRating = getRatingProperty().get().multiply(BigDecimal.valueOf(getNumberOfRatingStars()));
+        BigDecimal ratingToDisplay = (currentUserRating != BigDecimal.ZERO) ? currentUserRating
+        	       : (postAverageRating != BigDecimal.ZERO) ? postAverageRating
+        	    	       : BigDecimal.ZERO;
+        
+        return ratingToDisplay;
+	}
+	
+	public ObjectProperty<RatingStats> getReviewerStatsProperty() {
+	    return reviewerStatsProperty;
+	}
+
+	public RatingStats getReviewerStats() {
+	    return reviewerStatsProperty.get();
+	}
 
 	// ===================
 	// SETTERS
@@ -250,9 +274,10 @@ public class PostDisplayViewModel {
 	
 	public void setShouldDisplayFavoredReviewerButton() {
 	    boolean isReviewType = post.getPostType() == Type.Review;
+	    boolean posterIsReviewer = post.getAuthor().getRole() == Role.reviewer;
 	    boolean isCurrentUserAuthor = userSession.getCurrentUserId() == post.getAuthor().getId();
 
-	    boolean shouldDisplay = isReviewType && !isCurrentUserAuthor;
+	    boolean shouldDisplay = isReviewType && posterIsReviewer && !isCurrentUserAuthor;
 	    shouldDisplayFavoredReviewerButtonProperty.set(shouldDisplay);
 	}
 
@@ -312,7 +337,7 @@ public class PostDisplayViewModel {
 
 	    BigDecimal oldRating = currentUserRatingProperty.get();
 
-	    AnswerRatingInfo newAvgRatingAndUpvoteCount;
+	    RatingStats newAvgRatingAndUpvoteCount;
 	    
 	    Answer answer = ((Answer)post);
 
@@ -364,6 +389,10 @@ public class PostDisplayViewModel {
 		} else {
 			currentUserRatingProperty.set(cachedRating);
 		}
+	}
+	
+	private void setReviewerStats(RatingStats stats) {
+	    reviewerStatsProperty.set(stats);
 	}
 
 	// ===================
@@ -499,6 +528,29 @@ public class PostDisplayViewModel {
 //
 //		new Thread(updateTask).start();
 //	}
+	
+	public void loadReviewerStatsAsync(int reviewerId) {
+	    Task<RatingStats> task = new Task<>() {
+	        @Override
+	        protected RatingStats call() throws Exception {
+	            return answerService.getReviewerStats(reviewerId);
+	        }
+	    };
+
+	    task.setOnSucceeded(_ -> {
+	        setReviewerStats(task.getValue());
+	        System.out.println("Reviewer stats loaded: avgRating=" 
+	            + task.getValue().getAverageRating() 
+	            + ", upvoteCount=" + task.getValue().getUpvoteCount());
+	    });
+
+	    task.setOnFailed(e -> {
+	        Debug.write(e.toString());
+	    });
+
+	    new Thread(task).start();
+	}
+
 }
 
 

@@ -2,12 +2,15 @@ package UI.Elements;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import Controllers.ForumPage.PostDisplayViewModel;
 
 import Models.IPost;
 import Models.IPost.Type;
+import Models.Interfaces.ISharedUser.Role;
+import Utils.RatingStats;
 import Utils.Time;
 import javafx.beans.binding.Bindings;
 
@@ -68,7 +71,6 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
         bodyStackPane.getChildren().addAll(bodyText, bodyTextField);
         timeHBox.getChildren().addAll(new Label(" • "), createdTimestampLabel, updatedTimestampLabel);
-        nameAndTimeHBox.getChildren().addAll(authorNameLabel, timeHBox);
         
         layout.getChildren().addAll(
         		nameAndTimeHBox,
@@ -101,6 +103,36 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         }
 
         currentVm = vm;
+        
+        nameAndTimeHBox.getChildren().clear();
+        nameAndTimeHBox.getChildren().addAll(authorNameLabel, timeHBox);
+        
+        if(currentVm.getPost().getAuthor().getRole() == Role.reviewer) {
+        	Label viewStatsLabel = new Label("view reviewer stats");
+        	Tooltip statsTip = new Tooltip(vm.getReviewerStats() == null ? "null" : vm.getReviewerStats().getAverageRating().toString());
+        	statsTip.textProperty().bind(Bindings.createStringBinding(() -> {
+        	    RatingStats stats = vm.getReviewerStatsProperty().get();
+        	    if (stats == null) return "loading...";
+        	    
+        	    // Convert from 0-1 scale to percentage
+        	    double percent = stats.getAverageRating().doubleValue() * 100;
+        	    int votes = stats.getUpvoteCount();
+        	    
+        	    return String.format("%.0f%% average (%d votes)", percent, votes);
+        	}, vm.getReviewerStatsProperty()));
+        	
+        	Tooltip.install(viewStatsLabel, statsTip);
+        	nameAndTimeHBox.getChildren().addAll(1, Arrays.asList(new Label(" • "), viewStatsLabel));
+        	
+        	viewStatsLabel.setOnMouseEntered(_ -> {
+        		System.out.println("Entered");
+        		currentVm.loadReviewerStatsAsync(vm.getPost().getAuthor().getId());
+        	});
+        	
+        	viewStatsLabel.setOnMouseExited(_ -> {
+        		System.out.println("Exited");
+        	});
+        }
         
         layout.getChildren().remove(ratingProperties);
         if (!currentVm.isQuestion()) {
@@ -154,9 +186,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         statusLabel.getStyleClass().add("question-status");
 
         if (vm.getPost().getPostType() == Type.Review) {
-            outerMostContainer.setStyle("-fx-background-color: #5189A1; -fx-text-fill: white;");
+        	authorNameLabel.setStyle("-fx-text-fill: #5189A1;");
         } else {
-            outerMostContainer.setStyle("");
+        	authorNameLabel.setStyle("");
         }
     }
 
@@ -368,7 +400,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
         favorReviewerButton.visibleProperty().bind(vm.getShouldDisplayFavoredReviewerButtonProperty());
         favorReviewerButton.managedProperty().bind(vm.getShouldDisplayFavoredReviewerButtonProperty());
-
+        
+        
         actionsContainer.getChildren().add(favorReviewerButton);
     }
 
@@ -456,14 +489,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
     private void refreshStarFills(PostDisplayViewModel vm) {
         if (interactiveStars.isEmpty()) return;
-
-        BigDecimal currentUserRating =  vm.getCurrentUserStarRating();
-        BigDecimal postAverageRating = vm.getRatingProperty().get().multiply(BigDecimal.valueOf(vm.getNumberOfRatingStars()));
-        BigDecimal ratingToDisplay = (currentUserRating != BigDecimal.ZERO) ? currentUserRating
-        	       : (postAverageRating != BigDecimal.ZERO) ? postAverageRating
-        	    	       : BigDecimal.ZERO;;
+        
         int totalStars = vm.getNumberOfRatingStars();
-        double starsFilled = ratingToDisplay.doubleValue();
+        double starsFilled = vm.getPostRatingToDisplay().doubleValue();
 
         for (int i = 1; i <= totalStars; i++) {
             StackPane starStackPane = interactiveStars.get(i - 1);
