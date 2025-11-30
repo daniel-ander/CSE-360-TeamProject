@@ -5,12 +5,12 @@ Team Project for CSE360 - ASU
 ### Project Deliverables - Links to relevant deliverables  
 * [Team Project Report (Google Doc)](https://docs.google.com/document/d/1eKY1ra0Rp9Fvj6Kd1y0YryjP38ertm6kgclr2zKQdCg/edit?tab=t.0)
   (Current Phase Completed PDF turned in on Canvas)
-- Demo Screentest - This screencast documents demonstration of successful testing, as well as a walk through demo of the project. [(Youtube.com)](https://www.youtube.com/watch?v=qjIEaaubhx4) 
+- Demo Screentest - This screencast documents demonstration of successful testing, as well as a walk through demo of the project. [(Youtube.com)](https://youtu.be/heEZ_pEDMDE) 
 - Technical ScreenCast - This screencast documents and explains the project's code. [(Youtube.com)](https://youtu.be/NwmCDx2oE-Y)
-- [Standup Meeting 1](https://drive.google.com/file/d/1jHgE2P6WjzSbBd6ExgwVkffbZeLLi8B6/view?usp=sharing)
-- [Standup Meeting 2](https://drive.google.com/file/d/1JQn_3-jU08iLCtDeEgJPndBQY38tpBL9/view?usp=sharing)
-- [Standup Meeting 3](https://drive.google.com/file/d/1tImzZoB-6Zg0wOMdRcmKJxXVnvuCqLP-/view?usp=sharing)
-- [Standup Meeting 4]() - No Link, meeting was held in text-based format due to time constraints + life responsibilities
+- [Standup Meeting 1](https://drive.google.com/file/d/1gg40_7BI_HFbbvzpBP2I7yiaQvn2pRT3/view?usp=sharing)
+- [Standup Meeting 2](No Link, meeting was held in text-based format due to time constraints + life responsibilities)
+- [Standup Meeting 3](https://drive.google.com/file/d/1OidXycav6YYfqrNT6hWK3O0j64zli7Sf/view?usp=sharing)
+- [Standup Meeting 4](https://drive.google.com/file/d/130M4tTY0nh4xmzHcDZ0nl2Ewf_rr8gMz/view?usp=sharing)
 
 - Team Norms: Included in the above google document 
 
@@ -20,7 +20,7 @@ Team Project for CSE360 - ASU
   - Collab guide for helping get eclipse to work
 - Project Libs: ./libs/
 
-### Project Phase3 Design Documents
+### Project Phase4 Design Documents
 * Introduction - A comprehensive overview of the software design of the Staff role, brief updates to the Instructor abilities and Admin role in the application.
 * System Overview -
   * Desktop-based application with added Staff and Instructor role specifically to monitor all activity of posted questions and answers, communicating through a universal Q&A forum.
