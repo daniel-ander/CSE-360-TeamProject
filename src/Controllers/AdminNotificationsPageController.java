@@ -192,7 +192,7 @@ public class AdminNotificationsPageController {
 	
 	private String formatQuestion(Question q) {
 	    try {
-	        String author = userService.getUserNameById(q.getAuthorId());
+	        String author = userService.getUserNameById(q.getAuthor().getId());
 	        if (author == null || author.trim().isEmpty()) author = "(unknown)";
 	        return "Question by " + author + "\n"
 	                + "Posted: " + q.getCreatedTimestamp() + "\n\n"
@@ -204,8 +204,8 @@ public class AdminNotificationsPageController {
 
 	private String formatAnswer(Answer a) {
 	    try {
-	        String author = a.getAuthorName();
-	        try { String resolved = userService.getUserNameById(a.getAuthorId()); if (resolved != null && !resolved.trim().isEmpty()) author = resolved; } catch (Exception ignored) {}
+	        String author = a.getAuthor().getUserName();
+	        try { String resolved = userService.getUserNameById(a.getAuthor().getId()); if (resolved != null && !resolved.trim().isEmpty()) author = resolved; } catch (Exception ignored) {}
 	        if (author == null || author.trim().isEmpty()) author = "(unknown)";
 	        return "Answer by " + author + "\n"
 	                + "Posted: " + a.getCreatedTimestamp() + "\n\n"
