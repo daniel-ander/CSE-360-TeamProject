@@ -139,9 +139,9 @@ public class InstructorRequestsPageController {
                             }
 
                             // answer author's username by id
-                            String authorName = a.getAuthorName();
+                            String authorName = a.getAuthor().getUserName();
                             try {
-                                String resolved = userService.getUserNameById(a.getAuthorId());
+                                String resolved = userService.getUserNameById(a.getAuthor().getId());
                                 if (resolved != null && !resolved.trim().isEmpty()) authorName = resolved;
                             } catch (Exception ignore) { }
                             // show full details: question title + question body, then answer metadata and body
@@ -152,7 +152,7 @@ public class InstructorRequestsPageController {
                                 java.util.Arrays.stream(q.getBodyText().split("\\r?\\n")).forEach(line -> details.add("    " + line));
                             }
                             // directly add answer metadata (no extra blank line)
-                            details.add(String.format("Answer by %s (Author ID: %d)", authorName == null ? "(unknown)" : authorName, a.getAuthorId()));
+                            details.add(String.format("Answer by %s (Author ID: %d)", authorName == null ? "(unknown)" : authorName, a.getAuthor().getId()));
                             if (a.getBodyText() != null) {
                                 java.util.Arrays.stream(a.getBodyText().split("\\r?\\n")).forEach(line -> details.add("    " + line));
                             }
@@ -249,8 +249,8 @@ public class InstructorRequestsPageController {
             List<Answer> answers = answerService.getAnswersByQuestionID(questionId);
             List<String> aStrings = answers.stream().map(a -> {
                 String base = String.format("[%d] %s", a.getId(), a.getBodyText());
-                String authorName = a.getAuthorName();
-                try { String n = userService.getUserNameById(a.getAuthorId()); if (n != null) authorName = n; } catch (Exception ignore) {}
+                String authorName = a.getAuthor().getUserName();
+                try { String n = userService.getUserNameById(a.getAuthor().getId()); if (n != null) authorName = n; } catch (Exception ignore) {}
                 if (selectedStudentUserName != null && selectedStudentUserName.equalsIgnoreCase(authorName)) {
                     return base + "    (Author: Selected Student)";
                 } else {

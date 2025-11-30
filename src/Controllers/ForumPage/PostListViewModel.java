@@ -108,7 +108,7 @@ public class PostListViewModel {
 		postParentMap.forEach((parentQuestionAnswerIDKey, postVMs) -> {			
 			for (PostDisplayViewModel answerVM : postVMs) {
 				boolean postIsReviewType = ((Answer) answerVM.getPost()).getIsReview();
-				boolean postBelongsToUser = reviewersToShow.contains(((Answer) answerVM.getPost()).getAuthorId());
+				boolean postBelongsToUser = reviewersToShow.contains(answerVM.getPost().getAuthor().getId());
 
 				if (postIsReviewType && postBelongsToUser) {
 					PostDisplayViewModel reviewOfCurrentReviewer = answerVM;
@@ -264,7 +264,6 @@ public class PostListViewModel {
 	 */
 	public void toggleExpand(int postIdToToggle, KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair,
 			IPost.Type postType) {
-
 		PostDisplayViewModel selectedPostVM = getVisiblePostByID(postIdToToggle, postType);
 		if (selectedPostVM == null)
 			return;
@@ -376,7 +375,7 @@ public class PostListViewModel {
 	 */
 	private void expandChildren(PostDisplayViewModel parentPost, int visibleParentPostIndex,
 			KeyPairHolder<Integer, Integer> questionAnswerIDKeyPair) {
-
+	
 		List<PostDisplayViewModel> children = null;
 
 		switch (currentFilterMode) {
@@ -387,7 +386,6 @@ public class PostListViewModel {
 			children = reviewPostParentMap.get(questionAnswerIDKeyPair);
 			break;
 		}
-
 		if (children == null)
 			return;
 
@@ -402,9 +400,10 @@ public class PostListViewModel {
 
 		// Refresh children
 		visiblePosts.removeAll(postParentMap.get(questionAnswerIDKeyPair));
-
+		
 		for (int i = children.size() - 1; i >= 0; i--) {
 			PostDisplayViewModel child = children.get(i);
+			child.setUserDefinedRating();
 			
 			child.setDepthLevel(parentPost.getDepthLevel() + 1);
 			visiblePosts.add(visibleParentPostIndex + 1, child);
@@ -451,7 +450,13 @@ public class PostListViewModel {
 		
 		SharedForumState sharedForumState = new SharedForumState();
 
-		PostDisplayViewModel vm = new PostDisplayViewModel(post, permissions, userSession, userService, sharedForumState,
+		PostDisplayViewModel vm = new PostDisplayViewModel(
+				post, 
+				permissions, 
+				userSession, 
+				userService, 
+				answerService, 
+				sharedForumState,
 
 				// DELETE callback
 				postId -> {

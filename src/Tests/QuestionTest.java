@@ -1,8 +1,12 @@
 package Tests;
 
 import Models.Question;
+import Models.DBModels.UserDTO;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import Tests.Utils.*;
 
 
 /**
@@ -10,15 +14,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class QuestionTest {
 	
+	private UserDTO userDTOModel = Utils.getUserDTOModel();
+	
     /**
      * Tests that the constructor creates a Question object with valid inputs.
      */
     @Test
     public void Constructor__WithValidInputs_CreatesQuestion() {
-        Question q = new Question(1, "Title", "This is a question text");
+        Question q = new Question(userDTOModel, "Title", "This is a question text");
         
         assertNull(q.getId()); // null since not yet in DB
-        assertEquals(1, q.getAuthorId());
+        assertEquals(1, q.getAuthor().getId());
         assertEquals("Title", q.getTitleText());
         assertEquals("This is a question text", q.getBodyText());
         assertFalse(q.getAnsweredStatus());
@@ -32,7 +38,7 @@ public class QuestionTest {
     @Test
     public void Constructor_WithEmptyString_ThrowsException() {
         Exception testError = assertThrows(IllegalArgumentException.class,
-                () -> new Question(2, "Title", " "));
+                () -> new Question(userDTOModel, "Title", " "));
             
             assertEquals("Text is empty", testError.getMessage());
     }
@@ -42,7 +48,7 @@ public class QuestionTest {
      */
     @Test
     public void SetText_WithValidString_ChangesText() {
-        Question q = new Question(1, "Title", "Old question");
+        Question q = new Question(userDTOModel, "Title", "Old question");
         
         q.setText("New question");
         
@@ -54,7 +60,7 @@ public class QuestionTest {
      */
     @Test
     public void SetText_WithEmptyString_ThrowsException() {
-        Question q = new Question(1, "Title", "QuestionText");
+        Question q = new Question(userDTOModel, "Title", "QuestionText");
         
         Exception testError = assertThrows(IllegalArgumentException.class,
                 () -> q.setText(" "));

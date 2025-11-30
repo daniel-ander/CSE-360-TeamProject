@@ -12,7 +12,8 @@ import Database.Services.Interfaces.IQuestionService;
 import Database.Services.Interfaces.IAdminRequestService;
 import Database.Services.Interfaces.IAnswerService; 
 import Database.Services.Interfaces.IMessageService; 
-import Models.Question; 
+import Models.Question;
+import Models.DBModels.UserDTO;
 import Models.Answer; 
 import Models.Message; 
 import org.junit.jupiter.api.BeforeEach; 
@@ -149,9 +150,12 @@ public void clearStaffNotes_clearsCurrentUserNotesOnly() {
 */
 @Test
 public void loadUserData_populatesQuestionsForSelectedUser() {
-    // create a mock question whose authorId maps to "alice"
     Question q = mock(Question.class);
-    when(q.getAuthorId()).thenReturn(1);
+    UserDTO mockAuthor = mock(UserDTO.class);
+    q.setAuthor(mockAuthor);
+
+    when(q.getAuthor()).thenReturn(mockAuthor);
+    when(q.getAuthor().getId()).thenReturn(1);
     when(mockUserService.getUserNameById(1)).thenReturn("alice");
     when(mockQuestionService.getAllQuestions()).thenReturn(List.of(q));
 
@@ -166,9 +170,13 @@ public void loadUserData_populatesQuestionsForSelectedUser() {
 */
 @Test
 public void loadUserData_populatesAnswersForSelectedUser() {
-    // create a mock answer with authorName "alice"
     Answer a = mock(Answer.class);
-    when(a.getAuthorName()).thenReturn("alice");
+    UserDTO mockAuthor = mock(UserDTO.class);
+    a.setAuthor(mockAuthor);
+    
+    when(mockAuthor.getUserName()).thenReturn("alice");
+    when(a.getAuthor()).thenReturn(mockAuthor);
+    when(a.getAuthor().getUserName()).thenReturn("alice");
     when(mockAnswerService.getAllAnswers()).thenReturn(List.of(a));
 
     vm.setSelectedUser("alice");

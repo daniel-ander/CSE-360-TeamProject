@@ -1,10 +1,14 @@
 package Config;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import DisplayModels.PostWithPermissions;
 import DisplayModels.QuestionWithAnswersAndPermissions;
-
+import Models.Answer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -18,6 +22,9 @@ public class AppCache {
     
     private final ObjectProperty<List<QuestionWithAnswersAndPermissions>> initialDataProperty = new SimpleObjectProperty<>(null);
     private final ObjectProperty<List<QuestionWithAnswersAndPermissions>> fullDataProperty = new SimpleObjectProperty<>(null);
+    
+    // TODO: - Set up ratings cache
+    private final Map<Integer, BigDecimal> ratings = new ConcurrentHashMap<>();
     
     private AppCache() {}
 
@@ -56,6 +63,10 @@ public class AppCache {
         this.fullDataProperty.set(fullData);
     }
     
+    public void setRatingForAnswer(int answerId, BigDecimal rating) {
+//    	ratings.put(answerId, rating);
+    }
+    
     // ===================
     // 		 GETTERS 
  	// ===================
@@ -78,6 +89,20 @@ public class AppCache {
     
     public ObjectProperty<List<PostWithPermissions>> getInitialQuestionDataProperty() {
     	return initialQuestionDataProperty;
+    }
+    
+    public List<Answer> getAnswerList() {
+    	List<Answer> answerHolder = new ArrayList<Answer>();
+    	
+    	answerDataProperty.get().forEach(postWithPermissions -> {
+    		answerHolder.add(isolateAnswer(postWithPermissions));
+    	});
+    	
+    	return answerHolder;
+    }
+    
+    public BigDecimal getRatingForAnswer(int answerId) {
+    	return ratings.get(answerId);
     }
     
     // ===================
@@ -108,5 +133,9 @@ public class AppCache {
     	    
     	 initialDataProperty.set(null);
     	 fullDataProperty.set(null);
+    }
+    
+    private Answer isolateAnswer(PostWithPermissions postWithPermissions) throws ClassCastException {
+    	return (Answer)postWithPermissions.getPost();
     }
 }

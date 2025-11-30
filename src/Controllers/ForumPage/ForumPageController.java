@@ -13,7 +13,7 @@ import Database.Services.Interfaces.IUserService;
 import DisplayModels.PostWithPermissions;
 import Exceptions.DBExceptions.DataAccessException;
 import Models.Question;
-import Models.User.Role;
+import Models.Interfaces.*;
 import Sessions.UserSession;
 
 import UI.Pages.ForumPage;
@@ -70,7 +70,7 @@ public class ForumPageController {
 		forumHeaderViewModel.getSeeReviewsButtonPressedProperty().addListener((_, _, isPressed) -> {
 			if(isPressed) {
 				postListViewModel.setFilterMode(FilterMode.REVIEW);
-				if(userSession.getCurrentUserRole() == Role.reviewer) {
+				if(userSession.getCurrentUserRole() == ISharedUser.Role.reviewer) {
 					postListViewModel.filterVisibleQuestionsByReview();
 				} else {
 					try {
@@ -92,7 +92,7 @@ public class ForumPageController {
 
 			if (didSubmit) {
 				try {
-					Question question = new Question(userSession.getCurrentUserId(), titleText, bodyText);
+					Question question = new Question(userSession.getDTOModel(), titleText, bodyText);
 					questionService.addQuestion(question);
 
 					List<String> permissions = new ArrayList<>(List.of(

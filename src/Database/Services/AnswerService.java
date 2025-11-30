@@ -1,8 +1,13 @@
 package Database.Services;
 
 import Models.Answer;
+import Models.DBModels.Rating;
+import Utils.AnswerRatingInfo;
 import Utils.Debug;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.List;
@@ -173,6 +178,51 @@ public class AnswerService implements IAnswerService {
 			return answerRepository.getAnswersByUser(userId);
 		} catch (SQLException e) {
 			throw new DataAccessException("Failed to get answers by user id: " + userId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
+	public BigDecimal getRatingForUser(int answerId, int userId) throws DataAccessException {
+		try {
+			return answerRepository.getRating(answerId, userId);
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to fetch rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
+	public void addRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
+		try {
+			answerRepository.addRating(answerId, userId, rating);
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to add rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
+	public AnswerRatingInfo updateRating(int answerId, int userId, BigDecimal rating) throws DataAccessException {
+		try {
+			return answerRepository.updateRating(answerId, userId, rating);
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to add rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
+	public AnswerRatingInfo removeRating(int answerId, int userId) throws DataAccessException {
+		try {
+			return answerRepository.deleteRating(answerId, userId);
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to delete rating between user: " + userId + " and answer " + answerId + " from database due to: " + e);
+		}
+	}
+	
+	@Override
+	public BigDecimal getAverageRating(int answerId) throws DataAccessException {
+		try {
+			return answerRepository.getAnswerRatingInfo(answerId).getAverageRating();
+		} catch(SQLException e) {
+			throw new DataAccessException("Failed to get average raing for answer " + answerId + " from database due to: " + e);
 		}
 	}
 

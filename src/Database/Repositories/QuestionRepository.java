@@ -1,6 +1,10 @@
 package Database.Repositories;
 
+import Models.Answer;
 import Models.Question;
+import Models.User;
+import Models.DBModels.UserDTO;
+import Models.Interfaces.ISharedUser;
 import Utils.Debug;
 
 import java.sql.Connection;
@@ -36,7 +40,7 @@ public class QuestionRepository implements IQuestionRepository {
 		String insertQuestion = String.format("INSERT INTO %s (userId, title, body, answered, resolved, isDeleted, upvoteCount) VALUES (?, ?, ?, ?, ?, ?, ?)", Question.tableName);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
-			pstmt.setInt(1, q.getAuthorId());
+			pstmt.setInt(1, q.getAuthor().getId());
 			pstmt.setString(2,q.getTitleText());
 			pstmt.setString(3,q.getBodyText());
 			pstmt.setBoolean(4, q.getAnsweredStatus());
@@ -65,23 +69,21 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAllQuestions() throws SQLException {
 		List<Question> allQuestions = new ArrayList<>();
-		String getAllQuestions = String.format("SELECT * FROM %s", Question.tableName);
+		String getAllQuestions = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id",
+			    Question.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				allQuestions.add(q);
 			}
 		}
@@ -96,23 +98,24 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getLimitedAmountOfQuestions(int amount) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getAllQuestions = String.format("SELECT * FROM %s ORDER BY created DESC LIMIT %s", Question.tableName, amount);
+		String getAllQuestions = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id " +
+			    "ORDER BY q.created DESC " +
+			    "LIMIT %s",
+			    Question.tableName,
+			    User.tableName,
+			    amount
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAllQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				questions.add(q);
 			}
 		}
@@ -126,24 +129,23 @@ public class QuestionRepository implements IQuestionRepository {
 	 */
 	@Override
 	public Question getQuestionById(int searchId) throws SQLException {
-		String getQuestionById = String.format("SELECT * FROM %s WHERE id = ?", Question.tableName);
+		String getQuestionById = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id " +
+			    "WHERE q.id = ?",
+			    Question.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionById)) {
 			pstmt.setInt(1, searchId);
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				return q;
 			}
 		}
@@ -156,23 +158,22 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getAnsweredQuestions() throws SQLException {
 		List<Question> answeredQuestions = new ArrayList<>();
-		String getAnsweredQuestions = String.format("SELECT * FROM %s WHERE answered = TRUE", Question.tableName);
+		String getAnsweredQuestions = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id " +
+			    "WHERE q.answered = TRUE",
+			    Question.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getAnsweredQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				answeredQuestions.add(q);
 			}
 		}
@@ -185,23 +186,22 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getUnansweredQuestions() throws SQLException {
 		List<Question> unansweredQuestions = new ArrayList<>();
-		String getUnansweredQuestions = String.format("SELECT * FROM %s WHERE answered = FALSE", Question.tableName);
+		String getUnansweredQuestions = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id " +
+			    "WHERE q.answered = FALSE",
+			    Question.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getUnansweredQuestions)) {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				unansweredQuestions.add(q);
 			}
 		}
@@ -217,7 +217,17 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsBySearch(String searchString) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getQuestionsBySearch = String.format("SELECT * FROM %s WHERE (title LIKE ? OR body LIKE ?)", Question.tableName);
+		String getQuestionsBySearch = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id " +
+			    "WHERE q.title LIKE ? OR q.body LIKE ?",
+			    Question.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionsBySearch)) {
 			String searchPattern = "%" + searchString + "%";
@@ -225,18 +235,7 @@ public class QuestionRepository implements IQuestionRepository {
 			pstmt.setString(2, searchPattern);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				questions.add(q);
 			}
 		}
@@ -250,24 +249,23 @@ public class QuestionRepository implements IQuestionRepository {
 	@Override
 	public List<Question> getQuestionsFromUser(int userId) throws SQLException {
 		List<Question> questions = new ArrayList<>();
-		String getQuestionsFromUser = String.format("SELECT * FROM %s WHERE userId = ?", Question.tableName);
+		String getQuestionsFromUser = String.format(
+			    "SELECT q.*, " +
+			    "u.id AS user_id, " +
+			    "u.userName AS user_name, " +
+			    "u.role AS user_role " +
+			    "FROM %s q " +
+			    "JOIN %s u ON q.userId = u.id " +
+			    "WHERE q.userId = ?",
+			    Question.tableName,
+			    User.tableName
+		);
 		try (Connection connection = generalDBManager.getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(getQuestionsFromUser)) {
 			pstmt.setInt(1, userId);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				Question q = new Question(
-						rs.getInt("id"),
-						rs.getInt("userId"),
-						rs.getString("title"),
-						rs.getString("body"),
-						rs.getTimestamp("created"),
-						rs.getTimestamp("lastUpdated"),
-						rs.getBoolean("answered"), 
-						rs.getBoolean("resolved"),
-						rs.getBoolean("isDeleted"),
-						rs.getInt("upvoteCount")
-				);
+				Question q = filledQuestionModel(rs);
 				questions.add(q);
 			}
 		}
@@ -318,6 +316,27 @@ public class QuestionRepository implements IQuestionRepository {
 			}
 		}
 		return false;
+	}
+	
+	private Question filledQuestionModel(ResultSet rs) throws SQLException {
+		UserDTO user = new UserDTO(
+		        rs.getInt("user_id"),
+		        rs.getString("user_name"),
+		        ISharedUser.roleFromString(rs.getString("user_role"))
+		);
+		
+		return new Question(
+				rs.getInt("id"),
+				user,
+				rs.getString("title"),
+				rs.getString("body"),
+				rs.getTimestamp("created"),
+				rs.getTimestamp("lastUpdated"),
+				rs.getBoolean("answered"), 
+				rs.getBoolean("resolved"),
+				rs.getBoolean("isDeleted"),
+				rs.getInt("upvoteCount")
+		);
 	}
 
 }
