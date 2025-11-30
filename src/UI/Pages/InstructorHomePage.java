@@ -115,13 +115,9 @@ public class InstructorHomePage implements IInitializable {
     	
     	requestsGrid.add(createBox, 0, 2);
     	requestsGrid.add(reopenBox, 1, 2);
-    	
-    	Tab homeTab = new Tab("Home", homeBox);
-    	homeTab.setClosable(false);
+    
     	Tab requestsTab = new Tab("Requests", requestsGrid);
     	requestsTab.setClosable(false);
-    	Tab reviewerScoreCardTab = new Tab("Reviewer Scorecards");
-    	reviewerScoreCardTab.setClosable(false);
 
     	// Reviews tab layout (left: users, center: activity tabs, right: content viewer)
     	VBox leftUsersBox = new VBox(10);
@@ -166,7 +162,7 @@ public class InstructorHomePage implements IInitializable {
 
     	// Add tabs to tabPane (ensure Reviews tab is included)
     	tabPane.getTabs().clear();
-    	tabPane.getTabs().addAll(homeTab, requestsTab, reviewerScoreCardTab, reviewsTab);
+    	tabPane.getTabs().addAll(requestsTab, reviewsTab);
 
     	// Set center and show stage
     	root.setCenter(tabPane);

@@ -13,6 +13,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import UI.Elements.*;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -236,6 +237,8 @@ public void removeStaffNoteAt(int index) {
     }
 }
 
+
+
 // Clear all notes for current selection
 public void clearStaffNotes() {
     String currentUser = selectedUserProperty.get();
@@ -254,13 +257,24 @@ public void flagCurrentContent() {
 
     if (currentContent instanceof Question) {
         Question q = (Question) currentContent;
-        adminRequestService.createRequest("Flagged Question ID: " + q.getId());
+        adminRequestService.createRequest("Question by: " + q.getAuthor().getUserName() + " | Question ID: " + q.getId());
+        if (AlertPopUp.showConfirm("Are you sure you want to flag this question for review?")) {
+        	adminRequestService.createRequest("Question by: " + q.getAuthor().getUserName() + " | Question ID: " + q.getId());
+
+		}
     } else if (currentContent instanceof Answer) {
         Answer a = (Answer) currentContent;
-        adminRequestService.createRequest("Flagged Answer ID: " + a.getId());
+        if (AlertPopUp.showConfirm("Are you sure you want to flag this answer for review?")) {
+            adminRequestService.createRequest("Answer by: " + a.getAuthor().getUserName() + " | Answer ID: " + a.getId());
+
+		}
+
     } else if (currentContent instanceof Message) {
         Message m = (Message) currentContent;
-        adminRequestService.createRequest("Flagged Message ID: " + m.getId());
+        if (AlertPopUp.showConfirm("Are you sure you want to flag this message for review?")) {
+            adminRequestService.createRequest("Message from: " + safeString(m.getSenderUsername()) + " to " + safeString(m.getReceiverUsername()) + " | Message ID: " + m.getId());
+		}
+
     }
 }
 
