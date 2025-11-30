@@ -29,6 +29,7 @@ import Utils.Debug;
 
 import javafx.stage.Stage;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 
 /**
  * The InstructorHomePageController class manages the instructor's home page.
@@ -117,7 +118,17 @@ public class InstructorHomePageController {
 			adminRequestsViewModel.refresh();
 		});
 		view.getReopenButton().setOnAction(_e -> {
-			adminRequestsViewModel.reopenSelected();
+			boolean validDescription = adminRequestsViewModel.reopenSelected();
+			
+			if (!validDescription) {
+				Alert alert = new Alert(Alert.AlertType.WARNING);
+		        alert.setTitle("Missing Description");
+		        alert.setHeaderText(null);
+		        alert.setContentText("Please fill description box before reopening a request.");
+		        alert.showAndWait();
+		        return;
+			}
+			
 			adminRequestsViewModel.refresh();
 		});
 		

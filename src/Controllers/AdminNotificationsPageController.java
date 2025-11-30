@@ -13,7 +13,7 @@ import UI.Pages.AdminNotificationsPage;
 import UI.Pages.UserLoginPage;
 import UI.Pages.WelcomeLoginPage;
 import Utils.Debug;
-
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 /**
@@ -82,7 +82,18 @@ public class AdminNotificationsPageController {
 			adminRequestsViewModel.closeSelected();
 		});
 		view.getReopenButton().setOnAction(_ -> {
-			adminRequestsViewModel.reopenSelected();
+			boolean validDescription = adminRequestsViewModel.reopenSelected();
+			
+			if (!validDescription) {
+				Alert alert = new Alert(Alert.AlertType.WARNING);
+		        alert.setTitle("Missing Description");
+		        alert.setHeaderText(null);
+		        alert.setContentText("Please fill description box before reopening a request.");
+		        alert.showAndWait();
+		        return;
+			}
+			
+			adminRequestsViewModel.refresh();
 		});
 		
 		adminRequestsViewModel.refresh();
