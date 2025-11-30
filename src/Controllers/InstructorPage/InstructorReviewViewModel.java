@@ -139,7 +139,7 @@ private void loadUserData(String username) {
         List<Question> allQuestions = questionService.getAllQuestions();
         if (allQuestions != null) {
             List<Question> filtered = allQuestions.stream()
-                .filter(q -> safeString(userService.getUserNameById(q.getAuthorId())).equals(username))
+                .filter(q -> safeString(userService.getUserNameById(q.getAuthor().getId())).equals(username))
                 .collect(Collectors.toList());
             questions.setAll(filtered);
         }
@@ -152,7 +152,7 @@ private void loadUserData(String username) {
         List<Answer> allAnswers = answerService.getAllAnswers();
         if (allAnswers != null) {
             List<Answer> filtered = allAnswers.stream()
-                .filter(a -> safeString(a.getAuthorName()).equals(username))
+                .filter(a -> safeString(a.getAuthor().getUserName()).equals(username))
                 .collect(Collectors.toList());
             answers.setAll(filtered);
         }
