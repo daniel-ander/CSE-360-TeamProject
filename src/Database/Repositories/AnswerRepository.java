@@ -91,7 +91,7 @@ public class AnswerRepository implements IAnswerRepository {
 
 	                // review_id = this answer’s id
 	                ps.setInt(1, a.getId());
-	                ps.setInt(2, a.getAuthorId());
+	                ps.setInt(2, a.getAuthor().getId());
 
 	                // receiver = target user (question or parent answer’s author)
 	                Integer receiverId = null;
