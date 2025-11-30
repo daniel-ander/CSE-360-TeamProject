@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import Config.AppCache;
+import Database.Services.InstructorService;
+import Database.Services.UserService;
 import Database.Services.Interfaces.IAnswerService;
 import Database.Services.Interfaces.IUserService;
 import Exceptions.DBExceptions.DataAccessException;
@@ -214,16 +216,16 @@ public class PostDisplayViewModel {
 	public boolean isExpandButtonPressed() {
 		return isExpandedProperty.get();
 	}
-
-	// Properties that cannot be active at once
-	private List<BooleanProperty> nonConcurrentProperties() {
-		return new ArrayList<BooleanProperty>(List.of(isReviewingProperty, isCommentingProperty));
-	}
 	
 	public ObjectProperty<BigDecimal> getRatingProperty() {
 	    return ratingProperty;
 	}
 	
+	/**
+     * Builds rating from the UI Style, IE: 1-5 for stars
+     * Removes or Updates rating in the DB
+     * Sets the currentUserRatingProperty, upvoteCountProperty and ratingProperty
+     */
 	public BigDecimal getCurrentUserStarRating() {
  		BigDecimal starsToFillRating = getCurrentUserRating() != null ? currentUserRatingProperty.get() : ratingProperty.get();
 
@@ -246,6 +248,11 @@ public class PostDisplayViewModel {
 		 return post.getCreatedTimestamp().compareTo(post.getLastUpdatedTimestamp()) != 0;
 	}
 	
+	/**
+     * Gets the rating that should be displayed on the star system
+     * If the user has made a rating, it displays that, otherwise, displays
+     * The average from all the users
+     */
 	public BigDecimal getPostRatingToDisplay() {
 		BigDecimal currentUserRating =  getCurrentUserStarRating();
         BigDecimal postAverageRating = getRatingProperty().get().multiply(BigDecimal.valueOf(getNumberOfRatingStars()));
@@ -329,6 +336,11 @@ public class PostDisplayViewModel {
 	    ratingProperty.set(newRating);
 	}
 	
+	/**
+     * Builds rating from the UI Style, IE: 1-5 for stars
+     * Removes or Updates rating in the DB
+     * Sets the currentUserRatingProperty, upvoteCountProperty and ratingProperty
+     */
 	public void setCurrentUserRatingProperty(BigDecimal rating) {
 		currentUserRatingProperty.set(rating);
 	}
@@ -403,16 +415,27 @@ public class PostDisplayViewModel {
 	// CRUD
 	// ===================
 
+	/**
+     * Change UI isDeleted Property
+     * And returns with the callback to delete
+     */
 	public void deletePost() {
 		setIsDeletedProperty(!getIsDeletedProperty().get());
 		deleteCallback.accept(post.getId());
 	}
 
+	/**
+     * Change UI isToggled Property
+     * And returns with the expand callback
+     */
 	public void toggleExpand() {
 		setIsExpanded(!isExpandButtonPressed());
 		this.toggleExpandCallback.run();
 	}
 
+	/**
+     * Returns with the update callback
+     */
 	public void updatePost(String newTitle, String newBody) {
 		if (isQuestion()) {
 			updateCallBack.accept(post.getId(), newTitle, newBody);
@@ -422,6 +445,9 @@ public class PostDisplayViewModel {
 		}
 	}
 	
+	/**
+     * Returns with the add callback
+     */
 	public void addAnswer(String newTitleText, String newBodyText, IPost.Type answerType) {
 		IPost.Type currentPostType = post.getPostType();
 		
@@ -458,6 +484,10 @@ public class PostDisplayViewModel {
 	// HELPERS
 	// ===================
 	
+	/**
+     * Makes a DB request to toggle favored reviewer status
+     * And makes the UI change accordingly
+     */
 	public void toggleFavoredReviewerStatus(boolean newStatus) {
 		try {
 			userService.toggleIsFavoredReviewer(userSession.getCurrentUserId(), post.getAuthor().getId());
@@ -468,71 +498,23 @@ public class PostDisplayViewModel {
 		setIsFavoredReviewerProperty(newStatus);
 	}
 	
-	// Properties that cannot be active at the same time. 
-	// IE: Commenting and Reviewing windows cannot both be open at once
+	private List<BooleanProperty> nonConcurrentProperties() {
+		return new ArrayList<BooleanProperty>(List.of(isReviewingProperty, isCommentingProperty));
+	}
+	
+	/**
+     * Properties that cannot be active at the same time. 
+     * Commenting and Reviewing windows cannot both be open at once
+     */
 	private void resetNonConcurrentActions() {
 		nonConcurrentProperties().forEach(property -> {
 			property.set(false);
 		});
 	}
 	
-	//TODO: - Related to async update of rating
-	
-//	private AnswerRatingInfo applyRatingChange(
-//	        BigDecimal avg,
-//	        int count,
-//	        BigDecimal oldRating,
-//	        BigDecimal newRating)
-//	{
-//		System.out.println("Average: " + avg);
-//		System.out.println("Count: " + count);
-//	    BigDecimal total = avg.multiply(BigDecimal.valueOf(count));
-//
-//	    // Remove old rating
-//	    if (oldRating != null) {
-//	        total = total.subtract(oldRating);
-//	        count--;
-//	    }
-//
-//	    // Add new rating
-//	    if (newRating != null) {
-//	        total = total.add(newRating);
-//	        count++;
-//	    }
-//
-//	    if (count == 0) {
-//	        return new AnswerRatingInfo(BigDecimal.ZERO, 0);
-//	    }
-//
-//	    BigDecimal newAverage =
-//	        total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
-//
-//	    return new AnswerRatingInfo(newAverage, count);
-//	}
-
-	
-//	private void updateRatingInBackground(BigDecimal newRating, BigDecimal oldRating, int oldUpvoteCount, RatingUpdateType updateType) {
-//		Task<Void> updateTask = new Task<>() {
-//			@Override
-//			protected Void call() throws Exception {
-//				if(updateType == RatingUpdateType.DELETE) {
-//					answerService.removeRating(post.getId(), userSession.getCurrentUserId());
-//				} else {
-//					answerService.updateRating(post.getId(), userSession.getCurrentUserId(), newRating);
-//				}
-//				return null;
-//			}
-//
-//			@Override
-//			protected void failed() {
-//				currentUserRatingProperty.set(oldRating);
-//				upvoteCountProperty.set(oldUpvoteCount);
-//			}
-//		};
-//
-//		new Thread(updateTask).start();
-//	}
-	
+	/**
+     * Asyncronously load the average review score for reviewer
+     */
 	public void loadReviewerStatsAsync(int reviewerId) {
 	    Task<RatingStats> task = new Task<>() {
 	        @Override

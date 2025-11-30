@@ -40,7 +40,7 @@ public class Question implements IPost {
 			Timestamp createdTimestamp,
 			Timestamp lastUpdatedTimestamp, 
 			boolean answered, 
-			boolean resolved, 
+			boolean resolved,
 			boolean deleted, 
 			int upvoteCount
 	) {
