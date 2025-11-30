@@ -63,6 +63,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
     private final StackPane titleStackPane = new StackPane(titleLabel, titleTextField);
 
+    /**
+     * Constructs a new PostCell and initializes all UI components,
+     * listeners, bindings, and layout structure.
+     */
     public PostCell() {
         setInitialProperties();
         setInitialListeners();
@@ -86,6 +90,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         setGraphic(outerMostContainer);
     }
 
+    /**
+     * Updates the ListCell when the underlying PostDisplayViewModel changes.
+     *
+     * @param vm    the new view model for this cell
+     * @param empty whether the cell is empty
+     */
     @Override
     protected void updateItem(PostDisplayViewModel vm, boolean empty) {
         super.updateItem(vm, empty);
@@ -109,6 +119,8 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         
         if(currentVm.getPost().getAuthor().getRole() == Role.reviewer) {
         	Label viewStatsLabel = new Label("view reviewer stats");
+        	viewStatsLabel.setUnderline(true);
+        	
         	Tooltip statsTip = new Tooltip(vm.getReviewerStats() == null ? "null" : vm.getReviewerStats().getAverageRating().toString());
         	statsTip.textProperty().bind(Bindings.createStringBinding(() -> {
         	    RatingStats stats = vm.getReviewerStatsProperty().get();
@@ -176,6 +188,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         setGraphic(outerMostContainer);
     }
 
+    /**
+     * Applies CSS, colors, and conditional visual styling based on
+     * the post type and author role.
+     *
+     * @param vm the view model providing post metadata
+     */
     private void setStyles(PostDisplayViewModel vm) {
         layout.getStylesheets().add(
                 getClass().getResource("/Styles/styles.css").toExternalForm());
@@ -193,6 +211,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
     }
 
 
+    /**
+     * Populates all text-related UI fields (title, body, timestamps)
+     * based on the view model's data.
+     *
+     * @param vm the view model whose text fields should be displayed
+     */
     private void populateTextFields(PostDisplayViewModel vm) {
         titleTextField.clear();
         bodyTextField.clear();
@@ -247,6 +271,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         }
     }
 
+    /**
+     * Creates and inserts all action buttons (edit, delete, comment,
+     * review, expand/collapse) depending on the user's permissions.
+     *
+     * @param vm the view model providing permissions and handlers
+     */
     private void populateActionsContainer(PostDisplayViewModel vm) {
         actionsContainer.getChildren().clear();
 
@@ -334,7 +364,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         actionsContainer.getChildren().add(toggleExpandButton);
     }
 
-
+    /**
+     * Listener used to swap between editing and viewing modes for
+     * title and body text fields.
+     */
     private final ChangeListener<Boolean> editingListener = (_, _, isEditing) -> {
         if (currentVm == null) return;
 
@@ -349,15 +382,22 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         }
     };
 
-
+    /**
+     * Listener that adjusts the height of the body text field as its
+     * content changes.
+     */
     private final ChangeListener<String> bodyTextHeightChangeListener =
             (_, _, newText) -> {
                 Text text = new Text(newText);
                 text.setFont(bodyTextField.getFont());
                 double height = text.getLayoutBounds().getHeight() + 20;
                 bodyTextField.setPrefHeight(height);
-            };
-
+    };
+    
+    /**
+     * Initializes baseline control properties, layout behavior,
+     * and static configurations for UI components.
+     */
     private void setInitialProperties() {
         bodyTextField.setWrapText(true);
         bodyTextField.setPrefRowCount(1);
@@ -385,6 +425,12 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         bodyStackPane.setAlignment(Pos.CENTER_LEFT);
     }
 
+    /**
+     * Sets up change listeners that need to be attached only once
+     * during construction.
+     *
+     * @param vm the view model used to bind UI controls
+     */
     private void setUpBindings(PostDisplayViewModel vm) {
         newCommentTextField.visibleProperty().bind(vm.getIsCommentingProperty());
         newCommentTextField.managedProperty().bind(vm.getIsCommentingProperty());
@@ -405,10 +451,17 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         actionsContainer.getChildren().add(favorReviewerButton);
     }
 
+    /**
+     * Installs initial event listeners for text fields, such as
+     * automatic resizing behavior.
+     */
     private void setInitialListeners() {
         bodyTextField.textProperty().addListener(bodyTextHeightChangeListener);
     }
 
+    /**
+     * Creates the HBox with the invididual filles stars
+     */
     private HBox buildInteractiveStarRow(PostDisplayViewModel vm) {
         starsLayout.getChildren().clear();
         interactiveStars.clear();
@@ -442,6 +495,10 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         return starsLayout;
     }
 
+    /**
+     * Creates a stack pane with 3 layers - outline, filling, and button
+     * First two for dipslay and the button for proper onMouse effects
+     */
     private StackPane createInteractiveStar(
             Runnable onClick,
             int starIndex,
@@ -487,6 +544,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         return pane;
     }
 
+    /**
+     * Refreshes star fills
+     */
     private void refreshStarFills(PostDisplayViewModel vm) {
         if (interactiveStars.isEmpty()) return;
         
@@ -510,6 +570,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         }
     }
 
+    /**
+     * Applies the filling to the star polygon as a clip layer
+     */
     private void applyFillToStar(StackPane starStackPane, double fillFraction) {
         Polygon starFill = (Polygon) starStackPane.getChildren().get(1);
         Rectangle clip = (Rectangle) starFill.getClip();
@@ -522,7 +585,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
         clip.setHeight(lb.getHeight());
     }
 
-
+    /**
+     * Builds polygon in the form of a star
+     */
     private Polygon buildStarPolygon(double scale) {
         Polygon star = new Polygon();
         double[] points = new double[]{
