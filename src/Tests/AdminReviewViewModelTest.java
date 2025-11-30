@@ -44,7 +44,9 @@ public class AdminReviewViewModelTest {
 
         vm = new AdminReviewViewModel(userService, questionService, answerService, messageService);
     }
-
+    /*
+     * Test that loading all users populates the users list correctly.
+     */
     @Test
     public void loadAllUsers_populatesUsersList() {
         ObservableList<String> users = vm.getUsers();
@@ -52,7 +54,10 @@ public class AdminReviewViewModelTest {
         assertTrue(users.contains("alice"));
         assertTrue(users.contains("bob"));
     }
-
+    /*
+	 * Test that switching between users preserves their individual notes
+	 * and updates the visible staff notes list accordingly.
+	 */
     @Test
     public void switchingUsers_preservesPerUserNotes_and_updatesStaffNotesList() {
         vm.setSelectedUser("alice");
@@ -74,7 +79,10 @@ public class AdminReviewViewModelTest {
         assertTrue(restoredAlice.get(0).contains("Alice note"));
         assertFalse(restoredAlice.get(0).contains("Bob note"));
     }
-
+    /*
+	 * Test that removing a staff note affects only the current user's notes.
+	 */
+    
     @Test
     public void removeStaffNoteAt_removesFromCurrentUserStorage() {
         vm.setSelectedUser("alice");
@@ -88,7 +96,9 @@ public class AdminReviewViewModelTest {
         vm.setSelectedUser("alice");
         assertTrue(vm.getStaffNotes().isEmpty());
     }
-
+    /*
+	 * Test that clearing staff notes affects only the current user's notes.
+	 */
     @Test
     public void clearStaffNotes_clearsCurrentUserNotesOnly() {
         vm.setSelectedUser("alice");
@@ -107,6 +117,9 @@ public class AdminReviewViewModelTest {
         assertTrue(vm.getStaffNotes().isEmpty());
     }
 
+    /*
+     * Test that loading user data populates questions for the selected user.
+     */
     @Test
     public void loadUserData_populatesQuestionsForSelectedUser() {
         Question q = mock(Question.class);
@@ -121,7 +134,10 @@ public class AdminReviewViewModelTest {
         assertEquals(1, questions.size());
         assertSame(q, questions.get(0));
     }
-
+    
+	/*
+	 * Test that loading user data populates answers for the selected user.
+	 */
     @Test
     public void loadUserData_populatesAnswersForSelectedUser() {
         Answer a = mock(Answer.class);
@@ -139,6 +155,9 @@ public class AdminReviewViewModelTest {
         assertSame(a, answers.get(0));
     }
 
+    /*
+	 * Test that loading user data populates messages for the selected user using username API.
+	 */
     @Test
     public void loadUserData_populatesMessagesForSelectedUser_usingUsernameApi() {
         Message m = mock(Message.class);
@@ -152,6 +171,10 @@ public class AdminReviewViewModelTest {
         assertSame(m, messages.get(0));
     }
 
+    /*
+	 * Test that flagCurrentContent does not throw exceptions when called
+	 * with different content types, even if the implementation is commented out.
+	 */
     @Test
     public void flagCurrentContent_noExceptionWhenCommentedOut() {
         // ensure calling flagCurrentContent for different content types does not throw

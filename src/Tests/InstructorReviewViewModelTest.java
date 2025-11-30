@@ -44,6 +44,9 @@ public class InstructorReviewViewModelTest {
         vm = new InstructorReviewViewModel(userService, questionService, answerService, messageService);
     }
 
+    /*
+	 * Test that loading all users populates the users list correctly.
+	 */
     @Test
     public void loadAllUsers_populatesUsersList() {
         ObservableList<String> users = vm.getUsers();
@@ -52,6 +55,9 @@ public class InstructorReviewViewModelTest {
         assertTrue(users.contains("bob"));
     }
 
+    /*
+     * Test that switching between users preserves their individual notes
+     */
     @Test
     public void switchingUsers_preservesPerUserNotes_and_updatesStaffNotesList() {
         vm.setSelectedUser("alice");
@@ -73,7 +79,10 @@ public class InstructorReviewViewModelTest {
         assertTrue(restoredAlice.get(0).contains("Alice note"));
         assertFalse(restoredAlice.get(0).contains("Bob note"));
     }
-
+    /*
+	 * Test that removing a staff note works correctly for the current user
+	 * and does not affect other users' notes.
+	 */
     @Test
     public void removeStaffNoteAt_removesFromCurrentUserStorage() {
         vm.setSelectedUser("alice");
@@ -89,6 +98,9 @@ public class InstructorReviewViewModelTest {
         assertTrue(vm.getStaffNotes().isEmpty());
     }
 
+    /*
+	 * Test that clearing staff notes affects only the current user's notes.
+	 */
     @Test
     public void clearStaffNotes_clearsCurrentUserNotesOnly() {
         vm.setSelectedUser("alice");
@@ -106,7 +118,9 @@ public class InstructorReviewViewModelTest {
         vm.setSelectedUser("alice");
         assertTrue(vm.getStaffNotes().isEmpty());
     }
-
+    /*
+     * Test that loading user data populates questions for the selected user.
+     */
     @Test
     public void loadUserData_populatesQuestionsForSelectedUser() {
         Question q = mock(Question.class);
@@ -123,6 +137,9 @@ public class InstructorReviewViewModelTest {
         assertSame(q, questions.get(0));
     }
 
+    /*
+	 * Test that loading user data populates answers for the selected user.
+	 */
     @Test
     public void loadUserData_populatesAnswersForSelectedUser() {
         Answer a = mock(Answer.class);
@@ -137,7 +154,9 @@ public class InstructorReviewViewModelTest {
         assertEquals(1, answers.size());
         assertSame(a, answers.get(0));
     }
-
+	/*
+	 * Test that loading user data populates messages for the selected user.
+	 */
     @Test
     public void loadUserData_populatesMessagesForSelectedUser_usingUsernameApi() {
         Message m = mock(Message.class);
@@ -150,7 +169,10 @@ public class InstructorReviewViewModelTest {
         assertEquals(1, messages.size());
         assertSame(m, messages.get(0));
     }
-
+	/*
+	 * Test that flagging current content does not throw exceptions
+	 * when the content is a Question, Answer, or Message.
+	 */
     @Test
     public void flagCurrentContent_noExceptionWhenCommentedOut() {
         Question q = mock(Question.class);
