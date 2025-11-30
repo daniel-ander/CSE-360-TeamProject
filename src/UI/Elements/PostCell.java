@@ -489,14 +489,9 @@ public class PostCell extends ListCell<PostDisplayViewModel> {
 
     private void refreshStarFills(PostDisplayViewModel vm) {
         if (interactiveStars.isEmpty()) return;
-
-        BigDecimal currentUserRating =  vm.getCurrentUserStarRating();
-        BigDecimal postAverageRating = vm.getRatingProperty().get().multiply(BigDecimal.valueOf(vm.getNumberOfRatingStars()));
-        BigDecimal ratingToDisplay = (currentUserRating != BigDecimal.ZERO) ? currentUserRating
-        	       : (postAverageRating != BigDecimal.ZERO) ? postAverageRating
-        	    	       : BigDecimal.ZERO;;
+        
         int totalStars = vm.getNumberOfRatingStars();
-        double starsFilled = ratingToDisplay.doubleValue();
+        double starsFilled = vm.getPostRatingToDisplay().doubleValue();
 
         for (int i = 1; i <= totalStars; i++) {
             StackPane starStackPane = interactiveStars.get(i - 1);

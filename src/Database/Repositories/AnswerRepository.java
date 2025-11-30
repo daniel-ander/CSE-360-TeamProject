@@ -554,20 +554,6 @@ public class AnswerRepository implements IAnswerRepository {
 			    Rating.tableName,
 			    Answer.tableName
 			);
-	    
-//	    String reviewerStatsQuery = String.format(
-//		        "SELECT AVG(r.rating) AS avgRating, "
-//		      + "       COUNT(DISTINCT a.id) AS totalReviews "
-//		      + "FROM %s r "
-//		      + "JOIN %s a ON a.id = r.answerId "
-//		      + "JOIN %s u ON u.id = a.userId "
-//		      + "WHERE u.role = 'reviewer' "
-//		      + "  AND a.isReview = TRUE "
-//		      + "  AND u.id = ?",
-//		        Rating.tableName,
-//		        Answer.tableName,
-//		        User.tableName
-//		    );
 
 	    try (Connection connection = generalDBManager.getConnection();
 	         PreparedStatement pstmt = connection.prepareStatement(reviewerStatsQuery)) {
