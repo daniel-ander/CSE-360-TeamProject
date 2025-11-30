@@ -258,7 +258,7 @@ public class StaffHomePageController {
 	 * Formats a question for display.
 	 */
 	private String formatQuestion(Question q) {
-		return "Question by " + userService.getUserNameById(q.getAuthorId()) + "\n"
+		return "Question by " + userService.getUserNameById(q.getAuthor().getId()) + "\n"
 				+ "Posted: " + q.getCreatedTimestamp() + "\n\n"
 				+ q.getBodyText();
 	}
@@ -266,7 +266,7 @@ public class StaffHomePageController {
 	 * Formats an answer for display.
 	 */
 	private String formatAnswer(Answer a) {
-		return "Answer by " + a.getAuthorName() + "\n"
+		return "Answer by " + a.getAuthor().getUserName() + "\n"
 				+ "Posted: " + a.getCreatedTimestamp() + "\n\n"
 				+ a.getBodyText();
 	}

@@ -19,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test; 
 import org.mockito.Mockito;
 
+import Tests.Utils.*;
+
 import javafx.collections.ObservableList;
 
 import java.util.List;
@@ -151,7 +153,9 @@ public void clearStaffNotes_clearsCurrentUserNotesOnly() {
 public void loadUserData_populatesQuestionsForSelectedUser() {
     // create a mock question whose authorId maps to "alice"
     Question q = mock(Question.class);
-    when(q.getAuthorId()).thenReturn(1);
+    q.setAuthor(Utils.getUserDTOModel());
+    
+    when(q.getAuthor().getId()).thenReturn(1);
     when(mockUserService.getUserNameById(1)).thenReturn("alice");
     when(mockQuestionService.getAllQuestions()).thenReturn(List.of(q));
 
@@ -168,7 +172,9 @@ public void loadUserData_populatesQuestionsForSelectedUser() {
 public void loadUserData_populatesAnswersForSelectedUser() {
     // create a mock answer with authorName "alice"
     Answer a = mock(Answer.class);
-    when(a.getAuthorName()).thenReturn("alice");
+    a.setAuthor(Utils.getUserDTOModel());
+    
+    when(a.getAuthor().getUserName()).thenReturn("alice");
     when(mockAnswerService.getAllAnswers()).thenReturn(List.of(a));
 
     vm.setSelectedUser("alice");

@@ -215,9 +215,6 @@ public class GeneralDBManager implements IGeneralDBManager {
 			  + "UNIQUE (userId, answerId))",
 			    ratingTableName, userTableName, answerTableName
 		);
-
-		
-			);
 		
 		String adminRequestsTableQuery =
 			    "CREATE TABLE IF NOT EXISTS admin_requests ("

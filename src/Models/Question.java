@@ -112,6 +112,7 @@ public class Question implements IPost {
 	public void setResolved(boolean resolvedStatus) {isResolved = resolvedStatus;}
 	public void setAnswered(boolean answeredStatus) {isAnswered = answeredStatus;}
 	public void setDeleted(boolean deletedStatus) {isDeleted = deletedStatus;}
+	public void setAuthor(UserDTO author) {this.author = author;}
 	public void setTitle(String newTitle) { this.title = newTitle; }
 	public void setUpvoteCount(int newCount) { this.upvoteCount = newCount; }
 	
