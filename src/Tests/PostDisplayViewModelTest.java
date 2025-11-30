@@ -53,6 +53,8 @@ public class PostDisplayViewModelTest {
         answerService = mock(IAnswerService.class);
         userSession = mock(UserSession.class);
         sharedForumState = mock(SharedForumState.class);
+        deleteCallback = mock(Consumer.class);
+        addCallback = mock(Consumer.class);
 
         toggleExpandCallback = mock(Runnable.class);
 
